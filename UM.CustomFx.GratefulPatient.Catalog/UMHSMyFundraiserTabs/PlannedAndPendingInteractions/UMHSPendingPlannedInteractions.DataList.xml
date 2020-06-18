@@ -1,0 +1,227 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="5d630dd0-b1b8-4b37-8450-6fb80b797016" 
+	Name="MIMED Pending Planned Interactions"
+	Description="A data list showing MIMED pending planned interactions records." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.CustomFx.Prospects.Catalog.dll" ClassName="Interactions.PendingAndCompletedInteractionsList.Extension.DataList.xml" />
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSPENDINGPLANNEDINTERACTIONS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+CREATE PROCEDURE [DBO].[USR_UM_USP_DATALIST_UMHSPENDINGPLANNEDINTERACTIONS] (
+  @CONSTITUENTID    UNIQUEIDENTIFIER,
+  @DATEFILTER       TINYINT = 0,
+  @STARTDATE        DATETIME = NULL,
+  @ENDDATE          DATETIME = NULL,
+  @TYPEFILTER       UNIQUEIDENTIFIER = NULL,
+  @CURRENTAPPUSERID UNIQUEIDENTIFIER = NULL,
+  @SITESSELECTED    XML = NULL,
+  @STATUS           NVARCHAR(50) = NULL
+)
+AS
+  BEGIN
+      SET NOCOUNT ON;
+
+      DECLARE @DATE DATETIME = GETDATE();
+
+      IF @DATEFILTER = 0 -- all
+        BEGIN
+            SET @STARTDATE = NULL;
+            SET @ENDDATE = NULL;
+        END
+
+      IF @DATEFILTER = 1 -- this year
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_THISCALENDARYEAR_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_THISCALENDARYEAR_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 2 -- this quarter
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_THISQUARTER_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_THISQUARTER_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 3 -- this month
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_THISMONTH_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_THISMONTH_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 4 -- this week
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_THISWEEK_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_THISWEEK_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 5 -- next week
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_NEXTWEEK_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_NEXTWEEK_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 6 -- next month
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_NEXTMONTH_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_NEXTMONTH_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 7 -- next quarter
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_NEXTQUARTER_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_NEXTQUARTER_LASTDAY(@DATE, 0);
+        END
+
+      IF @DATEFILTER = 8 -- next year
+        BEGIN
+            SET @STARTDATE = DBO.UFN_DATE_NEXTCALENDARYEAR_FIRSTDAY(@DATE, 0);
+            SET @ENDDATE = DBO.UFN_DATE_NEXTCALENDARYEAR_LASTDAY(@DATE, 0);
+        END;
+
+      --DECLARE @PENDINGID nvarchar(10);
+      --SET @PENDINGID = 'Pending';
+      --DECLARE @PLANNEDID uniqueidentifier
+      --SET @PLANNEDID = (SELECT ID FROM USR_INTERACTION_STATUSCODE WHERE ltrim(rtrim(DESCRIPTION)) = 'Planned');
+      --Declare @CONSTITUENTID uniqueidentifier = null;
+      --SET @CONSTITUENTID = (SELECT FUNDRAISERID FROM USR_UMHS_INTERACTION where UMHSID = @UMHSID);
+      WITH INTERACTION_CTE
+           AS (SELECT INTERACTION.ID,
+                      INTERACTION.DATE,
+                      UIS.DESCRIPTION                                          AS STATUS,
+                      INTERACTION.UMHSID,
+                      INTERACTION.FUNDRAISERID                                 AS OWNERID,
+                      INTERACTION.SUMMARY                                      AS OBJECTIVE,
+                      INTERACTION.CONTACTMETHODCODEID,
+                      INTERACTIONTYPECODE.[DESCRIPTION]                        AS INTERACTIONTYPE,
+                      DBO.USR_UFN_UMHS_INTERACTION_GETSITELIST(INTERACTION.ID) AS SITES,
+                      INTERACTION.STARTTIME,
+                      INTERACTION.ENDTIME,
+                      INTERACTION.TIMEZONEENTRYID
+                FROM  DBO.USR_UMHS_INTERACTION INTERACTION
+				              LEFT JOIN DBO.USR_UMHS_INTERACTIONPARTICIPANT IP ON IP.INTERACTIONID = INTERACTION.ID
+                      LEFT JOIN DBO.INTERACTIONTYPECODE ON INTERACTIONTYPECODE.ID = INTERACTION.CONTACTMETHODCODEID
+                      LEFT JOIN DBO.USR_INTERACTION_STATUSCODE UIS ON UIS.ID = INTERACTION.STATUSCODEID
+                WHERE (INTERACTION.FUNDRAISERID = @CONSTITUENTID OR IP.CONSTITUENTID = @CONSTITUENTID) AND ( UIS.DESCRIPTION in ('Pending','Planned'))
+      )
+      SELECT distinct I.ID,
+             FC2.FIRSTNAME + ' ' + FC2.KEYNAME AS NAME,
+             FC2.CONSTITUENTID as CONID,
+             --FC2.FIRSTNAME,
+             --FC2.KEYNAME,
+             I.DATE,
+             I.STATUS,
+             I.UMHSID,
+             FC.NAME                   OWNER,
+             I.OWNERID,
+             I.OBJECTIVE,
+             I.INTERACTIONTYPE,
+             I.SITES,
+             I.STARTTIME,
+             I.ENDTIME,
+             TIMEZONEENTRY.DISPLAYNAME TIMEZONE
+      FROM   INTERACTION_CTE I
+             LEFT OUTER JOIN DBO.CONSTITUENT FC ON FC.ID = I.OWNERID
+             LEFT OUTER JOIN DBO.USR_UMHS_DATA FC2 ON FC2.ID = I.UMHSID
+             LEFT OUTER JOIN DBO.TIMEZONEENTRY ON I.TIMEZONEENTRYID = TIMEZONEENTRY.ID
+      WHERE  ( ISNULL(@DATEFILTER, 0) = 0
+                OR I.DATE BETWEEN @STARTDATE AND @ENDDATE )
+             AND ( @TYPEFILTER IS NULL
+                    OR I.CONTACTMETHODCODEID = @TYPEFILTER )
+      ORDER  BY I.DATE;
+  END 
+
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+  <Context ContextRecordType="Constituent" RecordIDParameter="ConstituentID" />
+  <Parameters>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="SITESSELECTED" DataType="XML" Hidden="true" AvailableToClient="false">
+          <Collection>
+            <Fields>
+              <FormField FieldID="SITEID" DataType="Guid" Caption="Site ID" CaptionResourceKey="$$site_id" />
+            </Fields>
+          </Collection>
+        </FormField>
+        <FormField FieldID="TYPEFILTER" DataType="Guid" Caption="Contact method" CaptionResourceKey="$$contact_method">
+          <CodeTable CodeTableName="INTERACTIONTYPECODE" />
+        </FormField>
+        <FormField FieldID="DATEFILTER" DataType="TinyInt" Caption="Date" DefaultValueText="0" CaptionResourceKey="$$date">
+          <ValueList>
+            <Items>
+              <Item>
+                <Value>0</Value>
+                <Label>All</Label>
+              </Item>
+              <Item>
+                <Value>1</Value>
+                <Label>This year</Label>
+              </Item>
+              <Item>
+                <Value>2</Value>
+                <Label>This quarter</Label>
+              </Item>
+              <Item>
+                <Value>3</Value>
+                <Label>This month</Label>
+              </Item>
+              <Item>
+                <Value>4</Value>
+                <Label>This week</Label>
+              </Item>
+              <Item>
+                <Value>5</Value>
+                <Label>Next week</Label>
+              </Item>
+              <Item>
+                <Value>6</Value>
+                <Label>Next month</Label>
+              </Item>
+              <Item>
+                <Value>7</Value>
+                <Label>Next quarter</Label>
+              </Item>
+              <Item>
+                <Value>8</Value>
+                <Label>Next year</Label>
+              </Item>
+            </Items>
+          </ValueList>
+        </FormField>
+        <FormField FieldID="STARTDATE" DataType="Date" Hidden="true" Caption="Start date" CaptionResourceKey="$$start_date" />
+        <FormField FieldID="ENDDATE" DataType="Date" Hidden="true" Caption="End date" CaptionResourceKey="$$end_date" />
+        <FormField FieldID="STATUS" Hidden="true" MaxLength="50" Caption="Status" CaptionResourceKey="$$status" />
+      </FormFields>
+      <FormUIComponent FormUIComponentType="CustomComponent">
+        <CustomComponentID AssemblyName="Blackbaud.CustomFx.Constituent.Client.dll" ClassName="Blackbaud.CustomFx.Constituent.Client.InteractionFilter" />
+      </FormUIComponent>
+    </FormMetaData>
+  </Parameters>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="NAME" Caption="Name" DataType="String" CaptionResourceKey="$$_name" />
+      <OutputField FieldID="CONID" Caption="CONSTID" IsHidden="true" DataType="Guid" />
+      <!--<OutputField FieldID="FIRSTNAME" Caption="First name" DataType="String" CaptionResourceKey="$$first_name" />
+      <OutputField FieldID="KEYNAME" Caption="Last name" DataType="String" CaptionResourceKey="$$last_name"  />-->
+      <OutputField FieldID="DATE" Caption="Date" DataType="Date" CaptionResourceKey="$$date"  />
+      <OutputField FieldID="STATUS" Caption="Status" DataType="String" CaptionResourceKey="$$status"  />
+      <OutputField FieldID="UMHSID" Caption="MIMED ID" IsHidden="true" DataType="Guid" CaptionResourceKey="umhsid"  />
+      <OutputField FieldID="OWNER" Caption="Owner" DataType="String" CaptionResourceKey="$$owner" />
+      <OutputField FieldID="OWNERID" Caption="Owner ID" IsHidden="true" DataType="Guid"  />
+      <OutputField FieldID="OBJECTIVE" Caption="Summary" DataType="String" CaptionResourceKey="$$summary"  />
+      <OutputField FieldID="TYPE" Caption="Contact method" DataType="String" CaptionResourceKey="$$contact_method" />
+      <OutputField FieldID="SITES" Caption="Sites" DataType="String" CaptionResourceKey="$$Sites" />
+      <OutputField FieldID="STARTTIME" Caption="Start time" IsHidden="true" DataType="HourMinute" CaptionResourceKey="$$start_time" />
+      <OutputField FieldID="ENDTIME" Caption="End time" IsHidden="true" DataType="HourMinute" CaptionResourceKey="$$end_time" />
+      <OutputField FieldID="TIMEZONE" Caption="Time zone" IsHidden="true" DataType="String" CaptionResourceKey="$$time_zone" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

@@ -1,0 +1,29 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="98275904-ca6c-43fa-a89e-0ad137894268"
+	Name="USR_UFN_UMHS_NAMEFORMAT_FROMID"
+	Description="Function to call the function USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL for name formats for Relationship"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_NAMEFORMAT_FROMID"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+      CREATE function dbo.USR_UFN_UMHS_NAMEFORMAT_FROMID
+			(
+				@NAMEFORMATFUNCTIONID uniqueidentifier,
+				@UMHSID uniqueidentifier
+			) 
+			returns nvarchar(700)
+			with execute as caller
+			as begin
+				declare @NAME nvarchar(700);				
+				select @NAME = dbo.USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL(@NAMEFORMATFUNCTIONID, @UMHSID, 0);				
+				return @NAME;
+			end;
+		
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

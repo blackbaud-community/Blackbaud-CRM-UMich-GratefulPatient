@@ -1,0 +1,12 @@
+﻿<ConfigurationDataSpec
+	xmlns="bb_appfx_configurationdata"
+	ID="cf2ac6e3-87c2-4bb7-a01d-e0a8eeb5a512"
+	Name="UMHSAffiliationCategory"
+	Description="Defines the process used to import and export MIMED affiliationcategory records"
+	Author="UM Dev"
+	ConfigurationDataFolder="UM Configurations"
+	DisplayName="MIMED Affiliation Category"
+	IncludeChildTables="true"
+	ParentTableName="USR_UMHS_AFFILIATIONBASE"
+	>
+</ConfigurationDataSpec>

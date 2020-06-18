@@ -1,0 +1,159 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ec1063ee-4c61-486f-96c7-f43f95353464"
+	Name="MIMED Address Query"
+	Description="A view defined for querying on MIMED address records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSADDRESS">
+		<ViewSQL>
+			<![CDATA[
+      SELECT A.ID,
+             UMHSID,
+             ISPRIMARY,
+             DONOTMAIL,
+             DNMRC.DESCRIPTION      DONOTMAILREASON,
+             ATC.DESCRIPTION        ADDRESSTYPE,
+             A.DESCRIPTION          ADDRESSDESCRIPTION,
+             ADDRESSBLOCK,
+             CITY,
+             POSTCODE,
+             STATE.DESCRIPTION           STATEID_TRANSLATION,
+             STATE.ABBREVIATION          STATEID_ABBREVIATION,
+             COUNTRY.DESCRIPTION         COUNTRYID_TRANSLATION,
+             COUNTRY.ABBREVIATION        COUNTRYID_ABBREVIATION,
+             A.SEQUENCE,
+             HISTORICALSTARTDATE,
+             HISTORICALENDDATE,
+             INFOSOURCE.DESCRIPTION      INFOSOURCE_DESCRIPTION,
+             INFOSOURCECOMMENTS,
+             ISCONFIDENTIAL,
+             [ADDEDBY].APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             [ADDEDBY].USERNAME          AS ADDEDBY_USERNAME,
+             [CHANGEDBY].APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             [CHANGEDBY].USERNAME        AS CHANGEDBY_USERNAME,
+             A.DATEADDED,
+             A.DATECHANGED,
+             DONOTMAILREASONCODEID,
+             ADDRESSTYPECODEID,
+             INFOSOURCECODEID,
+             A.COUNTRYID,
+             A.STATEID
+      FROM   DBO.USR_UMHS_ADDRESS A
+             LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON [ADDEDBY].ID = A.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON [CHANGEDBY].ID = A.CHANGEDBYID
+             LEFT JOIN COUNTRY ON COUNTRY.ID = A.COUNTRYID
+             LEFT JOIN STATE ON STATE.ID = A.STATEID
+             LEFT JOIN DONOTMAILREASONCODE DNMRC ON DNMRC.ID = A.DONOTMAILREASONCODEID
+             LEFT JOIN INFOSOURCECODE INFOSOURCE ON INFOSOURCE.ID = A.INFOSOURCECODEID
+             LEFT JOIN ADDRESSTYPECODE ATC ON ATC.ID = A.ADDRESSTYPECODEID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+			<OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="MIMED ID" Category="System Fields" Name="UMHSID" />
+      <OutputField Name="ISPRIMARY" Caption="Is primary" DataType="Boolean"/>
+      <OutputField Name="DONOTMAIL" Caption="Do not mail" DataType="Boolean"/>
+      <OutputField Name="DONOTMAILREASON" Caption="Do not mail reason" DataType="String">
+        <LookupInfo IDField="DONOTMAILREASONCODEID">
+          <CodeTable CodeTableName="DONOTMAILREASONCODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADDRESSTYPE" Caption="Address type" DataType="String">
+        <LookupInfo IDField="ADDRESSTYPECODEID">
+          <CodeTable CodeTableName="ADDRESSTYPECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADDRESSDESCRIPTION" Caption="Address description" DataType="String"/>
+      <OutputField Name="ADDRESSBLOCK" Caption="Address block" DataType="String"/>
+      <OutputField Name="CITY" Caption="City" DataType="String"/>
+      <OutputField Name="POSTCODE" Caption="Post code" DataType="String"/>
+      <OutputField Caption="State" Name="STATEID_TRANSLATION" CaptionResourceKey="$$state">
+        <LookupInfo IDField="STATEID">
+          <SimpleDataList SimpleDataListID="B46D36D1-D3ED-4f6e-91DA-89B6C88CA0C6">
+            <Params xmlns="bb_appfx_commontypes">
+              <Param ID="INCLUDEINACTIVE">
+                <Value>1</Value>
+              </Param>
+              <Param ID="USEDEFAULTCOUNTRY">
+                <Value>0</Value>
+              </Param>
+            </Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="State abbreviation" Name="STATEID_ABBREVIATION" CaptionResourceKey="$$state_abbreviation">
+        <LookupInfo IDField="STATEID">
+          <SimpleDataList SimpleDataListID="7FA91401-596C-4f7c-936D-6E41683121D7">
+            <Params xmlns="bb_appfx_commontypes">
+              <Param ID="INCLUDEINACTIVE">
+                <Value>1</Value>
+              </Param>
+              <Param ID="USEDEFAULTCOUNTRY">
+                <Value>0</Value>
+              </Param>
+            </Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Country" Name="COUNTRYID_TRANSLATION">
+        <LookupInfo IDField="COUNTRYID">
+          <SimpleDataList SimpleDataListID="C9649672-353D-42E8-8C25-4D34BBABFBBA">
+            <Params xmlns="bb_appfx_commontypes">
+              <Param ID="INCLUDEINACTIVE">
+                <Value>1</Value>
+              </Param>
+            </Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Country abbreviation" Name="COUNTRYID_ABBREVIATION" CaptionResourceKey="$$country_abbreviation">
+        <LookupInfo IDField="COUNTRYID">
+          <SimpleDataList SimpleDataListID="0D730B19-FA6C-41d3-9C71-70906C5DCE5A">
+            <Params xmlns="bb_appfx_commontypes">
+              <Param ID="INCLUDEINACTIVE">
+                <Value>1</Value>
+              </Param>
+            </Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>      
+      <OutputField Name="SEQUENCE" Caption="Sequence" DataType="Integer"/>
+      <OutputField Name="HISTORICALSTARTDATE" Caption="Start date" DataType="Date"/>
+      <OutputField Name="HISTORICALENDDATE" Caption="End date" DataType="Date"/>
+      <OutputField Name="INFOSOURCE_DESCRIPTION" Caption="Information source" DataType="String">
+        <LookupInfo IDField="INFOSOURCECODEID">
+          <CodeTable CodeTableName="INFOSOURCECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="INFOSOURCECOMMENTS" Caption="Information source comments" DataType="String"/>
+      <OutputField Name="ISCONFIDENTIAL" Caption="Is confidential" DataType="Boolean"/>
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+      <OutputField Caption="DONOTMAILREASONCODEID" Name="DONOTMAILREASONCODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="ADDRESSTYPECODEID" Name="ADDRESSTYPECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="INFOSOURCECODEID" Name="INFOSOURCECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="COUNTRYID" Name="COUNTRYID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="STATEID" Name="STATEID" DataType="Guid" IsHidden="true" />
+    </OutputFields>
+	</Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Address"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

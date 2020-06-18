@@ -1,0 +1,14 @@
+﻿<PackageSpec 
+	xmlns="bb_appfx_package"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="4b9a464d-623d-4b98-b203-fe367c0149af" 
+	Name="GratefulPatient.Package.CSR_1599_pebigler"
+	Description="GP Import Providers: Time getting truncated on the LAST_PROC_DATE field (DAR2-185)" 
+	Author="UM Dev"
+	>
+
+	<DependencyList xmlns="bb_appfx_commontypes">
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.Providers.xml" />
+  </DependencyList>
+
+</PackageSpec>

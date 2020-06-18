@@ -1,0 +1,557 @@
+<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="f9225388-f9db-409b-a4d7-a68e6968cdc9"
+    Name="MIMED Constituent Search"
+    Description="A search list for locating MIMED data constituent records"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="85dc28ea-ec58-4648-be80-196f8d635728"
+    QuickFindCriteriaFieldID=""
+    >
+	<SPSearchList SPName="USR_USP_SEARCHLIST_CONSTITUENT_UMHSDATA">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+      CREATE PROCEDURE DBO.USR_USP_SEARCHLIST_CONSTITUENT_UMHSDATA
+      (  
+	      @FIRSTNAME     NVARCHAR(50) = NULL,
+        @LASTNAME      NVARCHAR(100) = NULL,
+        @UMHSDATA      NVARCHAR(3) = null,
+        @CONSTITUENTTYPE NVARCHAR(50) = null,
+        @MIDDLENAME    NVARCHAR(50) = NULL,
+        @MRN           NVARCHAR(50) = NULL,
+        @CPISEQUENCE   NVARCHAR(50) = NULL,
+        @LOOKUPID      NVARCHAR(40) = NULL,
+        @EMAILADDRESS  NVARCHAR(150) = NULL,
+        @ADDRESSBLOCK  NVARCHAR(100) = NULL,
+        @CITY          NVARCHAR(100) = NULL, --'rochester',
+        @POSTCODE       NVARCHAR(20) = NULL,
+        @PHONENUMBER   NVARCHAR(10) = NULL,
+        @GENDERCODE    INT = NULL,
+        @BIRTHDATE     UDT_FUZZYDATE = NULL,
+        @STATECODEID   UNIQUEIDENTIFIER = NULL, 
+        @SUFFIXCODEID  UNIQUEIDENTIFIER = NULL,
+        @COUNTRYCODEID UNIQUEIDENTIFIER = NULL,
+        @INCLUDEINACTIVE bit=0,
+        @INCLUDEDECEASED bit =0,
+        @ONLYPRIMARYADDRESS bit=0,
+        @EXACTMATCHONLY bit=0,
+        @CHECKNICKNAME bit =0,
+        @CHECKALIASES bit = 0,
+        @CLASSOF int = null,
+        @PRIMARYBUSINESS bit=0,
+        @CHECKMERGEDCONSTITUENTS bit = 0,
+        @MINIMUMDATE DATE = null,
+        @EXCLUDECUSTOMGROUPS bit =0,
+        @EXCLUDEHOUSEHOLDS bit = 0,
+        @INCLUDEINDIVIDUALS bit = 0,
+        @INCLUDEORGANIZATIONS bit =0,
+        @INCLUDEGROUPS bit =0,
+        @CHECKALTERNATELOOKUPIDS bit = 0,
+        @FUZZYSEARCHONNAME bit = 0,
+        @INCLUDENONCONSTITUENTRECORDS bit = 0,
+        @PATIENTSONLY bit = 0,
+        @PROSPECTMANAGERID UNIQUEIDENTIFIER = NULL,
+        @CONSTITUENCY UNIQUEIDENTIFIER = NULL,
+        @SOURCECODE NVARCHAR(50) = NULL,
+        @SCU NVARCHAR(50) = NULL,
+        @ISMATCHINGORG bit = 0,
+        @MATCHINGORGNAME NVARCHAR(100) = NULL,
+        @MAXROWS       SMALLINT = 100
+)
+
+as
+BEGIN
+
+declare @CANDIDATE table
+(
+  CONSTITUENTID uniqueidentifier,
+  ADDRESSID uniqueidentifier,
+  EMAILADDRESSID uniqueidentifier,
+  PHONEID uniqueidentifier,
+  MATCHPERCENTAGE numeric(5, 2),
+  LOOKUPIDTYPE nvarchar(100),
+  LOOKUPID nvarchar(100),
+  STREETNUMBERRESULT tinyint,
+  STREETNAMERESULT tinyint,
+  POSTCODERESULT tinyint            
+)
+
+SET @FIRSTNAME = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@FIRSTNAME, 0, NULL);
+SET @LASTNAME = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@LASTNAME, 0, NULL);
+SET @MIDDLENAME = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@MIDDLENAME, 0, NULL);
+SET @MRN = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@MRN, 0, NULL);
+SET @CPISEQUENCE = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@CPISEQUENCE, 0, NULL);
+SET @EMAILADDRESS = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@EMAILADDRESS, 0, NULL);
+SET @ADDRESSBLOCK = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@ADDRESSBLOCK, 0, NULL);
+SET @CITY = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@CITY, 0, NULL);
+SET @POSTCODE = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@POSTCODE, 0, NULL);
+SET @PHONENUMBER = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@PHONENUMBER, 0, NULL);
+SET @SCU = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@SCU, 0, NULL);
+SET @LOOKUPID = DBO.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@LOOKUPID, 0, NULL);
+
+IF @CLASSOF = 0 
+  SET @CLASSOF = NULL
+
+--@CONSTITUENTTYPE int = null,
+--@ONLYPRIMARYADDRESS bit=0,
+--@EXACTMATCHONLY bit=0,
+
+--@CLASSOF int = null,
+
+--@PRIMARYBUSINESS bit=0,
+--@CHECKMERGEDCONSTITUENTS bit = 0,
+
+--@MINIMUMDATE DATE = null,
+
+--@EXCLUDECUSTOMGROUPS bit =0,
+--@EXCLUDEHOUSEHOLDS bit = 0,
+
+--@CHECKALTERNATELOOKUPIDS bit = 0,
+
+--@FUZZYSEARCHONNAME bit = 0,
+--@INCLUDENONCONSTITUENTRECORDS bit = 0,
+
+DECLARE @SEARCHTABLE TABLE (
+  CONSTITUENTID UNIQUEIDENTIFIER,
+  LASTNAME      NVARCHAR(100),
+  FIRSTNAME     NVARCHAR(100)
+)
+
+if @CHECKALTERNATELOOKUPIDS = 1
+  INSERT INTO @SEARCHTABLE
+  SELECT C.ID,
+         C.KEYNAME,
+         C.FIRSTNAME
+  FROM   CONSTITUENT C
+         JOIN ALTERNATELOOKUPID A ON a.CONSTITUENTID = c.ID
+  WHERE ( A.ALTERNATELOOKUPID = @LOOKUPID )
+
+--UPDATE THE REST OF THE SEARCH RESULTS
+INSERT INTO @SEARCHTABLE
+SELECT  distinct TOP(@MAXROWS)
+	    PATIENT.CONSTITUENTID,
+        PATIENT.FIRSTNAME,
+        PATIENT.KEYNAME
+FROM   USR_UMHS_DATA PATIENT
+	   JOIN CONSTITUENT C ON C.ID = PATIENT.CONSTITUENTID
+	   LEFT JOIN ALIAS ON ALIAS.CONSTITUENTID = C.ID
+       LEFT JOIN USR_UMHS_ADDRESS UA ON UA.UMHSID = PATIENT.ID -- AND UA.ISCONFIDENTIAL = 1
+       LEFT JOIN STATE S2 ON S2.ID = UA.STATEID
+       LEFT JOIN COUNTRY UCOUNTRY ON UCOUNTRY.ID = UA.COUNTRYID
+       LEFT JOIN USR_UMHS_EMAILADDRESS UE ON UE.UMHSID = PATIENT.ID AND UE.ISPRIMARY = 1
+       LEFT JOIN USR_UMHS_PHONE UP ON UP.UMHSID  = PATIENT.ID AND UP.ISPRIMARY = 1
+		LEFT JOIN DBO.EDUCATIONALHISTORY WITH (NOLOCK) ON EDUCATIONALHISTORY.CONSTITUENTID = C.ID and EDUCATIONALHISTORY.ISPRIMARYRECORD = 1 
+		LEFT JOIN DBO.EDUCATIONALINSTITUTION WITH (NOLOCK) ON EDUCATIONALINSTITUTION.ID = EDUCATIONALHISTORY.EDUCATIONALINSTITUTIONID AND EDUCATIONALINSTITUTION.ISAFFILIATED = 1
+		LEFT OUTER JOIN DBO.UFN_EDUCATIONALINVOLVEMENT_GETLIST() AS I ON I.CONSTITUENTID = C.ID LEFT OUTER JOIN USR_EDUCATIONALINVOLVEMENT UEI ON I.ID = UEI.ID
+		LEFT OUTER JOIN EDUCATIONADDITIONALINFORMATION EAIPRIMARY ON EDUCATIONALHISTORY.ID = EAIPRIMARY.EDUCATIONALHISTORYID
+		LEFT OUTER JOIN EDUCATIONALCOLLEGECODE SCU ON SCU.ID = EAIPRIMARY.EDUCATIONALCOLLEGECODEID 
+WHERE
+  (( PATIENT.KEYNAME LIKE @LASTNAME OR @LASTNAME IS NULL ) OR (@CHECKALIASES = 1 AND ALIAS.KEYNAME LIKE @LASTNAME))
+  AND ( PATIENT.MIDDLENAME LIKE @MIDDLENAME OR @MIDDLENAME IS NULL )
+  AND (( PATIENT.FIRSTNAME LIKE @FIRSTNAME OR @FIRSTNAME IS NULL ) OR (@CHECKNICKNAME = 1 AND C.NICKNAME LIKE @FIRSTNAME))
+  AND ( UA.ADDRESSBLOCK LIKE @ADDRESSBLOCK OR @ADDRESSBLOCK IS NULL )
+  AND ( UA.CITY LIKE @CITY OR @CITY IS NULL )
+  AND ( UE.EMAILADDRESS LIKE @EMAILADDRESS OR @EMAILADDRESS IS NULL )
+  AND ( PATIENT.GENDERCODE = @GENDERCODE OR @GENDERCODE IS NULL )
+  AND ( PATIENT.SUFFIXCODEID = @SUFFIXCODEID OR @SUFFIXCODEID IS NULL )
+  AND ( UA.STATEID = @STATECODEID OR @STATECODEID IS NULL )
+  AND ( UA.COUNTRYID = @COUNTRYCODEID OR @COUNTRYCODEID IS NULL )
+  AND ( PATIENT.MRN LIKE @MRN OR @MRN IS NULL )
+  AND ( PATIENT.CPISEQUENCE LIKE @CPISEQUENCE OR @CPISEQUENCE IS NULL )
+  AND ( C.LOOKUPID like @LOOKUPID or @LOOKUPID IS NULL )
+  AND ( PATIENT.BIRTHDATE like @BIRTHDATE or @BIRTHDATE IS NULL )
+  AND ( SCU.DESCRIPTION LIKE @SCU OR @SCU IS NULL)
+  AND ((EDUCATIONALHISTORY.CLASSOF = @CLASSOF OR @CLASSOF IS NULL))
+
+UNION
+SELECT distinct TOP(@MAXROWS) C.ID,
+       C.FIRSTNAME,
+       C.KEYNAME
+FROM   CONSTITUENT C
+       --LEFT JOIN USR_UMHS_DATA PATIENT ON PATIENT.CONSTITUENTID = C.ID
+	   LEFT JOIN ALIAS ON ALIAS.CONSTITUENTID = C.ID
+       LEFT JOIN ADDRESS A ON A.CONSTITUENTID = C.ID AND A.ISPRIMARY in (@ONLYPRIMARYADDRESS,1)
+       LEFT JOIN STATE S ON S.ID = A.STATEID
+	   LEFT JOIN COUNTRY ON COUNTRY.ID = A.COUNTRYID
+       LEFT JOIN EMAILADDRESS E ON E.CONSTITUENTID = C.ID AND E.ISPRIMARY     = 1
+       LEFT JOIN PHONE P ON P.CONSTITUENTID = C.ID AND P.ISPRIMARY     = 1
+	   LEFT JOIN DBO.EDUCATIONALHISTORY WITH (NOLOCK) ON EDUCATIONALHISTORY.CONSTITUENTID = C.ID and EDUCATIONALHISTORY.ISPRIMARYRECORD = 1 
+	   LEFT JOIN DBO.EDUCATIONALINSTITUTION WITH (NOLOCK) ON EDUCATIONALINSTITUTION.ID = EDUCATIONALHISTORY.EDUCATIONALINSTITUTIONID AND EDUCATIONALINSTITUTION.ISAFFILIATED = 1
+	   LEFT JOIN DBO.UFN_EDUCATIONALINVOLVEMENT_GETLIST() AS I ON I.CONSTITUENTID = C.ID LEFT OUTER JOIN USR_EDUCATIONALINVOLVEMENT UEI ON I.ID = UEI.ID
+	   LEFT JOIN EDUCATIONADDITIONALINFORMATION EAIPRIMARY ON EDUCATIONALHISTORY.ID = EAIPRIMARY.EDUCATIONALHISTORYID
+	   LEFT JOIN EDUCATIONALCOLLEGECODE SCU ON SCU.ID = EAIPRIMARY.EDUCATIONALCOLLEGECODEID 
+WHERE
+  (( C.KEYNAME LIKE @LASTNAME OR @LASTNAME IS NULL ) or (@CHECKALIASES = 1 and ALIAS.KEYNAME like @LASTNAME))
+  AND ( C.MIDDLENAME LIKE @MIDDLENAME OR @MIDDLENAME IS NULL )
+  AND (( C.FIRSTNAME LIKE @FIRSTNAME OR @FIRSTNAME IS NULL ) OR (@CHECKNICKNAME = 1 AND C.NICKNAME LIKE @FIRSTNAME))
+  AND ( A.ADDRESSBLOCK LIKE @ADDRESSBLOCK OR @ADDRESSBLOCK IS NULL )
+  AND ( A.CITY LIKE @CITY OR @CITY IS NULL )
+  AND ( E.EMAILADDRESS LIKE @EMAILADDRESS OR @EMAILADDRESS IS NULL )
+  AND ( C.GENDERCODE = @GENDERCODE OR @GENDERCODE IS NULL )
+  AND ( C.SUFFIXCODEID = @SUFFIXCODEID OR @SUFFIXCODEID IS NULL )
+  AND ( A.STATEID = @STATECODEID OR @STATECODEID IS NULL )
+  AND ( A.COUNTRYID    = @COUNTRYCODEID OR @COUNTRYCODEID IS NULL )
+  AND ( C.LOOKUPID like @LOOKUPID or @LOOKUPID IS NULL )
+  AND ( C.BIRTHDATE like @BIRTHDATE or @BIRTHDATE IS NULL )
+  AND (SCU.DESCRIPTION LIKE @SCU OR @SCU IS NULL)
+  AND ((EDUCATIONALHISTORY.CLASSOF = @CLASSOF OR @CLASSOF IS NULL))
+
+IF @PATIENTSONLY = 0 -- if its 0 then search in both (Constituent and MIMED Data)
+  BEGIN
+	SELECT DISTINCT TOP (@MAXROWS) 
+		   C.ID																				ID,
+		   C.LOOKUPID																		LOOKUPID,
+		   CONCAT(C.KEYNAME, ', ', C.FIRSTNAME, ' ', C.MIDDLENAME)							CLNAME,
+		   CASE 
+					 WHEN C.ISGROUP = 0
+						AND C.ISORGANIZATION = 1
+						AND C.ISCONSTITUENT = 1 THEN 'Organization'
+					 WHEN C.ISGROUP = 0
+						  AND C.ISORGANIZATION = 1
+						  AND C.ISCONSTITUENT = 0 THEN 'Organization'
+					 WHEN C.ISGROUP = 0
+						  AND C.ISORGANIZATION = 0
+						  AND C.ISCONSTITUENT = 1 THEN 'Individual'
+					 WHEN C.ISGROUP = 1
+						  AND GD.GROUPTYPECODE = 1
+						  AND C.ISCONSTITUENT = 1 THEN 'Group'
+					 WHEN C.ISGROUP = 1
+						  AND GD.GROUPTYPECODE = 0
+						  AND C.ISCONSTITUENT = 1 THEN 'Household'
+				   END																		CONSTITUENTTYPE,
+		     CASE WHEN PATIENT.MRN IS NOT NULL THEN 'Yes' ELSE 'No' END						UMHSDATA,
+		     CONCAT(PATIENT.KEYNAME, ', ', PATIENT.FIRSTNAME, ' ', PATIENT.MIDDLENAME)		PLNAME,
+		     PATIENT.ID																		UMHSID,
+		     PATIENT.MRN																    MRN,
+		     PATIENT.CPISEQUENCE															CPISEQUENCE,
+		   case when ((COALESCE(A.HISTORICALENDDATE,UA.HISTORICALENDDATE) is null) or (COALESCE(A.HISTORICALENDDATE,UA.HISTORICALENDDATE) >= GETDATE())) 
+			   then coalesce(dbo.UFN_ADDRESSTYPECODE_GETDESCRIPTION(COALESCE(A.ADDRESSTYPECODEID,UA.ADDRESSTYPECODEID)), N'') + N' (Current)' 
+			   else coalesce(dbo.UFN_ADDRESSTYPECODE_GETDESCRIPTION(COALESCE(A.ADDRESSTYPECODEID,UA.ADDRESSTYPECODEID)), N'') + N' (Former)' end 
+			 as ADDRESSTYPE,
+		   COALESCE(A.ADDRESSBLOCK, UA.DESCRIPTION)											ADDRESS,
+		   COALESCE(A.CITY, UA.CITY, '')													CITY,
+		   COALESCE(S.DESCRIPTION, S2.DESCRIPTION, '')										STATE,
+		   COALESCE(A.POSTCODE, UA.POSTCODE, '')											ZIP,
+		   COALESCE(COUNTRY.DESCRIPTION, UCOUNTRY.DESCRIPTION, '')							COUNTRY,
+		   EDUCATIONALHISTORY.CLASSOF														CLASSOF,
+		   (SELECT TOP 1 ORG.NAME FROM DBO.RELATIONSHIP WITH (NOLOCK) 
+			  INNER JOIN DBO.CONSTITUENT AS ORG WITH (NOLOCK) ON ORG.ID = RELATIONSHIP.RELATIONSHIPCONSTITUENTID 
+			  WHERE RELATIONSHIP.ISPRIMARYBUSINESS = 1 
+			  AND ORG.ISORGANIZATION = 1 
+			  AND RELATIONSHIP.RECIPROCALCONSTITUENTID = C.ID)							    PRIMARYBUSINESS,
+		   COALESCE(E.EMAILADDRESS, UE.EMAILADDRESS, '')									    EMAILADDRESS,
+		   COALESCE(C.MIDDLENAME, PATIENT.MIDDLENAME,'')									    MIDDLENAME, 
+		   dbo.UFN_SUFFIXCODE_GETDESCRIPTION(C.SUFFIXCODEID)								  SUFFIXCODEID, 
+		   COALESCE(P.NUMBER, UP.NUMBER, '')												          PHONENUMBER,
+		   (select PROSPECTMANAGER_NF.NAME from dbo.PROSPECT with (nolock)  
+			  outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(PROSPECT.PROSPECTMANAGERFUNDRAISERID) PROSPECTMANAGER_NF where PROSPECT.ID = C.ID 
+			  and prospect.PROSPECTMANAGERENDDATE is null)									    PROSPECTMANAGER, 	   
+		   CASE WHEN (DBO.UFN_CONSTITUENT_ISDECEASED(C.ID)) = 1 THEN 'Yes' ELSE 'No' END	DECEASED,
+		    BIRTHDATE = FORMAT(DBO.UFN_DATE_FROMFUZZYDATE(C.BIRTHDATE), 'MM/dd/yyyy'),
+		    C.GENDER																			GENDER,
+		   (select top 1 ecc.DESCRIPTION 
+				from EDUCATIONALCOLLEGECODE ecc 
+					join EDUCATIONADDITIONALINFORMATION eaiprimary on ecc.ID = eaiprimary.EDUCATIONALCOLLEGECODEID 
+					join EDUCATIONALHISTORY ehprimary on eaiprimary.EDUCATIONALHISTORYID = ehprimary.ID 
+				where ecc.ID = eaiprimary.EDUCATIONALCOLLEGECODEID 
+				and ehprimary.ISPRIMARYRECORD = 1 
+				and ehprimary.CONSTITUENTID = C.ID)											SCU,       
+		   case (select 1 from MATCHINGGIFTCONDITION where ORGANIZATIONID = C.ID) 
+			when 1 then 'true' else 'false' end  as											ISMATCHINGORG,
+			dbo.USR_UFN_GETMATCHINGGIFTORGANIZATIONNAME(C.ID) as							MATCHINGORGNAME
+	FROM   @SEARCHTABLE SR
+		   JOIN CONSTITUENT C ON C.ID = SR.CONSTITUENTID
+		   LEFT JOIN GROUPDATA GD ON GD.ID = C.ID
+		   LEFT JOIN USR_UMHS_DATA PATIENT ON PATIENT.CONSTITUENTID = SR.CONSTITUENTID
+		   LEFT JOIN ADDRESS A ON A.CONSTITUENTID = C.ID AND A.ISPRIMARY in (@ONLYPRIMARYADDRESS,1)
+		   LEFT JOIN USR_UMHS_ADDRESS UA ON UA.UMHSID = PATIENT.ID --AND UA.ISCONFIDENTIAL = 0
+		   LEFT JOIN ADDRESSTYPECODE ATC ON ATC.ID = A.ADDRESSTYPECODEID
+		   LEFT JOIN ADDRESSTYPECODE ATC2 ON ATC2.ID = UA.ADDRESSTYPECODEID
+		   LEFT JOIN STATE S ON S.ID = A.STATEID
+		   LEFT JOIN STATE S2 ON S2.ID = UA.STATEID
+		   LEFT JOIN COUNTRY ON COUNTRY.ID = A.COUNTRYID
+		   LEFT JOIN COUNTRY UCOUNTRY ON UCOUNTRY.ID = UA.COUNTRYID
+		   LEFT JOIN EMAILADDRESS E ON E.CONSTITUENTID = C.ID AND E.ISPRIMARY     = 1
+		   LEFT JOIN USR_UMHS_EMAILADDRESS UE ON UE.UMHSID = PATIENT.ID AND UE.ISPRIMARY = 1
+		   LEFT JOIN PHONE P ON P.CONSTITUENTID = C.ID AND P.ISPRIMARY = 1
+		   LEFT JOIN USR_UMHS_PHONE UP ON UP.UMHSID = PATIENT.ID AND UP.ISPRIMARY = 1
+		   LEFT JOIN DBO.EDUCATIONALHISTORY WITH (NOLOCK) ON EDUCATIONALHISTORY.CONSTITUENTID = C.ID and EDUCATIONALHISTORY.ISPRIMARYRECORD = 1 
+		   LEFT JOIN DBO.EDUCATIONALINSTITUTION WITH (NOLOCK) ON EDUCATIONALINSTITUTION.ID = EDUCATIONALHISTORY.EDUCATIONALINSTITUTIONID AND EDUCATIONALINSTITUTION.ISAFFILIATED = 1
+		   LEFT OUTER JOIN DBO.UFN_EDUCATIONALINVOLVEMENT_GETLIST() AS I ON I.CONSTITUENTID = C.ID LEFT OUTER JOIN USR_EDUCATIONALINVOLVEMENT UEI ON I.ID = UEI.ID
+		   LEFT OUTER JOIN EDUCATIONADDITIONALINFORMATION EAIPRIMARY ON EDUCATIONALHISTORY.ID = EAIPRIMARY.EDUCATIONALHISTORYID
+		   LEFT OUTER JOIN EDUCATIONALCOLLEGECODE SCU ON SCU.ID = EAIPRIMARY.EDUCATIONALCOLLEGECODEID 
+	WHERE   
+	  ( @INCLUDEDECEASED = 1 OR DBO.UFN_CONSTITUENT_ISDECEASED(C.ID) = 0 ) --filter out deceased
+	  AND ( @INCLUDEINACTIVE = 1 OR C.ISINACTIVE = 0 ) --filter out inactive
+	  AND ( C.ISCONSTITUENT = CASE WHEN @INCLUDEINDIVIDUALS = 1 THEN 1 ELSE 0 END and c.ISGROUP = 0 and c.ISORGANIZATION = 0) -- filter individuals
+	  OR ( C.ISGROUP = CASE WHEN @INCLUDEGROUPS = 1 THEN 1 ELSE 0 END and C.ISCONSTITUENT = 1 AND GD.GROUPTYPECODE = 1) -- filter GROUPS
+	  OR ( C.ISGROUP = CASE WHEN @EXCLUDEHOUSEHOLDS = 0 THEN 1 ELSE 0 END and C.ISCONSTITUENT = 1 AND GD.GROUPTYPECODE = 0) -- filter households
+	  OR ( C.ISORGANIZATION = CASE WHEN @INCLUDEORGANIZATIONS = 1 THEN 1 ELSE 0 END and C.ISCONSTITUENT IN (0,1) and c.ISGROUP = 0) -- filter ORGS
+	  OR ( C.ISGROUP = CASE WHEN @EXCLUDEHOUSEHOLDS = 1 THEN 0 ELSE 1 END and C.ISCONSTITUENT = 1 AND GD.GROUPTYPECODE = 0) -- filter out households
+	ORDER  BY CONCAT(C.KEYNAME, ', ', C.FIRSTNAME, ' ', C.MIDDLENAME),
+			  CONCAT(PATIENT.KEYNAME, ', ', PATIENT.FIRSTNAME, ' ', PATIENT.MIDDLENAME)
+			  --C.KEYNAME,
+			  --C.FIRSTNAME,
+			  --PATIENT.KEYNAME,
+			  --PATIENT.FIRSTNAME ASC
+   END 
+   ELSE --If Patients Only selected - search in MIMED Data only.
+   BEGIN
+	   SELECT DISTINCT TOP (@MAXROWS) 
+			C.ID																			                            ID,
+			C.LOOKUPID																		                        LOOKUPID,       
+			CONCAT(C.KEYNAME, ', ', C.FIRSTNAME, ' ', C.MIDDLENAME)							  CLNAME,     
+					(SELECT CASE 
+					 WHEN C.ISGROUP = 0
+						AND C.ISORGANIZATION = 1
+						AND C.ISCONSTITUENT = 1 THEN 'Organization'
+					 WHEN C.ISGROUP = 0
+						  AND C.ISORGANIZATION = 1
+						  AND C.ISCONSTITUENT = 0 THEN 'Organization'
+					 WHEN C.ISGROUP = 0
+						  AND C.ISORGANIZATION = 0
+						  AND C.ISCONSTITUENT = 1 THEN 'Individual'
+					 WHEN C.ISGROUP = 1
+						  AND GD.GROUPTYPECODE = 1
+						  AND C.ISCONSTITUENT = 1 THEN 'Group'
+					 WHEN C.ISGROUP = 1
+						  AND GD.GROUPTYPECODE = 0
+						  AND C.ISCONSTITUENT = 1 THEN 'Household'
+				   END)																		                            CONSTITUENTTYPE,  
+		   CASE WHEN PATIENT.MRN IS NOT NULL THEN 'Yes' ELSE 'No' END						        UMHSDATA, 
+		   CONCAT(PATIENT.KEYNAME, ', ', PATIENT.FIRSTNAME, ' ', PATIENT.MIDDLENAME)		PLNAME,
+			 PATIENT.ID																		          UMHSID,  
+		   PATIENT.MRN																		        MRN,
+		   PATIENT.CPISEQUENCE																    CPISEQUENCE,       
+		   case when ((UA.HISTORICALENDDATE is null) or (UA.HISTORICALENDDATE >= GETDATE())) 
+			then coalesce(dbo.UFN_ADDRESSTYPECODE_GETDESCRIPTION(UA.ADDRESSTYPECODEID), N'') + N' (Current)' 
+			else coalesce(dbo.UFN_ADDRESSTYPECODE_GETDESCRIPTION(UA.ADDRESSTYPECODEID), N'') + N' (Former)' end 
+			as ADDRESSTYPE,
+		   COALESCE(UA.ADDRESSBLOCK,'')														  ADDRESS,
+		   COALESCE(UA.CITY, '')															      CITY,
+		   COALESCE(S2.DESCRIPTION, '')														  STATE,
+		   COALESCE(UA.POSTCODE, '')														    ZIP,
+		   COALESCE(UCOUNTRY.DESCRIPTION, '')												COUNTRY,	   
+		   EHPRIMARY.CLASSOF,
+		   (Select TOP 1 ORG.NAME from dbo.RELATIONSHIP with (nolock) 
+			inner join dbo.CONSTITUENT as ORG with (nolock) on ORG.ID = RELATIONSHIP.RELATIONSHIPCONSTITUENTID where RELATIONSHIP.ISPRIMARYBUSINESS = 1 
+			and ORG.ISORGANIZATION = 1 and RELATIONSHIP.RECIPROCALCONSTITUENTID = C.ID) as PRIMARYBUSINESS,	  
+		   COALESCE(UE.EMAILADDRESS, '')													EMAILADDRESS,
+		   COALESCE(PATIENT.MIDDLENAME, '')													MIDDLENAME,
+		   dbo.UFN_SUFFIXCODE_GETDESCRIPTION(C.SUFFIXCODEID)				SUFFIXCODEID, 
+		   COALESCE(UP.NUMBER, '')															  PHONENUMBER,
+			 (select PROSPECTMANAGER_NF.NAME from dbo.PROSPECT with (nolock)  
+			outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(PROSPECT.PROSPECTMANAGERFUNDRAISERID) PROSPECTMANAGER_NF where PROSPECT.ID = C.ID 
+			and prospect.PROSPECTMANAGERENDDATE is null)									as PROSPECTMANAGER, 
+		   CASE WHEN (DBO.UFN_CONSTITUENT_ISDECEASED(C.ID)) = 1 THEN 'Yes' ELSE 'No' END    DECEASED,
+		   BIRTHDATE = FORMAT(DBO.UFN_DATE_FROMFUZZYDATE(C.BIRTHDATE), 'MM/dd/yyyy'),
+		   C.GENDER																			GENDER,
+		   (select top 1 ecc.DESCRIPTION from EDUCATIONALCOLLEGECODE ecc inner join EDUCATIONADDITIONALINFORMATION eaiprimary on ecc.ID = eaiprimary.EDUCATIONALCOLLEGECODEID 
+			inner join EDUCATIONALHISTORY ehprimary on eaiprimary.EDUCATIONALHISTORYID = ehprimary.ID where ecc.ID = eaiprimary.EDUCATIONALCOLLEGECODEID 
+			and ehprimary.ISPRIMARYRECORD = 1 and ehprimary.CONSTITUENTID = C.ID) as		SCU,       
+		   case (select 1 from MATCHINGGIFTCONDITION where ORGANIZATIONID = C.ID) 
+			when 1 then 'true' else 'false' end  as											ISMATCHINGORG,
+			dbo.USR_UFN_GETMATCHINGGIFTORGANIZATIONNAME(C.ID) as				MATCHINGORGNAME
+	FROM   @SEARCHTABLE SR
+       JOIN USR_UMHS_DATA PATIENT ON PATIENT.CONSTITUENTID = SR.CONSTITUENTID
+	   LEFT JOIN CONSTITUENT C ON C.ID = PATIENT.CONSTITUENTID
+	   LEFT JOIN GROUPDATA GD ON GD.ID = C.ID
+       LEFT JOIN USR_UMHS_ADDRESS UA ON UA.UMHSID = PATIENT.ID --and UA.ISCONFIDENTIAL = 1
+       LEFT JOIN ADDRESSTYPECODE ATC2 ON ATC2.ID = UA.ADDRESSTYPECODEID
+       LEFT JOIN STATE S2 ON S2.ID = UA.STATEID
+       LEFT JOIN COUNTRY UCOUNTRY ON UCOUNTRY.ID = UA.COUNTRYID
+       LEFT JOIN USR_UMHS_EMAILADDRESS UE ON UE.UMHSID = PATIENT.ID AND UE.ISPRIMARY = 1
+       LEFT JOIN USR_UMHS_PHONE UP ON UP.UMHSID = PATIENT.ID AND UP.ISPRIMARY = 1
+	   left join dbo.EDUCATIONALHISTORY with (nolock) on EDUCATIONALHISTORY.CONSTITUENTID = C.ID
+	   left join dbo.EDUCATIONALINSTITUTION with (nolock) on EDUCATIONALINSTITUTION.ID = EDUCATIONALHISTORY.EDUCATIONALINSTITUTIONID and EDUCATIONALINSTITUTION.ISAFFILIATED = 1
+	   left outer join dbo.UFN_EDUCATIONALINVOLVEMENT_GETLIST() as I on I.CONSTITUENTID = C.ID left outer join USR_EDUCATIONALINVOLVEMENT UEI on I.ID = UEI.ID
+	   left outer join EDUCATIONALHISTORY ehprimary on C.ID = ehprimary.CONSTITUENTID left outer join EDUCATIONADDITIONALINFORMATION eaiprimary on ehprimary.ID = eaiprimary.EDUCATIONALHISTORYID and ehprimary.ISPRIMARYRECORD = 1 
+	ORDER  BY CONCAT(C.KEYNAME, ', ', C.FIRSTNAME, ' ', C.MIDDLENAME),
+		  CONCAT(PATIENT.KEYNAME, ', ', PATIENT.FIRSTNAME, ' ', PATIENT.MIDDLENAME) 
+		      --C.KEYNAME,
+          --C.FIRSTNAME,
+          --PATIENT.KEYNAME,
+          --PATIENT.FIRSTNAME ASC
+		  END
+END
+    
+    
+ 
+			]]>
+		
+    </c:CreateProcedureSQL>    
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="FIRSTNAME" Caption="First name" DataType="String" MaxLength="50" />
+      <FormField FieldID="LASTNAME" Caption="Last name" DataType="String" MaxLength="100" />
+      <FormField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" MaxLength="50" /> 
+      <FormField FieldID="UMHSDATA" Caption="MIMED Data" DataType="String" MaxLength="3" />
+      <FormField FieldID="CONSTITUENTTYPE" DataType="String" Hidden="false" MaxLength="50" />
+      <FormField FieldID="SUFFIXCODEID" Caption="Suffix" DataType="Guid">
+        <CodeTable CodeTableName="SUFFIXCODE" />
+      </FormField>
+      <FormField FieldID="MRN" Caption="MRN" DataType="String" MaxLength="50" />
+      <FormField FieldID="CPISEQUENCE" Caption="CPI Sequence" DataType="String" MaxLength="50" />
+      <FormField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String" />
+      <FormField FieldID="EMAILADDRESS" Caption="Email address" DataType="String" />
+      <FormField FieldID="COUNTRYCODEID" Caption="Country" DataType="Guid" >
+        <SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+      </FormField>
+      <FormField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" />
+      <FormField FieldID="CITY" Caption="City" DataType="String" />
+      <FormField FieldID="STATECODEID" Caption="State" DataType="Guid">
+        <SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7" />
+      </FormField>
+      <FormField FieldID="PHONENUMBER" Caption="Phone number" DataType="String" />
+      <FormField FieldID="POSTCODE" MaxLength="20" Caption="ZIP/Postal code" CaptionResourceKey="$$zip/postal_code">
+        <SearchList SearchListID="e5de8c33-de58-4dc6-9a13-48be9f03db81" DisplayTextIsValue="true" />
+      </FormField>      
+      <FormField FieldID="INCLUDEINACTIVE" DataType="Boolean" Caption="Include inactive" CaptionResourceKey="$$include_inactive" />
+      <FormField FieldID="INCLUDEDECEASED" DataType="Boolean" Caption="Include deceased" CaptionResourceKey="$$include_deceased" />
+      <FormField FieldID="ONLYPRIMARYADDRESS" DataType="Boolean" Caption="Only search primary addresses" DefaultValueText="true" CaptionResourceKey="$$only_search_primary_addresses" />
+      <FormField FieldID="EXACTMATCHONLY" DataType="Boolean" Caption="Match all criteria exactly" CaptionResourceKey="$$match_all_criteria_exactly" />
+      <!--<FormField FieldID="SSN" Hidden="true" MaxLength="20" Caption="SSN" CaptionResourceKey="$$ssn" />-->
+      <FormField FieldID="CHECKNICKNAME" DataType="Boolean" Caption="Check nickname" CaptionResourceKey="$$check_nickname" />
+      <FormField FieldID="CHECKALIASES" DataType="Boolean" Caption="Check aliases" CaptionResourceKey="$$check_aliases" />
+      <FormField FieldID="CLASSOF" DataType="Year" Caption="Primary class year" CaptionResourceKey="$$primary_class_year" />
+      <FormField FieldID="PRIMARYBUSINESS" Caption="Primary business" DataType="Boolean" CaptionResourceKey="$$primary_business" />
+      <FormField FieldID="CHECKMERGEDCONSTITUENTS" DataType="Boolean" Caption="Check merged constituents" CaptionResourceKey="$$check_merged_constituents">
+        <InstalledProductList>
+          <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+          <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+          <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+          <InstalledProduct ID="10f9e9fd-6d69-422e-ac2a-11aec6abac46" />
+        </InstalledProductList>
+      </FormField>
+      <FormField FieldID="MINIMUMDATE" DataType="Date" Caption="Minimum date" CaptionResourceKey="$$minimum_date" />
+      <FormField FieldID="EXCLUDECUSTOMGROUPS" DataType="Boolean" Caption="Exclude custom groups" CaptionResourceKey="$$exclude_custom_groups" />
+      <FormField FieldID="EXCLUDEHOUSEHOLDS" DataType="Boolean" Caption="Exclude households" CaptionResourceKey="$$exclude_households" />
+      <FormField FieldID="INCLUDEINDIVIDUALS" DataType="Boolean" Caption="Individuals" DefaultValueText="True" CaptionResourceKey="$$individuals" />
+      <FormField FieldID="INCLUDEORGANIZATIONS" DataType="Boolean" Caption="Organizations" DefaultValueText="True" CaptionResourceKey="$$organizations" />
+      <FormField FieldID="INCLUDEGROUPS" DataType="Boolean" Caption="Groups/Households" DefaultValueText="True" CaptionResourceKey="$$groups/households" />
+      <FormField FieldID="CHECKALTERNATELOOKUPIDS" DataType="Boolean" Caption="Check alternate lookup IDs" CaptionResourceKey="$$check_alternate_lookup_ids" />
+      <FormField FieldID="FUZZYSEARCHONNAME" DataType="Boolean" Caption="Include fuzzy search on name" CaptionResourceKey="$$include_fuzzy_search_on_name" />
+      <FormField FieldID="INCLUDENONCONSTITUENTRECORDS" DataType="Boolean" Hidden="true" Caption="Include constituents not considered for fundraising purposes" DefaultValueText="false" />
+      <FormField FieldID="PROSPECTMANAGERID" DataType="Guid" Caption="Prospect manager" CaptionResourceKey="$$prospect_manager0">
+        <SearchList SearchListID="35fa0186-b669-436f-913a-5e9fd5e59982" EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="CONSTITUENCY" DataType="Guid" Caption="Constituency" CaptionResourceKey="$$constituency">
+        <SimpleDataList SimpleDataListID="7821c1ab-3001-485b-aec7-f55749f959e6" />
+      </FormField>
+      <FormField FieldID="SOURCECODE" Caption="Source code" CaptionResourceKey="$$source_code" />
+      <FormField FieldID="GENDERCODE" DataType="TinyInt" Caption="Gender">
+        <ValueList>
+          <Items>
+            <Item>
+              <Value>0</Value>
+              <Label>Unknown</Label>
+            </Item>
+            <Item>
+              <Value>1</Value>
+              <Label>Male</Label>
+            </Item>
+            <Item>
+              <Value>2</Value>
+              <Label>Female</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="PATIENTSONLY" DataType="Boolean" Caption="MIMED Constituents Only" DefaultValueText="false" />
+      <FormField FieldID="SCU" DataType="Guid" Caption="Degree from">        
+        <SimpleDataList SimpleDataListID="bb0353ee-ac0e-4d80-9fc3-0d4e6202dbf6" />
+      </FormField>
+      <FormField FieldID="BIRTHDATE" Caption="Birth date" DataType="FuzzyDate" />
+    <FormField FieldID="ISMATCHINGORG" Caption="Is matching org" DataType="Boolean"/>
+    <FormField FieldID="MATCHINGORGNAME" Caption="Matching org name" DataType="String" />
+    </FormFields>
+    <WebUIComponent>
+        <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSConstituentSearchUIModel" />
+        <WebUI>
+            <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSConstituentSearch.html" />
+        </WebUI>
+    </WebUIComponent>
+    <FieldGroups>
+    <FieldGroup ID="ADVANCEDSEARCHOPTIONSGROUP" Caption="Advanced search options" CaptionResourceKey="$$advanced_search_options" />
+  </FieldGroups>
+  <UIFields>
+    <FormField FieldID="SEARCHIN" Caption="Search in" CaptionResourceKey="$$search_in" />
+  </UIFields>
+  <UIActions>
+    <UIAction ActionID="SHOWADVANCEDOPTIONS" Caption="Show advanced search options" CaptionResourceKey="$$show_advanced_search_options" />
+    <UIAction ActionID="HIDEADVANCEDOPTIONS" Caption="Hide advanced search options" CaptionResourceKey="$$hide_advanced_search_options" />
+  </UIActions>
+	</FormMetaData>
+ 
+	<!-- also describe the output fields for the search screen -->
+	<Output>
+		<OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid"  DisplaySequence="1" />
+      <OutputField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String"  DisplaySequence="2" />
+      <OutputField FieldID="CLNAME" Caption="Constituent Name" DataType="String"  DisplaySequence="3" />      
+      <OutputField FieldID="CONSTITUENTTYPE" Caption="Constituent type" DataType="String"  DisplaySequence="4" />
+      <OutputField FieldID="UMHSDATA" Caption="MIMED Data" DataType="String"  DisplaySequence="5"/>
+      <OutputField FieldID="PLNAME" Caption="MIMED Name" DataType="String"  DisplaySequence="6" />
+      <OutputField FieldID="UMHSID" Caption="ID" DataType="Guid" IsHidden="true"  DisplaySequence="7"/>     
+      <OutputField FieldID="MRN" Caption="MRN" DataType="String"   DisplaySequence="8" />
+      <OutputField FieldID="CPISEQUENCE" Caption="CPI Sequence" DataType="String"   DisplaySequence="9" />      
+      <OutputField FieldID="ADDRESSTYPE" Caption="Address type" DataType="String" DisplaySequence="10" />
+      <OutputField FieldID="ADDRESS" Caption="Address" DataType="String"  DisplaySequence="11" />
+      <OutputField FieldID="CITY" Caption="City" DataType="String"  DisplaySequence="12" />
+      <OutputField FieldID="STATE" Caption="State" DataType="String"  DisplaySequence="13" />
+      <OutputField FieldID="ZIP" Caption="ZIP/Postal code" DataType="String"  DisplaySequence="14" />
+      <OutputField FieldID="COUNTRYCODEID" Caption="Country" DataType="String"  DisplaySequence="15" />
+      <OutputField FieldID="CLASSOF" Caption="Primary class year" DataType="Year"  DisplaySequence="16" />
+      <OutputField FieldID="PRIMARYBUSINESS" Caption="Primary business" DataType="String"  DisplaySequence="17" />
+      <OutputField FieldID="EMAILADDRESS" Caption="Email address" DataType="String"  DisplaySequence="18" />
+      <OutputField FieldID="MIDDLENAME" Caption="Middle name" DataType="String"  DisplaySequence="19" />
+      <OutputField FieldID="SUFFIXCODEID" Caption="Suffix" DataType="String"  DisplaySequence="20" />
+      <OutputField FieldID="PHONENUMBER" Caption="Phone Number" DataType="String"  DisplaySequence="21" />
+      <OutputField FieldID="PROSPECTMANAGERID" Caption="Prospect manager" DataType="String"  DisplaySequence="22" />
+      <OutputField FieldID="DECEASED" Caption="Deceased" DataType="String" DisplaySequence="23" />
+      <OutputField FieldID="BIRTHDATE" Caption="Birth date" DataType="Date" DisplaySequence="24" />
+      <OutputField FieldID="GENDER" Caption="Gender" IsHidden="true" DataType="String" DisplaySequence="25" />
+      <OutputField FieldID="SCU" Caption="Primary degree from" DataType="String" DisplaySequence="26" />
+      <OutputField FieldID="ISMATCHINGORG" Caption="Is matching org" DataType="Boolean" DisplaySequence="27" />
+      <OutputField FieldID="MATCHINGORGNAME" Caption="Matching org name" DataType="String" DisplaySequence="28" />
+      
+    </OutputFields>
+	</Output>
+  <!--<OptionalFields>
+    <FilterFields>
+      <FilterFieldID>CLASSOF</FilterFieldID>
+      <FilterFieldID>PRIMARYBUSINESS</FilterFieldID>
+      <FilterFieldID>EMAILADDRESS</FilterFieldID>
+      <FilterFieldID>COUNTRYCODEID</FilterFieldID>
+      <FilterFieldID>PHONENUMBER</FilterFieldID>
+      <FilterFieldID>PROSPECTMANAGERID</FilterFieldID>
+      <FilterFieldID>MIDDLENAME</FilterFieldID>
+      <FilterFieldID>SUFFIXCODEID</FilterFieldID>
+      <FilterFieldID>CONSTITUENCY</FilterFieldID>
+      <FilterFieldID>SOURCECODE</FilterFieldID>
+      <FilterFieldID>MRN</FilterFieldID>
+      <FilterFieldID>CPISEQUENCE</FilterFieldID>
+      <FilterFieldID>BIRTHDATE</FilterFieldID>
+    </FilterFields>
+  </OptionalFields>-->
+  <PersistentFields>
+    <PersistentFieldID>INCLUDEINDIVIDUALS</PersistentFieldID>
+    <PersistentFieldID>INCLUDEORGANIZATIONS</PersistentFieldID>
+    <PersistentFieldID>INCLUDEGROUPS</PersistentFieldID>
+    <PersistentFieldID>CHECKNICKNAME</PersistentFieldID>
+    <PersistentFieldID>CHECKALIASES</PersistentFieldID>
+    <PersistentFieldID>CHECKMERGEDCONSTITUENTS</PersistentFieldID>
+    <PersistentFieldID>CHECKALTERNATELOOKUPIDS</PersistentFieldID>
+    <PersistentFieldID>ONLYPRIMARYADDRESS</PersistentFieldID>
+    <PersistentFieldID>INCLUDEDECEASED</PersistentFieldID>
+    <PersistentFieldID>INCLUDEINACTIVE</PersistentFieldID>
+    <PersistentFieldID>FUZZYSEARCHONNAME</PersistentFieldID>
+    <PersistentFieldID>PRIMARYBUSINESS</PersistentFieldID>
+    <PersistentFieldID>PATIENTSONLY</PersistentFieldID>
+    
+  </PersistentFields>
+</SearchListSpec>

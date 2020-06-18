@@ -1,0 +1,733 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BB06B2D7-3828-4D9D-92FF-9521F8C956EF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UM.CustomFx.GratefulPatient.Catalog</RootNamespace>
+    <AssemblyName>UM.CustomFx.GratefulPatient.Catalog</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>Catalog.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>
+    </NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>C:\BBEC\Instances\BB40\bbappfx\vroot\bin\custom</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>Catalog.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Blackbaud.AppFx, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Platform.Catalog, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.Platform.Catalog.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Server, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.Server.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.SpWrap, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.SpWrap.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.UIModeling.Core, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.UIModeling.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.XmlTypes, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\BBEC\SDK\DLLReferences\Blackbaud.AppFx.XmlTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.XmlTypes.XmlSerializers, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.XmlTypes.XmlSerializers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Constituent\Search\ConstituentExtension.Search.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConstituentExtension.Search.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Constituent\Search\MergedConstituentsExtensionSearch.cs" />
+    <Compile Include="Constituent\Search\UMHSDataConstituentSearch.cs" />
+    <Compile Include="Constituent\Search\UMHSDataConstituentSearchBase.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Catalog.ruleset" />
+    <None Include="postbuild.bat" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_HASUMAFFILIATION.xml" />
+    <EmbeddedResource Include="Batch\SearchLists\UMHSBatch.FundraiserByLookupID.Search.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\UMHSAffiliationDuplicateSearch2.Page.xml" />
+    <EmbeddedResource Include="UMHSData\MIMED_History\MIMED_HistoryReport.Task.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GlobalChange\Add.MIMEDTeamMember.GlobalChange.xml" />
+    <EmbeddedResource Include="GlobalChange\Change.MIMEDTeamMember.GlobalChange.xml" />
+    <EmbeddedResource Include="GlobalChange\Delete.MIMEDTeamMember.GlobalChange.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1509_sas.xml" />
+    <EmbeddedResource Include="UMHSData\MIMED_History\MIMED History Report.rdl" />
+    <EmbeddedResource Include="UMHSData\LoggingReport\MIMEDLoggingReport.rdl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Constituent\Search\ConstituentExtension.Search.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConstituentExtension.Search.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\Patient.png" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\Functions\UFN_UMHS_ADDRESSES.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\Functions\UFN_UMHS_ADDRESS_TRANSLATE.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\UMHSAddress.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Address\UMHSAddress.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\UMHSAddress.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Address\UMHSAddressDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\USR_UMHS_ADDRESS.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Email\UMHSEmailAddress.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Email\UMHSEmailAddress.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Email\UMHSEmailAddress.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Email\UMHSEmailAddressDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Email\USR_UMHS_EMAILADDRESS.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Phone\UMHSPhone.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Phone\UMHSPhone.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Phone\UMHSPhone.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Contact\Phone\UMHSPhoneDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Phone\USR_UMHS_PHONE.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliation.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliation.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliation.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationCategory.CodeTable.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\USR_UMHS_AFFILIATION.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\Functions\USR_UFN_UMHS_INTERACTIONPARTICIPANT.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\Functions\USR_UFN_UMHS_INTERACTION_GETSITES.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteraction.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteraction.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteraction.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteractionDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\USR_UMHS_INTERACTION.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\USR_UMHS_INTERACTIONPARTICIPANT.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterestType.CodeTable.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\USR_UMHS_INTEREST.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Team\UMHSTeamRole.CodeTable.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Team\USR_UMHS_TEAM.Table.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\UMHSData.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\UMHSData.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\UMHSData.View.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\UMHSDataDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Info\UMHSDataExpression.View.xml" />
+    <EmbeddedResource Include="UMHSData\Info\USR_UMHS_DATA.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Referral\UMHSDataReferral.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Referral\UMHSDataReferral.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Referral\UMHSDataReferral.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Referral\UMHSDataReferralDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Referral\UMHSReferrerRole.CodeTable.xml" />
+    <EmbeddedResource Include="UMHSData\Referral\USR_UMHS_REFERRAL.Table.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterest.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterestDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterest.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterest.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Development\Interests\Functions\USR_UFN_UMHS_INTEREST_GETDEPTS.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Development\Team\UMHSTeam.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Team\UMHSTeamDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Team\UMHSTeam.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Team\UMHSTeam.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Constituent\UMHSConstituent.AddIn.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Constituent\UMHSDataAdd.Task.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Constituent\ConstiteuntToUMHS.IDMapper.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Info\UMHSData.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Contact\Address\UMHSAddress.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Development\Team\UMHSTeam.Query.xml" />
+    <EmbeddedResource Include="UMHSData\Referral\UMHSDataReferral.Query.xml" />
+    <EmbeddedResource Include="UMHSData\Info\USR_UMHS_SEARCHPATIENT.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\UMHSSearchPatientAllNames.Query.xml" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USR_USP_UMHS_CONSTITUENTDUPLICATESEARCHRESOLUTION.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Edit\UMHSBatch.ReconEdit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\Search\UMHSDataConstituentSearch.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\USR_UMHS_INTERACTIONSITE.Table.xml" />
+    <Content Include="..\..\..\Configurations\GratefulPatients\Populate.USR_UMHS_BATCH_GIVINGCAPACITYTRANSLATION.sql">
+      <Link>Batch\Configuration\Populate.USR_UMHS_BATCH_GIVINGCAPACITYTRANSLATION.sql</Link>
+    </Content>
+    <Content Include="..\..\..\Configurations\GratefulPatients\UMHS_BatchTemplates.xml">
+      <Link>Batch\Configuration\UMHS_BatchTemplates.xml</Link>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\..\Configurations\GratefulPatients\UMHS_BatchTemplates_SetDefaults.sql">
+      <Link>Batch\Configuration\UMHS_BatchTemplates_SetDefaults.sql</Link>
+    </Content>
+    <EmbeddedResource Include="Constituent\StoredProcedures\USR_USP_UMHS_GETUMHSFRIENDKEYNAME.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\StoredProcedures\USR_USP_UMHS_GETUMHSFRIENDNUMBER.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\USR_UMHS_FRIENDNUMBERS.Table.xml" />
+    <EmbeddedResource Include="Batch\Tables\USR_UMHS_BATCH_ESTGIVINGCAPTRANSLATION.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Functions\UMHSBatch.Translation.GivingCapacity.Function.xml" />
+    <EmbeddedResource Include="UMHSData\Providers\UMHSProvidersQuery.Query.xml" />
+    <EmbeddedResource Include="UMHSData\VisitsDetail\UMHSVisits.Query.xml" />
+    <EmbeddedResource Include="UMHSData\VisitsSummary\UMHSVisitsSummaryQuery.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\Relationships\Functions\USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL.xml" />
+    <EmbeddedResource Include="UMHSData\Info\Relationships\Functions\USR_UFN_UMHS_NAMEFORMAT_FROMID.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\USR_UMHS_INTERACTIONRESPONSE.Table.xml" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_BATCH_EDIT_INDIVIDUAL.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\Functions\USR_UMHS_UFN_FINDCONSTITUENTMATCHES_COMPOSITETHRESHOLD.xml" />
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\Functions\USR_UMHS_UFN_FINDCONSTITUENTMATCHES.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\UMHSDataERB.BatchExtension.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\Addin\UMHSDataERB.AddIn.xml" />
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\SearchLists\UMHSDataConstituentDuplicateSearch.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddShellRecordKeyName.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\Affiliation\UMHSAffiliationBatch.Add.xml" />
+    <EmbeddedResource Include="Batch\Affiliation\UMHSAffiliationBatch.Commit.xml" />
+    <EmbeddedResource Include="Batch\Affiliation\UMHSAffiliationBatch.Edit.xml" />
+    <EmbeddedResource Include="Batch\Affiliation\UMHSAffiliationBatch.xml" />
+    <EmbeddedResource Include="Batch\Affiliation\UMHSAffiliationBatchDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\Affiliation\USR_UMHS_AFFILIATIONBATCH.Table.xml" />
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\Functions\USR_UMHS_UFN_FINDMIMEDMATCHES.xml" />
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\Functions\USR_UMHS_UFN_FINDMIMEDMATCHES_COMPOSITETHRESHOLD.xml" />
+    <Content Include="Batch\EnhancedRevenueBatch\SqlScripts\updateBatchTemplate.sql" />
+    <EmbeddedResource Include="UMHSData\Info\USR_UMHS_DMINELIGIBLEREASONCODE.CodeTable.xml" />
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\Tables\USR_UMHS_BATCHREVENUE.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\ViewForms\UMHSDataIncoming.View.xml" />
+    <Content Include="Batch\EnhancedRevenueBatch\SqlScripts\updateExistingTemplates.sql" />
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\UMHSConstituentDuplicateMatch.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Functions\UMHSBatch.GetMatchingSubDepartment.Function.xml" />
+    <EmbeddedResource Include="Constituent\Search\UMHSDataConstituentSearchLookupID.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteraction.Copy.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\Functions\USR_UFN_UMHS_INTERACTIONS.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\CompletedInteractions\UMHSCompletedInteractions.DataList.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\CompletedInteractions\USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\CompletedInteractions\USR_V_UMHS_INTERACTION_ALL_STATUSES.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\PlannedAndPendingInteractions\UMHSPendingPlannedInteractions.DataList.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\Portfolio\Functions\UFN_UMHS_PROSPECTPLANSUMMARY.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\Portfolio\Functions\UFN_UMHS_REFERRERPLANSUMMARY.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\Portfolio\UMHSPortfolioProspects.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\Portfolio\UMHSPortfolioProspects.Edit.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\Portfolio\UMHSPortfolioReferrals.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\StoredProcedures\USR_USP_UMHS_INTERACTION_ADDRECIP.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\StoredProcedures\USR_USP_UMHS_CREATEFROMCONSTITUENT.xml" />
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\UMHSInteraction.Page.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSMyFundraiserTabs\UMHSInteractionExression.View.xml" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_GETSPOUSEPARTNERID.xml" />
+    <EmbeddedResource Include="Batch\RecordOperations\UMHSBatchDelete.UMHSBatch.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\Interaction\USR_UMHS_INTERACTIONBATCH.Table.xml" />
+    <EmbeddedResource Include="Batch\Interaction\UMHSInteractionBatch.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Interaction\UMHSInteractionBatch.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Interaction\UMHSInteractionBatchDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\Interaction\USR_UMHS_INTERACTIONBATCHSITE.Table.xml" />
+    <EmbeddedResource Include="Batch\Interaction\USR_UMHS_INTERACTIONBATCHPARTICIPANT.Table.xml" />
+    <EmbeddedResource Include="Batch\Interaction\UMHSInteractionBatch.Commit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Interaction\UFN_UMHS_INTERACTIONBATCHPARTICIPANT.xml" />
+    <EmbeddedResource Include="Batch\Interaction\UFN_UMHS_INTERACTIONBATCH_GETSITES.xml" />
+    <EmbeddedResource Include="Batch\Interaction\UMHSInteractionBatch.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Tables\USR_UMHS_BATCH_UMAFFILIATION.Table.xml" />
+    <EmbeddedResource Include="Constituent\OnlineHelp\MIMEDConstituent.Task.xml" />
+    <EmbeddedResource Include="Batch\Referral\USR_UMHS_REFERRALBATCH.Table.xml" />
+    <EmbeddedResource Include="Batch\Referral\UMHSReferral.Batch.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Referral\UMHSReferralBatch.Add.xml" />
+    <EmbeddedResource Include="Batch\Referral\UMHSReferralBatch.Edit.xml" />
+    <EmbeddedResource Include="Batch\Referral\UMHSReferralBatch.Commit.xml" />
+    <EmbeddedResource Include="Batch\Referral\UMHSReferralBatchDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_SETUMAFFILIATION.xml" />
+    <EmbeddedResource Include="GlobalChange\Delete.MIMEDAffiliations.GlobalChange.xml" />
+    <EmbeddedResource Include="GlobalChange\Delete.MIMEDInteraction.GlobalChange.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\StoredProcs\USP_UMHS_FINDFRIEND.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1510_jiac.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1528_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1543_pebigler.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1547_pebigler.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\EnhancedRevenueBatch\StoredProcs\USR_USP_UMHS_ADDCONTACTINFORMATIONFORBBISMIMEDDONOR.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1548_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1552_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1599_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1612_sas.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1636_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1651_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1685_jiac.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1692_peb.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1699_pebigler.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1700_pebigler.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1723_peb.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1768_jiac.xml" />
+    <Content Include="Images\patientsearch.png" />
+    <EmbeddedResource Include="Images\Patient_16.png" />
+    <EmbeddedResource Include="UMHSAuditing\USR_UMHS_MIMEDTABVIEWLOG.Table.xml" />
+    <EmbeddedResource Include="UMHSData\MIMED_History\Functions\USR_UFN_UMHSHISTORY_APPUSER_AUDIT.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\MIMED_History\Functions\USR_UFN_UMHSHISTORY_UMHSCHILDTABLES_RECORDTYPE_AUDIT.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\MIMED_History\MIMEDHistory.Report.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\MIMED_History\MIMEDHistoryReport.Package.xml" />
+    <EmbeddedResource Include="UMHSData\MIMED_History\USR_USP_UMHS_GETHISTORY.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Providers\UMHSProviderView.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\VisitsDetail\UMHSVisitsDetailView.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\VisitsSummary\UMHSVisitsSummary.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Team\StoredProcs\USR_USP_MIMEDDEFAULTSITEFORMEMBER.xml" />
+    <EmbeddedResource Include="UMHSData\MIMED_History\MIMED_History.Page.xml" />
+    <EmbeddedResource Include="UMHSData\Referral\UMHSFollowUpStatus.CodeTable.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Phone\Functions\UFN_UMHS_ISUNIQUEPHONENUMBERANDTYPE.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Email\Functions\UFN_UMHS_ISUNIQUEEMAILADDRESSANDTYPE.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\Functions\UFN_UMHS_ISUNIQUEADDRESSANDTYPE.xml" />
+    <EmbeddedResource Include="UMHSData\LoggingReport\MIMEDLoggingReport.Page.xml" />
+    <EmbeddedResource Include="UMHSData\LoggingReport\MIMEDLoggingReport.Report.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\LoggingReport\MIMEDLoggingReport.Task.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\LoggingReport\MIMEDLoggingReport.Package.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\LoggingReport\MIMEDTabNames.SimpleList.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Functions\USR_UFN_UMHS_UMAFFILIATEDCONSTITUENTMATCHES.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\StoredProcedures\USR_USP_UMHS_DELETEMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\StoredProcedures\USR_USP_UMHS_GETMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Tables\USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.Table.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Tables\USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Views\USR_UMHS_V_UMAFFILIATEDCONSTITUENTS.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\UMHSAffiliationDuplicateSearch.Task.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Query\UMHSDuplicateSearchMatchSets.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\SimpleDatalists\UMHSDupSearchMatchSet.SimpleList.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Query\UMHSDuplicateSearchCleanupHistory.Query.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\Functions\USR_UFN_UMHS_GETTIMEDURATION.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\RecordOperation\UMHSSetMatchReviewStatusToDeleted.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\RecordOperation\UMHSSetMatchReviewStatusToComplete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSAffiliationDuplicateSearch\RecordOperation\UMHSSetMatchReviewStatusToReview.RecordOperation.xml" />
+    <EmbeddedResource Include="GratefulPatient.Package.CSR_1788_marilena.xml" />
+    <Content Include="UMHSMyFundraiserTabs\UMHSInteraction.Page.xml" />
+    <Content Include="UMHSMyFundraiserTabs\UMHSInteractionExression.View.xml" />
+    <EmbeddedResource Include="UMHSData\Info\Relationships\UMHSRelationship.Query.xml" />
+    <EmbeddedResource Include="UMHSData\Info\Relationships\UMHSRelationship.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\Relationships\UMHSRelationshipDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Info\Relationships\UMHSRelationship.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Info\Relationships\UMHSRelationship.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\Relationships\USR_UMHS_RELATIONSHIPSET.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\Relationships\Functions\USR_UFN_UMHS_RELATIONSHIP_DESCRIPTION.Function.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Info\Relationships\USR_UMHS_RELATIONSHIP.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Providers\UMHSProviders.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteractionSites.Query.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterestDepartments.Query.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Email\Functions\USR_UFN_UMHS_PRIMARYEMAILADDRESSCNT.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Functions\UFN_UMHS_VALIDATE_STARTEND_DATES.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Phone\Functions\UFN_UMHS_PRIMARYPHONECNT.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\Functions\UFN_UMHS_PRIMARYADDRESSCNT.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Documentation\UMHSDocumentation.DataList.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Documentation\USR_UMHS_NOTETYPECODE.CodeTable.xml" />
+    <EmbeddedResource Include="UMHSData\Documentation\USR_UMHS_NOTE.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Documentation\UMHSDocumentation.Add.xml" />
+    <EmbeddedResource Include="UMHSData\Providers\USR_UMHS_PROVIDERS.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\VisitsSummary\UMHSVisitsSummary.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\VisitsDetail\UMHSVisitOutPatient.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\VisitsDetail\UMHSVisitInpatient.Query.xml" />
+    <EmbeddedResource Include="UMHSData\VisitsDetail\USR_UMHS_VISITS.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Referral\UMHSDataReferral.View.xml" />
+    <EmbeddedResource Include="UMHSData\USR_UFN_UMHS_SUBDEPARTMENT_GETNAME.TranslationFunction.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\UMHSSubDepartment.SimpleList.xml" />
+    <EmbeddedResource Include="UMHSData\UMHSDepartment.Search.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\USR_UFN_UMHS_DEPARTMENT_GETNAME.TranslationFunction.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\UMHSDepartment.SimpleList.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliation.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteraction.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteractionParticipant.Query.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterest.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\UMHS.Batch.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Add\UMHSBatch.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Add\UMHSBatchCommit.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Edit\UMHSBatch.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\RecordOperations\UMHSBatchDelete.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\Tables\USR_UMHS_BATCH.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\UMHSDepartmentSubDepartment.Task.xml" />
+    <EmbeddedResource Include="Constituent\UMHSDepartment.Page.xml" />
+    <EmbeddedResource Include="Constituent\UMHSDepartment.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\UMHSDepartment.Edit.xml" />
+    <EmbeddedResource Include="Constituent\UMHSDepartment.DataList.xml" />
+    <EmbeddedResource Include="Constituent\UMHSDepartment.RecordOperation.xml" />
+    <EmbeddedResource Include="Constituent\USR_UMHS_DEPARTMENT.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\USR_UMHS_SUBDEPARTMENT.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\UMHSDepartmentSetInactive.RecordOperation.xml" />
+    <EmbeddedResource Include="Constituent\UMHSDepartmentSetActive.RecordOperation.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartment.Page.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartment.DataList.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartmentOrder.Edit.xml" />
+    <EmbeddedResource Include="Constituent\USR_UFN_UMHS_DEPARTMENT_GETSUBDEPARTMENT.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartment.Add.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\UMHSSubDepartment.Edit.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartmentSetInactive.RecordOperation.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartmentSetActive.RecordOperation.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartment.RecordOperation.xml" />
+    <EmbeddedResource Include="Constituent\UMHSSubDepartment.View.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliation.View.xml" />
+    <Content Include="..\UM.CustomFx.GratefulPatient.UIModel\htmlforms\custom\um.customfx.gratefulpatient\UMHSAffiliationAddForm.html">
+      <Link>UMHSAffiliationAddForm.html</Link>
+    </Content>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\Functions\USR_UFN_UMHS_INTERACTION_ISPLANSTEP.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\Functions\USR_UFN_UMHS_INTERACTION_GETSITELIST.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\UMHSInteraction.View.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Development\Interactions\Functions\USR_UFN_UMHS_DISPLAYNAME.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\USR_UMHS_INTERESTDEPTSUBDEPT.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\Functions\USR_UFN_UMHS_INTEREST_GETDEPTLIST.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\Functions\USR_UFN_UMHS_INTEREST_GETSUBDEPTLIST.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interests\UMHSInterest.View.xml" />
+    <EmbeddedResource Include="Constituent\ConfigExportData\UMHS_Departments.ConfigurationData.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Constituent\ConfigExportData\UMHS_Subdepartments.ConfigurationData.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\USR_UMHS_AFFILIATIONBASE.Table.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationBase.SimpleList.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliations.Task.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationConfiguration.Page.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationCategory.Add.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationCategory.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationCategory.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\UMHSAffiliationBase.DataList.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Address\UMHSAddress.View.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Email\UMHSEmailAddress.View.xml" />
+    <EmbeddedResource Include="UMHSData\Contact\Phone\UMHSPhone.View.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Affiliations\ConfigurationExportData\UMHS_AffiliationBase.ConfigurationData.xml" />
+    <EmbeddedResource Include="Batch\SearchLists\UMHSBatch.DupCheck.Search.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Functions\UMHSBatch.Translation.ConstituentName.Function.xml" />
+    <EmbeddedResource Include="Batch\SearchLists\UMHSBatch.ConstituentID.Search.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Documentation\UMHSDocumentation.Edit.xml" />
+    <EmbeddedResource Include="UMHSData\Documentation\UMHSDocumentation.RecordOperation.xml" />
+    <EmbeddedResource Include="UMHSData\Documentation\UMHSDocumentation.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UMHSData\Documentation\UMHSDocumentation.View.xml" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_BATCH_ENDDATEADDRESS.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_BATCH_ENDDATEEMAIL.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_BATCH_ENDDATEPHONE.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Edit\UMHSBatchCommit.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\DataForms\UMHSBatchDataForm.Edit.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Add\UMHSBatch.Add.Providers.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Add\UMHSBatchCommit.Add.Providers.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\DataForms\UMHSBatchDataForm.Edit.Providers.xml" />
+    <EmbeddedResource Include="Batch\Edit\UMHSBatch.Edit.Providers.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Edit\UMHSBatchCommit.Edit.Providers.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Functions\UMHSBatch.Translation.ProviderName.Function.xml" />
+    <EmbeddedResource Include="Batch\RecordOperations\UMHSBatchDelete.Providers.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\SearchLists\UMHSBatch.DupCheck.Search.Providers.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\SimpleDataLists\UMHSBatch.Department.SimpleList.xml" />
+    <EmbeddedResource Include="Batch\SimpleDataLists\UMHSBatch.SubDepartment.SimpleList.xml" />
+    <EmbeddedResource Include="Batch\SearchLists\UMHSBatch.Provider.ConstituentID.Search.xml" />
+    <EmbeddedResource Include="Batch\SearchLists\UMHSBatch.Provider.ID.Search.xml" />
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD.xml" />
+    <EmbeddedResource Include="Batch\Tables\USR_UMHS_BATCH_PROVIDERS.Table.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\UMHS.Batch.Providers.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\StoredProcedures\USP_USR_UMHS_BATCH_ADD_INDIVIDUAL.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Tables\USR_UMHS_BATCH_VISITS.Table.xml" />
+    <EmbeddedResource Include="Batch\RecordOperations\UMHSBatchDelete.Visits.RecordOperation.xml" />
+    <EmbeddedResource Include="Batch\UMHS.Batch.Visits.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\DataForms\UMHSBatchDataForm.Edit.Visits.xml" />
+    <EmbeddedResource Include="Batch\Add\UMHSBatch.Add.Visits.xml" />
+    <EmbeddedResource Include="Batch\Add\UMHSBatchCommit.Add.Visits.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Batch\Edit\UMHSBatch.Edit.Visits.xml" />
+    <EmbeddedResource Include="UMHSData\Development\Interactions\StoredProcedures\USR_USP_UMHS_UPDATE_CUSTOM_STATUS.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Contact\Email\UMHSEmailAddress.Query.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UMHSData\Contact\Phone\UMHSPhone.Query.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Batch\QueryView\" />
+    <Folder Include="CodeTables\" />
+    <Folder Include="LinkedSpecs\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>$(ProjectDir)postbuild.bat</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

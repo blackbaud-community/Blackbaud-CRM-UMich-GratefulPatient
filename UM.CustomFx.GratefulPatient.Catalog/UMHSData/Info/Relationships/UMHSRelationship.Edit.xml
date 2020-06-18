@@ -1,0 +1,222 @@
+<EditDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="9ae6c14d-4d35-4fb4-a25d-820e0719b243"
+    Name="MIMED Relationship Edit Form"
+    Description="Used for editing the given USR_UMHS_RELATIONSHIP"
+    Author="UM Dev"
+    RecordType="MIMED Relationship"
+    DataFormInstanceID="204f8d3a-2e0b-47ca-bc7e-3e10cdf41d49"
+    c:SecurityUIFolder="MIMED Data"
+    OwnerIDMapperID="00000000-0000-0000-0000-000000000000"
+    xmlns="bb_appfx_editdataformtemplate"
+    >
+    <SPDataForm>
+        <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_USR_UMHS_RELATIONSHIP">
+            <c:CreateProcedureSQL>
+<![CDATA[
+CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDITLOAD_USR_UMHS_RELATIONSHIP (@ID                         UNIQUEIDENTIFIER,
+                                                                              @DATALOADED                 BIT = 0 OUTPUT,
+                                                                              @TSLONG                     BIGINT = 0 OUTPUT,
+                                                                              @PATIENTNAME                NVARCHAR(100) = NULL OUTPUT,
+                                                                              @RELATEDINDIVIDUAL          NVARCHAR(100) = NULL OUTPUT,
+                                                                              @RELATIONSHIPTYPECODEID     UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @RECIPROCALTYPECODEID       UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @STARTDATE                  DATETIME = NULL OUTPUT,
+                                                                              @ENDDATE                    DATETIME = NULL OUTPUT,
+                                                                              @ISSPOUSE                   BIT = NULL OUTPUT,
+                                                                              @ISPRIMARYBUSINESS          BIT = NULL OUTPUT,
+                                                                              @ISCONTACT                  BIT = NULL OUTPUT,
+                                                                              @CONTACTTYPECODEID          UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @ISPRIMARYCONTACT           BIT = NULL OUTPUT,
+                                                                              @ISMATCHINGGIFTRELATIONSHIP BIT = NULL OUTPUT,
+                                                                              @RELATIONSHIPSETID          UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @COMMENTS                   NVARCHAR(MAX) = NULL OUTPUT,
+                                                                              @ISEMERGENCYCONTACT         BIT = NULL OUTPUT,
+                                                                              @RECEIVESREPORTCARD         BIT = NULL OUTPUT,
+                                                                              @ISGUARANTOR                BIT = NULL OUTPUT)
+AS
+    SET NOCOUNT ON;
+    -- be sure to set these, in case the select returns no rows
+    SET @DATALOADED = 0
+    SET @TSLONG = 0
+
+    -- populate the output parameters, which correspond to fields on the form.  Note that
+    -- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+    -- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+    -- can be considered.
+    SELECT @DATALOADED = 1,
+           @TSLONG = R.TSLONG,
+           @PATIENTNAME = CONCAT(P.FIRSTNAME,' ',P.KEYNAME),
+           @RELATEDINDIVIDUAL = CONCAT(D.FIRSTNAME,' ',D.KEYNAME),
+           @RELATIONSHIPTYPECODEID = RELATIONSHIPTYPECODEID,
+           @RECIPROCALTYPECODEID = RECIPROCALTYPECODEID,
+           @STARTDATE = STARTDATE,
+           @ENDDATE = ENDDATE,
+           @ISSPOUSE = ISSPOUSE,
+           @ISPRIMARYBUSINESS = ISPRIMARYBUSINESS,
+           @ISCONTACT = ISCONTACT,
+           @CONTACTTYPECODEID = CONTACTTYPECODEID,
+           @ISPRIMARYCONTACT = ISPRIMARYCONTACT,
+           @ISMATCHINGGIFTRELATIONSHIP = ISMATCHINGGIFTRELATIONSHIP,
+           @RELATIONSHIPSETID = RELATIONSHIPSETID,
+           @COMMENTS = COMMENTS,
+           @ISEMERGENCYCONTACT = ISEMERGENCYCONTACT,
+           @RECEIVESREPORTCARD = RECEIVESREPORTCARD,
+           @ISGUARANTOR = ISGUARANTOR
+    FROM   DBO.USR_UMHS_RELATIONSHIP R
+           JOIN USR_UMHS_DATA D ON D.ID = RECIPROCALUMHSID
+           JOIN USR_UMHS_DATA P ON P.ID = R.UMHSID
+    WHERE  R.ID = @ID
+
+    RETURN 0; 
+
+]]>
+</c:CreateProcedureSQL>
+        </LoadImplementation>
+        <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_USR_UMHS_RELATIONSHIP">
+            <c:CreateProcedureSQL>
+<![CDATA[
+CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDIT_USR_UMHS_RELATIONSHIP (@ID                         UNIQUEIDENTIFIER,
+                                                                          @CHANGEAGENTID              UNIQUEIDENTIFIER = NULL,
+                                                                          @RELATIONSHIPTYPECODEID     UNIQUEIDENTIFIER,
+                                                                          @RECIPROCALTYPECODEID       UNIQUEIDENTIFIER,
+                                                                          @STARTDATE                  DATETIME,
+                                                                          @ENDDATE                    DATETIME,
+                                                                          @ISSPOUSE                   BIT,
+                                                                          @ISPRIMARYBUSINESS          BIT,
+                                                                          @ISCONTACT                  BIT,
+                                                                          @CONTACTTYPECODEID          UNIQUEIDENTIFIER,
+                                                                          @ISPRIMARYCONTACT           BIT,
+                                                                          @ISMATCHINGGIFTRELATIONSHIP BIT,
+                                                                          @RELATIONSHIPSETID          UNIQUEIDENTIFIER,
+                                                                          @COMMENTS                   NVARCHAR(MAX),
+                                                                          @ISEMERGENCYCONTACT         BIT,
+                                                                          @RECEIVESREPORTCARD         BIT,
+                                                                          @ISGUARANTOR                BIT)
+AS
+    SET NOCOUNT ON;
+
+    IF @CHANGEAGENTID IS NULL
+      EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+        @CHANGEAGENTID OUTPUT
+
+    BEGIN TRY
+        -- handle updating the data
+        UPDATE DBO.USR_UMHS_RELATIONSHIP
+        SET    RELATIONSHIPTYPECODEID = @RELATIONSHIPTYPECODEID,
+               RECIPROCALTYPECODEID = @RECIPROCALTYPECODEID,
+               STARTDATE = @STARTDATE,
+               ENDDATE = @ENDDATE,
+               ISSPOUSE = @ISSPOUSE,
+               ISPRIMARYBUSINESS = @ISPRIMARYBUSINESS,
+               ISCONTACT = @ISCONTACT,
+               CONTACTTYPECODEID = @CONTACTTYPECODEID,
+               ISPRIMARYCONTACT = @ISPRIMARYCONTACT,
+               ISMATCHINGGIFTRELATIONSHIP = @ISMATCHINGGIFTRELATIONSHIP,
+               RELATIONSHIPSETID = @RELATIONSHIPSETID,
+               COMMENTS = @COMMENTS,
+               ISEMERGENCYCONTACT = @ISEMERGENCYCONTACT,
+               RECEIVESREPORTCARD = @RECEIVESREPORTCARD,
+               ISGUARANTOR = @ISGUARANTOR,
+               CHANGEDBYID = @CHANGEAGENTID,
+               DATECHANGED = GETDATE()
+        WHERE  ID = @ID
+    END TRY
+    BEGIN CATCH
+        EXEC DBO.USP_RAISE_ERROR
+        RETURN 1
+    END CATCH
+
+    RETURN 0; 
+
+]]>
+</c:CreateProcedureSQL>
+            <c:ExpectedDBExceptions>
+                <c:Constraints>
+                    <!--<c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RELATIONSHIPTYPECODEID" Field="RELATIONSHIPTYPECODEID" Type="ForeignKey" />
+                    <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RECIPROCALTYPECODEID" Field="RECIPROCALTYPECODEID" Type="ForeignKey" />-->
+                    <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_CONTACTTYPECODEID" Field="CONTACTTYPECODEID" Type="ForeignKey" />
+                    <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RELATIONSHIPSETID" Field="RELATIONSHIPSETID" Type="ForeignKey" />
+                </c:Constraints>
+            </c:ExpectedDBExceptions>
+        </SaveImplementation>
+    </SPDataForm>
+    <c:FormMetaData FixedDialog="true">
+        <c:FormFields>
+          <c:FormField FieldID="PATIENTNAME" DataType="String" Caption="Patient name" ReadOnly="true" Hidden="true" />
+          <c:FormField FieldID="RELATEDINDIVIDUAL" DataType="String" Caption="Related individual" ReadOnly="true" />
+          <c:FormField FieldID="RELATIONSHIPTYPECODEID" DataType="Guid" Required="true" Caption="Relationship type">
+            <c:SimpleDataList SimpleDataListID="4e869c5a-9b9d-4e84-b6e0-1fc66bafbafc">
+              <c:Params>
+                <c:Param ID="CONSTITUENTID">
+                  <c:Value>Form!ContextID</c:Value>
+                </c:Param>
+              </c:Params>
+            </c:SimpleDataList>
+          </c:FormField>
+          <c:FormField FieldID="RECIPROCALTYPECODEID" DataType="Guid" Required="true" Caption="Individual is the">
+            <c:SimpleDataList SimpleDataListID="c3018803-2ea5-4f62-91cf-412e88d15f9b">
+              <c:Params>
+                <c:Param ID="APPLIESTOCONSTITUENTTYPE">
+                  <c:Value>Fields!CONSTITUENTTYPE</c:Value>
+                </c:Param>
+                <c:Param ID="CONSTITUENTID">
+                  <c:Value>Fields!RECIPROCALCONSTITUENTID</c:Value>
+                </c:Param>
+                <c:Param ID="APPLIESTORELATIONSHIPTYPEID">
+                  <c:Value>Fields!RELATIONSHIPTYPECODEID</c:Value>
+                </c:Param>
+              </c:Params>
+            </c:SimpleDataList>
+          </c:FormField>
+          <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" />
+          <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+          <c:FormField FieldID="CONTACTTYPECODEID" DataType="Guid" Caption="Contact type">
+            <c:CodeTable CodeTableName="CONTACTTYPECODE" />
+          </c:FormField>
+          <c:FormField FieldID="RELATIONSHIPSETID" DataType="Guid" Caption="Relationship set" Hidden="true" />
+          <c:FormField FieldID="ISSPOUSE" DataType="Boolean" Caption="Spouse" />
+          <c:FormField FieldID="ISPRIMARYBUSINESS" DataType="Boolean" Caption="Primary business" />
+          <c:FormField FieldID="ISCONTACT" DataType="Boolean" Caption="Contact" />
+          <c:FormField FieldID="ISPRIMARYCONTACT" DataType="Boolean" Caption="Primary contact" />
+          <c:FormField FieldID="ISMATCHINGGIFTRELATIONSHIP" DataType="Boolean" Caption="Matching gift relationship" />
+          <c:FormField FieldID="ISEMERGENCYCONTACT" DataType="Boolean" Caption="Emergency contact" />
+          <c:FormField FieldID="RECEIVESREPORTCARD" DataType="Boolean" Caption="Receives report card" />
+          <c:FormField FieldID="ISGUARANTOR" DataType="Boolean" Caption="Is guarantor" />
+          <c:FormField FieldID="COMMENTS" Caption="Comments" />
+        </c:FormFields>
+        <c:FormUIComponent />
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSRelationshipEditFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSRelationshipEditForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+        <c:FieldGroups>
+          <c:FieldGroup ID="RELATIONSHIPGROUP" Caption="Relationship">
+            <c:Fields>
+              <c:Field>RELATEDINDIVIDUAL</c:Field>
+              <c:Field>RELATIONSHIPTYPECODEID</c:Field>
+              <c:Field>RECIPROCALTYPECODEID</c:Field>
+              <c:Field>STARTDATE</c:Field>
+              <c:Field>ENDDATE</c:Field>
+              <c:Field>CONTACTTYPECODEID</c:Field>
+              <c:Field>RELATIONSHIPSETID</c:Field>
+            </c:Fields>
+          </c:FieldGroup>
+          <c:FieldGroup ID="COMMENTSGROUP" Caption="Comments">
+            <c:Fields>
+              <c:Field>COMMENTS</c:Field>
+              <c:Field>ISSPOUSE</c:Field>
+              <c:Field>ISPRIMARYBUSINESS</c:Field>
+              <c:Field>ISCONTACT</c:Field>
+              <c:Field>ISPRIMARYCONTACT</c:Field>
+              <c:Field>ISMATCHINGGIFTRELATIONSHIP</c:Field>
+              <c:Field>ISEMERGENCYCONTACT</c:Field>
+              <c:Field>RECEIVESREPORTCARD</c:Field>
+              <c:Field>ISGUARANTOR</c:Field>
+            </c:Fields>
+          </c:FieldGroup>
+        </c:FieldGroups>
+      </c:FormMetaData>
+    </EditDataFormTemplateSpec>

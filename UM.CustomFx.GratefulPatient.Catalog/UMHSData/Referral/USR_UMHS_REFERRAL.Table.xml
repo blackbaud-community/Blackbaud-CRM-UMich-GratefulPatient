@@ -1,0 +1,46 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:common="bb_appfx_commontypes" 
+	ID="5467c0b4-59e7-406c-b0eb-ce498451c598"
+	Name="USR_UMHS_REFERRAL"
+	Description="Stores information about MIMED Referral records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_REFERRAL"		   
+	>
+	<Fields>
+    <ForeignKeyField Name="UMHSID" ForeignTable="USR_UMHS_DATA" Description="Foreign key to the MIMED Data table" Required="true" OnDelete="CascadeDelete"></ForeignKeyField>
+    <ForeignKeyField Name ="REFERRERID" ForeignTable ="CONSTITUENT" Description ="Foreign key to the referrer's constituent record." />
+    <CodeTableField CodeTable="USR_UMHS_REFERRERROLECODE" Name="REFERRERROLECODEID"/>
+    <ForeignKeyField ForeignTable="USR_UMHS_DEPARTMENT" Name="DEPARTMENTID"/>
+    <ForeignKeyField ForeignTable="USR_UMHS_SUBDEPARTMENT" Name="SUBDEPARTMENTID"/>
+    <DateField Name ="REFERRALDATE" IncludeTime ="false" Description ="Date of referral."/>
+    <ForeignKeyField Name="UMHSDEVSTAFFID" ForeignTable="CONSTITUENT"  />
+    <BooleanField Name="FOLLOWUPCOMPLETED" Description="Follow-up Completed represents the completion of the follow-up with this the referral" DefaultValue="0"></BooleanField>
+    <EnumField Name="FOLLOWUPSTATUSCODE" Description="Follow-up Status represents the success or failure status of the follow-up" DefaultValue="0" >
+      <EnumValues>
+        <EnumValue ID="0" Translation=" "/>
+        <EnumValue ID="1" Translation="Unsuccessful"/>
+        <EnumValue ID="2" Translation="Successful"/>
+      </EnumValues>
+    </EnumField>
+    <MemoField Name ="COMMENTS" Description ="Comments."/>
+  </Fields>
+	<Indexes>
+		<Index IsUnique="true">
+			<IndexFields>
+				<IndexField Name ="UMHSID"/>
+				<IndexField Name ="REFERRERID"/>
+			</IndexFields>
+		</Index>	
+    <Index>
+      <IndexFields>
+        <IndexField Name ="UMHSDEVSTAFFID"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name ="UMHSID"/>
+      </IndexFields>
+    </Index>
+   </Indexes>
+</TableSpec>

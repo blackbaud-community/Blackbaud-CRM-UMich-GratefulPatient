@@ -1,0 +1,292 @@
+<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:common="bb_appfx_commontypes"
+    ID="747530a1-be80-4054-a021-d2a599248261"
+    Name="MIMED Constituent Search"
+    Description="A search list for locating MIMED constituent search records"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="68EE2516-F46F-45ae-A6C2-E480D0E794D8" 
+    QuickFindCriteriaFieldID="FULLNAME"
+    >
+
+  <ResourceFile AssemblyName="UM.CustomFx.GratefulPatient.Catalog.dll" ClassName="UM.CustomFx.GratefulPatient.Catalog.Search.ConstituentExtensionSearch" />
+
+  <CLRSearchList AssemblyName="UM.CustomFx.GratefulPatient.Catalog.dll" ClassName="UM.CustomFx.GratefulPatient.Catalog.Constituent.Search.UMHSDataConstituentSearch">
+    <GrantExecuteList xmlns="bb_appfx_commontypes">
+      <GrantExecute>dbo.UFN_NAMEFORMAT_08</GrantExecute>
+      <GrantExecute>dbo.UFN_CONSTITUENT_ISCOMMITTEE</GrantExecute>
+      <GrantExecute>dbo.USR_UFN_GETMATCHINGGIFTORGANIZATIONNAME</GrantExecute>
+    </GrantExecuteList>
+    <common:GrantSelectList>
+      <common:GrantSelect>CONSTITUENT(ID,NAME,KEYNAME,FIRSTNAME,NICKNAME,MAIDENNAME,LOOKUPID,SSNINDEX,SSN,ISINACTIVE,ISORGANIZATION)</common:GrantSelect>
+      <common:GrantSelect>USR_UMHS_DATA(ID,KEYNAME,FIRSTNAME,MRN,CPISEQUENCE,BIRTHDATE)</common:GrantSelect>
+      <common:GrantSelect>ALIAS(CONSTITUENTID,NAME,KEYNAME,FIRSTNAME)</common:GrantSelect>
+      <common:GrantSelect>ADDRESS(CONSTITUENTID,ADDRESSBLOCK,CITY,STATEID,POSTCODE,ISPRIMARY)</common:GrantSelect>
+      <common:GrantSelect>USR_UMHS_ADDRESS(ID,UMHSID,ADDRESSBLOCK,CITY,STATEID,POSTCODE,ISPRIMARY)</common:GrantSelect>
+      <common:GrantSelect>PHONE(CONSTITUENTID,ISPRIMARY)</common:GrantSelect>
+      <common:GrantSelect>USR_UMHS_PHONE(ID,UMHSID,NUMBER,ISPRIMARY)</common:GrantSelect>
+      <common:GrantSelect>STATE (ID,DESCRIPTION)</common:GrantSelect>
+      <common:GrantSelect>DECEASEDCONSTITUENT(ID)</common:GrantSelect>
+      <common:GrantSelect>EDUCATIONALHISTORY(ID, CONSTITUENTID, CLASSOF, EDUCATIONALINSTITUTIONID)</common:GrantSelect>
+      <common:GrantSelect>EDUCATIONALINSTITUTION(ID, ISAFFILIATED)</common:GrantSelect>
+      <common:GrantSelect>RELATIONSHIP(ID, RELATIONSHIPCONSTITUENTID, RECIPROCALCONSTITUENTID, ISPRIMARYBUSINESS)</common:GrantSelect>
+      <common:GrantSelect>GROUPMEMBERDATERANGE(GROUPMEMBERID,DATEFROM,DATETO)</common:GrantSelect>
+      <common:GrantSelect>GROUPDATA(ID,GROUPTYPECODE)</common:GrantSelect>
+      <common:GrantSelect>GROUPMEMBER(ID,GROUPID,MEMBERID)</common:GrantSelect>
+      <common:GrantSelect>EMAILADDRESS(ID,CONSTITUENTID,EMAILADDRESS,ISPRIMARY)</common:GrantSelect>
+      <common:GrantSelect>PHONE(ID, CONSTITUENTID, NUMBER, ISPRIMARY)</common:GrantSelect>
+      <common:GrantSelect>ALTERNATELOOKUPID(ALTERNATELOOKUPID,CONSTITUENTID)</common:GrantSelect>
+      <common:GrantSelect>SCHOOL(ID)</common:GrantSelect>
+      <common:GrantSelect>COUNTRY(ID,DESCRIPTION)</common:GrantSelect>
+      <common:GrantSelect>CONSTITUENCY(ID, CONSTITUENTID, CONSTITUENCYCODEID)</common:GrantSelect>
+      <common:GrantSelect>NETCOMMUNITYCLIENTUSER(ID, CONSTITUENTID, ACTIVE, DELETED)</common:GrantSelect>
+      <common:GrantSelect>EVENTEXPENSE(VENDORID)</common:GrantSelect>
+      <common:GrantSelect>MEMBERSHIPLEVELTERM(ID, TERMCODE)</common:GrantSelect>
+      <common:GrantSelect>MATCHFINDERCONSTITUENT(MATCHFINDERRECORDID)</common:GrantSelect>
+      <common:GrantSelect>PLANNEDGIFTDESIGNATION(ID, PLANNEDGIFTID)</common:GrantSelect>
+      <common:GrantSelect>USR_EDUCATIONALINVOLVEMENT(ID, SITE_ID)</common:GrantSelect>
+      <common:GrantSelect>dbo.UFN_EDUCATIONALINVOLVEMENT_GETLIST</common:GrantSelect>
+      <common:GrantSelect>EDUCATIONALCOLLEGECODE(ID)</common:GrantSelect>
+      <common:GrantSelect>EDUCATIONADDITIONALINFORMATION</common:GrantSelect>
+      <common:GrantSelect>MATCHINGGIFTCONDITION</common:GrantSelect>
+    </common:GrantSelectList>
+    <common:StaticParameters>
+      <common:ParameterList>
+        <common:Param ID="ONLYPROSPECTS">
+          <common:Value>false</common:Value>
+        </common:Param>
+        <common:Param ID="ONLYFUNDRAISERS">
+          <common:Value>false</common:Value>
+        </common:Param>
+        <common:Param ID="ONLYSTAFF">
+          <common:Value>false</common:Value>
+        </common:Param>
+        <common:Param ID="ONLYVOLUNTEERS">
+          <common:Value>false</common:Value>
+        </common:Param>
+        <common:Param ID="ONLYMATCHINGGIFTORGANIZATIONS">
+          <common:Value>false</common:Value>
+        </common:Param>
+        <common:Param ID="ONLYBOARDMEMBERS">
+          <common:Value>false</common:Value>
+        </common:Param>
+      </common:ParameterList>
+    </common:StaticParameters>
+  </CLRSearchList>
+
+  <FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="CONSTITUENTTYPE" DataType="Integer" DefaultValueText="0" Hidden="true" />
+      <FormField FieldID="FULLNAME" DataType="String" Hidden="true" />
+      <FormField FieldID="KEYNAME" MaxLength="50" DataType="String" Caption="Last/Org name" CaptionResourceKey="$$last/org_name" />
+      <FormField FieldID="FIRSTNAME" MaxLength="50" DataType="String" Caption="First name" CaptionResourceKey="$$first_name" />
+      <FormField FieldID="LOOKUPID" DataType="String" MaxLength="36" Caption="Lookup ID" CaptionResourceKey="$$lookup_id" />
+      <FormField FieldID="ADDRESSBLOCK" DataType="String" MaxLength="100" Caption="Address" CaptionResourceKey="$$address" />
+      <FormField FieldID="CITY" DataType="String" MaxLength="100" Caption="City" CaptionResourceKey="$$city" />
+      <FormField FieldID="STATEID" Caption="State" DataType="Guid" CaptionResourceKey="$$state">
+        <SimpleDataList SimpleDataListID="7FA91401-596C-4f7c-936D-6E41683121D7">
+          <Params>
+            <Param ID="COUNTRYID">
+              <Value>FIELDS!COUNTRYID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="POSTCODE" DataType="String" MaxLength="20" Caption="ZIP/Postal code" CaptionResourceKey="$$zip/postal_code">
+        <SearchList SearchListID="e5de8c33-de58-4dc6-9a13-48be9f03db81" DisplayTextIsValue="true" />
+      </FormField>
+      <FormField FieldID="COUNTRYID" Caption="Country" DataType="Guid" CaptionResourceKey="$$country">
+        <SimpleDataList SimpleDataListID="C9649672-353D-42E8-8C25-4D34BBABFBBA" />
+      </FormField>
+      <FormField FieldID="INCLUDEINACTIVE" DataType="Boolean" Caption="Include inactive" CaptionResourceKey="$$include_inactive" />
+      <FormField FieldID="INCLUDEDECEASED" DataType="Boolean" Caption="Include deceased" CaptionResourceKey="$$include_deceased" />
+      <FormField FieldID="ONLYPRIMARYADDRESS" DataType="Boolean" Caption="Only search primary addresses" DefaultValueText="true" CaptionResourceKey="$$only_search_primary_addresses" />
+      <FormField FieldID="EXACTMATCHONLY" DataType="Boolean" Caption="Match all criteria exactly" CaptionResourceKey="$$match_all_criteria_exactly" />
+      <FormField FieldID="SSN" MaxLength="20" DataType="String" Caption="SSN" CaptionResourceKey="$$ssn" Hidden="true" />
+      <FormField FieldID="CHECKNICKNAME" DataType="Boolean" Caption="Check nickname" CaptionResourceKey="$$check_nickname" />
+      <FormField FieldID="CHECKALIASES" DataType="Boolean" Caption="Check aliases" CaptionResourceKey="$$check_aliases" />
+      <FormField FieldID="CLASSOF" DataType="Year" Caption="Primary class year" CaptionResourceKey="$$primary_class_year" />
+      <FormField FieldID="PRIMARYBUSINESS" DataType="String" Caption="Primary business" CaptionResourceKey="$$primary_business" />
+      <FormField FieldID="CHECKMERGEDCONSTITUENTS" DataType="Boolean" Caption="Check merged constituents" CaptionResourceKey="$$check_merged_constituents">
+        <InstalledProductList>
+          <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+          <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+          <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+          <InstalledProduct ID="10F9E9FD-6D69-422e-AC2A-11AEC6ABAC46" />
+        </InstalledProductList>
+      </FormField>
+      <FormField FieldID="MINIMUMDATE" DataType="Date" Caption="Minimum date" CaptionResourceKey="$$minimum_date" />
+      <FormField FieldID="EXCLUDECUSTOMGROUPS" DataType="Boolean" Caption="Exclude custom groups" CaptionResourceKey="$$exclude_custom_groups" />
+      <FormField FieldID="EXCLUDEHOUSEHOLDS" DataType="Boolean" Caption="Exclude households" CaptionResourceKey="$$exclude_households" />
+      <FormField FieldID="EMAILADDRESS" DataType="String" MaxLength="100" Caption="Email address" CaptionResourceKey="$$email_address" />
+      <FormField FieldID="INCLUDEINDIVIDUALS" DataType="Boolean" Caption="Individuals" DefaultValueText="True" CaptionResourceKey="$$individuals" />
+      <FormField FieldID="INCLUDEORGANIZATIONS" DataType="Boolean" Caption="Organizations" DefaultValueText="True" CaptionResourceKey="$$organizations" />
+      <FormField FieldID="INCLUDEGROUPS" DataType="Boolean" Caption="Groups/Households" DefaultValueText="True" CaptionResourceKey="$$groups/households" />
+      <FormField FieldID="CHECKALTERNATELOOKUPIDS" DataType="Boolean" Caption="Check alternate lookup IDs" CaptionResourceKey="$$check_alternate_lookup_ids" />
+      <FormField FieldID="FUZZYSEARCHONNAME" DataType="Boolean" Caption="Include fuzzy search on name" CaptionResourceKey="$$include_fuzzy_search_on_name" />
+      <FormField FieldID="INCLUDENONCONSTITUENTRECORDS" DataType="Boolean" Caption="Include constituents not considered for fundraising purposes" Hidden="true" DefaultValueText="false" />
+      <FormField FieldID="PHONENUMBER" DataType="String" Caption="Phone number" CaptionResourceKey="$$phone_number" />
+      <FormField FieldID="PROSPECTMANAGERID" Caption="Prospect manager" DataType="Guid" CaptionResourceKey="$$prospect_manager0">
+        <SearchList SearchListID="35FA0186-B669-436F-913A-5E9FD5E59982" EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" CaptionResourceKey="$$middle_name" />
+      <FormField FieldID="SUFFIXCODEID" Caption="Suffix" DataType="String" CaptionResourceKey="$$suffix">
+        <CodeTable CodeTableName="SUFFIXCODE" />
+      </FormField>
+      <FormField FieldID="CONSTITUENCY" Caption="Constituency" DataType="Guid" CaptionResourceKey="$$constituency">
+        <SimpleDataList SimpleDataListID="7821c1ab-3001-485b-aec7-f55749f959e6" />
+      </FormField>
+      <FormField FieldID="SOURCECODE" Caption="Source code" CaptionResourceKey="$$source_code" />
+      <FormField FieldID="GENDERCODE" Caption="Gender" DataType="TinyInt">
+        <ValueList>
+          <Items>
+            <Item>
+              <Value>0</Value>
+              <Label>Unknown</Label>
+            </Item>
+            <Item>
+              <Value>1</Value>
+              <Label>Male</Label>
+            </Item>
+            <Item>
+              <Value>2</Value>
+              <Label>Female</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="SCU" Caption="Degree from" DataType="Guid">
+        <SimpleDataList SimpleDataListID="bb0353ee-ac0e-4d80-9fc3-0d4e6202dbf6" />
+      </FormField>
+      <FormField FieldID="UMHSDATA" Caption="MIMED Data" DataType="String" MaxLength="3" />
+      <FormField FieldID="MRN" Caption="MRN" DataType="String" MaxLength="50" />
+      <FormField FieldID="CPISEQUENCE" Caption="CPI Sequence" DataType="String" MaxLength="50" />
+      <FormField FieldID="PATIENTSONLY" DataType="Boolean" Caption="MIMED Constituents Only" DefaultValueText="false" />
+      <FormField FieldID="BIRTHDATE" Caption="Birth date" DataType="FuzzyDate" />
+    </FormFields>
+    <WebUIComponent>
+        <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDataConstituentSearchUIModel" />
+        <WebUI>
+            <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSDataConstituentSearch.html" />
+        </WebUI>
+    </WebUIComponent>
+    <!--<FormUIComponent FormUIComponentType="CustomComponent">
+            <CustomComponentID AssemblyName="Blackbaud.CustomFx.Constituent.Client.dll" ClassName="Blackbaud.CustomFx.Constituent.Client.ConstituentExtensionSearch" />
+        </FormUIComponent>-->
+    <FieldGroups>
+      <FieldGroup ID="ADVANCEDSEARCHOPTIONSGROUP" Caption="Advanced search options" CaptionResourceKey="$$advanced_search_options"></FieldGroup>
+    </FieldGroups>
+    <UIFields>
+      <FormField FieldID="SEARCHIN" Caption="Search in" DataType="String" CaptionResourceKey="$$search_in"></FormField>
+    </UIFields>
+    <UIActions>
+      <UIAction ActionID="SHOWADVANCEDOPTIONS" Caption="Show advanced search options" CaptionResourceKey="$$show_advanced_search_options" />
+      <UIAction ActionID="HIDEADVANCEDOPTIONS" Caption="Hide advanced search options" CaptionResourceKey="$$hide_advanced_search_options" />
+    </UIActions>
+  </FormMetaData>
+  <Output TranslationField="SortConstituentName">
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" CaptionResourceKey="$$id" />
+      <OutputField FieldID="LookupID" Caption="Lookup ID" DataType="String" CaptionResourceKey="$$lookup_id" />
+      <OutputField FieldID="SortConstituentName" Caption="Constituent name" DataType="String" CaptionResourceKey="$$name" />
+      <OutputField FieldID="ConstituentType" Caption="Constituent type" DataType="String" CaptionResourceKey="$$constituent_type" />
+      <OutputField FieldID="PLNAME" Caption="MIMED Name" DataType="String" />
+      <OutputField FieldID="UMHSID" Caption="ID" DataType="Guid" IsHidden="true" />
+      <OutputField FieldID="ADDRESSTYPE" Caption="Address type" DataType="String" />
+      <OutputField FieldID="Address" Caption="Address" DataType="String" CaptionResourceKey="$$address" />
+      <OutputField FieldID="City" Caption="City" DataType="String" CaptionResourceKey="$$city" />
+      <OutputField FieldID="State" Caption="State" DataType="String" CaptionResourceKey="$$state" />
+      <OutputField FieldID="Postcode" Caption="ZIP/Postal code" DataType="String" CaptionResourceKey="$$zip/postal_code" />
+      <OutputField FieldID="COUNTRYID" Caption="Country" DataType="String" CaptionResourceKey="$$country" />
+      <OutputField FieldID="GivesAnonymously" Caption="Gives anonymously" IsHidden="true" DataType="Boolean" CaptionResourceKey="$$gives_anonymously" />
+      <OutputField FieldID="ClassOf" Caption="Primary class year" DataType="Year" CaptionResourceKey="$$primary_class_year" />
+      <OutputField FieldID="PrimaryBusiness" Caption="Primary business" DataType="String" CaptionResourceKey="$$primary_business" />
+      <OutputField FieldID="IsOrganization" Caption="Is organization" DataType="Boolean" IsHidden="true" CaptionResourceKey="$$is_organization" />
+      <OutputField FieldID="Name" Caption="Name" DataType="String" IsHidden="true" CaptionResourceKey="$$name" />
+      <OutputField FieldID="EmailAddress" Caption="Email address" DataType="String" CaptionResourceKey="$$email_address" />
+      <OutputField FieldID="IsGroup" Caption="Is group" DataType="Boolean" IsHidden="true" CaptionResourceKey="$$is_group" />
+      <OutputField FieldID="IsHousehold" Caption="Is household" DataType="Boolean" IsHidden="true" CaptionResourceKey="$$is_household" />
+      <OutputField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" CaptionResourceKey="$$middle_name" />
+      <OutputField FieldID="SUFFIXCODEID" Caption="Suffix" DataType="String" CaptionResourceKey="$$suffix" />
+      <OutputField FieldID="PHONE" Caption="Phone" DataType="String" CaptionResourceKey="$$phone" />
+      <OutputField FieldID="ProspectManager" Caption="Prospect manager" DataType="String" CaptionResourceKey="$$prospect_manager" />
+      <OutputField FieldID="DECEASED" Caption="Deceased" DataType="String" />
+      <OutputField FieldID="GENDER" Caption="Gender" DataType="String" IsHidden="true" />
+      <OutputField FieldID="SCU" Caption="Primary degree from" DataType="String" />
+      <OutputField FieldID="ISMATCHINGORG" Caption="Is matching org" DataType="Boolean" />
+      <OutputField FieldID="MATCHINGORGNAME" Caption="Matching org name" DataType="String" />
+      <OutputField FieldID="UMHSDATA" Caption="MIMED Data" DataType="String" />
+      <OutputField FieldID="MRN" Caption="MRN" DataType="String" />
+      <OutputField FieldID="CPISEQUENCE" Caption="CPI Sequence" DataType="String" />
+    </OutputFields>
+  </Output>
+  <LookupView ViewName="V_SEARCHLIST_CONSTITUENT">
+    <ViewSQL>
+      <![CDATA[
+				select ID, 
+					LOOKUPID, 
+					[NAME], 
+					FIRSTNAME, 
+					MIDDLENAME, 
+					NICKNAME, 
+					KEYNAME, 
+					ISORGANIZATION 
+				from dbo.CONSTITUENT
+                where ISCONSTITUENT = 1;
+			]]>
+    </ViewSQL>
+    <Output TranslationField="NAME">
+      <OutputFields>
+        <OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" CaptionResourceKey="$$id" />
+        <OutputField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String" CaptionResourceKey="$$lookup_id" />
+        <OutputField FieldID="NAME" Caption="Name" DataType="String" CaptionResourceKey="$$name" />
+        <OutputField FieldID="FIRSTNAME" Caption="First name" DataType="String" CaptionResourceKey="$$first_name" />
+        <OutputField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" CaptionResourceKey="$$middle_name" />
+        <OutputField FieldID="NICKNAME" Caption="Nickname" DataType="String" CaptionResourceKey="$$nickname" />
+        <OutputField FieldID="KEYNAME" Caption="Last/Org name" DataType="String" CaptionResourceKey="$$last/org_name" />
+        <OutputField FieldID="ISORGANIZATION" Caption="Is organization" DataType="Boolean" CaptionResourceKey="$$is_organization" />
+      </OutputFields>
+    </Output>
+  </LookupView>
+  <!--<OptionalFields>
+    <FilterFields>
+      <FilterFieldID>CLASSOF</FilterFieldID>
+      <FilterFieldID>PRIMARYBUSINESS</FilterFieldID>
+      <FilterFieldID>EMAILADDRESS</FilterFieldID>
+      <FilterFieldID>COUNTRYID</FilterFieldID>
+      <FilterFieldID>PHONENUMBER</FilterFieldID>
+      <FilterFieldID>PROSPECTMANAGERID</FilterFieldID>
+      <FilterFieldID>MIDDLENAME</FilterFieldID>
+      <FilterFieldID>SUFFIXCODEID</FilterFieldID>
+      <FilterFieldID>CONSTITUENCY</FilterFieldID>
+      <FilterFieldID>SOURCECODE</FilterFieldID>
+    </FilterFields>
+    <OutputFields>
+      <OutputFieldID>CLASSOF</OutputFieldID>
+      <OutputFieldID>PRIMARYBUSINESS</OutputFieldID>
+      <OutputFieldID>EMAILADDRESS</OutputFieldID>
+      <OutputFieldID>COUNTRYID</OutputFieldID>
+      <OutputFieldID>MIDDLENAME</OutputFieldID>
+      <OutputFieldID>SUFFIXCODEID</OutputFieldID>
+      <OutputFieldID>PHONE</OutputFieldID>
+      <OutputFieldID>PROSPECTMANAGER</OutputFieldID>
+    </OutputFields>
+  </OptionalFields>-->
+  <!--To keep the Advanced Search criteria selection stickey add following tag-->
+  <PersistentFields>
+    <PersistentFieldID>INCLUDEINDIVIDUALS</PersistentFieldID>
+    <PersistentFieldID>INCLUDEORGANIZATIONS</PersistentFieldID>
+    <PersistentFieldID>INCLUDEGROUPS</PersistentFieldID>
+    <PersistentFieldID>CHECKNICKNAME</PersistentFieldID>
+    <PersistentFieldID>CHECKALIASES</PersistentFieldID>
+    <PersistentFieldID>CHECKMERGEDCONSTITUENTS</PersistentFieldID>
+    <PersistentFieldID>CHECKALTERNATELOOKUPIDS</PersistentFieldID>
+    <PersistentFieldID>ONLYPRIMARYADDRESS</PersistentFieldID>
+    <PersistentFieldID>INCLUDEDECEASED</PersistentFieldID>
+    <PersistentFieldID>INCLUDEINACTIVE</PersistentFieldID>
+    <PersistentFieldID>FUZZYSEARCHONNAME</PersistentFieldID>
+    <PersistentFieldID>PRIMARYBUSINESS</PersistentFieldID>
+    <PersistentFieldID>PATIENTSONLY</PersistentFieldID>
+  </PersistentFields>
+</SearchListSpec>

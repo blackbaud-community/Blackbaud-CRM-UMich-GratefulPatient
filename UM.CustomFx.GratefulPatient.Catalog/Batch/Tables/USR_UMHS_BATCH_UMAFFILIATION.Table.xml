@@ -1,0 +1,39 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="fce89e67-7a56-4691-ac59-4cacd7c9eeb7"
+	Name="USR UMHS BATCH UMAFFILIATION"
+	Description="Contacts who are an existing constituent in DART"
+	Author="UM Dev"
+	Tablename="USR_UMHS_BATCH_UMAFFILIATION"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Name="CONSTITUENTID" Description="Constituent ID" ForeignTable="CONSTITUENT" OnDelete="CascadeDelete" Cardinality="ManyToOne" Required="true"/>
+    <TextField Name="MRN" Description="Contituent MRN" Length="50" IsUnique="true" Required="true" />
+    <BooleanField Name="HASUMAFFILIATION" Description="Does the constituent have a affiliation or constituency with U-M or is a spouse of such an individual?" />
+	</Fields>
+
+  <!-- define any indexes on the table -->
+	<Indexes>
+    <Index IsUnique="false">
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID"/>
+      </IndexFields>
+    </Index>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="MRN"/>
+      </IndexFields>
+    </Index>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID"/>
+        <IndexField Name="MRN"/>
+      </IndexFields>
+    </Index>
+	</Indexes>
+
+</TableSpec>

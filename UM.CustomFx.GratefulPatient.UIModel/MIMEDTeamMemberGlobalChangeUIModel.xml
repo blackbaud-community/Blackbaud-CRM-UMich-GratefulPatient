@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>Add.MIMEDTeamMember.GlobalChange.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>MIMEDTeamMemberGlobalChangeUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>MIMEDTeamMemberGlobalChange.html</HtmlFile>
+    <HtmlFolder>htmlforms\custom\um.customfx.gratefulpatient\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

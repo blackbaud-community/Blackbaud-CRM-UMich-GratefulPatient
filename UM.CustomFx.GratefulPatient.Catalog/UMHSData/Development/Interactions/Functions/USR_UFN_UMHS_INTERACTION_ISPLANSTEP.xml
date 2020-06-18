@@ -1,0 +1,37 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="8eb27c41-71b5-43ed-9678-13b713842322"
+	Name="USR_UFN_UMHS_INTERACTION_ISPLANSTEP"
+	Description="Returns true if the given interaction is linked to a prospect plan."
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_INTERACTION_ISPLANSTEP"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_INTERACTION_ISPLANSTEP(
+				@INTERACTIONID uniqueidentifier
+			) 
+			returns bit
+			as
+			begin
+			
+			declare @ISSTEP bit;			
+			select 
+				@ISSTEP = 
+					case 
+						when PROSPECTPLANID is null then 0 
+						else 1 
+					end	
+			from dbo.USR_UMHS_INTERACTION
+			where ID = @INTERACTIONID;
+			
+			return @ISSTEP;
+			
+			end
+
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

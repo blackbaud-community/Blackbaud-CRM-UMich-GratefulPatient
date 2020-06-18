@@ -1,0 +1,47 @@
+<DataListSpec
+    xmlns:c="bb_appfx_commontypes"
+    ID="969a687f-ec1e-4106-88e1-ef8da2fc424b"
+    Name="MIMED Relationship List"
+    Description="Returns all MIMED Relationship records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+  <SPDataList SPName="USR_USP_DATALIST_USR_UMHS_RELATIONSHIP">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+      CREATE PROCEDURE DBO.USR_USP_DATALIST_USR_UMHS_RELATIONSHIP(@ID UNIQUEIDENTIFIER)
+      AS
+          SET NOCOUNT ON;
+
+          SELECT R.ID,
+                 D.CONSTITUENTID,
+                 concat(D.FIRSTNAME,' ', D.KEYNAME) FULLNAME,
+                 RTC.DESCRIPTION RELATIONSHP,                 
+				         R.STARTDATE,
+				         R.ENDDATE,
+                 R.ISGUARANTOR,
+                 R.COMMENTS
+          FROM   USR_UMHS_RELATIONSHIP R
+                 JOIN USR_UMHS_DATA D
+                   ON D.ID = R.RECIPROCALUMHSID
+                 JOIN RELATIONSHIPTYPECODE RTC
+                   ON RTC.ID = R.RECIPROCALTYPECODEID
+          WHERE  R.UMHSID = @ID 
+      ]]>
+    </c:CreateProcedureSQL>
+  </SPDataList>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="ID"/>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="CONSTITUENTID" Caption="CONSTITUENTID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="FULLNAME" Caption="Name" DataType="String" />
+      <OutputField FieldID="RELATIONSHP" Caption="Relationship" DataType="String" />      
+      <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date" />
+      <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date" />
+      <OutputField FieldID="ISGUARANTOR" Caption="Is Guarantor" DataType="Boolean" DisplayBooleanAsCheck="true" />
+      <OutputField FieldID="COMMENTS" Caption="Comments" DataType="String" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

@@ -1,0 +1,470 @@
+﻿<TableSpec
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes"
+	ID="e8d3322b-cb35-41c2-998a-ef29d768c6cb"
+	Name="MIMED Address"
+	Description="Stores information about MIMED address records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_ADDRESS"
+	IsBuiltIn="false"
+	>
+  <DependencyList xmlns="bb_appfx_commontypes">
+    <Dependency CatalogAssembly="Blackbaud.AppFx.Constituent.Catalog.dll" CatalogItem="Blackbaud.AppFx.Constituent.Catalog.UFN_ADDRESS_PRIMARYCOUNT.xml" />
+    <Dependency CatalogAssembly="Blackbaud.AppFx.Platform.Catalog.dll" CatalogItem="Blackbaud.AppFx.Platform.Catalog.UFN_STATE_GETCOUNTRY.xml" />
+    <Dependency CatalogAssembly="Blackbaud.AppFx.Constituent.Catalog.dll" CatalogItem="Blackbaud.AppFx.Constituent.Catalog.UFN_ADDRESS_TRANSLATE.xml" />
+  </DependencyList>
+  <Fields>
+    <ForeignKeyField Name="UMHSID" Required="true" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" />
+    <CodeTableField Name="ADDRESSTYPECODEID" CodeTable="ADDRESSTYPECODE" />
+    <BooleanField Description="Indicates this address is the primary address." Name="ISPRIMARY" />
+    <BooleanField Description="Indicates this address should not recieve mailings." Name="DONOTMAIL" />
+    <ForeignKeyField Name="COUNTRYID" Required="true" ForeignTable="COUNTRY" />
+    <ForeignKeyField Name="STATEID" ForeignTable="STATE" />
+    <TextField Description="Contains the address lines." Name="ADDRESSBLOCK" Length="500" />
+    <TextField Description="Contains the address city." Name="CITY" Length="50" />
+    <TextField Description="Contains the address post code." Name="POSTCODE" Length="12" />
+    <SequenceField Description="Stores the user-defined sequence for addresses on a constituent." Name="SEQUENCE" />
+    <CodeTableField Name="DONOTMAILREASONCODEID" CodeTable="DONOTMAILREASONCODE" />
+    <ComputedColumnField Description="Provides a translation field for the address record" Name="DESCRIPTION" Expression="dbo.USR_UFN_UMHS_ADDRESS_TRANSLATE(ID)" />
+    <DateField Description="Indicates the date that the constituent started using this address." Name="HISTORICALSTARTDATE" IncludeTime="false" />
+    <DateField Description="Indicates the date that the constituent stopped using this address." Name="HISTORICALENDDATE" IncludeTime="false" />
+    <BooleanField Description="Indicates this address is confidential." Name="ISCONFIDENTIAL" />
+    <CodeTableField Name="INFOSOURCECODEID" CodeTable="INFOSOURCECODE" />
+    <TextField Description="Contains additional comments about the information source." Name="INFOSOURCECOMMENTS" Length="256" />
+  </Fields>
+  <CheckConstraints>
+    <CheckConstraint Name="CK_USR_UMHS_ADDRESS_PRIMARYCOUNT" CheckExpression="ISPRIMARY=0 or dbo.USR_UFN_UMHS_PRIMARYADDRESSCNT(UMHSID) &lt;= 1" />
+    <CheckConstraint Name="CK_USR_UMHS_ADDRESS_VALIDHISTORICALDATERANGE" CheckExpression="dbo.USR_UFN_UMHS_VALIDATE_STARTEND_DATES(HISTORICALSTARTDATE, HISTORICALENDDATE) = 1" />
+    <CheckConstraint Name="CK_USR_UMHS_ADDRESS_ENDDATEINVALIDIFPRIMARY" CheckExpression="ISPRIMARY = 0 or (ISPRIMARY = 1 and HISTORICALENDDATE is null)" />
+    <CheckConstraint Name="CK_USR_UMHS_ADDRESS_UNIQUEADDRESSANDTYPE" CheckExpression="dbo.USR_UFN_UMHS_ISUNIQUEADDRESSANDTYPE(UMHSID,ADDRESSBLOCK,CITY,STATEID,POSTCODE,COUNTRYID,ADDRESSTYPECODEID) = 1"/>
+  </CheckConstraints>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="STATEID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="POSTCODE" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="DONOTMAIL" />
+        <IncludeField Name="SEQUENCE" />
+        <IncludeField Name="ISPRIMARY" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+        <IndexField Name="ISPRIMARY" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ID" />
+        <IncludeField Name="STATEID" />
+        <IncludeField Name="ADDRESSBLOCK" />
+        <IncludeField Name="CITY" />
+        <IncludeField Name="POSTCODE" />
+        <IncludeField Name="ADDRESSTYPECODEID" />
+        <IncludeField Name="COUNTRYID" />
+        <IncludeField Name="DONOTMAIL" />
+        <IncludeField Name="SEQUENCE" />
+        <IncludeField Name="DATECHANGED" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="DONOTMAIL" />
+        <IndexField Name="ISPRIMARY" />
+        <IndexField Name="ADDRESSTYPECODEID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ID" />
+        <IncludeField Name="SEQUENCE" />
+        <IncludeField Name="UMHSID" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="DATECHANGED" />
+        <IncludeField Name="COUNTRYID" />
+        <IncludeField Name="STATEID" />
+        <IncludeField Name="ADDRESSBLOCK" />
+        <IncludeField Name="CITY" />
+        <IncludeField Name="POSTCODE" />
+        <IncludeField Name="DONOTMAIL" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="STATEID" />
+        <IndexField Name="ADDRESSBLOCK" />
+        <IndexField Name="CITY" />
+        <IndexField Name="POSTCODE" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="UMHSID" />
+      </IncludeFields>
+    </Index>
+  </Indexes>
+  <Triggers>
+    <Trigger Name="TR_UMHSADDRESS_INSERT_SEARCHCPATIENT">
+      <CreateTriggerSQL>
+        <![CDATA[
+      CREATE TRIGGER TR_UMHSADDRESS_INSERT_SEARCHCPATIENT ON DBO.USR_UMHS_ADDRESS AFTER INSERT NOT FOR REPLICATION
+      AS
+        BEGIN
+          -- Delete search records for the patient if the patient originally didn't have an address                
+          delete sp
+          from USR_UMHS_SEARCHPATIENT sp
+          inner join INSERTED i on i.UMHSID=sp.UMHSID
+          where
+            sp.ADDRESSID is NULL;
+
+          -- Add rows for new constituents.
+          INSERT INTO DBO.USR_UMHS_SEARCHPATIENT (
+            ID,
+            UMHSID,
+            CONSTITUENTID,
+            ADDRESSID,
+            KEYNAME,
+            FIRSTNAME,
+            MIDDLENAME,
+            NICKNAME,
+            TITLECODEID,
+            SUFFIXCODEID,
+            COUNTRYID,
+            POSTCODE,
+            STREETNUMBER,
+            STREETNAME
+          )
+          SELECT NEWID(),
+                  C.UMHSID,
+                  C.CONSTITUENTID,
+                  INSERTED.ID,
+                  UPPER(C.KEYNAME),
+                  UPPER(C.FIRSTNAME),
+                  UPPER(C.MIDDLENAME),
+                  UPPER(C.NICKNAME),
+                  C.TITLECODEID,
+                  C.SUFFIXCODEID,
+                  INSERTED.COUNTRYID,
+                  CASE WHEN LTRIM(RTRIM(INSERTED.POSTCODE)) LIKE '[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]' THEN LEFT(LTRIM(INSERTED.POSTCODE), 5)
+                      ELSE LTRIM(RTRIM(INSERTED.POSTCODE))
+                  END,
+                  ISNULL(PARSEDADDRESS.STREETNUMBER, ''),
+                  ISNULL(PARSEDADDRESS.STREETNAME, AB.CLEANADDRESSBLOCK)
+          FROM  INSERTED
+                INNER JOIN DBO.USR_UMHS_V_PATIENTALLNAMES C ON C.UMHSID = INSERTED.UMHSID
+                CROSS APPLY (SELECT LTRIM(RTRIM(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(INSERTED.ADDRESSBLOCK, '.', ''), '-', ' '), ',', ' '), CHAR(13) + CHAR(10), ' '), CHAR(10) + CHAR(13), ' '), CHAR(13), ' '), CHAR(10), ' '), '  ', ' ')))) CLEANADDRESSBLOCK) AB
+                OUTER APPLY (SELECT LEFT(CLEANADDRESSBLOCK, CHARINDEX(' ', CLEANADDRESSBLOCK) - 1)                       STREETNUMBER,
+                                    RIGHT(CLEANADDRESSBLOCK, LEN(CLEANADDRESSBLOCK) - CHARINDEX(' ', CLEANADDRESSBLOCK)) STREETNAME
+                            WHERE DBO.UFN_REGULAREXPRESSIONMATCH('(?:^[A-Z]?[\d-]+[A-Z]? (?:.|\n)+$)', CLEANADDRESSBLOCK) = 1 
+                            AND CHARINDEX(' ', CLEANADDRESSBLOCK) <= 13) PARSEDADDRESS
+                WHERE C.KEYNAME <> ''
+        END          
+      ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHSADDRESS_UPDATE_SEARCHCPATIENT">
+      <CreateTriggerSQL>
+        <![CDATA[
+        CREATE TRIGGER TR_UMHSADDRESS_UPDATE_SEARCHCPATIENT ON DBO.USR_UMHS_ADDRESS AFTER UPDATE NOT FOR REPLICATION
+        AS
+          BEGIN
+                    -- Remove rows for old constituents.
+                  DELETE sp
+                  FROM DBO.USR_UMHS_SEARCHPATIENT sp
+                  INNER JOIN DELETED d on d.ID = sp.ADDRESSID
+                  INNER JOIN INSERTED i on i.ID=d.ID
+                  WHERE
+                    d.UMHSID <> i.UMHSID
+
+                  IF @@ROWCOUNT > 0
+                    BEGIN
+                        -- If there are no more addresses for the old constituent, add a name-only row.
+                        DECLARE @DELETEDCONSTITS TABLE (
+                          UMHSID UNIQUEIDENTIFIER
+                        )
+
+                        -- Load the distinct deleted constituents into a temp table.
+                        -- Originally I had this in-line with the insert below but it caused performance issues.
+                        -- Taking it out to a temp table resolved this.
+                        INSERT INTO @DELETEDCONSTITS
+                        SELECT DISTINCT D.UMHSID
+                        FROM   DELETED D,
+                               INSERTED I
+                        WHERE D.ID = I.ID AND D.UMHSID <> I.UMHSID;
+
+                        INSERT INTO DBO.USR_UMHS_SEARCHPATIENT(
+                          ID,
+                          UMHSID,
+                          CONSTITUENTID,
+                          KEYNAME,
+                          FIRSTNAME,
+                          MIDDLENAME,
+                          NICKNAME,
+                          TITLECODEID,
+                          SUFFIXCODEID
+                        )
+                        SELECT NEWID(),
+                               C.UMHSID,
+                               C.CONSTITUENTID,
+                               UPPER(C.KEYNAME),
+                               UPPER(C.FIRSTNAME),
+                               UPPER(C.MIDDLENAME),
+                               UPPER(C.NICKNAME),
+                               C.TITLECODEID,
+                               C.SUFFIXCODEID
+                        FROM   @DELETEDCONSTITS D
+                               INNER JOIN DBO.USR_UMHS_V_PATIENTALLNAMES C ON C.UMHSID = D.UMHSID
+                        WHERE C.KEYNAME <> '' AND NOT EXISTS(
+                          SELECT 'x'
+                          FROM   DBO.USR_UMHS_SEARCHPATIENT
+                          WHERE  UMHSID = D.UMHSID
+                        );
+
+                        -- Delete name-only rows for constituents for which we are adding addresses.
+                        DELETE FROM DBO.USR_UMHS_SEARCHPATIENT
+                        WHERE  UMHSID IN (
+                          SELECT I.UMHSID
+                          FROM   DELETED D, INSERTED I
+                          WHERE  D.ID = I.ID AND D.UMHSID <> I.UMHSID
+                        )
+                        AND ADDRESSID IS NULL;
+
+
+                        -- Add rows for new constituents.
+                        INSERT INTO DBO.USR_UMHS_SEARCHPATIENT (
+                          ID,
+                          UMHSID,
+                          CONSTITUENTID,
+                          ADDRESSID,
+                          KEYNAME,
+                          FIRSTNAME,
+                          MIDDLENAME,
+                          NICKNAME,
+                          TITLECODEID,
+                          SUFFIXCODEID,
+                          COUNTRYID,
+                          POSTCODE,
+                          STREETNUMBER,
+                          STREETNAME
+                        )
+                        SELECT NEWID(),
+                               C.UMHSID,
+                               C.CONSTITUENTID,
+                               INSERTED.ID,
+                               UPPER(C.KEYNAME),
+                               UPPER(C.FIRSTNAME),
+                               UPPER(C.MIDDLENAME),
+                               UPPER(C.NICKNAME),
+                               C.TITLECODEID,
+                               C.SUFFIXCODEID,
+                               INSERTED.COUNTRYID,
+                               CASE WHEN LTRIM(RTRIM(INSERTED.POSTCODE)) LIKE '[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]' THEN LEFT(LTRIM(INSERTED.POSTCODE), 5)
+                                    ELSE LTRIM(RTRIM(INSERTED.POSTCODE))
+                                END,
+                               ISNULL(PARSEDADDRESS.STREETNUMBER, ''),
+                               ISNULL(PARSEDADDRESS.STREETNAME, AB.CLEANADDRESSBLOCK)
+                        FROM   INSERTED
+                               INNER JOIN DELETED ON DELETED.ID = INSERTED.ID
+                                                 AND DELETED.UMHSID <> INSERTED.UMHSID
+                               INNER JOIN DBO.USR_UMHS_V_PATIENTALLNAMES C ON C.UMHSID = INSERTED.UMHSID
+                               CROSS APPLY (SELECT LTRIM(RTRIM(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(INSERTED.ADDRESSBLOCK, '.', ''), '-', ' '), ',', ' '), CHAR(13) + CHAR(10), ' '), CHAR(10) + CHAR(13), ' '), CHAR(13), ' '), CHAR(10), ' '), '  ', ' ')))) CLEANADDRESSBLOCK) AB
+                               OUTER APPLY (SELECT LEFT(CLEANADDRESSBLOCK, CHARINDEX(' ', CLEANADDRESSBLOCK) - 1)                       STREETNUMBER,
+                                                   RIGHT(CLEANADDRESSBLOCK, LEN(CLEANADDRESSBLOCK) - CHARINDEX(' ', CLEANADDRESSBLOCK)) STREETNAME
+                                            WHERE DBO.UFN_REGULAREXPRESSIONMATCH('(?:^[A-Z]?[\d-]+[A-Z]? (?:.|\n)+$)', CLEANADDRESSBLOCK) = 1 
+                                            AND CHARINDEX(' ', CLEANADDRESSBLOCK) <= 13) PARSEDADDRESS
+                        WHERE C.KEYNAME <> ''
+                    END
+                    
+            IF UPDATE(ADDRESSBLOCK) OR UPDATE(POSTCODE) OR UPDATE(COUNTRYID)
+              BEGIN
+                  UPDATE DBO.USR_UMHS_SEARCHPATIENT
+                  SET    COUNTRYID = INSERTED.COUNTRYID,
+                         POSTCODE = CASE WHEN LTRIM(RTRIM(INSERTED.POSTCODE)) LIKE '[0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]' THEN LEFT(LTRIM(INSERTED.POSTCODE), 5)
+                                    ELSE LTRIM(RTRIM(INSERTED.POSTCODE))
+                                    END,
+                         STREETNUMBER = ISNULL(PARSEDADDRESS.STREETNUMBER, ''),
+                         STREETNAME = ISNULL(PARSEDADDRESS.STREETNAME, AB.CLEANADDRESSBLOCK)
+                  FROM   INSERTED
+                         CROSS APPLY (SELECT LTRIM(RTRIM(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(INSERTED.ADDRESSBLOCK, '.', ''), '-', ' '), ',', ' '), CHAR(13) + CHAR(10), ' '), CHAR(10) + CHAR(13), ' '), CHAR(13), ' '), CHAR(10), ' '), '  ', ' ')))) CLEANADDRESSBLOCK) AB
+                         OUTER APPLY (SELECT LEFT(CLEANADDRESSBLOCK, CHARINDEX(' ', CLEANADDRESSBLOCK) - 1)                       STREETNUMBER,
+                                             RIGHT(CLEANADDRESSBLOCK, LEN(CLEANADDRESSBLOCK) - CHARINDEX(' ', CLEANADDRESSBLOCK)) STREETNAME
+                                      WHERE
+                                           DBO.UFN_REGULAREXPRESSIONMATCH('(?:^[A-Z]?[\d-]+[A-Z]? (?:.|\n)+$)', CLEANADDRESSBLOCK) = 1
+                                       AND CHARINDEX(' ', CLEANADDRESSBLOCK)                                                       <= 13) PARSEDADDRESS
+                  WHERE USR_UMHS_SEARCHPATIENT.ADDRESSID = INSERTED.ID
+              END
+          END 
+
+        ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHSADDRESS_DELETE_SEARCHCPATIENT">
+      <CreateTriggerSQL>
+        <![CDATA[
+      CREATE TRIGGER TR_UMHSADDRESS_DELETE_SEARCHCPATIENT ON DBO.USR_UMHS_ADDRESS AFTER DELETE NOT FOR REPLICATION
+      AS
+        BEGIN
+          /*
+           * When deleting all of the address records for an individual, we need to leave one of 
+           * the records to represent just the individual for the patient search. Then the address
+           * fields for the one record will be cleared in the next SQL statement. 
+           */
+		      /*
+		      select 
+			      sp.ID,
+			      sp.UMHSID,
+            sp.ADDRESSID,
+            sp.COUNTRYID,
+            sp.POSTCODE,
+            sp.STREETNAME,
+            sp.STREETNUMBER
+		      */          
+          delete sp
+          from USR_UMHS_SEARCHPATIENT sp
+          inner join 
+          (
+	          select UMHSID, max(ROWNMB) ADDRESSCOUNT
+	          from
+	          (
+		          select
+			          ROW_NUMBER() over(partition by sp.UMHSID order by sp.ADDRESSID) as ROWNMB,
+			          UMHSID,
+			          ADDRESSID
+		          from USR_UMHS_SEARCHPATIENT sp
+	          ) x
+	          group by UMHSID
+          ) curr_address_counts on curr_address_counts.UMHSID=sp.UMHSID
+          inner join 
+          (
+	          select UMHSID, max(ROWNMB) ADDRESSCOUNT
+	          from
+	          (
+		          select
+			          ROW_NUMBER() over(partition by d.UMHSID order by d.ID) as ROWNMB,
+			          sp.UMHSID,
+			          sp.ADDRESSID
+		          from DELETED d
+				  inner join USR_UMHS_SEARCHPATIENT sp on sp.UMHSID=d.UMHSID and sp.ADDRESSID=d.ID
+	          ) x
+	          group by UMHSID
+          ) del_address_counts on del_address_counts.UMHSID=sp.UMHSID
+          inner join
+          (
+	          select
+		          ROW_NUMBER() over(partition by sp.UMHSID order by sp.ADDRESSID) as ROWNMB,
+		          UMHSID,
+		          ADDRESSID
+	          from USR_UMHS_SEARCHPATIENT sp
+          ) cur_address_rownmbs on cur_address_rownmbs.UMHSID=sp.UMHSID and cur_address_rownmbs.ADDRESSID=sp.ADDRESSID 
+          where
+	          (curr_address_counts.ADDRESSCOUNT - del_address_counts.ADDRESSCOUNT) = 0 -- Deleting all address records
+          and (curr_address_counts.addresscount > 1) -- There is more than 1 record being deleted
+          and (cur_address_rownmbs.rownmb > 1)       -- Use the first row to associate to the individual, but delete the others
+          
+          /*
+           * Clear address fields where all the address records are being deleted for an individual. This
+           * is to allow at least one record to be available for an individual
+           */
+			    /*
+			    select 
+				    sp.ID,
+				    sp.UMHSID,
+				    sp.ADDRESSID,
+				    sp.COUNTRYID,
+				    sp.POSTCODE,
+				    sp.STREETNAME,
+				    sp.STREETNUMBER
+			    */          
+          update sp
+          set 
+            sp.ADDRESSID = NULL,
+            sp.COUNTRYID = NULL,
+            sp.POSTCODE = N'',
+            sp.STREETNAME = N'',
+            sp.STREETNUMBER = N''
+          from USR_UMHS_SEARCHPATIENT sp
+          inner join 
+          (
+	          select UMHSID, max(ROWNMB) ADDRESSCOUNT
+	          from
+	          (
+		          select
+			          ROW_NUMBER() over(partition by sp.UMHSID order by sp.ADDRESSID) as ROWNMB,
+			          UMHSID,
+			          ADDRESSID
+		          from USR_UMHS_SEARCHPATIENT sp
+	          ) x
+	          group by UMHSID
+          ) curr_address_counts on curr_address_counts.UMHSID=sp.umhsid
+          inner join 
+          (
+	          select UMHSID, max(ROWNMB) ADDRESSCOUNT
+	          from
+	          (
+		          select
+			          ROW_NUMBER() over(partition by d.UMHSID order by d.ID) as ROWNMB,
+			          sp.UMHSID,
+			          sp.ADDRESSID
+		          from DELETED d
+				  inner join USR_UMHS_SEARCHPATIENT sp on sp.UMHSID=d.UMHSID and sp.ADDRESSID=d.ID
+	          ) x
+	          group by UMHSID
+          ) del_address_counts on del_address_counts.UMHSID=sp.UMHSID
+          where
+	          (curr_address_counts.ADDRESSCOUNT - del_address_counts.ADDRESSCOUNT) = 0 -- Deleting all address records
+            
+          /*
+           * Delete the address records where not all of the address records are being deleted for an individual,
+           * so that there is at least one recorded to associate to the individual.
+           */
+          delete sp
+          from USR_UMHS_SEARCHPATIENT sp
+          inner join 
+          (
+	          select UMHSID, max(ROWNMB) ADDRESSCOUNT
+	          from
+	          (
+		          select
+			          ROW_NUMBER() over(partition by sp.UMHSID order by sp.ADDRESSID) as ROWNMB,
+			          UMHSID,
+			          ADDRESSID
+		          from USR_UMHS_SEARCHPATIENT sp
+	          ) x
+	          group by UMHSID
+          ) curr_address_counts on curr_address_counts.UMHSID=sp.UMHSID
+          inner join 
+          (
+	          select UMHSID, max(ROWNMB) ADDRESSCOUNT
+	          from
+	          (
+		          select
+			          ROW_NUMBER() over(partition by d.UMHSID order by d.ID) as ROWNMB,
+			          UMHSID,
+			          ID as ADDRESSID
+		          from DELETED d
+	          ) x
+	          group by UMHSID
+          ) del_address_counts on del_address_counts.UMHSID=sp.UMHSID
+          inner join DELETED d on d.UMHSID=sp.UMHSID and d.ID=sp.ADDRESSID
+          where
+	          (curr_address_counts.ADDRESSCOUNT - del_address_counts.ADDRESSCOUNT) > 0 -- Not all of the address records for an individual are being deleted    
+            
+        END 
+
+        ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+  </Triggers>
+</TableSpec>

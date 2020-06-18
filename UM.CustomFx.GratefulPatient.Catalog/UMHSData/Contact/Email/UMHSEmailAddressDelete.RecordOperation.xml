@@ -1,0 +1,60 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="2ea8cba1-bf39-40cb-a3c3-ddf1de3e0f99"
+    Name="MIMED Email Address Delete Operation"
+    Description="Used to delete the given USR UM MIMED EMAILADDRESS"
+    Author="UM Dev"
+    RecordType="MIMED Email Address"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_USR_UM_UMHSEMAILADDRESS_DELETE">
+            <c:CreateProcedureSQL>
+<![CDATA[
+create procedure dbo.USR_USP_USR_UM_UMHSEMAILADDRESS_DELETE
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as begin
+	--check deletion rules, if any
+if (select
+							count(NONPRIMARY.ID)
+						from
+							dbo.USR_UMHS_EMAILADDRESS [TODELETE]
+						left join
+							dbo.USR_UMHS_EMAILADDRESS [NONPRIMARY]
+						on
+							TODELETE.UMHSID = NONPRIMARY.UMHSID
+						where
+							TODELETE.ID = @ID and
+							TODELETE.ISPRIMARY = 1 and
+							NONPRIMARY.ISPRIMARY = 0 ) > 0
+						begin
+							raiserror ('ERR_PRIMARY_EMAILADDRESS_DELETE',13,1);
+							return 0;
+						end
+	-- use the system generated delete routine to allow proper recording of the deleting agent
+	exec USP_USR_UMHS_EMAILADDRESS_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	return 0;
+	
+end
+]]>
+</c:CreateProcedureSQL>
+        </SPOperationImplementation>
+      <ExpectedOperationDBExceptions>
+        <c:CustomExceptions>
+          <c:Exception SearchText="ERR_PRIMARY_EMAILADDRESS_DELETE" CustomErrorMsgResourceKey="$$a_primary_emailaddress_cannot_be_deleted_unless_it_is_a_constituent's_only_address">
+            <c:CustomErrorMsg>A primary email address cannot be deleted unless it is a constituent's only address.</c:CustomErrorMsg>
+          </c:Exception>
+        </c:CustomExceptions>
+
+      </ExpectedOperationDBExceptions>
+
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this MIMED email address?" />
+    </Prompt>
+</RecordOperationSpec>

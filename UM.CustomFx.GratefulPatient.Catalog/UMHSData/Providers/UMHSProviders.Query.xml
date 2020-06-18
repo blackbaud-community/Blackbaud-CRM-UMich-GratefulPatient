@@ -1,0 +1,98 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ca86bb02-b12d-4955-b193-3fd9f52fc29d"
+	Name="MIMED Providers ListBuilder Query"
+	Description="A table function defined for querying on MIMED provider records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  
+	<!-- define the view used to return data for the query -->
+  <TVFImplementation FunctionName="USR_UFN_UMHS_PROVIDERS">
+    <CreateFunctionSQL>
+      <![CDATA[
+        create function dbo.USR_UFN_UMHS_PROVIDERS
+          (
+            @UMHSID uniqueidentifier = null
+          )
+          returns table
+          as       
+          return  
+        select DISTINCT
+          p.ID,
+          c.ID as CONSTITUENTID,
+          c.NAME as PROVIDERNAME,
+          p.PROVIDERDRNUMBER,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when sd.ID is NOT null
+            then
+              sd.NAME
+            else
+              N''
+          end as SUBDEPARTMENT,
+          p.ADMITDOCTORIND,
+          p.ATTENDDOCTORIND,
+          p.RESIDENTDOCTORIND,
+          p.CONSULTDOCTORIND,         
+          dbo.USR_UFN_UM_FORMATPHONE(p.PHONE) as PHONE         
+        from dbo.USR_UMHS_PROVIDERS p
+        inner join USR_UMHS_VISITS v on v.providerid = p.ID
+        inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+        left join USR_UMHS_DATA u on u.ID = v.UMHSID
+        --left outer join [STATE] s on s.ID = p.STATEID
+        left outer join USR_UMHS_DEPARTMENT d on d.ID = p.DEPARTMENTID
+        left outer join USR_UMHS_SUBDEPARTMENT sd on sd.ID = p.SUBDEPARTMENTID
+        WHERE v.UMHSID = @UMHSID        
+        
+      ]]>
+    </CreateFunctionSQL>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  </TVFImplementation>	
+  
+
+	<!-- describe each field in the view output -->
+	<Output>		
+      <OutputFields>
+        <OutputField Name="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+        <OutputField Name="CONSTITUENTID" Caption="Constituent" DataType="Guid" IsHidden="true"/>       
+        <OutputField Name="PROVIDERNAME" Caption="Provider Name" DataType="String" />
+        <OutputField Name="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" />
+        <OutputField Name="DEPARTMENT" Caption="MIMED department" DataType="String" />
+        <OutputField Name="SUBDEPARTMENT" Caption="MIMED subdepartment" DataType="String" />
+        <OutputField Name="ADMITDOCTORIND" Caption="Admitting Provider" DataType="Boolean" />        
+        <OutputField Name="ATTENDDOCTORIND" Caption="Attending Provider" DataType="Boolean" />        
+        <OutputField Name="RESIDENTDOCTORIND" Caption="Resident Provider" DataType="Boolean" />        
+        <OutputField Name="CONSULTDOCTORIND" Caption="Consulting Provider" DataType="Boolean" /> 
+        <OutputField Name="PHONE" Caption="Provider Phone" DataType="String" />
+      </OutputFields>
+	</Output>
+  
+  <ListBuilder>
+    <Columns>
+      <Column IsDefaultColumn="true" Name="CONSTITUENTID" />
+      <Column IsDefaultColumn="true" Name="PROVIDERNAME" />      
+      <Column IsDefaultColumn="true" Name="PROVIDERDRNUMBER"/>
+      <Column IsDefaultColumn="true" Name="DEPARTMENT"/>
+      <Column IsDefaultColumn="true" Name="SUBDEPARTMENT"/>
+      <Column IsDefaultColumn="true" Name="ADMITDOCTORIND"/>
+      <Column IsDefaultColumn="true" Name="ATTENDDOCTORIND"/>
+      <Column IsDefaultColumn="true" Name="RESIDENTDOCTORIND"/>
+      <Column IsDefaultColumn="true" Name="CONSULTDOCTORIND"/>      
+      <Column IsDefaultColumn="true" Name="PHONE"/>
+    </Columns>
+    
+  </ListBuilder>
+  
+</QueryViewSpec>
+

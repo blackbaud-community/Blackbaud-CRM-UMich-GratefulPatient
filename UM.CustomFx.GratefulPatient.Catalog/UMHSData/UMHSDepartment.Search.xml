@@ -1,0 +1,54 @@
+﻿<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="4b3370c4-b360-493d-8de0-fc4dba2377b1"
+    Name="MIMED department Search"
+    Description="A search list for locating MIMED department records"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="6eb22cbc-8e57-494f-93a0-227af6cc41db"
+	>
+
+	<!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be 
+	used to limit the number of rows returned to a reasonable number. -->
+	<SPSearchList SPName="USR_UM_USP_SEARCHLIST_UMHSDEPARTMENT">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_SEARCHLIST_UMHSDEPARTMENT
+(
+	@NAME nvarchar(100) = null,
+	@MAXROWS smallint = 500
+)
+as
+	set @NAME = dbo.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@NAME, 0, null);
+
+	select top(@MAXROWS)
+		ID,
+		NAME
+	from 
+		dbo.USR_UMHS_DEPARTMENT
+	where
+		 (NAME LIKE @NAME)
+	order by 
+		NAME asc
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+			<FormField FieldID="NAME" Caption="Name" DataType="String" MaxLength="100" />
+		</FormFields>
+	</FormMetaData>
+
+	<!-- also describe the output fields for the search screen -->
+	<Output TranslationField="Name">
+		<OutputFields>
+			<OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+			<OutputField FieldID="NAME" Caption="Name" DataType="String" />
+		</OutputFields>
+	</Output>
+
+</SearchListSpec>
+

@@ -1,0 +1,107 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="83b3506c-8bed-448d-ae81-763ee51c1cee"
+	Name="MIMED Interest Query"
+	Description="A view defined for querying on MIMED interest records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSINTEREST">
+		<ViewSQL>
+			<![CDATA[
+      SELECT I.ID,
+             I.UMHSID,
+	           I.INTERESTLEVEL,
+	           I.INTERESTLEVELCODE,
+             TC.DESCRIPTION              AS INTERESTTYPE_TRANSLATION,             
+             ID.DEPARTMENTID,
+             ID.SUBDEPARTMENTID,
+             UD.NAME AS DEPARTMENT,
+             USD.NAME AS SUBDEPARTMENT,
+             I.COMMENT,             
+             --I.DISCOVEREDBYID,
+             C.NAME as DISCOVEREDBY,
+             I.STARTDATE,
+             I.ENDDATE,
+             [ADDEDBY].APPLICATIONNAME   AS [ADDEDBY_APPLICATION],
+             [ADDEDBY].USERNAME          AS [ADDEDBY_USERNAME],
+             [CHANGEDBY].APPLICATIONNAME AS [CHANGEDBY_APPLICATION],
+             [CHANGEDBY].USERNAME        AS [CHANGEDBY_USERNAME],
+             I.DATEADDED,
+             I.DATECHANGED,
+             I.INTERESTTYPECODEID
+      FROM   DBO.USR_UMHS_INTEREST I
+             LEFT JOIN DBO.USR_UMHS_INTERESTTYPECODE TC ON TC.ID = I.INTERESTTYPECODEID
+             LEFT JOIN DBO.USR_UMHS_INTERESTDEPTSUBDEPT ID on ID.INTERESTID = I.ID
+			 LEFT JOIN DBO.USR_UMHS_DEPARTMENT UD ON UD.ID = ID.DEPARTMENTID
+			 LEFT JOIN DBO.USR_UMHS_SUBDEPARTMENT USD ON USD.ID = ID.SUBDEPARTMENTID
+             LEFT JOIN CONSTITUENT C ON C.ID = I.DISCOVEREDBYID 
+             LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON ADDEDBY.ID = I.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON CHANGEDBY.ID = I.CHANGEDBYID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+    <OutputFields>
+      <OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="MIMED ID"  Category="System Fields" Name="UMHSID" />
+      <OutputField Caption="Interest level" Name="INTERESTLEVEL">
+        <LookupInfo>
+          <TranslationList>
+            <c:Options>
+              <c:TranslationListOption Value="" />
+              <c:TranslationListOption Value="Extremely positive" />
+              <c:TranslationListOption Value="Somewhat positive" />
+              <c:TranslationListOption Value="Neutral" />
+              <c:TranslationListOption Value="Somewhat negative" />
+              <c:TranslationListOption Value="Extremely negative" />
+            </c:Options>
+          </TranslationList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="INTERESTLEVELCODE" Caption="Interest level code" DataType="Integer" />
+      <OutputField Caption="Interest type" Name="INTERESTTYPE_TRANSLATION">
+        <LookupInfo IDField="INTERESTTYPECODEID">
+          <CodeTable CodeTableName="USR_UMHS_INTERESTTYPECODE" IncludeInactive="true" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="DEPARTMENTID" Name="DEPARTMENTID" IsHidden="true" DataType="Guid"></OutputField>
+      <OutputField Caption="SUBDEPARTMENTID" Name="SUBDEPARTMENTID" IsHidden="true" DataType="Guid"></OutputField>
+        <OutputField Caption="MIMED department" Name="DEPARTMENT">
+        <LookupInfo IDField="DEPARTMENTID">
+          <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="MIMED subdepartment" Name="SUBDEPARTMENT">
+        <LookupInfo IDField="SUBDEPARTMENTID">
+          <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Comments" Name="COMMENT" />
+      <OutputField Caption="Discovered by" Name="DISCOVEREDBY" />
+      <OutputField Caption="Start date" Name="STARTDATE" />
+      <OutputField Caption="End date" Name="ENDDATE" />
+      <OutputField Caption="Added by application" Category="System Fields" Name="ADDEDBY_APPLICATION" />
+      <OutputField Caption="Added by user name" Category="System Fields" Name="ADDEDBY_USERNAME" />
+      <OutputField Caption="Changed by application" Category="System Fields" Name="CHANGEDBY_APPLICATION" />
+      <OutputField Caption="Changed by user name" Category="System Fields" Name="CHANGEDBY_USERNAME" />
+      <OutputField Caption="Date added" Category="System Fields" Name="DATEADDED" />
+      <OutputField Caption="Date changed" Category="System Fields" Name="DATECHANGED" />
+      <OutputField Caption="INTERESTTYPECODEID" Name="INTERESTTYPECODEID" DataType="Guid" IsHidden="true" />
+    </OutputFields>
+  </Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Interest"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

@@ -1,0 +1,60 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="7f182a11-c1b0-4965-8c15-fd4d69218e50"
+	Name="MIMED Interest Departments Query"
+	Description="A view defined for querying on MIMED interest department records"
+	Author="UM Dev"
+	IsRoot="true"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_UM_V_QUERY_UMHSINTERESTDEPARTMENT">
+		<ViewSQL>
+			<![CDATA[
+          SELECT IDEPT.ID,
+             IDEPT.INTERESTID,
+             IDEPT.DEPARTMENTID,
+             IDEPT.SUBDEPARTMENTID,
+             DEPT.NAME               AS UMHS_DEPARTMENT,
+             SUBDEPT.NAME            AS UMHS_SUBDEPARTMENT, 
+             IDEPT.DATEADDED,        
+             IDEPT.DATECHANGED,
+             ADDEDBY.APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             ADDEDBY.USERNAME          AS ADDEDBY_USERNAME,
+             CHANGEDBY.APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             CHANGEDBY.USERNAME        AS CHANGEDBY_USERNAME
+             FROM   DBO.USR_UMHS_INTERESTDEPTSUBDEPT IDEPT
+             INNER JOIN DBO.USR_UMHS_DEPARTMENT DEPT ON DEPT.ID = IDEPT.DEPARTMENTID
+             INNER JOIN DBO.USR_UMHS_SUBDEPARTMENT SUBDEPT ON SUBDEPT.ID = IDEPT.SUBDEPARTMENTID
+             LEFT OUTER JOIN DBO.CHANGEAGENT ADDEDBY ON ADDEDBY.ID = IDEPT.ADDEDBYID
+             LEFT OUTER JOIN DBO.CHANGEAGENT CHANGEDBY ON CHANGEDBY.ID = IDEPT.CHANGEDBYID 
+			]]>
+    </ViewSQL>
+  </ViewImplementation>
+
+  <!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Caption="System record ID" Name="ID" Category="System Fields"/>
+      <OutputField Caption="Interest record ID" Name="INTERESTID" Category="System Fields"  />
+      <OutputField Caption="Department record ID" Name="DEPARTMENTID" Category="System Fields" />
+      <OutputField Caption="Subdepartment record ID" Name="SUBDEPARTMENTID" Category="System Fields" />
+      <OutputField Caption="MIMED department" Name="UMHS_DEPARTMENT" />
+      <OutputField Caption="MIMED subdepartment" Name="UMHS_SUBDEPARTMENT" />
+      <OutputField Caption="Date added" Category="System Fields" Name="DATEADDED"/>
+      <OutputField Caption="Date changed" Category="System Fields" Name="DATECHANGED" />
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" Category="System Fields" />
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" Category="System Fields" />
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" Category="System Fields" />
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" Category="System Fields" />
+    </OutputFields>
+  </Output>
+  <!--<RelationshipOperations>
+    <AddToParentView Cardinality="OneToMany" PathAlias="MIMED departments" Field="INTERESTID" ParentView="USR_V_QUERY_UMHSINTEREST" ParentViewRelatedField="ID" />
+  </RelationshipOperations>-->
+</QueryViewSpec>
+

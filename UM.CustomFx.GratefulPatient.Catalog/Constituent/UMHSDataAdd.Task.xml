@@ -1,0 +1,42 @@
+﻿<TaskSpec
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c1cd0c47-26d9-4c59-9504-4f053776691f"
+	Name="MIMED Constituent Search"
+	Description="Task to Search MIMED Constituent."
+	Author="UM Dev"
+	FunctionalAreaID="00050ce8-8abb-4a86-b9af-70a035ce0582"
+	Sequence="999"
+	ImageKey="CATALOG:UM.CustomFx.GratefulPatient.Catalog,UM.CustomFx.GratefulPatient.Catalog.Images.Patient.png" 
+  TaskGroup="Constituents"
+	>
+
+	<!-- indicate what this task should do (navigate to a page, show a form, etc. -->
+
+  <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+    <ActionContext>
+      <SearchListReturnValue SearchListID="747530a1-be80-4054-a021-d2a599248261">
+        <!--"f9225388-f9db-409b-a4d7-a68e6968cdc9">-->
+        <!--"06752763-28da-466a-b5d3-6ce25f1597b4">-->
+        <AddDataForms>
+          <AddDataForm ID="1f9671b3-6740-447c-ad15-ef2718c0e43a" Caption="Individual" CaptionResourceKey="$$individual" />
+          <AddDataForm ID="d846a816-46c7-470e-9ad0-973b2730e836" Caption="Household" CaptionResourceKey="$$household" />
+          <AddDataForm ID="f0f6426a-fccd-48bb-846b-eb3d1a4a0ed4" Caption="Group" CaptionResourceKey="$$group" />
+          <AddDataForm ID="ca3ed110-a5f0-4b5b-8eb7-0616e0a82e8e" Caption="Organization" CaptionResourceKey="$$organization" />
+        </AddDataForms>
+      </SearchListReturnValue>
+      <IDMapperDescriptor IDMapperID="9063aa78-8fef-4f18-9c01-c4b26c88b9f5" SourceIDValueSource="ContextID"/>
+    </ActionContext>
+    
+    <!--<PostActionEvent>
+      <GoToPage>
+        <SpecificPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000">
+          <ActionContext>
+            <IDMapperDescriptor IDMapperID="9063aa78-8fef-4f18-9c01-c4b26c88b9f5" SourceIDValueSource="ContextID"/>
+          </ActionContext>
+        </SpecificPage>
+      </GoToPage>
+    </PostActionEvent>-->
+  </ShowPage>
+  <PervasiveSearchOptions Caption="MIMED Constituents" PlaceholderText="Name or Lookup ID"/>
+</TaskSpec>

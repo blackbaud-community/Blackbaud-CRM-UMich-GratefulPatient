@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>UMHSData.Add.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>UMHSDataFormUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>UMHSDataForm.html</HtmlFile>
+    <HtmlFolder>htmlforms\custom\um.customfx.gratefulpatient\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

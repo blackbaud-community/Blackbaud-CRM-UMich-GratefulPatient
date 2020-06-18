@@ -1,0 +1,15 @@
+<PackageSpec
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="E2F0D143-ECB2-4829-9F7D-6188787AF546"
+    Name="Grateful Patient - Team Member Global Change Package (CSR-DRT-1510_jiac)"
+    Description="A package defining specs related to Team Member Add/Edit/Delete Global Changes"
+    Author="UM Dev"
+    >
+
+  <c:DependencyList>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Add.MIMEDTeamMember.GlobalChange.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Change.MIMEDTeamMember.GlobalChange.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Delete.MIMEDTeamMember.GlobalChange.xml" />
+  </c:DependencyList>
+</PackageSpec>

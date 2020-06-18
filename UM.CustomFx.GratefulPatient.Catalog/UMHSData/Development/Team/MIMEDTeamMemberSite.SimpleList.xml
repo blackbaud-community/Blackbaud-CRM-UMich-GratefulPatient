@@ -1,0 +1,28 @@
+﻿<SimpleDataListSpec
+	xmlns="bb_appfx_simpledatalist"
+	xmlns:c="bb_appfx_commontypes"
+	ID="934a2dad-2c37-4c87-a205-ac12ca37d8f1"
+	Name="MIMED Team Member Site Simple Data List"
+	Description="A simple data list that returns mimed team member site records"
+	Author="UM Dev"
+	TranslationFunctionID="00000000-0000-0000-0000-000000000000"
+	>
+
+	<SPSimpleList SPName="USR_UM_USP_MIMEDTEAMSITE">
+		<c:CreateProcedureSQL >
+			<![CDATA[
+create procedure dbo.USR_UM_USP_MIMEDTEAMSITE (	     
+        @TEAMMEMBERID uniqueidentifier = null
+      ) as
+      set nocount on;
+ select
+        a.SITEID as VALUE, s.NAME as LABEL
+      from dbo.APPUSER a
+	  inner join dbo.SITE s on s.ID = a.SITEID
+	  WHERE a.CONSTITUENTID = @TEAMMEMBERID
+        order by Name
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSimpleList>
+
+</SimpleDataListSpec>

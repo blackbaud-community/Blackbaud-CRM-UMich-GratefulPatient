@@ -1,0 +1,32 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c84d68a1-0e45-4514-b915-85949f63e9d6"
+	Name="USR_UFN_UMHS_INTERACTIONS"
+	Description="Returns all the MIMED interactions for a patient"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_INTERACTIONS"
+	>
+	<CreateFunctionSQL>
+		<![CDATA[
+    CREATE FUNCTION DBO.USR_UFN_UMHS_INTERACTIONS(@UMHSID UNIQUEIDENTIFIER)
+    RETURNS TABLE
+    AS
+        RETURN
+          SELECT I.ID,
+                 DATE,
+                 ISC.DESCRIPTION STATUS,
+                 IC.NAME        CATEGORY,
+                 SC.NAME        SUBCATEGORY,
+                 SUMMARY,
+                 TC.DESCRIPTION CONTACTMETHOD
+          FROM   USR_UMHS_INTERACTION I
+                 LEFT JOIN USR_INTERACTION_STATUSCODE ISC ON ISC.ID = I.STATUSCODEID
+                 JOIN INTERACTIONCATEGORY IC ON IC.ID = I.INTERACTIONCATEGORYID
+                 JOIN INTERACTIONSUBCATEGORY SC ON SC.ID = I.INTERACTIONSUBCATEGORYID
+                 JOIN INTERACTIONTYPECODE TC ON TC.ID = I.CONTACTMETHODCODEID
+          WHERE  UMHSID = @UMHSID 
+		]]>
+	</CreateFunctionSQL>
+  <CreateChildCollectionFunction RootElementName="INTERACTIONS" BaseTableName="USR_UMHS_INTERACTION" ParentIDColumn="UMHSID" OrderBy="CATEGORY" />
+</SQLFunctionSpec>

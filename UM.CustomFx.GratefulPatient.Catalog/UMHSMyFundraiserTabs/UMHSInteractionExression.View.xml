@@ -1,0 +1,60 @@
+﻿<ViewDataFormTemplateSpec 
+	xmlns="bb_appfx_viewdataformtemplate" 
+	xmlns:c="bb_appfx_commontypes" 
+	ID="5367e57f-a6fd-4fb9-a1fb-435e100d2cbc" 
+	Name="MIMED Interaction Page Exression View Data Form"
+	Description="Used by the built-in MIMED Interaction Page for input into properties defined as expressions"
+	Author="UM Dev"
+	DataFormInstanceID="4bd04331-1e6e-42fe-9a07-4d962cebc094" 
+	RecordType="MIMED Interaction"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the SP that returns the data used by the form -->
+	<SPDataForm SPName="USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSINTERACTIONEXRESSION">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+      create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSINTERACTIONEXRESSION
+      (
+	        @ID uniqueidentifier,
+					@DATALOADED bit = 0 output,
+          @CONSTITUENT nvarchar(700) = null output,
+					@UMHSID uniqueidentifier = null output,
+					@CONSTITUENTID uniqueidentifier = null output,
+					@TYPE nvarchar(100) = null output,
+					@DATE datetime = null output
+				)
+        as begin
+
+					set nocount on;
+					
+					set @DATALOADED = 0;         
+         
+          SELECT @DATALOADED = 1,
+                 @CONSTITUENT = NF.NAME,
+                 @UMHSID = I.UMHSID,
+                 @CONSTITUENTID = U.CONSTITUENTID,
+                 @TYPE = ITC.DESCRIPTION,
+                 @DATE = I.DATE
+          FROM   DBO.USR_UMHS_INTERACTION I
+                 JOIN USR_UMHS_DATA U ON U.ID = I.UMHSID
+                 OUTER APPLY DBO.UFN_CONSTITUENT_DISPLAYNAME(U.CONSTITUENTID) NF
+                 LEFT JOIN DBO.INTERACTIONTYPECODE ITC ON ITC.ID = I.CONTACTMETHODCODEID
+          WHERE  I.ID = @ID;
+
+					return 0;
+				end 
+      ]]>
+    </c:CreateProcedureSQL>		
+  </SPDataForm>
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="CONSTITUENT" MaxLength="700" Caption="CONSTITUENT" />
+      <c:FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="CONSTITUENTID" />
+      <c:FormField FieldID="UMHSID" DataType="Guid" Caption="UMHSID" />
+      <c:FormField FieldID="TYPE" MaxLength="100" Caption="TYPE" />
+      <c:FormField FieldID="DATE" DataType="Date" Caption="DATE" />
+    </c:FormFields>
+  </c:FormMetaData>
+
+</ViewDataFormTemplateSpec>

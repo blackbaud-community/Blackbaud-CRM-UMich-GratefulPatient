@@ -1,0 +1,56 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="b107c390-8671-433d-9777-f251d0d9069a"
+	Name="MIMED Phone"
+	Description="Stores information about usr um UMHSPHONE records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_PHONE"		   
+	IsBuiltIn="false"
+	>
+
+  <Fields>
+    <ForeignKeyField Name="UMHSID" Required="true" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" />
+    <CodeTableField Name="PHONETYPECODEID" CodeTable="PHONETYPECODE" />
+    <TextField Description="Stores the phone number." Name="NUMBER" Length="100" Required="true" />
+    <BooleanField Description="Indicates this phone number is the primary phone number." Name="ISPRIMARY" />
+    <BooleanField Description="Indicates this phone number should not receive phone calls." Name="DONOTCALL" />
+    <SequenceField Description="Stores the user-defined sequence for phone numbers on a constituent." Name="SEQUENCE" />
+    <CodeTableField Name="INFOSOURCECODEID" CodeTable="INFOSOURCECODE" />
+    <TextField Description="Contains additional comments about the information source." Name="INFOSOURCECOMMENTS" Length="256" />
+    <DateField Description="The date the phone number becomes valid." Name="STARTDATE" IncludeTime="false" />
+    <DateField Description="The date the phone number becomes invalid." Name="ENDDATE" IncludeTime="false" />
+    <CodeTableField Description="The reason code translation ID for do not call." Name="DONOTCALLREASONCODEID" CodeTable="DONOTCALLREASONCODE" />
+    <ForeignKeyField Description="The country for this phone number." Name="COUNTRYID" ForeignTable="COUNTRY" />
+    <BooleanField Description="Indicates this phone number is confidential." Name="ISCONFIDENTIAL" />
+    <TimeField Name="CALLBEFORE"/>
+    <TimeField Name="CALLAFTER" />
+  </Fields>
+  <CheckConstraints>
+    <CheckConstraint Name="CK_USR_UMHS_PHONE_PRIMARYCOUNT" CheckExpression="ISPRIMARY=0 or dbo.USR_UFN_UMHS_PRIMARYPHONECNT(UMHSID) &lt;= 1" />
+    <CheckConstraint Name="CK_USR_UMHS_PHONE_VALIDDATERANGE" CheckExpression="dbo.USR_UFN_UMHS_VALIDATE_STARTEND_DATES(STARTDATE, ENDDATE) = 1" />
+    <CheckConstraint Name="CK_USR_UMHS_PHONE_ENDDATEINVALIDIFPRIMARY" CheckExpression="ISPRIMARY=0 or (ISPRIMARY = 1 and ENDDATE is null)" />
+    <CheckConstraint Name="CK_USR_UMHS_PHONE_UNIQUENUMBERANDTYPE" CheckExpression="dbo.USR_UFN_UMHS_ISUNIQUEPHONENUMBERANDTYPE(UMHSID,NUMBER,PHONETYPECODEID) = 1"/>
+  </CheckConstraints>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+        <IndexField Name="ISPRIMARY"/>
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="NUMBER" />
+        <IncludeField Name="ID" />
+        <IncludeField Name="DATECHANGED" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+        <IndexField Name="PHONETYPECODEID" />
+        <IndexField Name="NUMBER" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+
+</TableSpec>

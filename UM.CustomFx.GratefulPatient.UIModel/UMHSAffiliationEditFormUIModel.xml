@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>UMHSAffiliation.Edit.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>UMHSAffiliationEditFormUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>UMHSAffiliationEditForm.html</HtmlFile>
+    <HtmlFolder>htmlforms\custom\um.customfx.gratefulpatient\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

@@ -1,0 +1,126 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="35975872-5e8f-4100-8f5e-ae90783d60d4" 
+	Name="Delete MIMED Batch" 
+	Description="Delete MIMED Batch"
+	Author="UM Dev"
+	OperationType="Delete"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_USP_UMHS_BATCH_RECORDOPERATION_UMHSBATCH_DELETE">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+/*
+ * USR_USP_UMHS_BATCH_RECORDOPERATION_UMHSBATCH_DELETE - This procedure is a modified copy of the default batch delete procedure called USP_BATCH_DELETE where it 
+ * deletes the UMHS batch's associated records in the IMPORTERROR tables for each of the UMHS batches, which are the tables 
+ * [USR_UMHS_BATCH_CONTACTS_IMPORTERRORS], [USR_UMHS_BATCH_PROVIDERS_IMPORTERRORS], and [USR_UMHS_BATCH_VISITS_IMPORTERRORS].
+ */
+create procedure dbo.USR_USP_UMHS_BATCH_RECORDOPERATION_UMHSBATCH_DELETE
+(
+  @ID uniqueidentifier,
+  @CURRENTAPPUSERID uniqueidentifier,
+  @CHANGEAGENTID uniqueidentifier
+)
+with execute as owner
+as
+  set nocount on;
+
+  declare @LOCKNAME nvarchar(36);
+  declare @RESULT int;
+  declare @GRANTED bit;
+  declare @BASETABLE nvarchar(128);
+  declare @STATUSCODE tinyint;
+  declare @PARENTCOMMITTED bit;
+
+  begin try
+    set @LOCKNAME = upper(cast(@ID as nvarchar(36)));
+    exec @RESULT = sp_getapplock @Resource=@LOCKNAME, @LockMode='Exclusive', @LockOwner='Session', @LockTimeout=0;
+
+    if @RESULT = 0
+      begin
+        set @GRANTED = dbo.[UFN_SECURITY_APPUSER_GRANTED_BATCHOWNER](@CURRENTAPPUSERID, @ID);
+        if @GRANTED = 0
+          raiserror('You do not have permission to delete this batch.', 13, 1);
+
+        if @CHANGEAGENTID is null
+          exec dbo.[USP_CHANGEAGENT_GETORCREATECHANGEAGENT] @CHANGEAGENTID output;
+
+        declare @CONTEXTCACHE varbinary(128);
+        set @CONTEXTCACHE = CONTEXT_INFO();
+
+        if not @CHANGEAGENTID is null
+          set CONTEXT_INFO @CHANGEAGENTID;
+
+        --Get the base tablename for this batch type...
+        select
+          @BASETABLE = [BATCHTYPECATALOG].[BASETABLENAME],
+          @STATUSCODE = [BATCH].[STATUSCODE],
+          @PARENTCOMMITTED = (case when [PARENTBATCH].[STATUSCODE] not in (1, 2) then 0 else 1 end)
+        from dbo.[BATCH]
+        inner join dbo.[BATCHTEMPLATE] on [BATCH].[BATCHTEMPLATEID] = [BATCHTEMPLATE].[ID]
+        inner join dbo.[BATCHTYPECATALOG] on [BATCHTEMPLATE].[BATCHTYPECATALOGID] = [BATCHTYPECATALOG].[ID]
+        left join dbo.[BATCH] as [PARENTBATCH] on [PARENTBATCH].[ID] = [BATCH].[ORIGINATINGBATCHID]
+        where [BATCH].[ID] = @ID;
+
+        if @STATUSCODE = 3
+          raiserror('This batch is in a state which cannot be deleted.', 13, 1);
+
+        if @PARENTCOMMITTED = 0
+          raiserror('BBERR_BATCH_HASUNCOMMITTEDPARENT', 13, 1);
+
+        --delete from batchtable
+        declare @SQL nvarchar(max);
+        set @SQL = 'delete from dbo.[' + @BASETABLE + '] where [BATCHID] = @BATCHID';
+        exec sp_executesql @SQL, N'@BATCHID uniqueidentifier', @BATCHID = @ID;
+
+        -- ******************************************************************
+        -- **** MODIFICATION of the original USP_BATCH_DELETE procedure *****
+        -- ******************************************************************
+        --delete from <batchtable>_IMPORTERRORS table
+        set @SQL = 'delete from dbo.[' + @BASETABLE + '_IMPORTERRORS] where [BATCHID] = @BATCHID';
+        exec sp_executesql @SQL, N'@BATCHID uniqueidentifier', @BATCHID = @ID;
+        
+        --mark batch as deleted
+        update dbo.[BATCH] set
+          [STATUSCODE] = 2,
+          [CHANGEDBYID] = @CHANGEAGENTID,
+          [DATECHANGED] = getdate()
+        where [ID] = @ID;
+
+        --Delete ignore duplicate list
+        delete from dbo.[BATCHIGNOREDUPLICATE]
+        where [BATCHID] = @ID;
+
+        if not @CONTEXTCACHE is null
+          set CONTEXT_INFO @CONTEXTCACHE;
+
+        exec sp_releaseapplock @Resource=@LOCKNAME, @LockOwner='Session';
+      end
+    else
+      raiserror('This batch is in use and cannot be deleted.', 13, 1);
+  end try
+
+  begin catch
+    if len(@LOCKNAME) > 0 and @RESULT = 0
+      exec sp_releaseapplock @Resource=@LOCKNAME, @LockOwner='Session';
+
+    exec dbo.[USP_RAISE_ERROR];
+    return 1;
+  end catch
+
+  return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+	<!-- optionally, offer a prompt before executing the record operation -->
+	<Prompt>
+		<StandardPrompt Text="Are you sure you want to delete this batch?" />
+	</Prompt>
+
+</RecordOperationSpec>

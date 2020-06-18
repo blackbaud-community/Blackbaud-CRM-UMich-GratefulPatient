@@ -1,0 +1,33 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="28ac818b-e524-4edc-80cf-3e9875c8deed"
+	Name="USR_UFN_UMHS_DISPLAYNAME"
+	Description="Provides access to the formatted MIMED display name"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_DISPLAYNAME"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+        create function dbo.USR_UFN_UMHS_DISPLAYNAME
+        (
+              @ID uniqueidentifier
+        )
+        returns table
+        as
+        
+          return (
+              select 
+       		        CASE FIRSTNAME WHEN '' THEN '' ELSE FIRSTNAME + ' ' END
+		              +
+		              CASE MIDDLENAME WHEN '' THEN '' ELSE LEFT(MIDDLENAME,1) + '. ' END
+		              + 
+		              KEYNAME as NAME
+          from dbo.USR_UMHS_DATA with(nolock)
+          where dbo.USR_UMHS_DATA.ID = @ID
+        )
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

@@ -1,0 +1,85 @@
+﻿<PackageSpec 
+	xmlns="bb_appfx_package"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0127e8a1-e3f9-466a-8b6f-c1c6db7defa9" 
+	Name="GratefulPatient.Package.CSR_1547_pebigler"
+	Description="A package defining specs related to grateful patient records" 
+	Author="UM Dev"
+	>
+
+	<!-- Note:  the order of the items listed here is important.  For example, you won't be able to load a data form that references 
+	a table that hasn't been loaded, etc.  In general, the following order is recommended:
+	
+		(functions and procedures first)
+		SQLFunctionSpec
+		SQLStoredProcedureSpec
+		TranslationFunctionSpec
+
+		(tables next)
+		CodeTableSpec
+		TableSpec
+		SQLViewSpec
+
+		(features next)
+		SimpleDataListSpec		
+		SearchListSpec
+		RecordOperationSpec
+		DataListSpec
+		
+		(forms next)
+		AddDataFormTemplateSpec
+		EditDataFormTemplateSpec
+		ViewDataFormTemplateSpec		
+
+		(more feature types)
+		BatchTypeSpec
+		BusinessProcessSpec
+		CalendarSpec
+		FlashDashSpec
+		GlobalChangeSpec
+		IDMapperSpec
+		KpiSpec
+		MapEntitySpec
+		MergeConfiguration
+		MergeTaskSpec
+		QueryViewSpec
+		ReportSpec
+		RelationshipMapSpec
+		SmartFieldSpec
+		SmartQuerySpec
+		WorkflowInboxSpec
+		WorkflowSpec
+		
+		(functional areas, pages, and tasks last)
+		PageDefinitionSpec
+		FunctionalAreaSpec
+		TaskSpec	
+	-->
+	
+	<DependencyList xmlns="bb_appfx_commontypes">
+
+	  <!--UMHS Contact/Address functions-->
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.Functions.UFN_UMHS_ISUNIQUEADDRESSANDTYPE.xml" />
+	  <!--UMHS Contact/Email functions-->
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.Functions.UFN_UMHS_ISUNIQUEEMAILADDRESSANDTYPE.xml" />
+	  <!--UMHS Contact/Phone functions-->
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.Functions.UFN_UMHS_ISUNIQUEPHONENUMBERANDTYPE.xml" />
+
+	  <!--UMHS Contacts tables-->
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.USR_UMHS_ADDRESS.Table.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.USR_UMHS_EMAILADDRESS.Table.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.USR_UMHS_PHONE.Table.xml" />
+
+	  <!--UMHS Contact add forms-->
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.Add.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.Add.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.Add.xml" />
+
+	  <!--UMHS Contact edit forms-->
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.Edit.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.Edit.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.Edit.xml" />
+
+  </DependencyList>
+
+</PackageSpec>

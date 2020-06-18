@@ -1,0 +1,218 @@
+<EditDataFormTemplateSpec
+    xmlns:c="bb_appfx_commontypes"
+    ID="508C5FA2-A92C-463F-AC9C-274ADDE83D87"
+    Name="MIMED Interaction Batch Edit Form"
+    Description="Used for editing the given MIMED Interaction Batch"
+    Author="UM Dev"
+    RecordType="MIMED Interaction Batch"
+    DataFormInstanceID="A7925865-4B1C-46A8-8265-62F68806BCB2"
+    c:SecurityUIFolder="MIMED Data"
+    OwnerIDMapperID="00000000-0000-0000-0000-000000000000"
+    xmlns="bb_appfx_editdataformtemplate"
+    >
+  <SPDataForm>
+    <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_INTERACTIONBATCH">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_INTERACTIONBATCH (
+          @ID                       UNIQUEIDENTIFIER,
+          @UMHSID                   UNIQUEIDENTIFIER = NULL OUTPUT, 
+          @INTERACTIONID            UNIQUEIDENTIFIER = NULL OUTPUT, 
+          @SEQUENCE                 INT = NULL  OUTPUT,
+          @DATALOADED               BIT = 0 OUTPUT,
+          @TSLONG                   BIGINT = 0 OUTPUT,
+          @SUMMARY                  NVARCHAR(100) = NULL OUTPUT,
+          @INTERACTIONCATEGORYID    UNIQUEIDENTIFIER = NULL OUTPUT,
+          @INTERACTIONSUBCATEGORYID UNIQUEIDENTIFIER = NULL OUTPUT,
+          @EXPECTEDDATE             DATETIME = NULL OUTPUT,
+          @FUNDRAISERID             UNIQUEIDENTIFIER = NULL OUTPUT,
+          @CONTACTMETHODCODEID      UNIQUEIDENTIFIER = NULL OUTPUT,
+          @EVENTID                  UNIQUEIDENTIFIER = NULL OUTPUT,
+          @ACTUALDATE               DATETIME = NULL OUTPUT,
+          @SITES                    XML = NULL OUTPUT,
+          @COMMENT                 NVARCHAR(MAX) = NULL OUTPUT,
+          @PARTICIPANTS             XML = NULL OUTPUT,
+          @STATUSCODEID             UNIQUEIDENTIFIER = NULL OUTPUT
+        )
+        AS
+            SET NOCOUNT ON;
+            -- be sure to set these, in case the select returns no rows
+            SET @DATALOADED = 0
+            SET @TSLONG = 0
+
+            -- populate the output parameters, which correspond to fields on the form.  Note that
+            -- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+            -- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+            -- can be considered.
+            SELECT @DATALOADED = 1,
+                   @UMHSID = UMHSID,
+                   @INTERACTIONID = I.INTERACTIONID,
+                   @SEQUENCE = I.SEQUENCE,
+                   @TSLONG = TSLONG,
+                   @SUMMARY = SUMMARY,
+                   @INTERACTIONCATEGORYID = INTERACTIONCATEGORYID,
+                   @INTERACTIONSUBCATEGORYID = INTERACTIONSUBCATEGORYID,
+                   @EXPECTEDDATE = EXPECTEDDATE,
+                   @FUNDRAISERID = FUNDRAISERID,
+                   @CONTACTMETHODCODEID = CONTACTMETHODCODEID,
+                   @EVENTID = EVENTID,
+                   @ACTUALDATE = ACTUALDATE,
+                   @SITES = DBO.USR_UFN_UMHS_INTERACTIONBATCH_GETSITES_TOITEMLISTXML(I.ID),
+                   @COMMENT = COMMENTS,
+                   @PARTICIPANTS = dbo.USR_UFN_UMHS_INTERACTIONBATCHPARTICIPANTS_TOITEMLISTXML(I.ID),
+                   @STATUSCODEID = STATUSCODEID
+            FROM   DBO.USR_UMHS_INTERACTIONBATCH I
+            WHERE  ID = @ID
+
+            RETURN 0; 
+        ]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_INTERACTIONBATCH">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_INTERACTIONBATCH (
+          @ID                       UNIQUEIDENTIFIER,
+          @UMHSID                   UNIQUEIDENTIFIER,
+          @INTERACTIONID            UNIQUEIDENTIFIER,
+          @SEQUENCE                 INT,
+          @CHANGEAGENTID            UNIQUEIDENTIFIER = NULL,
+          @SUMMARY                  NVARCHAR(100),
+          @INTERACTIONCATEGORYID    UNIQUEIDENTIFIER,
+          @INTERACTIONSUBCATEGORYID UNIQUEIDENTIFIER,
+          @EXPECTEDDATE             DATETIME,
+          @FUNDRAISERID             UNIQUEIDENTIFIER,
+          @CONTACTMETHODCODEID      UNIQUEIDENTIFIER,
+          @EVENTID                  UNIQUEIDENTIFIER,
+          @ACTUALDATE               DATETIME,
+          @SITES                    XML,
+          @COMMENT                 NVARCHAR(MAX),
+          @PARTICIPANTS             XML,
+          @STATUSCODEID               UNIQUEIDENTIFIER
+        )
+        AS
+            SET NOCOUNT ON;
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+          BEGIN TRY
+              -- handle updating the data
+              UPDATE DBO.USR_UMHS_INTERACTIONBATCH
+              SET    UMHSID = @UMHSID,
+                     INTERACTIONID = @INTERACTIONID,
+                     SEQUENCE = @SEQUENCE,
+                     SUMMARY = @SUMMARY,
+                     INTERACTIONCATEGORYID = @INTERACTIONCATEGORYID,
+                     INTERACTIONSUBCATEGORYID = @INTERACTIONSUBCATEGORYID,
+                     EXPECTEDDATE = @EXPECTEDDATE,
+                     FUNDRAISERID = @FUNDRAISERID,
+                     CONTACTMETHODCODEID = @CONTACTMETHODCODEID,
+                     EVENTID = @EVENTID,
+                     ACTUALDATE = @ACTUALDATE,
+                     COMMENTS = @COMMENT,
+                     STATUSCODEID = @STATUSCODEID,
+                     CHANGEDBYID = @CHANGEAGENTID,
+                     DATECHANGED = GETDATE()
+              WHERE  ID = @ID
+              
+              exec dbo.USR_USP_UMHS_INTERACTIONBATCH_GETSITES_UPDATEFROMXML @ID, @SITES, @CHANGEAGENTID;
+              exec dbo.USR_USP_UMHS_INTERACTIONBATCHPARTICIPANTS_UPDATEFROMXML @ID, @PARTICIPANTS, @CHANGEAGENTID;
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+
+            RETURN 0; 
+        ]]>
+      </c:CreateProcedureSQL>
+    </SaveImplementation>
+  </SPDataForm>
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="UMHSID" DataType="Guid" Caption="MIMED Constituent" Hidden="false" Required="true">
+        <SearchList SearchListID="875b6cfb-b52f-45a0-bf30-9f1992ab28ae" EnableQuickFind="true">
+          <FormFieldOverrides>
+            <FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true"/>
+            <FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="true"/>
+          </FormFieldOverrides>
+        </SearchList>
+      </FormField>
+      <FormField FieldID="INTERACTIONID" DataType="Guid" Caption="MIMED Interaction ID" Hidden="true" />
+      <FormField FieldID="SEQUENCE" Caption="Sequence" Required="true" Hidden="true" />
+      <FormField FieldID="SUMMARY" MaxLength="100" Caption="Summary" Required="true" />
+      <FormField FieldID="STATUSCODEID" Caption="Status" DataType="Guid" Required="true">
+        <CodeTable CodeTableName="USR_INTERACTION_STATUSCODE" />
+      </FormField>
+      <FormField FieldID="FUNDRAISERID" DataType="Guid" Caption="Owner">
+        <SearchList SearchListID="fb4a0305-70bc-4409-b3c2-ba672bf49626" EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="INTERACTIONCATEGORYID" DataType="Guid" Caption="Category" Required="true">
+        <SimpleDataList SimpleDataListID="cbba7545-b66f-44ac-aa24-d9c2f8cbc4ec" />
+      </FormField>
+      <FormField FieldID="INTERACTIONSUBCATEGORYID" DataType="Guid" Caption="Sub category" Required="true">
+        <SimpleDataList SimpleDataListID="0eacc39b-07d1-4641-8774-e319559535a7">
+          <Params>
+            <Param ID="INTERACTIONCATEGORYID">
+              <Value>Fields!INTERACTIONCATEGORYID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="CONTACTMETHODCODEID" DataType="Guid" Caption="Contact method" Required="true">
+        <CodeTable CodeTableName="INTERACTIONTYPECODE" />
+      </FormField>
+      <FormField FieldID="EVENTID" DataType="Guid" Caption="Event">
+        <SearchList SearchListID="21452a39-7c7d-4334-8b89-6c0ea619acec" EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="EXPECTEDDATE" DataType="Date" Caption="Expected date" />
+      <FormField FieldID="ACTUALDATE" DataType="Date" Caption="Actual date" />
+      <FormField FieldID="SITES" DataType="XML" Caption="Sites" Required="true">
+        <Collection>
+          <Fields>
+            <FormField FieldID="ID" DataType="Guid" Hidden="true" />
+            <FormField FieldID="SITEID" DataType="Guid" Required="true" Caption="Site">
+              <SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+                <SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+              </SimpleDataList>
+            </FormField>
+          </Fields>
+        </Collection>
+        <InstalledProductList>
+          <InstalledProduct ID="133f9bca-00f1-4007-9792-586b931340c6" />
+        </InstalledProductList>
+      </FormField>
+      <FormField FieldID="COMMENT" Caption="Comments" />
+      <FormField FieldID="PARTICIPANTS" DataType="XML" Caption="Participants">
+        <Collection>
+          <Fields>
+            <FormField FieldID="ID" DataType="Guid" Hidden="true" Caption="ID" />
+            <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Participant">
+              <SimpleDataList SimpleDataListID="eec723dc-3ed3-425b-9ef2-8ba1ccc190d1">
+                <Params>
+                  <Param ID="CONSTITUENTID">
+                    <Value>PARENT.FIELDS!UMHSID</Value>
+                  </Param>
+                </Params>
+                <SearchList SearchListID="875b6cfb-b52f-45a0-bf30-9f1992ab28ae" EnableQuickFind="true">
+                  <FormFieldOverrides>
+                    <FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true"/>
+                    <FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false"/>
+                    <FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false"/>
+                    <FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="false"/>
+                  </FormFieldOverrides>
+                </SearchList>
+              </SimpleDataList>
+            </FormField>
+          </Fields>
+        </Collection>
+      </FormField>
+    </FormFields>
+  </FormMetaData>
+</EditDataFormTemplateSpec>

@@ -1,0 +1,161 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="891318b5-2190-430a-9b43-584adab04af5"
+	Name="USR_USP_UMHS_ADDCONTACTINFORMATIONFORBBISMIMEDDONOR"
+	Description="Creates new record in contacts"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_ADDCONTACTINFORMATIONFORBBISMIMEDDONOR"
+   GrantServiceRolePermission="true"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+     CREATE PROCEDURE USR_USP_UMHS_ADDCONTACTINFORMATIONFORBBISMIMEDDONOR 
+          (
+          @TITLESTR nvarchar(20) = '',
+          @KEYNAME nvarchar(20) = '',
+          @FIRSTNAME nvarchar(20) = '',
+          @CONSTITUENTID uniqueidentifier = null,
+          @TYPESTR nvarchar(50) = '',
+          @COUNTRYID uniqueidentifier = '27CF0F7D-CDAF-448F-80DE-E9196BF28D36', -- united States by default
+          @STATESTR nvarchar(10) = '',
+          @ADDRESSBLOCK nvarchar(300) ='',
+          @CITY nvarchar(100) ='',
+          @POSTCODE nvarchar(24) ='',
+          @INFOSOURCECODEID uniqueidentifier= 'FF298AB5-74C6-4C30-924D-E2271175D7A4',	--Web-Self Reported,
+          @INFOSOURCECOMMENTS nvarchar(256) = '',
+          @NUMBER nvarchar(200) ='',
+          @EMAILADDRESS udt_emailaddress = '' ,
+		  @STARTDATE  dbo.UDT_MONTHDAY ='0000'
+          )
+          AS
+          SET NOCOUNT ON 
+          Declare @ID uniqueidentifier = null
+          Declare @CHANGEAGENTID uniqueidentifier = null
+          declare @ADDRESSTYPECODEID uniqueidentifier = null
+          declare @STATEID uniqueidentifier = null
+          declare @EMAILADDRESSTYPECODEID uniqueidentifier = null
+          declare @PHONETYPECODEID uniqueidentifier = null
+          declare @ADDCURRENTDATE datetime
+		  declare @CURRENTDATE datetime
+          declare @ENDDATE dbo.UDT_MONTHDAY = '0000'
+		  DECLARE @CURRENTKEYNAME nvarchar(100) = ''
+		  DECLARE @TYPEEMAIL nvarchar(50) =''
+
+          BEGIN
+	          if @CHANGEAGENTID is null  
+	          exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output				
+	          set @CURRENTDATE  = getdate()
+	          
+			  --First update constituent table for name instead of MIMED freind.			  
+			  SET @CURRENTKEYNAME = (SELECT KEYNAME FROM dbo.constituent where ID = @CONSTITUENTID )
+			  IF @CURRENTKEYNAME like 'MIMED Friend M0%'
+			  Begin
+					  update dbo.constituent 
+						  set KEYNAME = @KEYNAME ,
+						  FIRSTNAME = @FIRSTNAME,
+						  TITLECODEID = (SELECT ID from TITLECODE WHERE DESCRIPTION = @TITLESTR)	
+						  where ID = @CONSTITUENTID 
+
+					  --Contact information
+					  SET @ID = newid()
+					  SET @CONSTITUENTID = @CONSTITUENTID
+
+					  --As Per Andrea the type from BBIS is always Home.
+					  --SET @TYPESTR = (SELECT CASE WHEN @TYPESTR = 'H' THEN 'Home'	 
+							-- WHEN @TYPESTR = 'B' THEN 'Business'
+							-- ELSE 'OTHER' END )
+					  --SET @TYPEEMAIL = (SELECT CASE WHEN @TYPESTR = 'H' THEN 'Home E-mail Address'
+					  --                  WHEN @TYPESTR = 'B' THEN 'Work E-mail Address'
+							--			else 'E-mail Address' END)
+					  set @ADDRESSTYPECODEID = (SELECT ID FROM dbo.ADDRESSTYPECODE WHERE DESCRIPTION = 'HOME' )--@TYPESTR)
+					  set @PHONETYPECODEID = (SELECT ID FROM dbo.PHONETYPECODE WHERE DESCRIPTION = 'HOME' )-- @TYPESTR)
+					  set @EMAILADDRESSTYPECODEID = (SELECT ID from dbo.EMAILADDRESSTYPECODE WHERE DESCRIPTION = 'Home E-mail Address') --@TYPEEMAIL)
+					  set @STATEID = (SELECT ID FROM dbo.[STATE] where ABBREVIATION = @STATESTR AND COUNTRYID = @COUNTRYID)
+
+					  --Insert in to Address table
+					  BEGIN
+						  --if (SELECT count(ID) from DBO.ADDRESS WHERE  CONSTITUENTID = @CONSTITUENTID and city= @city and postcode = @POSTCODE 
+						  --	and STATEID = @STATEID and ADDRESSBLOCK = @ADDRESSBLOCK and COUNTRYID = @COUNTRYID ) > 0
+						  declare @NULLVALUE uniqueidentifier = newid();
+						  if exists (select 'X' from dbo.ADDRESS
+												  where  HISTORICALENDDATE is null and CONSTITUENTID = @CONSTITUENTID	and coalesce(ADDRESSBLOCK,'') = coalesce(@ADDRESSBLOCK,'') 
+												  and coalesce(CITY,'') = coalesce(@CITY,'')
+												  and coalesce(STATEID,@NULLVALUE) = coalesce(@STATEID,@NULLVALUE) 
+												  and coalesce(ADDRESSTYPECODEID,@NULLVALUE) = coalesce(@ADDRESSTYPECODEID,@NULLVALUE)
+												  and coalesce(COUNTRYID,@NULLVALUE) = coalesce(@COUNTRYID,@NULLVALUE) 
+												  and coalesce(POSTCODE,'') =coalesce(@POSTCODE,''))
+						  begin
+							  update dbo.[Address] set ISPRIMARY = 0 
+							  WHERE ISPRIMARY = 1 and constituentid = @ConstituentID
+							  update dbo.[Address] set ISPRIMARY = 1 
+							  where HISTORICALENDDATE is null and CONSTITUENTID = @CONSTITUENTID	and coalesce(ADDRESSBLOCK,'') = coalesce(@ADDRESSBLOCK,'') 
+												  and coalesce(CITY,'') = coalesce(@CITY,'')
+												  and coalesce(STATEID,@NULLVALUE) = coalesce(@STATEID,@NULLVALUE) 
+												  and coalesce(ADDRESSTYPECODEID,@NULLVALUE) = coalesce(@ADDRESSTYPECODEID,@NULLVALUE)
+												  and coalesce(COUNTRYID,@NULLVALUE) = coalesce(@COUNTRYID,@NULLVALUE) 
+												  and coalesce(POSTCODE,'') =coalesce(@POSTCODE,'')
+						  end
+					  else
+						  Begin
+							  exec dbo.USP_DATAFORMTEMPLATE_ADD_ADDRESS_2 @ID=@ID OUTPUT, 
+							  @CHANGEAGENTID=@CHANGEAGENTID, @CONSTITUENTID=@CONSTITUENTID, 
+							  @HISTORICALSTARTDATE = @CURRENTDATE,
+							  @ADDRESSTYPECODEID=@ADDRESSTYPECODEID,
+							  @PRIMARY=1, @COUNTRYID=@COUNTRYID,@STATEID=@STATEID,
+							  @ADDRESSBLOCK=@ADDRESSBLOCK,@CITY=@CITY,@POSTCODE=@POSTCODE,@INFOSOURCECODEID=@INFOSOURCECODEID  
+						  end
+					  --insert in to phone table
+					  --if (select count(ID) from dbo.PHONE where NUMBER = @NUMBER and CONSTITUENTID = @CONSTITUENTID) > 0
+					  --set @NUMBER = dbo.UFN_PHONE_REMOVECOUNTRYCODE(@NUMBER, @COUNTRYID);
+					  if exists (select 'X' from dbo.PHONE
+													  where CONSTITUENTID = @CONSTITUENTID
+													  and NUMBER = @NUMBER)
+						  begin
+							  update dbo.phone set ISPRIMARY = 0 
+							  WHERE ISPRIMARY = 1 and constituentid = @ConstituentID and NUMBER = @NUMBER
+							  update dbo.phone set ISPRIMARY = 1 --, @PHONETYPECODEID=@PHONETYPECODEID
+							  where CONSTITUENTID = @CONSTITUENTID
+													  and NUMBER = @NUMBER
+						  end
+					  else
+						  begin 
+							  exec [dbo].USP_DATAFORMTEMPLATE_ADD_PHONE @ID=@ID output,
+							  @CHANGEAGENTID=@CHANGEAGENTID,@CONSTITUENTID=@CONSTITUENTID,
+							  @PHONETYPECODEID=@PHONETYPECODEID, @COUNTRYID=@COUNTRYID, 
+							  @NUMBER=@NUMBER, @PRIMARY = 1 , @DONOTCALL = 0,
+							  @INFOSOURCECODEID=@INFOSOURCECODEID,@INFOSOURCECOMMENTS=@INFOSOURCECOMMENTS,@STARTDATE=@CURRENTDATE
+						  end
+
+					  --insert in to email table
+					  --if (select count(ID) from dbo.EMAILADDRESS where EMAILADDRESS = @EMAILADDRESS and CONSTITUENTID = @CONSTITUENTID) > 0
+					  if exists (select 'X' 
+													  from dbo.EMAILADDRESS
+													  where  ENDDATE is null and CONSTITUENTID = @CONSTITUENTID
+													  and coalesce(EMAILADDRESS,'') = coalesce(@EMAILADDRESS,'') 
+													  and coalesce(EMAILADDRESSTYPECODEID,@NULLVALUE) = coalesce(@EMAILADDRESSTYPECODEID,@NULLVALUE))
+						  begin
+							  update dbo.EmailAddress set ISPRIMARY = 0 
+							  WHERE ISPRIMARY = 1 and constituentid = @ConstituentID and coalesce(EMAILADDRESS,'') = coalesce(@EMAILADDRESS,'') 
+							  update dbo.EmailAddress set ISPRIMARY = 1 --, @EMAILADDRESSTYPECODEID=@EMAILADDRESSTYPECODEID
+							  where ENDDATE is null and CONSTITUENTID = @CONSTITUENTID
+													  and coalesce(EMAILADDRESS,'') = coalesce(@EMAILADDRESS,'') 
+													  and coalesce(EMAILADDRESSTYPECODEID,@NULLVALUE) = coalesce(@EMAILADDRESSTYPECODEID,@NULLVALUE)
+						  end
+					  else
+						  begin 
+							  exec [dbo].USP_DATAFORMTEMPLATE_ADD_EMAILADDRESS  @ID=@ID output, @CHANGEAGENTID=@CHANGEAGENTID,@CONSTITUENTID=@CONSTITUENTID,
+							  @EMAILADDRESSTYPECODEID=@EMAILADDRESSTYPECODEID,@EMAILADDRESS=@EMAILADDRESS,
+							  @INFOSOURCECODEID=@INFOSOURCECODEID,@PRIMARY = 1, @DONOTEMAIL = 0,
+							  @INFOSOURCECOMMENTS=@INFOSOURCECOMMENTS,@STARTDATE=@CURRENTDATE
+						  end 	
+					  END	          
+				END
+		  END
+          
+          return 0
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

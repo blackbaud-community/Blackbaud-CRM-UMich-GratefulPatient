@@ -1,0 +1,186 @@
+<QueryViewSpec 
+    xmlns="bb_appfx_queryview"
+    xmlns:c="bb_appfx_commontypes"
+    ID="e7a024a1-1ae0-42d3-a14b-8446c8c7a6cb"
+    Name="UMHS Duplicate Search Match Sets Query"
+    Description="UMHS Sets of matches from running the UMHS Duplicate Search"
+    Author="UM Dev"
+    IsRoot="false"
+    RecordType="Matched MIMED Friend Contacts to U-M affiliations"
+    AllowAttributeExtension="false"
+    c:SecurityUIFolder="UMHS Duplicate Search"
+    >
+
+  <TVFImplementation FunctionName="USR_UFN_QUERY_UMHS_DUPLICATESEARCHEVALUATION_LISTBUILDER">
+    <CreateFunctionSQL>
+      <![CDATA[
+      create function dbo.USR_UFN_QUERY_UMHS_DUPLICATESEARCHEVALUATION_LISTBUILDER(@MATCHSETID uniqueidentifier = null)
+      returns table
+      as
+      return
+        select
+            m3.ID,
+            m3.MATCHSETID,
+            c.ID MATCHEDCONSTITUENTID,
+            m3.REVIEWSTATUS, 
+            c.[NAME] MATCHEDCONSTITUENTNAME,
+            c.LOOKUPID MATCHEDCONSTITUENTLOOKUPID,
+            FORMAT(ISNULL(NULLIF(CAST(c.BIRTHDATE as INT), 0), 19000101), '####-##-##') MATCHEDCONSTITUENTBIRTHDATE,
+              CASE
+              WHEN NULLIF(ISNULL(a.ADDRESSBLOCK, ''), '') IS NULL
+              THEN ''
+              ELSE
+                a.ADDRESSBLOCK + N' ' + a.CITY + N', ' + s.[ABBREVIATION] + N' ' + a.POSTCODE
+            END MATCHEDCONSTITUENTADDRESS,
+            ISNULL(e.EMAILADDRESS, N'') MATCHEDCONSTITUENTEMAIL,
+            ISNULL(p.NUMBER, N'') MATCHEDCONSTITUENTPHONE,
+            d.[FIRSTNAME] + N' ' + ISNULL(d.[MIDDLENAME], N'') + N' ' + d.[KEYNAME] MIMEDCONTACTNAME,
+            d.MRN,
+            FORMAT(ISNULL(NULLIF(CAST(d.BIRTHDATE as INT), 0), 19000101), '####-##-##') MIMEDCONTACTBIRTHDATE,
+            CASE
+              WHEN NULLIF(ISNULL(a1.ADDRESSBLOCK, ''), '') IS NULL
+              THEN ''
+              ELSE
+                a1.ADDRESSBLOCK + N' ' + a1.CITY + N', ' + s1.[ABBREVIATION] + N' ' + a1.POSTCODE
+            END MIMEDCONTACTADDRESS,
+            ISNULL(e1.EMAILADDRESS, N'') MIMEDCONTACTEMAIL,
+            ISNULL(p1.NUMBER, N'') MIMEDCONTACTPHONE,
+            c1.[NAME] MIMEDCONSTITUENTNAME,
+            c1.LOOKUPID MIMEDCONSTITUENTLOOKUPID,
+            c1.[ID] MIMEDCONSTITUENTID,
+            m3.COMPOSITESCORE,
+            CASE
+              WHEN m3.CONSTITUENTID=UMHSCONSTITUENTID
+              THEN N'False'
+              ELSE N'True'
+            END ISMIMEDFRIENDRECORD
+        from
+        (
+              select 
+                  a.ID,
+                  a.CONSTITUENTID,
+                  a.REVIEWSTATUS,
+                  a.MATCHSETID,
+                  a.MRN,
+                  a.UMHSCONSTITUENTID,
+                  a.ADDRESSID,
+                  a.EMAILADDRESSID,
+                  a.PHONEID,
+                  a.COMPOSITESCORE,
+                  ROW_NUMBER() OVER(PARTITION BY a.CONSTITUENTID, a.MRN ORDER BY a.COMPOSITESCORE DESC) COMPOSITESCOREORDER
+              from USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS a
+              inner join BATCHTEMPLATE bt1 on                        -- records with a Composite score in the evaluation range
+                  bt1.OVERALLMATCHTHRESHOLD <= a.COMPOSITESCORE   -- Composite score evaluation based on the "Overall Match Threshold" and
+              and bt1.AUTOMATCHTHRESHOLD > a.COMPOSITESCORE       -- "Auto Match Threshold" settings on the 'MIMED Data - Contacts' batch template
+              left outer join
+              (
+                  -- All the records in the evaluation range that are older than the MATCH SET 
+                  select distinct
+                      m1.CONSTITUENTID,
+                      m1.MRN,
+                      m1.UMHSCONSTITUENTID,
+                      m1.ADDRESSID,
+                      m1.EMAILADDRESSID,
+                      m1.PHONEID,
+                      m1.COMPOSITESCORE,
+                      m1.MATCHSETID
+                  from USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS m1
+                  inner join BATCHTEMPLATE bt2 on                        -- records with a Composite score in the evaluation range
+                      bt2.OVERALLMATCHTHRESHOLD <= m1.COMPOSITESCORE  -- Composite score evaluation based on the "Overall Match Threshold" and
+                  and bt2.AUTOMATCHTHRESHOLD > m1.COMPOSITESCORE      -- "Auto Match Threshold" settings on the 'MIMED Data - Contacts' batch template
+                  inner join (select TOP 1 DATEADDED from USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS where (MATCHSETID=@MATCHSETID) ORDER BY DATEADDED) m2 on m2.DATEADDED > m1.DATEADDED -- All the records older than the MATCHSET being compared
+                  where
+                      (m1.MATCHSETID <> @MATCHSETID)               -- All records not in the set being compared
+                  and bt2.ID='DEDEA4B8-B29B-4102-AF44-155C8B7D5C8C'      -- 'MIMED Data - Contacts' batch template for getting the records with the Composite Score the falls withing the evaluation range
+              ) x on  
+                  ISNULL(x.MRN, '')=ISNULL(a.MRN, '')
+              and ISNULL(x.CONSTITUENTID, '00000000-0000-0000-0000-000000000000')=ISNULL(a.CONSTITUENTID, '00000000-0000-0000-0000-000000000000')
+              and ISNULL(x.ADDRESSID, '00000000-0000-0000-0000-000000000000')=ISNULL(a.ADDRESSID, '00000000-0000-0000-0000-000000000000')
+              and ISNULL(x.EMAILADDRESSID, '00000000-0000-0000-0000-000000000000')=ISNULL(a.EMAILADDRESSID, '00000000-0000-0000-0000-000000000000')
+              and ISNULL(x.PHONEID, '00000000-0000-0000-0000-000000000000')=ISNULL(a.PHONEID, '00000000-0000-0000-0000-000000000000')
+              and ISNULL(x.COMPOSITESCORE, -1)=ISNULL(a.COMPOSITESCORE, -1)
+              where
+                  x.MRN is NULL
+              and a.MATCHSETID=@MATCHSETID
+              and bt1.ID='DEDEA4B8-B29B-4102-AF44-155C8B7D5C8C'         -- 'MIMED Data - Contacts' batch template for getting the records with the Composite Score the falls withing the evaluation range
+        ) m3
+        inner join CONSTITUENT c on c.ID=m3.CONSTITUENTID
+        left outer join [ADDRESS] a on a.ID=m3.ADDRESSID
+        left outer join [STATE] s on s.ID=a.STATEID
+        left outer join [EMAILADDRESS] e on e.ID=m3.EMAILADDRESSID
+        left outer join [PHONE] p on p.ID=m3.PHONEID
+        inner join USR_UMHS_DATA d on d.MRN=m3.MRN
+        left outer join USR_UMHS_ADDRESS a1 on a1.UMHSID=d.ID
+        left outer join [STATE] s1 on s1.ID=a1.STATEID
+        left outer join USR_UMHS_EMAILADDRESS e1 on e1.UMHSID=d.ID
+        left outer join USR_UMHS_PHONE p1 on p1.UMHSID=d.ID
+        inner join CONSTITUENT c1 on c1.ID=d.CONSTITUENTID
+        where
+          m3.COMPOSITESCOREORDER=1
+      ]]>
+    </CreateFunctionSQL>
+    <Parameters>
+      <c:FormMetaData>
+        <c:FormFields>
+          <c:FormField FieldID="MATCHSETID" Caption="Match Sets (20 most recent)" Required="false" DataType="Guid">
+            <c:SimpleDataList SimpleDataListID="728fb163-43fd-44de-9d4e-125d44fdb5f7" />
+          </c:FormField>
+        </c:FormFields>
+      </c:FormMetaData>
+    </Parameters>
+  </TVFImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+      <OutputField Name="ID" Caption="System Record ID" IsHidden="true" />
+      <OutputField Name="MATCHSETID" Caption="Match Set ID" IsHidden="true" />
+			<OutputField Name="MATCHEDCONSTITUENTID" Caption="Matched Constituent ID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="REVIEWSTATUS" Caption="Review Status" DataType="String" />
+		  <OutputField Name="MATCHEDCONSTITUENTNAME" Caption="Matched Constituent Name" DataType="String" />
+		  <OutputField Name="MATCHEDCONSTITUENTLOOKUPID" Caption="Matched Constituent LID" DataType="String" />
+      <OutputField Name="MATCHEDCONSTITUENTBIRTHDATE" Caption="Matched Constituent Birthdate" DataType="Date" />
+      <OutputField Name="MATCHEDCONSTITUENTADDRESS" Caption="Matched Constituent Address" DataType="String" />
+      <OutputField Name="MATCHEDCONSTITUENTEMAIL" Caption="Matched Constituent Email" DataType="String" />
+      <OutputField Name="MATCHEDCONSTITUENTPHONE" Caption="Matched Constituent Phone" DataType="String" />
+      <OutputField Name="MIMEDCONTACTNAME" Caption="MIMED Contact Name" DataType="String" />
+      <OutputField Name="MRN" Caption="MRN" DataType="String" />
+      <OutputField Name="MIMEDCONTACTBIRTHDATE" Caption="MIMED Contact Birthdate" DataType="Date" />
+      <OutputField Name="MIMEDCONTACTADDRESS" Caption="MIMED Contact Address" DataType="String" />
+      <OutputField Name="MIMEDCONTACTEMAIL" Caption="MIMED Contact Email" DataType="String" />
+      <OutputField Name="MIMEDCONTACTPHONE" Caption="MIMED Contact Phone" DataType="String" />
+      <OutputField Name="MIMEDCONSTITUENTNAME" Caption="MIMED Constituent Name" DataType="String" />
+      <OutputField Name="MIMEDCONSTITUENTLOOKUPID" Caption="MIMED Constituent LID" DataType="String" />
+      <OutputField Name="MIMEDCONSTITUENTID" Caption="MIMED Constituent ID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="COMPOSITESCORE" Caption="Composite Score" DataType="SmallInt" />
+      <OutputField Name="ISMIMEDFRIENDRECORD" Caption="Is MIMED Friend Constituent" DataType="Boolean" />
+    </OutputFields>
+	</Output>
+  <ListBuilder>
+    <Columns>
+      <Column Name="ID" IsDefaultColumn="false" />
+      <Column Name="MATCHSETID" IsDefaultColumn="false" />
+      <Column Name="MATCHEDCONSTITUENTID" IsDefaultColumn="false" />
+      <Column Name="REVIEWSTATUS" IsDefaultColumn="true"/>
+      <Column Name="MATCHEDCONSTITUENTNAME" IsDefaultColumn="true" />
+      <Column Name="MATCHEDCONSTITUENTLOOKUPID" IsDefaultColumn="true" />
+      <Column Name="MATCHEDCONSTITUENTBIRTHDATE" IsDefaultColumn="true" />
+      <Column Name="MATCHEDCONSTITUENTADDRESS" IsDefaultColumn="true" />
+      <Column Name="MATCHEDCONSTITUENTEMAIL" IsDefaultColumn="true" />
+      <Column Name="MATCHEDCONSTITUENTPHONE" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONTACTNAME" IsDefaultColumn="true" />
+      <Column Name="MRN" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONTACTBIRTHDATE" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONTACTADDRESS" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONTACTEMAIL" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONTACTPHONE" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONSTITUENTNAME" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONSTITUENTLOOKUPID" IsDefaultColumn="true" />
+      <Column Name="MIMEDCONSTITUENTID" IsDefaultColumn="false" />
+      <Column Name="COMPOSITESCORE" IsDefaultColumn="true" />
+      <Column Name="ISMIMEDFRIENDRECORD" IsDefaultColumn="true" />
+    </Columns>
+  </ListBuilder>
+
+</QueryViewSpec>
+

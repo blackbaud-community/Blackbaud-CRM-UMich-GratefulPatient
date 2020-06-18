@@ -1,0 +1,29 @@
+﻿<SQLFunctionSpec 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="bb_appfx_sqlfunction" 
+  ID="493A0991-B7B9-4053-A12F-5BAE88F352D7" 
+  Name="USR_UFN_UMHS_INTERACTION_GETSITES" 
+  Description="retrieves that MIMED interaction Sites." 
+  Author="UM Dev" 
+  DBFunctionName="USR_UFN_UMHS_INTERACTION_GETSITES" >
+  
+  <CreateFunctionSQL>
+    <![CDATA[
+    CREATE FUNCTION DBO.USR_UFN_UMHS_INTERACTION_GETSITES (@INTERACTIONID UNIQUEIDENTIFIER)
+    RETURNS TABLE
+    AS
+        RETURN
+          (SELECT ID,
+                  SITEID--,
+                  --ISNULL(SUBDEPARTMENTID, NULL) as SUBDEPARTMENTID
+           FROM   DBO.USR_UMHS_INTERACTIONSITE
+           WHERE  INTERACTIONID = @INTERACTIONID
+           and dbo.USR_UFN_UMHS_INTERACTION_ISPLANSTEP(USR_UMHS_INTERACTIONSITE.INTERACTIONID) = 0
+				)
+                   
+    ]]>
+  </CreateFunctionSQL>
+  <CreateChildCollectionFunction RootElementName="SITES" BaseTableName="USR_UMHS_INTERACTIONSITE" ParentIDColumn="INTERACTIONID" />
+  
+</SQLFunctionSpec>

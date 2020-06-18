@@ -1,0 +1,63 @@
+﻿<PackageSpec 
+	xmlns="bb_appfx_package"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="4c1ae7d3-cf33-4371-9eaf-c6f6ceb580ad" 
+	Name="GratefulPatient.Package.CSR_1548_pebigler"
+	Description="A package defining specs related to grateful patient records" 
+	Author="UM Dev"
+	>
+
+	<!-- Note:  the order of the items listed here is important.  For example, you won't be able to load a data form that references 
+	a table that hasn't been loaded, etc.  In general, the following order is recommended:
+	
+		(functions and procedures first)
+		SQLFunctionSpec
+		SQLStoredProcedureSpec
+		TranslationFunctionSpec
+
+		(tables next)
+		CodeTableSpec
+		TableSpec
+		SQLViewSpec
+
+		(features next)
+		SimpleDataListSpec		
+		SearchListSpec
+		RecordOperationSpec
+		DataListSpec
+		
+		(forms next)
+		AddDataFormTemplateSpec
+		EditDataFormTemplateSpec
+		ViewDataFormTemplateSpec		
+
+		(more feature types)
+		BatchTypeSpec
+		BusinessProcessSpec
+		CalendarSpec
+		FlashDashSpec
+		GlobalChangeSpec
+		IDMapperSpec
+		KpiSpec
+		MapEntitySpec
+		MergeConfiguration
+		MergeTaskSpec
+		QueryViewSpec
+		ReportSpec
+		RelationshipMapSpec
+		SmartFieldSpec
+		SmartQuerySpec
+		WorkflowInboxSpec
+		WorkflowSpec
+		
+		(functional areas, pages, and tasks last)
+		PageDefinitionSpec
+		FunctionalAreaSpec
+		TaskSpec	
+	-->
+	
+	<DependencyList xmlns="bb_appfx_commontypes">
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.xml" />
+  </DependencyList>
+
+</PackageSpec>

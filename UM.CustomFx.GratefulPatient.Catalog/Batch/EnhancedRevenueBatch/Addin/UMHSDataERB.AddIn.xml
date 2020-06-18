@@ -1,0 +1,11 @@
+﻿<BatchTypeAddInSpec
+	xmlns="bb_appfx_batchtypeaddin"
+	xmlns:c="bb_appfx_commontypes"
+	ID="9608adbe-853e-4743-9517-3a70e6e4bee8" 
+	Name="MIMED Data ERB AddIn"
+	Description="ERB event handlers for MIMED Data" 
+	Author="UM Dev"
+	BatchTypeCatalogId="326c43a6-d162-4fd4-8d61-fef9a0ee8c5e"
+	>
+	<BatchTypeAddIn AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDataERBBatchEntryHandler" />
+</BatchTypeAddInSpec>

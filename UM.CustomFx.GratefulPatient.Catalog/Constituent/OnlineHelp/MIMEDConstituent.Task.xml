@@ -1,0 +1,34 @@
+﻿<TaskSpec
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ff2883e0-a4c5-473e-ba84-6fa40fdfe8a6"
+	Name="Michigan Medicine"
+	Description="Information about Michigan Medicine."
+	Author="UM Dev"
+	FunctionalAreaID="c01c5cff-c26c-4726-b557-135f13edf5e7"
+	Sequence="30"
+	ImageKey="CATALOG:Blackbaud.AppFx.ProspectResearch.Catalog,Blackbaud.AppFx.ProspectResearch.Catalog.training_32.png"
+  
+	>
+
+  <ExecuteCLRAction xmlns="bb_appfx_commontypes">
+    <ComponentIdentifier AssemblyName="Blackbaud.AppFx.Platform.ClientComponents.dll" ClassName="Blackbaud.AppFx.Platform.ClientComponents.ShellToUrl">
+      <StaticParameters>
+        <ParameterList>
+          <Param ID="url">
+            <Value>https://maislinc.umich.edu/mais/html/dart/michigan-medicine/</Value>
+          </Param>
+        </ParameterList>
+      </StaticParameters>
+    </ComponentIdentifier>
+    <ScriptIdentifier Url="browser/htmlforms/programming/OpenWebPageAction.js" ObjectName="BBUI.customactions.programming.OpenWebPageAction">
+      <StaticParameters>
+        <ParameterList>
+          <Param ID="URL">
+            <Value>https://maislinc.umich.edu/mais/html/dart/michigan-medicine/</Value>
+          </Param>
+        </ParameterList>
+      </StaticParameters>
+    </ScriptIdentifier>
+  </ExecuteCLRAction>
+</TaskSpec>

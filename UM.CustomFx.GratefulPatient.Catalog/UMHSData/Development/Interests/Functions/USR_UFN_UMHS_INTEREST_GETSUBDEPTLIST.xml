@@ -1,0 +1,29 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="f5f95ea4-f0b4-4e1f-a97d-97822461a9b0"
+	Name="USR_UFN_UMHS_INTEREST_GETSUBDEPTLIST"
+	Description="Returns a comma delimited list of subdepartments. "
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_INTEREST_GETSUBDEPTLIST"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+    create function dbo.USR_UFN_UMHS_INTEREST_GETSUBDEPTLIST(
+				@INTERESTID uniqueidentifier
+			)
+			returns nvarchar(1024)
+			as
+			begin
+				declare @SUBDEPARTMENTS nvarchar(1024) = (select dbo.UDA_BUILDLIST(USR_UMHS_SUBDEPARTMENT.NAME)
+					from dbo.USR_UFN_UMHS_INTEREST_GETDEPTS(@INTERESTID) INTERESTSUBDEPARTMENT
+						inner join dbo.USR_UMHS_SUBDEPARTMENT on USR_UMHS_SUBDEPARTMENT.ID = INTERESTSUBDEPARTMENT.SUBDEPARTMENTID
+				);
+				
+				return @SUBDEPARTMENTS;			
+			end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

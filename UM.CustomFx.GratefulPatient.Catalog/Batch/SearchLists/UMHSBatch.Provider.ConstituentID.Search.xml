@@ -1,0 +1,79 @@
+﻿<SearchListSpec
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="27dffa05-1147-4ceb-a0da-36158da56b98"
+    Name="Search list for locating the Constituent ID of a Provider"
+    Description="Search list for locating the Constituent ID of a Provider"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="e58d466f-1532-4dea-9b50-dd046094ed31"
+	>
+
+  <!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be 
+	used to limit the number of rows returned to a reasonable number. -->
+  <SPSearchList SPName="USR_USP_SEARCHLIST_UMHS_BATCH_PROVIDER_CONSTITUENTID">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+create procedure dbo.USR_USP_SEARCHLIST_UMHS_BATCH_PROVIDER_CONSTITUENTID
+(
+	 @UMEMPLID nvarchar(200)
+  ,@UMUNIQUENAME nvarchar(200) 
+  ,@PROVIDERDRNUMBER nvarchar(50)
+	,@MAXROWS smallint = 500
+)
+as
+    declare @CONSTITUENTID uniqueidentifier=NULL;
+
+    select 
+      @CONSTITUENTID=CONSTITUENTID
+    from dbo.USR_UMHS_PROVIDERS 
+    where
+      PROVIDERDRNUMBER=@PROVIDERDRNUMBER
+
+    if @CONSTITUENTID is NULL
+    begin
+      select
+        @CONSTITUENTID=c.ID
+      from constituent c
+      inner join alternatelookupid a on a.CONSTITUENTID=c.ID
+      inner join ALTERNATELOOKUPIDTYPECODE atc on atc.ID=a.ALTERNATELOOKUPIDTYPECODEID
+      where
+	      a.ALTERNATELOOKUPID=@UMEMPLID
+      and atc.ID='97CE11D1-6793-47D5-9FEE-B54B90DA16DA' -- University of Michigan ID-UMID
+    end
+    
+    if @CONSTITUENTID is NULL
+    begin
+      select
+        @CONSTITUENTID=c.ID
+      from constituent c
+      inner join alternatelookupid a on a.CONSTITUENTID=c.ID
+      inner join ALTERNATELOOKUPIDTYPECODE atc on atc.ID=a.ALTERNATELOOKUPIDTYPECODEID
+      where
+	      a.ALTERNATELOOKUPID=@UMUNIQUENAME
+      and atc.ID='4073AA02-1416-4F6F-9238-9FCEFDEE6423' -- U-M Uniqname
+    end
+  
+    select @CONSTITUENTID as ID;
+    
+			]]>
+    </c:CreateProcedureSQL>
+  </SPSearchList>
+
+  <!-- describe the filter fields for the search screen -->
+  <FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="UMEMPLID" Caption="U-M Employee ID" DataType="String" MaxLength="200" Required="true"/>
+      <FormField FieldID="UMUNIQUENAME" Caption="U-M Unique Name" DataType="String" MaxLength="200" Required="true"/>
+    </FormFields>
+  </FormMetaData>
+
+  <!-- also describe the output fields for the search screen -->
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+    </OutputFields>
+  </Output>
+
+</SearchListSpec>
+

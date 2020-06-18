@@ -1,0 +1,112 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="53e34667-8657-4864-9774-8bf6545e5851"
+	Name="UMHS Duplicate Search Cleanup History Query"
+	Description="History of running the Duplicate Search and Cleanup UMP"
+	Author="UM Dev"
+	IsRoot="false"
+	RecordType="Deleted MIMED Contacts and Friend (shell) records"
+  AllowAttributeExtension="false"
+	c:SecurityUIFolder="UMHS Duplicate Search"
+	>
+
+	<!-- define the view used to return data for the query -->
+  <TVFImplementation FunctionName="USR_UFN_QUERY_UMHS_DUPLICATESEARCHANDCLEANUPHISTORY_LISTBUILDER">
+    <CreateFunctionSQL>
+			<![CDATA[
+      create function dbo.USR_UFN_QUERY_UMHS_DUPLICATESEARCHANDCLEANUPHISTORY_LISTBUILDER()
+      returns table
+      as
+      return
+        select 
+            MatchesToReview.ID,
+            deletedMatches.MATCHSETID,
+            deletedMatches.[STATUS],
+            deletedMatches.DATEADDED,
+            deletedMatches.DATECHANGED,
+            c.USERNAME,
+            dbo.USR_UM_USR_UFN_UMHS_GETTIMEDURATION(deletedMatches.DATEADDED, deletedMatches.DATECHANGED) DURATION,
+            deletedMatches.MIMEDFRIENDRECORDS,
+            deletedMatches.MIMEDUMHSDATARECORDS,
+            case
+              when MatchesToReview.MIMEDMATCHEDRECORDSTOREVIEW is NULL
+                then 0
+              else
+                MatchesToReview.MIMEDMATCHEDRECORDSTOREVIEW
+            end MIMEDMATCHEDRECORDSTOREVIEW,
+            deletedMatches.[MESSAGE]
+        from USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS deletedMatches
+        inner join CHANGEAGENT c on c.ID=deletedMatches.ADDEDBYID
+        left outer join 
+        (
+            select 
+                x.ID,
+                x.MATCHSETID,
+                x.DATEADDED MATCHSETREVIEW_DATEADDED,
+                MAX(x.MATCHSETROWNUMBER) MIMEDMATCHEDRECORDSTOREVIEW
+            from
+            (
+                select 
+                    row_number() over(partition by m.MATCHSETID order by m.DATEADDED) MATCHSETROWNUMBER,
+                    m.*
+                from 
+                (
+                  SELECT 
+                    eval_msets.ID,
+                    eval_msets.MATCHSETID,
+                    eval_msets.DATEADDED
+                  from
+                  (
+                    select 
+                      ID,
+                      MATCHSETID, 
+                      DATEADDED,
+                      ROW_NUMBER() OVER(PARTITION BY MATCHSETID ORDER BY DATEADDED) ROWNUM
+                    from USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS 
+                  ) eval_msets
+                  where 
+                    eval_msets.ROWNUM=1
+                ) m
+                cross apply dbo.USR_UFN_QUERY_UMHS_DUPLICATESEARCHEVALUATION_LISTBUILDER(m.MATCHSETID) 
+            ) x
+            group by x.ID, x.MATCHSETID, x.DATEADDED
+        ) MatchesToReview on MatchesToReview.MATCHSETID=deletedMatches.MATCHSETID	
+        ]]>
+		</CreateFunctionSQL>
+	</TVFImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+      <OutputField Name="ID" Caption="System Record ID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="MATCHSETID" Caption="Match Set ID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="STATUS" Caption="Status" DataType="String" />
+      <OutputField Name="DATEADDED" Caption="Started" DataType="Date" Format="MM/dd/yyyy hh:mm tt" />
+      <OutputField Name="DATECHANGED" Caption="Ended" DataType="Date" Format="MM/dd/yyyy hh:mm tt" />
+      <OutputField Name="USERNAME" Caption="Started by" DataType="String" />
+      <OutputField Name="DURATION" Caption="Duration" DataType="String" />
+      <OutputField Name="MIMEDFRIENDRECORDS" Caption="Deleted MIMED Friend Records" DataType="Integer" />
+      <OutputField Name="MIMEDUMHSDATARECORDS" Caption="Deleted MIMED Contacts (Tabs)" DataType="Integer" />
+      <OutputField Name="MIMEDMATCHEDRECORDSTOREVIEW" Caption="Matched MIMED Contacts to Review" DataType="Integer" />
+      <OutputField Name="MESSAGE" Caption="Message" DataType="String" />
+		</OutputFields>
+	</Output>
+  <ListBuilder>
+    <Columns>
+      <Column Name="ID" IsDefaultColumn="false" />
+      <Column Name="MATCHSETID" IsDefaultColumn="false" />
+      <Column Name="STATUS" IsDefaultColumn="true" />
+      <Column Name="DATEADDED" IsDefaultColumn="true" />
+      <Column Name="DATECHANGED" IsDefaultColumn="true" />
+      <Column Name="USERNAME" IsDefaultColumn="true" />
+      <Column Name="DURATION" IsDefaultColumn="true" />
+      <Column Name="MIMEDFRIENDRECORDS" IsDefaultColumn="true" />
+      <Column Name="MIMEDUMHSDATARECORDS" IsDefaultColumn="true" />
+      <Column Name="MIMEDMATCHEDRECORDSTOREVIEW" IsDefaultColumn="true" />
+      <Column Name="MESSAGE" IsDefaultColumn="true" />
+    </Columns>
+  </ListBuilder>
+
+</QueryViewSpec>
+

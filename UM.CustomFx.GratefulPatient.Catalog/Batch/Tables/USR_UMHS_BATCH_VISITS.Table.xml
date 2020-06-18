@@ -1,0 +1,32 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="8a356810-1e90-434a-8a86-62ca231126b6"
+	Name="USR MIMED Batch VISITS"
+	Description="Stores information about usr MIMED Batch visits records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_BATCH_VISITS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Name="BATCHID" Required="true" ForeignTable="BATCH" OnDelete="CascadeDelete"/>
+    <SequenceField Name="SEQUENCE" />
+    <TextField Name="MRN" Description="For individuals, medical record number." Required="true" Length="50"/>
+    <TextField Name="PROVIDERDRNUMBER" Description="Provider doctor number" Required="true" Length="50"/>   
+    <DateField Name="LASTPROCDATE" Required="true" Description="Last Proc Date" />
+    <TextField Name="VISITTYPE" Length="1" Description="I for Inpatient and O for Outpatient"/>
+    <NumberField Name="UMHSDATA_CSN" Description="Raw Contact serial number" Type="bigint" />
+    <NumberField Name="UMHSDATA_PROV_ID" Description="Provider ID" Type="bigint" />
+    <DateField Name="VISITSTARTDATE"  Description="Visit start date" />
+    <DateField Name="VISITENDDATE"  Description="Visit end date" />
+    <TextField Name="PROVIDERROLE" Description="Provider role" Length="50" Required="true" />
+    <TextField Name="PATIENTHOSPITALROOM" Description="Patient Hospital Room" Length="150"/>
+    <DateField Name="HOSPITALVISITDATE" Description="Hospital Visit Date" />
+    <ForeignKeyField Name="DEPARTMENTID" Description="MIMED department" ForeignTable="USR_UMHS_DEPARTMENT"/>
+    <ForeignKeyField Name="SUBDEPARTMENTID" Description="MIMED subdepartment" ForeignTable="USR_UMHS_SUBDEPARTMENT"/>
+    <TextField Name="CATEGORYMEMBERDESCRIPTION" Description="Category of Member Description" Length="500"/>
+  </Fields>
+
+</TableSpec>

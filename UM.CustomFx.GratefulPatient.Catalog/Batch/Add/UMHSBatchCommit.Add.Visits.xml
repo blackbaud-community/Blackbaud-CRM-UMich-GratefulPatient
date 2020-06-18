@@ -1,0 +1,137 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="aa5ea87d-cf7f-4234-be7b-2d9cc41476a6" 
+	Name="MIMED Batch Add Commit Visit Data Form"
+	Description="MIMED Batch Add Commit Visit Data Form" 
+	Author="UM Dev"
+	DataFormInstanceID="ea7f8503-66e7-412e-a306-7d8d5e422d82" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Add commit MIMED batch Visits data"
+	>
+
+	<SPDataForm>
+
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCHCOMMIT_VISITS">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCHCOMMIT_VISITS
+(
+   @ID uniqueidentifier = null output
+  ,@BATCHID uniqueidentifier
+  ,@CHANGEAGENTID uniqueidentifier = null
+  ,@VALIDATEONLY bit = 0
+  -- Batch fields
+  ,@MRN nvarchar(50) = ''
+  ,@PROVIDERDRNUMBER nvarchar(50) = ''
+  ,@LASTPROCDATE datetime = null
+  ,@VISITTYPE nvarchar(1) = 'O'
+  ,@UMHSDATA_CSN bigint = 0
+  ,@UMHSDATA_PROV_ID bigint = 0
+  ,@VISITSTARTDATE datetime = null
+  ,@VISITENDDATE datetime = null
+  ,@PROVIDERROLE nvarchar(50) = ''
+  ,@PATIENTHOSPITALROOM nvarchar(150) = ''
+  ,@HOSPITALVISITDATE datetime = null
+  ,@DEPARTMENTID uniqueidentifier = null
+  ,@SUBDEPARTMENTID uniqueidentifier = null 
+  ,@CATEGORYMEMBERDESCRIPTION nvarchar(500) = ''
+)
+as
+
+  set nocount on;
+  declare @UMHSID uniqueidentifier;
+  declare @PROVIDERID uniqueidentifier;
+  declare @CURRENTDATE datetime
+
+  set @CURRENTDATE = getdate()
+
+  if @ID is null
+      set @ID = newid()
+
+  if @CHANGEAGENTID is null  
+      exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+  
+  select
+    @UMHSID=ID
+  from dbo.USR_UMHS_DATA
+  where
+    MRN=@MRN
+
+  if @UMHSID is NULL
+  begin
+    RAISERROR('Unknown Medical Record Number (MRN).', 13, 1);
+  end
+
+  select 
+    @PROVIDERID=ID
+  from USR_UMHS_PROVIDERS
+  where
+    PROVIDERDRNUMBER=@PROVIDERDRNUMBER
+
+  if @PROVIDERID is NULL
+  begin
+    RAISERROR('Unknown Provider doctor number.', 13, 1);
+  end
+
+  /*
+   * Commit sub-department if it is a sub-department of the department
+   */
+  declare @MATCHEDSUBDEPARTMENTID uniqueidentifier;
+  
+  set @MATCHEDSUBDEPARTMENTID = dbo.USR_UFN_UMHSBATCH_GETMATCHEDSUBDEPARTMENTID(@DEPARTMENTID, @SUBDEPARTMENTID);
+
+  begin try
+    begin tran
+	    -- handle inserting the data
+	    insert into dbo.USR_UMHS_VISITS
+		    (ID,  UMHSID, PROVIDERID, DEPARTMENTID, SUBDEPARTMENTID, CATEGORYMEMBERDESCRIPTION, LASTPROCDATE, VISITTYPE, VISITSTARTDATE, VISITENDDATE, PROVIDERROLE, PATIENTHOSPITALROOM, HOSPITALVISITDATE, UMHSDATA_CSN, UMHSDATA_PROV_ID, ADDEDBYID, CHANGEDBYID, DATEADDED, DATECHANGED)
+        values
+		    (@ID, @UMHSID, @PROVIDERID, @DEPARTMENTID, @MATCHEDSUBDEPARTMENTID, @CATEGORYMEMBERDESCRIPTION, @LASTPROCDATE, @VISITTYPE, @VISITSTARTDATE, @VISITENDDATE, @PROVIDERROLE, @PATIENTHOSPITALROOM, @HOSPITALVISITDATE, @UMHSDATA_CSN, @UMHSDATA_PROV_ID, @CHANGEAGENTID, @CHANGEAGENTID, @CURRENTDATE, @CURRENTDATE)
+      
+    commit tran	
+  end try
+  begin catch
+      rollback tran
+      exec dbo.USP_RAISE_ERROR
+      return 1
+  end catch
+
+  return 0				
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</SPDataForm>
+
+  <Context ContextRecordType="BATCH" RecordIDParameter="BATCHID"/>
+  
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="VALIDATEONLY" Caption="Validate only" Hidden="true" DataType="Boolean" />
+      <!--Batch fields-->
+      <FormField FieldID="MRN" Caption="Medical Record Number (MRN)" DataType="String" Required="true" MaxLength="50" />
+      <FormField FieldID="PROVIDERDRNUMBER" Caption="Provider's doctor number" DataType="String" Required="true" MaxLength="50"/>
+      <FormField FieldID="LASTPROCDATE" Caption="Last process date" DataType="Date" IncludeTimeOnDate="true" Required="true" />
+      <FormField FieldID="VISITTYPE" Caption="Visit type" DataType="String" MaxLength="1" Required="true" DefaultValueText="O" />
+      <FormField FieldID="UMHSDATA_CSN" Caption="Contact Serial Number (CSN)" DataType="Long" Required="true"  DoNotApplyFormat="true"/>
+      <FormField FieldID="UMHSDATA_PROV_ID" Caption="Provider ID" DataType="Long" Required="true" DoNotApplyFormat="true"/>
+      <FormField FieldID="VISITSTARTDATE" Caption="Visit start date" DataType="Date" IncludeTimeOnDate="true" />
+      <FormField FieldID="VISITENDDATE" Caption="Visit end date" DataType="Date" IncludeTimeOnDate="true" />
+      <FormField FieldID="PROVIDERROLE" Caption="Provider role" DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="PATIENTHOSPITALROOM" Caption="Hospital room" DataType="String" MaxLength="150" />
+      <FormField FieldID="HOSPITALVISITDATE" Caption="Hospital visit date" DataType="Date" IncludeTimeOnDate="true" />
+      <FormField FieldID="DEPARTMENTID" Caption="Department" Description="MIMED department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="df5aac7a-1861-4c47-8649-85f405d95ce7"/>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" Caption="Sub-department" Description="MIMED subdepartment" DataType="Guid">
+        <SimpleDataList SimpleDataListID="287fe463-4ca5-40e7-8064-3df34dd15864" />
+      </FormField>
+      <FormField FieldID="CATEGORYMEMBERDESCRIPTION" Description="Provider's Category of Member Description" Caption="Category of Member Description" DataType="String" MaxLength="500"/>
+    </FormFields>
+	</FormMetaData>
+
+</AddDataFormTemplateSpec>

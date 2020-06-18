@@ -1,0 +1,168 @@
+﻿<AddDataFormTemplateSpec
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes"
+	ID="a5f970b7-0702-47c6-99ac-decdfd9610fd"
+	Name="MIMED Affiliation Batch Commit Data Form"
+	Description="A data form for adding umhs affiliation batch records"
+	Author="UM Dev"
+	DataFormInstanceID="3e41266d-3736-454b-aa33-a5c2abc1b4aa"
+	RecordType="MIMED Affiliation Batch"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Commit an MIMED affiliation batch"
+	>
+
+  <SPDataForm>
+    <!-- describe the save SP -->
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_COMMIT_UMHSAFFILIATIONBATCH">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_COMMIT_UMHSAFFILIATIONBATCH (
+          @ID                        UNIQUEIDENTIFIER = NULL OUTPUT,
+          @CHANGEAGENTID             UNIQUEIDENTIFIER = NULL,
+          @VALIDATEONLY              BIT = 0,
+          @UMHSID                    UNIQUEIDENTIFIER,
+          @AFFILIATIONID             UNIQUEIDENTIFIER = NULL,
+          @AFFILIATIONCATEGORYCODEID UNIQUEIDENTIFIER = NULL,
+          @AFFILIATIONBASENAMECODEID UNIQUEIDENTIFIER = NULL,
+          @STARTDATE                 DATETIME = NULL,
+          @ENDDATE                   DATETIME = NULL,
+          @SITEID                    UNIQUEIDENTIFIER = NULL, 
+          @DEPARTMENTID              UNIQUEIDENTIFIER = NULL,
+          @SUBDEPARTMENTID           UNIQUEIDENTIFIER = NULL,
+          @COMMENTS                  NVARCHAR(MAX) = ''
+        )
+        AS
+            SET NOCOUNT ON;
+
+            IF @ID IS NULL
+              SET @ID = NEWID()
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+            DECLARE @CURRENTDATE DATETIME = GETDATE()
+
+            SET @UMHSID = (SELECT ID
+                           FROM   USR_UMHS_DATA
+                           WHERE  CONSTITUENTID = @UMHSID)
+
+            BEGIN TRY
+                MERGE INTO DBO.USR_UMHS_AFFILIATION AS TARGET
+                USING ( VALUES ( 
+                      @ID,
+                      @UMHSID,
+                      @AFFILIATIONID,
+                      @AFFILIATIONCATEGORYCODEID,
+                      @AFFILIATIONBASENAMECODEID,
+                      @STARTDATE,
+                      @ENDDATE,
+                      @SITEID,
+                      @DEPARTMENTID,
+                      @SUBDEPARTMENTID,
+                      @COMMENTS) ) AS SOURCE (ID, UMHSID, AFFILIATIONID, AFFILIATIONCATEGORYCODEID, AFFILIATIONBASENAMECODEID, STARTDATE, ENDDATE, SITEID, DEPARTMENTID, SUBDEPARTMENTID, COMMENTS)
+                ON TARGET.ID = SOURCE.AFFILIATIONID
+                WHEN MATCHED THEN
+                  UPDATE SET UMHSID = SOURCE.UMHSID,
+                             AFFILIATIONBASENAMECODEID = SOURCE.AFFILIATIONBASENAMECODEID,
+                             STARTDATE = SOURCE.STARTDATE,
+                             ENDDATE = SOURCE.ENDDATE,
+                             SITEID = SOURCE.SITEID,
+                             DEPARTMENTID = SOURCE.DEPARTMENTID,
+                             SUBDEPARTMENTID = SOURCE.SUBDEPARTMENTID,
+                             COMMENTS = SOURCE.COMMENTS,
+                             ADDEDBYID = @CHANGEAGENTID,
+                             CHANGEDBYID = @CHANGEAGENTID,
+                             DATEADDED = @CURRENTDATE,
+                             DATECHANGED = @CURRENTDATE
+                WHEN NOT MATCHED THEN
+                  INSERT ( ID,
+                           UMHSID,
+                           AFFILIATIONBASENAMECODEID,
+                           STARTDATE,
+                           ENDDATE,
+                           SITEID,
+                           DEPARTMENTID,
+                           SUBDEPARTMENTID,
+                           COMMENTS,
+                           ADDEDBYID,
+                           CHANGEDBYID,
+                           DATEADDED,
+                           DATECHANGED )
+                  VALUES ( SOURCE.ID,
+                           SOURCE.UMHSID,
+                           SOURCE.AFFILIATIONBASENAMECODEID,
+                           SOURCE.STARTDATE,
+                           SOURCE.ENDDATE,
+                           SOURCE.SITEID,
+                           SOURCE.DEPARTMENTID,
+                           SOURCE.SUBDEPARTMENTID,
+                           SOURCE.COMMENTS,
+                           @CHANGEAGENTID,
+                           @CHANGEAGENTID,
+                           @CURRENTDATE,
+                           @CURRENTDATE );
+            END TRY
+            BEGIN CATCH
+                EXEC DBO.USP_RAISE_ERROR
+                RETURN 1
+            END CATCH
+
+            RETURN 0 
+				]]>
+      </c:CreateProcedureSQL>
+    </SaveImplementation>
+  </SPDataForm>
+  <!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="UMHSID" DataType="Guid" Caption="MIMED Constituent" Hidden="false" Required="true">
+        <SearchList SearchListID="875b6cfb-b52f-45a0-bf30-9f1992ab28ae" EnableQuickFind="true">
+          <FormFieldOverrides>
+            <FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true"/>
+            <FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="true"/>
+          </FormFieldOverrides>
+        </SearchList>
+      </FormField>
+      <FormField FieldID="VALIDATEONLY" Caption="Validate only" Hidden="true" />
+      <FormField FieldID="AFFILIATIONID" DataType="Guid" Hidden="true"/>
+      <FormField FieldID="AFFILIATIONCATEGORYCODEID" DataType="Guid" Required="true" Caption="Category">
+        <CodeTable CodeTableName="USR_UMHS_AFFILIATIONCATEGORYTYPECODE" />
+      </FormField>
+      <FormField FieldID="AFFILIATIONBASENAMECODEID" DataType="Guid" Required="true" Caption="Name">
+        <SimpleDataList SimpleDataListID="4c646cee-0f5b-4197-b4d3-0869693cfc2d">
+          <Params>
+            <Param ID="AFFILIATIONCATEGORYCODEID">
+              <Value>Fields!AFFILIATIONCATEGORYCODEID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Required="true" />
+      <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+      <c:FormField FieldID="SITEID" DataType="Guid" Caption="Site">
+        <c:SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+          <c:SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+        </c:SimpleDataList>
+      </c:FormField>
+      <FormField FieldID="DEPARTMENTID" DataType="Guid" Caption="Department" Required="true">
+        <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" DataType="Guid" Caption="Sub department">
+        <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          <Params>
+            <Param ID="DEPARTMENTID">
+              <Value>Fields!DEPARTMENTID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="COMMENTS" Caption="Comments" />
+    </FormFields>
+    <FormUIComponent />
+  </FormMetaData>
+</AddDataFormTemplateSpec>

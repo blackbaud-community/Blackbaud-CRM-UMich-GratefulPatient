@@ -1,0 +1,127 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="e6adb038-cc06-498e-8fb7-86b3e6fbba84"
+	Name="MIMED Visits Summary Listbuilder Query"
+	Description="A view defined for querying on MIMED summary visit records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="PROVIDERID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+  <TVFImplementation FunctionName="USR_UFN_UMHS_UMHSVISITSSUMMARY">
+    <CreateFunctionSQL>
+      <![CDATA[
+        create function dbo.USR_UFN_UMHS_UMHSVISITSSUMMARY
+          (
+            @UMHSID uniqueidentifier = null
+          )
+          returns table
+          as       
+          return  
+          select DISTINCT
+		      v.PROVIDERID,	  
+          p.PROVIDERDRNUMBER,
+          c.ID as CONSTITUENTID,
+          c.NAME as PROVIDERFULLNAME,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when s.ID is NOT null
+            then
+              s.NAME
+            else
+              N''
+          end as SUBDEPARTMENT --,
+		  ,(SELECT COUNT(PROVIDERID) FROM dbo.USR_UMHS_VISITS AS NUMBEROFVISITS 
+          inner join dbo.USR_UMHS_DATA d8a on d8a.ID = NUMBEROFVISITS.UMHSID
+          inner join dbo.USR_UMHS_PROVIDERS p on p.ID = NUMBEROFVISITS.PROVIDERID
+          inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+          left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = NUMBEROFVISITS.DEPARTMENTID
+          left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = NUMBEROFVISITS.SUBDEPARTMENTID
+          WHERE NUMBEROFVISITS.PROVIDERID = v.PROVIDERID and NUMBEROFVISITS.UMHSID =  @UMHSID --'D13308AC-355A-44C4-BAB0-E1CEC43BD33C'
+		  )
+    AS NUMBEROFVISITS  
+          --SUM() + 1 as NUMBEROFVISITS 
+      ,CASE WHEN (SELECT COUNT(VISITTYPE) FROM dbo.USR_UMHS_VISITS AS VT
+			inner join dbo.USR_UMHS_DATA d8a on d8a.ID = vt.UMHSID
+			inner join dbo.USR_UMHS_PROVIDERS p on p.ID = vt.PROVIDERID
+			inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+			left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = vt.DEPARTMENTID
+			left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = vt.SUBDEPARTMENTID
+			WHERE vt.PROVIDERID = v.PROVIDERID  and vt.UMHSID =  v.UMHSID and v.VISITTYPE <> vt.VISITTYPE) > 0 THEN 'Multiple'
+			ELSE 			
+				CASE WHEN VISITTYPE = 'I' THEN 'Inpatient'
+				WHEN VISITTYPE = 'O' THEN 'Outpatient'
+				WHEN ISNULL(VISITTYPE,'')='' THEN 'Unknown'
+			END
+		END as
+		  VISITTYPE
+      ,(SELECT MIN(VISITSTARTDATE) FROM USR_UMHS_VISITS sdt  
+		  inner join dbo.USR_UMHS_DATA d8a on d8a.ID = sdt.UMHSID
+			inner join dbo.USR_UMHS_PROVIDERS p on p.ID = sdt.PROVIDERID
+			inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+			left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = sdt.DEPARTMENTID
+			left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = sdt.SUBDEPARTMENTID
+		  WHERE sdt.PROVIDERID = v.PROVIDERID  and sdt.UMHSID =  v.UMHSID) as FIRSTCONTACTDATE
+		  ,(SELECT MAX(VISITENDDATE) FROM USR_UMHS_VISITS edt 
+		   inner join dbo.USR_UMHS_DATA d8a on d8a.ID = edt.UMHSID
+			inner join dbo.USR_UMHS_PROVIDERS p on p.ID = edt.PROVIDERID
+			inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+			left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = edt.DEPARTMENTID
+			left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = edt.SUBDEPARTMENTID 
+		  WHERE edt.PROVIDERID = v.PROVIDERID  and edt.UMHSID =  v.UMHSID) as MOSTRECENTDATE
+
+      from dbo.USR_UMHS_VISITS v
+      inner join dbo.USR_UMHS_DATA d8a on d8a.ID = v.UMHSID
+      inner join dbo.USR_UMHS_PROVIDERS p on p.ID = v.PROVIDERID
+      inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+      left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = v.DEPARTMENTID
+      left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = v.SUBDEPARTMENTID
+	  where v.UMHSID =  @UMHSID
+      ]]>
+    </CreateFunctionSQL>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  </TVFImplementation>
+	
+
+  <!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Name="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" />
+      <OutputField Name="CONSTITUENTID" Caption="Constituent ID" IsHidden="true" DataType="Guid"/>
+      <OutputField Name="PROVIDERFULLNAME" Caption="Provider full name" DataType="String" />
+      <OutputField Name="DEPARTMENT" Caption="Provider department" DataType="String" />
+      <OutputField Name="SUBDEPARTMENT" Caption="Provider subdepartment" DataType="String" />
+      <OutputField Name="NUMBEROFVISITS" Caption="Number of visits" DataType="Integer" />
+      <OutputField Name="PROVIDERID" Caption="PROVIDERID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="VISITTYPE" Caption="Visit Type" DataType="String" />
+      <OutputField Name="FIRSTCONTACTDATE" Caption="First contact date" DataType="Date" />
+      <OutputField Name="MOSTRECENTDATE" Caption="Most recent date" DataType="Date" />
+    </OutputFields> 
+  </Output>
+
+  
+  <ListBuilder>
+    <Columns>
+      <Column IsDefaultColumn="true" Name="DEPARTMENT"/>
+      <Column IsDefaultColumn="true" Name="SUBDEPARTMENT"/>
+      <Column IsDefaultColumn="true" Name="CONSTITUENTID" />
+      <Column IsDefaultColumn="true" Name="PROVIDERFULLNAME"/>
+      <Column IsDefaultColumn="true" Name="PROVIDERDRNUMBER"/>
+      <Column IsDefaultColumn="true" Name="NUMBEROFVISITS"/>
+      <Column IsDefaultColumn="true" Name="VISITTYPE" />
+      <Column IsDefaultColumn="true" Name="FIRSTCONTACTDATE" />
+      <Column IsDefaultColumn="true" Name="MOSTRECENTDATE" />
+    </Columns>
+  </ListBuilder>
+</QueryViewSpec>
+

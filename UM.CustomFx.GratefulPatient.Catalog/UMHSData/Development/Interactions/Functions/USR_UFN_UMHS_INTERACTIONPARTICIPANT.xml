@@ -1,0 +1,27 @@
+﻿<SQLFunctionSpec 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="bb_appfx_sqlfunction" 
+  ID="5E967168-491E-42BD-95CE-4FA0B1189510" 
+  Name="USR_UFN_UMHS_INTERACTIONPARTICIPANTS" 
+  Description="Returns participants for an MIMED interaction." 
+  Author="UM Dev" 
+  DBFunctionName="USR_UFN_UMHS_INTERACTIONPARTICIPANTS">
+  <CreateFunctionSQL>
+    <![CDATA[
+    CREATE FUNCTION DBO.USR_UFN_UMHS_INTERACTIONPARTICIPANTS(@INTERACTIONID UNIQUEIDENTIFIER)
+    RETURNS TABLE
+    AS
+        RETURN
+          SELECT IP.ID,
+                 IP.CONSTITUENTID,
+                 C.KEYNAME,
+                 C.FIRSTNAME
+          FROM   DBO.USR_UMHS_INTERACTIONPARTICIPANT IP
+                 INNER JOIN DBO.CONSTITUENT C
+                         ON IP.CONSTITUENTID = C.ID
+          WHERE  INTERACTIONID = @INTERACTIONID; 
+  ]]>
+  </CreateFunctionSQL>
+  <CreateChildCollectionFunction RootElementName="PARTICIPANTS" BaseTableName="USR_UMHS_INTERACTIONPARTICIPANT" ParentIDColumn="INTERACTIONID" OrderBy="KEYNAME,FIRSTNAME" />
+</SQLFunctionSpec>

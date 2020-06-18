@@ -1,0 +1,204 @@
+﻿<BatchTypeExtensionSpec 
+    xmlns="bb_appfx_batchtypeextension" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="5878e5ec-a13b-496e-b9e4-894c856cfeec"
+    Name="ERB MIMED Data Extension"
+    Description="Extends the Batch Revenue Constituent"
+    Author="UM Dev"
+    BaseTableName="USR_UMHS_BATCHREVENUE"
+    BatchTypeCatalogID="326c43a6-d162-4fd4-8d61-fef9a0ee8c5e"  
+	>
+    
+	<AddRow DataFormInstanceID="06d05eb0-1a61-496f-9e02-7e3344e33ccd" DataFormTemplateID="074078ea-b29a-4ab2-8655-73067f7bf2ce">
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHSDATAERB">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHSDATAERB
+        (	
+	        @ID uniqueidentifier output,
+          @CHANGEAGENTID uniqueidentifier = null,
+	        @MIMEDCONSTITUENTID uniqueidentifier = null
+        )
+        as	  
+	        set nocount on;
+          
+            if @CHANGEAGENTID is null  
+                exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+
+            declare @CURRENTDATE datetime = getdate()
+
+            RETURN 0;
+            BEGIN TRY
+            IF @MIMEDCONSTITUENTID IS NOT NULL
+		          INSERT INTO USR_UMHS_BATCHREVENUE
+              (
+                ID,
+                MIMEDCONSTITUENTID,
+                ADDEDBYID,
+			          CHANGEDBYID,
+			          DATEADDED,
+			          DATECHANGED
+              )
+		          VALUES
+              (
+                @ID,
+			          @MIMEDCONSTITUENTID,
+			          @CHANGEAGENTID,
+			          @CHANGEAGENTID,
+			          @CURRENTDATE,
+			          @CURRENTDATE
+              )
+	          END TRY
+	        BEGIN CATCH
+		        EXEC DBO.USP_RAISE_ERROR;
+		        RETURN 1;
+	        END CATCH	
+
+        return 0;							 
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</AddRow>
+	
+	<EditRow DataFormInstanceID="fecf3cc9-6d4f-4fee-95dc-7fc5b0aade58" DataFormTemplateID="00809ed4-9aa4-4ab4-9df9-3eba2d73744d">
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSDATAERB">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSDATAERB
+        (
+	        @ID uniqueidentifier,
+          @TSLONG bigint = 0 output,
+	        @DATALOADED bit = 0 output,
+	        @MIMEDCONSTITUENTID uniqueidentifier = null OUTPUT
+        )
+        as
+	        set nocount on;
+
+	        set @DATALOADED = 0;
+	        set @TSLONG = 0;
+ 	        SELECT
+		        @DATALOADED = 1,
+		        @TSLONG = U.TSLONG,
+		        @MIMEDCONSTITUENTID = D.ID
+          FROM   USR_UMHS_BATCHREVENUE U
+            JOIN BATCHREVENUE BR ON BR.ID = U.ID
+            LEFT JOIN USR_UMHS_DATA D ON D.CONSTITUENTID = BR.CONSTITUENTID 
+	        WHERE U.ID = @ID
+    
+        return 0;  
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+		
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITSAVE_UMHSDATAERB">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITSAVE_UMHSDATAERB
+        (	
+	        @ID uniqueidentifier,
+	        @MIMEDCONSTITUENTID uniqueidentifier,
+	        @CHANGEAGENTID uniqueidentifier = null
+        )
+        as								 
+	        set nocount on;
+  
+	        if @CHANGEAGENTID is null  
+		        exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	        declare @CURRENTDATE datetime
+	        set @CURRENTDATE = getdate()  
+	        RETURN 0;
+	        begin try
+	          --save parameters with correspond to fields on the form.
+		        update USR_UMHS_BATCHREVENUE set
+              MIMEDCONSTITUENTID = @MIMEDCONSTITUENTID,
+			        CHANGEDBYID = @CHANGEAGENTID,
+			        DATECHANGED = @CURRENTDATE
+		        where
+			        ID = @ID
+	        End try
+	        begin catch
+		        exec dbo.USP_RAISE_ERROR;
+		        return 1;
+	        end catch									 
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</EditRow>
+	
+	<CommitRow>
+		<AddRow ContextRecordType="BATCHREVENUE"  DataFormInstanceID="a22c725f-bdcf-4d85-aeb8-a7fbc031a199" DataFormTemplateID="6065c22a-abc7-47e9-bab7-7b95cc2ab31e" RecordIDParameter="BATCHREVENUEID">
+			<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_COMMITADD_UMHSDATAERB">
+				<c:CreateProcedureSQL>
+					<![CDATA[
+         create procedure dbo.USR_USP_DATAFORMTEMPLATE_COMMITADD_UMHSDATAERB
+          (	
+	          @ID uniqueidentifier output,
+            @BATCHREVENUEID uniqueidentifier,
+	          @CHANGEAGENTID uniqueidentifier = null,
+	          @MIMEDCONSTITUENTID uniqueidentifier = null
+          )
+          as
+	          set nocount on;
+  
+	          if @CHANGEAGENTID is null  
+		          exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	          declare @CURRENTDATE datetime = getdate()
+            declare @CONSTITUENTID UNIQUEIDENTIFIER = (SELECT CONSTITUENTID FROM FINANCIALTRANSACTION WHERE ID = @BATCHREVENUEID)            
+            
+	          begin try
+		          
+              DELETE FROM ALIAS 
+                WHERE  CONSTITUENTID = @CONSTITUENTID AND KEYNAME LIKE 'MIMED Friend%' 
+                --ss: Todo May be try to save it here this is add commit 
+                -- all the fields those are in batchrevenueconstituent are needed to be saved in to Batch revenue as well as constituent and Address email phone tables. 
+                -- Edit constituent table update MIMED friend to name from batch
+            /*    declare @batchConstituentID uniqueidentifier = (SELECT CONSTITUENTID FROM BATCHREVENUE WHERE ID = @BATCHREVENUEID)
+                declare @ADDRESSTYPECODEID uniqueidentifier = (SELECT ADDRESSTYPECODEID from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @COUNTRYID uniqueidentifier = (SELECT COUNTRYID from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @STATEID  uniqueidentifier = (SELECT STATEID from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @ADDRESSBLOCK nvarchar(300) = (SELECT ADDRESSBLOCK from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @CITY nvarchar(100) = (SELECT CITY from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @POSTCODE nvarchar(24) = (SELECT POSTCODE from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @INFOSOURCECODEID uniqueidentifier = (SELECT INFOSOURCECODEID from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @PHONETYPECODEID uniqueidentifier = (SELECT PHONETYPECODEID from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @NUMBER nvarchar(200) = (SELECT NUMBER from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @EMAILADDRESSTYPECODEID uniqueidentifier = (SELECT EMAILADDRESSTYPECODEID from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                declare @EMAILADDRESS DBO.UDT_EMAILADDRESS = (SELECT EMAILADDRESS from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                
+                --Need to update Constituent to replace the name and then Run the sp that call 3 sps for address phone and email.
+                Update dbo.Constituent set keyname = (select keyname from dbo.batchrevenueconstituent where ID = @batchConstituentID), firstname = (select keyname from dbo.batchrevenueconstituent where ID = @batchConstituentID)
+                                                     WHERE ID = @MIMEDCONSTITUENTID
+                exec USR_USP_UMHS_ADDCONTACTINFORMATIONFORBBISMIMEDDONOR null, @MIMEDCONSTITUENTID, @CHANGEAGENTID, @ADDRESSTYPECODEID, @COUNTRYID, @STATEID, @ADDRESSBLOCK,
+                                                                         @CITY, @POSTCODE, @CURRENTDATE, @INFOSOURCECODEID, '', @PHONETYPECODEID, @NUMBER, 
+                                                                         @EMAILADDRESSTYPECODEID, @EMAILADDRESS */
+                
+                
+	          end try
+	          begin catch
+		          exec dbo.USP_RAISE_ERROR;
+		          return 1;
+	          end catch
+  
+          return 0;	
+					]]>
+				</c:CreateProcedureSQL>
+			</SaveImplementation>
+		</AddRow>
+	</CommitRow>
+	<!-- optionally, list any client-side event handlers that will be plugged into the event model for the batch data entry form.  Each handler
+	refers to a class that inherits from Browser.Batch.BatchEntryHandler -->
+	<!--<EventHandler AssemblyName="REPLACE_WITH_ASSEMBLYNAME" ClassName="REPLACE_WITH_CLASSNAME"/>-->
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="MIMEDCONSTITUENTID" DataType="Guid" Caption="MIMED Constituent" Hidden="false">
+        <SearchList SearchListID="747530a1-be80-4054-a021-d2a599248261" EnableQuickFind="true" />
+      </FormField>
+    </FormFields>
+	</FormMetaData>
+</BatchTypeExtensionSpec>
+

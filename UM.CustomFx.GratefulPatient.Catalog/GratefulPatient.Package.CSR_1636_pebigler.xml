@@ -1,0 +1,19 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="30C6977B-BBFE-462D-9FDA-F671C05E429C"
+    Name="GratefulPatient.Package.CSR_1636_pebigler"
+    Description="Import of Blackbaud Wealth Point Ratings (DAR2-214)"
+    Author="UM Dev"
+    >
+
+
+	  <c:DependencyList>
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH.Table.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.xml" />
+    </c:DependencyList>
+
+</PackageSpec>

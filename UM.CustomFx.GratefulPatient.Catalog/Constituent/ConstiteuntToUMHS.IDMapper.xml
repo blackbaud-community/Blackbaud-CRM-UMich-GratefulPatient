@@ -1,0 +1,37 @@
+﻿<IDMapperSpec
+	xmlns="bb_appfx_idmapper"
+	xmlns:c="bb_appfx_commontypes"
+	ID="9063aa78-8fef-4f18-9c01-c4b26c88b9f5"
+	Name="Constiteunt To MIMED IDMapper"
+	Description="Maps a constituent to MIMED record"
+	Author="UM Dev"
+	SourceRecordType="MIMED Data" 
+	TargetRecordType="Constituent"
+	>
+
+	<!-- describe the procedure that translates the source ID to the target -->
+	<SPIDMapper SPName="USR_USP_IDMAPPER_CONSTITEUNTTOUMHS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_USP_IDMAPPER_CONSTITEUNTTOUMHS
+(
+	@SOURCEID uniqueidentifier,
+	@TARGETID uniqueidentifier output
+)
+as
+	set nocount on;
+
+	-- write the SQL to fetch @TARGETID based on @SOURCEID
+	select
+		@TARGETID = CONSTITUENTID
+	from
+		USR_UMHS_DATA UMHS
+	where
+		UMHS.CONSTITUENTID = @SOURCEID;
+
+	return 0;
+			]]>
+		</c:CreateProcedureSQL>
+	</SPIDMapper>
+	
+</IDMapperSpec>

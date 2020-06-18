@@ -1,0 +1,115 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="a2d32e72-d636-422c-b1d6-dd59febc60e8"
+	Name="MIMED Affiliation Query"
+	Description="A view defined for querying on MIMED affiliation records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSAFFILIATION">
+		<ViewSQL>
+			<![CDATA[
+     SELECT A.ID,
+             UMHSID,
+             uatc.DESCRIPTION              CATEGORY_DESCRIPTION,
+             uab.UMHSAFFILIATIONBASENAME              NAME_DESCRIPTION,
+             A.AFFILIATIONBASENAMECODEID,
+             STARTDATE,
+             ENDDATE,
+             --OPTOUT,
+             --INFOSOURCECODE.DESCRIPTION  INFOSOURCE_DESCRIPTION,
+             COMMENTS,
+             S.NAME SITENAME,
+             D.NAME DEPARTMENTNAME,
+             SD.NAME SUBDEPARTMENTNAME,
+             [ADDEDBY].APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             [ADDEDBY].USERNAME          AS ADDEDBY_USERNAME,
+             [CHANGEDBY].APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             [CHANGEDBY].USERNAME        AS CHANGEDBY_USERNAME,
+             A.DATEADDED,
+             A.DATECHANGED,
+             A.SITEID,
+             A.DEPARTMENTID,
+             A.SUBDEPARTMENTID,
+			       uatc.ID as AFFILIATIONCATEGORYCODEID--,
+             --INFOSOURCECODEID
+      FROM   DBO.USR_UMHS_AFFILIATION A
+			       inner join dbo.USR_UMHS_AFFILIATIONBASE uab on A.AFFILIATIONBASENAMECODEID = uab.ID
+             left join dbo.USR_UMHS_AFFILIATIONCATEGORYTYPECODE uatc on uab.[UMHSAFFILIATIONCATEGORYCODEID] = uatc.ID
+             LEFT JOIN DBO.SITE S ON S.[ID] = A.SITEID
+             LEFT JOIN DBO.USR_UMHS_DEPARTMENT D ON D.[ID] = A.DEPARTMENTID
+             LEFT JOIN DBO.USR_UMHS_SUBDEPARTMENT SD ON SD.[ID] = A.SUBDEPARTMENTID
+             LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON [ADDEDBY].ID = A.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON [CHANGEDBY].ID = A.CHANGEDBYID
+            -- LEFT JOIN DBO.INFOSOURCECODE INFOSOURCECODE ON A.[INFOSOURCECODEID] = INFOSOURCECODE.ID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+      <OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="MIMED ID" Category="System Fields" Name="UMHSID" />
+      <OutputField Name="CATEGORY_DESCRIPTION" Caption="Category" DataType="String">
+        <LookupInfo IDField="AFFILIATIONCATEGORYCODEID">
+          <CodeTable CodeTableName="USR_UMHS_AFFILIATIONCATEGORYTYPECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="NAME_DESCRIPTION" Caption="Name" DataType="String">
+        <LookupInfo IDField="AFFILIATIONBASENAMECODEID">
+          <SimpleDataList SimpleDataListID="4c646cee-0f5b-4197-b4d3-0869693cfc2d">
+            <c:Params>
+              <c:Param ID="AFFILIATIONCATEGORYCODEID">
+                <c:Value>8f0e9e06-c49b-4062-8ca4-1e8b935d2754</c:Value>  <!--Prospect Tag-->
+              </c:Param>
+            </c:Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="STARTDATE" Caption="Start date" DataType="Date"/>
+      <OutputField Name="ENDDATE" Caption="End date" DataType="Date"/>
+      <OutputField Name="SITENAME" Caption="Site" DataType="String">
+        <LookupInfo IDField="SITEID">
+          <SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+            <!--<SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />-->
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="DEPARTMENTNAME" Caption="MIMED department" DataType="String">
+        <LookupInfo IDField="DEPARTMENTID">
+          <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="SUBDEPARTMENTNAME" Caption="MIMED subdepartment" DataType="String">
+        <LookupInfo IDField="SUBDEPARTMENTID">
+          <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="COMMENTS" Caption="Comments" DataType="String"/>
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+      <OutputField Caption="SITEID" Name="SITEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="DEPARTMENTID" Name="DEPARTMENTID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="SUBDEPARTMENTID" Name="SUBDEPARTMENTID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="AFFILIATIONCATEGORYCODEID" Name="AFFILIATIONCATEGORYCODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="AFFILIATIONBASENAMECODEID" Name="AFFILIATIONBASENAMECODEID" DataType="Guid" IsHidden="true" />
+    </OutputFields>
+	</Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Affiliations"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

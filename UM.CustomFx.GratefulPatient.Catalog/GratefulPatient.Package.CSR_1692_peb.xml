@@ -1,0 +1,46 @@
+﻿<PackageSpec 
+	xmlns="bb_appfx_package"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="3a92916a-68aa-4e4f-b360-1c265d0a76f6" 
+	Name="Grateful Patient Package for UMAffiliationDuplicateSearch (DAR2-281)"
+	Description="Grateful Patient Package for UMAffiliationDuplicateSearch (DAR2-281)" 
+	Author="UM Dev"
+	>
+
+	<DependencyList xmlns="bb_appfx_commontypes">
+    <!--UMAffiliation Duplicate Search tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Tables.USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Tables.USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.Table.xml" />
+
+    <!--UMAffiliation Duplicate Search functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Functions.USR_UFN_UMHS_GETTIMEDURATION.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Functions.USR_UFN_UMHS_UMAFFILIATEDCONSTITUENTMATCHES.xml" />
+
+    <!--UMAffiliation Duplicate Record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.RecordOperation.UMHSSetMatchReviewStatusToComplete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.RecordOperation.UMHSSetMatchReviewStatusToDeleted.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.RecordOperation.UMHSSetMatchReviewStatusToReview.RecordOperation.xml" />
+
+    <!--UMAffiliation Duplicate Search simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.SimpleDatalists.UMHSDupSearchMatchSet.SimpleList.xml" />
+
+    <!--UMAffiliation Duplicate Search stored procedures-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.StoredProcedures.USR_USP_UMHS_DELETEMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.StoredProcedures.USR_USP_UMHS_GETMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_HASUMAFFILIATION.xml" />
+
+    <!--UMAffiliation Duplicate Search view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Views.USR_UMHS_V_UMAFFILIATEDCONSTITUENTS.xml" />
+
+    <!--UMAffiliation Duplicate Search query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Query.UMHSDuplicateSearchMatchSets.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Query.UMHSDuplicateSearchCleanupHistory.Query.xml" />
+
+    <!--UMAffiliation Duplicate Search page-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.UMHSAffiliationDuplicateSearch2.Page.xml" />
+
+    <!--UMAffiliation Duplicate Search tasks-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.UMHSAffiliationDuplicateSearch.Task.xml" />
+  </DependencyList>
+
+</PackageSpec>

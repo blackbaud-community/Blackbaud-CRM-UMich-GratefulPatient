@@ -1,0 +1,18 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="1298ae2c-29b8-4807-84d0-008e181ff8f2"
+    Name="Package for CSR-DRT-1651_pebigler"
+    Description="CSR-DRT-1651_pebigler: Modify Grateful Patient Import error logging and minor refactoring for Blackbaud Wealth Scores"
+    Author="UM Dev"
+    >
+
+	<c:DependencyList>
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.xml" />
+  </c:DependencyList>
+
+</PackageSpec>

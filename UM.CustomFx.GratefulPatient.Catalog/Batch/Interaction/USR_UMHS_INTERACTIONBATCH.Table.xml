@@ -1,0 +1,91 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="8188db8c-777e-4dfa-a1a5-1410f8787037"
+	Name="MIMED Interaction batch table"
+	Description="Stores information about MIMED interaction batch records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_INTERACTIONBATCH"		   
+	IsBuiltIn="false"
+	>
+
+  <Fields>
+    <ForeignKeyField Name="BATCHID" ForeignTable="BATCH" />
+    <GuidField Name="UMHSID" Required="true"/>
+    <ForeignKeyField Name="INTERACTIONID" ForeignTable="USR_UMHS_INTERACTION" OnDelete="CascadeDelete" />
+    <SequenceField Name="SEQUENCE"/>
+    <ForeignKeyField Description="Indicates which fundraiser should be responsible for this interaction (i.e. Owner)" Name="FUNDRAISERID" ForeignTable="CONSTITUENT"/>
+    <TextField Name="OBJECTIVE" Length="100"  />
+    <CodeTableField Name="INTERACTIONTYPECODEID" CodeTable="INTERACTIONTYPECODE" />
+    <DateField Name="EXPECTEDDATE" Required="true" />
+    <DateField Name="ACTUALDATE" />
+    <ComputedColumnField Name="DATE" Expression="coalesce(ACTUALDATE,EXPECTEDDATE)" />
+    <CodeTableField Description="Indicates which stage of the plan this step belongs to." Name="PROSPECTPLANSTATUSCODEID" CodeTable="PROSPECTPLANSTATUSCODE" />
+    <CodeTableField Name="STATUSCODEID" CodeTable="USR_INTERACTION_STATUSCODE" Required="false" />
+    <ComputedColumnField Name="COMPLETED" Expression="case when dbo.UFN_USR_INTERACTION_STATUSCODE_GETDESCRIPTION(STATUSCODEID) in ('Planned','Pending') then 0 else 1 end" />
+    <MemoField Name="COMMENT" />
+    <ComputedColumnField Name="ISINTERACTION" Expression="case when INTERACTIONTYPECODEID is null then 0 else 1 end" />
+    <ForeignKeyField Description="Indicates that the interaction took place during a specific event." Name="EVENTID" ForeignTable="EVENT" OnDelete="SetToNull" />
+    <ForeignKeyField Description="Classification of the interaction type." Name="INTERACTIONSUBCATEGORYID" ForeignTable="INTERACTIONSUBCATEGORY" />
+    <ForeignKeyField Name="FUNDINGREQUESTID" ForeignTable="FUNDINGREQUEST" />
+    <CodeTableField Description="Indicates which stage of the request this step belongs to." Name="FUNDINGREQUESTSTAGECODEID" CodeTable="FUNDINGREQUESTSTAGECODE" />
+    <ForeignKeyField Name="FUNDINGREQUESTOUTLINESTEPID" ForeignTable="FUNDINGREQUESTOUTLINESTEP" OnDelete="SetToNull" />
+    <HourMinuteField Description="Expected starting time of the interaction." Name="EXPECTEDSTARTTIME" />
+    <HourMinuteField Description="Expected ending time of the interaction." Name="EXPECTEDENDTIME" />
+    <BooleanField Description="Flags this interaction as all day." Name="ISALLDAYEVENT" DefaultValue="true" />
+    <ForeignKeyField Description="Time zone of meeting time." Name="TIMEZONEENTRYID" ForeignTable="TIMEZONEENTRY" />
+    <HourMinuteField Description="Actual starting time of the interaction." Name="ACTUALSTARTTIME" />
+    <HourMinuteField Description="Actual ending time of the interaction." Name="ACTUALENDTIME" />
+    <ComputedColumnField Description="The expected start date and time of the interaction." Name="EXPECTEDSTARTDATETIME" Expression="dateadd(mi, convert(tinyint, substring(EXPECTEDSTARTTIME, 3, 2)), dateadd(hh, convert(tinyint, substring(EXPECTEDSTARTTIME, 1, 2)), convert(datetime, convert(date, EXPECTEDDATE))))" Persisted="true" />
+    <ComputedColumnField Description="The expected end date and time of the interaction." Name="EXPECTEDENDDATETIME" Expression="dateadd(mi, convert(tinyint, substring(EXPECTEDENDTIME, 3, 2)), dateadd(hh, convert(tinyint, substring(EXPECTEDENDTIME, 1, 2)), convert(datetime, convert(date, EXPECTEDDATE))))" Persisted="true" />
+    <ComputedColumnField Description="The Actual start date and time of the interaction." Name="ACTUALSTARTDATETIME" Expression="dateadd(mi, convert(tinyint, substring(ACTUALSTARTTIME, 3, 2)), dateadd(hh, convert(tinyint, substring(ACTUALSTARTTIME, 1, 2)), convert(datetime, convert(date, ACTUALDATE))))" Persisted="true" />
+    <ComputedColumnField Description="The Actual end date and time of the interaction." Name="ACTUALENDDATETIME" Expression="dateadd(mi, convert(tinyint, substring(ACTUALENDTIME, 3, 2)), dateadd(hh, convert(tinyint, substring(ACTUALENDTIME, 1, 2)), convert(datetime, convert(date, ACTUALDATE))))" Persisted="true" />
+    <ComputedColumnField Name="STARTTIME" Expression="coalesce((case when ACTUALSTARTTIME = '' then null else ACTUALSTARTTIME end),EXPECTEDSTARTTIME)" />
+    <ComputedColumnField Name="ENDTIME" Expression="coalesce((case when ACTUALENDTIME = '' then null else ACTUALENDTIME end) ,EXPECTEDENDTIME)" />
+    <!--New from constituent-->
+    <TextField Name="SUMMARY" Length="100"/>
+    <ForeignKeyField Name="INTERACTIONCATEGORYID" ForeignTable="INTERACTIONCATEGORY"/>
+    <CodeTableField Name="CONTACTMETHODCODEID" CodeTable="INTERACTIONTYPECODE"/>
+    <MemoField Name="COMMENTS"/>
+  </Fields>
+  <CheckConstraints>
+    <!--<CheckConstraint Name="CK_USR_UMHS_INTERACTION_ACTUALDATEPRESENTONLYWHENCOMPLETE" CheckExpression="(STATUSCODE in (0,1) and ACTUALDATE is null) or (STATUSCODE in (2,3) and ACTUALDATE is not null) or (STATUSCODE in (4,5))" />-->
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_INCOMPLETEONLYWHENACTIVE" CheckExpression="1=1" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_ACTUALDATENOTIME" CheckExpression="ACTUALDATE is null or ACTUALDATE = cast(ACTUALDATE as date)" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_EXPECTEDDATENOTIME" CheckExpression="EXPECTEDDATE is null or EXPECTEDDATE = cast(EXPECTEDDATE as date)" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_HASSTATUSWHENREQUESTSTEP" CheckExpression="(FUNDINGREQUESTSTAGECODEID is null and FUNDINGREQUESTID is null) or (FUNDINGREQUESTSTAGECODEID is not null and FUNDINGREQUESTID is not null)" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_ISADDITIONALFUNDRAISER" CheckExpression="dbo.UFN_INTERACTION_ISADDITIONALFUNDRAISER(ID,FUNDRAISERID)=0" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_HASREQUESTOUTLINESTEPONLYWHENREQUESTSTEP" CheckExpression="FUNDINGREQUESTOUTLINESTEPID is null or FUNDINGREQUESTID is not null" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_VALIDEXPECTEDTIMERANGE" CheckExpression="dbo.UFN_INTERACTION_VALIDTIMES(EXPECTEDSTARTTIME, EXPECTEDENDTIME)= 1" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_VALIDACTUALTIMERANGE" CheckExpression="dbo.UFN_INTERACTION_VALIDTIMES(ACTUALSTARTTIME, ACTUALENDTIME) = 1" />
+    <CheckConstraint Name="CK_UMHS_INTERACTIONBATCH_TIMEZONEPRESENTONLYWHENSTARTTIMEENTERED" CheckExpression="dbo.UFN_INTERACTION_VALIDTIMEZONE(EXPECTEDSTARTTIME,TIMEZONEENTRYID) = 1" />
+  </CheckConstraints>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="FUNDRAISERID"/>
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ID" />
+        <IncludeField Name="INTERACTIONTYPECODEID" />
+        <IncludeField Name="EXPECTEDDATE" />
+        <IncludeField Name="ACTUALDATE" />
+        <IncludeField Name="STATUSCODEID" />
+        <IncludeField Name="FUNDINGREQUESTID" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="FUNDINGREQUESTID" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ACTUALDATE" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

@@ -1,0 +1,104 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="783ae27b-2bbd-4d57-9bf1-e62a1039d68b"
+	Name="MIMED Notes Query"
+	Description="A view defined for querying on MIMED documentation records"
+	Author="UM Dev"
+	IsRoot="true"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_UM_V_QUERY_UMHSNOTES">
+		<ViewSQL>
+			<![CDATA[
+        select
+          UN.ID,
+          UN.UMHSID,
+          UN.DATEENTERED,
+          UN.TITLE,
+          [AUTHOR].NAME as [AUTHORNAME],
+          UN.AUTHORID,
+          UN.TEXTNOTE,
+          UNT.DESCRIPTION as [TYPE],
+          UN.DATEADDED,
+          UN.DATECHANGED,
+          UN.TSLONG,
+          [ADDEDBY].APPLICATIONNAME as [ADDEDBY_APPLICATION],
+          [ADDEDBY].USERNAME as [ADDEDBY_USERNAME],
+          [CHANGEDBY].APPLICATIONNAME as [CHANGEDBY_APPLICATION],
+          [CHANGEDBY].USERNAME as [CHANGEDBY_USERNAME],
+          UN.HTMLNOTE,
+          [UN].[UMHSNOTETYPECODEID]
+          /*#EXTENSION*/ 
+        from dbo.USR_UMHS_NOTE UN
+        inner join dbo.USR_UMHS_NOTETYPECODE UNT on UN.UMHSNOTETYPECODEID = UNT.ID
+        left join dbo.CHANGEAGENT as [ADDEDBY] on [ADDEDBY].ID = UN.ADDEDBYID
+        left join dbo.CHANGEAGENT as [CHANGEDBY] on [CHANGEDBY].ID = UN.CHANGEDBYID
+        left join dbo.CONSTITUENT as [AUTHOR] on [AUTHOR].ID = UN.AUTHORID	
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Caption="System record ID" Category="System Fields" Name="ID" CaptionResourceKey="$$system_record_id" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="MIMED ID" Category="System Fields" IsHidden="true" Name="UMHSID" CaptionResourceKey="$$UMHS_id" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="Date entered" DataType="Date" Name="DATEENTERED" CaptionResourceKey="$$date_entered" />
+      <OutputField Caption="Title" DataType="String" Name="TITLE" CaptionResourceKey="$$title" />
+      <OutputField Caption="Author name" Name="AUTHORNAME" CaptionResourceKey="$$author_name" />
+      <OutputField Caption="Author system ID" Name="AUTHORID" CaptionResourceKey="$$author_system_id" IsHidden="true">
+        <LookupInfo>
+          <SearchList ID="23C5C603-D7D8-4106-AECC-65392B563887" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Notes" Name="TEXTNOTE" CaptionResourceKey="$$notes" />
+      <OutputField Caption="Type" Name="TYPE" CaptionResourceKey="$$type">
+        <LookupInfo IDField="UMHSNOTETYPECODEID">
+          <CodeTable CodeTableName="USR_UMHS_NOTETYPECODE" IncludeInactive="true" UseCodeTableEntrySecurity="false" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Date added" Category="System Fields" Name="DATEADDED" CaptionResourceKey="$$date_added" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="Date changed" Category="System Fields" Name="DATECHANGED" CaptionResourceKey="$$date_changed" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="Timestamp value" Category="System Fields" IsHidden="true" Name="TSLONG" CaptionResourceKey="$$timestamp_value" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="Added by application" Category="System Fields" Name="ADDEDBY_APPLICATION" CaptionResourceKey="$$added_by_application" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="37E3E458-AF0D-4dbc-8A18-A93885521A42" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Added by user name" Category="System Fields" Name="ADDEDBY_USERNAME" CaptionResourceKey="$$added_by_user_name" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="CEA15E1C-E455-41be-9ECF-6B5453FA96A4" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Changed by application" Category="System Fields" Name="CHANGEDBY_APPLICATION" CaptionResourceKey="$$changed_by_application" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="37E3E458-AF0D-4dbc-8A18-A93885521A42" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Changed by user name" Category="System Fields" Name="CHANGEDBY_USERNAME" CaptionResourceKey="$$changed_by_user_name" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="CEA15E1C-E455-41be-9ECF-6B5453FA96A4" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Notes in HTML format" Name="HTMLNOTE" CaptionResourceKey="$$notes_in_html_format" />
+      <OutputField Caption="MIMED type code ID" Name="UMHSNOTETYPECODEID" DataType="Guid" IsHidden="true" CaptionResourceKey="$$UMHS_type_code_id" />
+    </OutputFields>
+    <IdentifyingFields>
+      <IdentifyingField Name="TITLE" />
+    </IdentifyingFields>
+  </Output>
+  <RelationshipOperations>
+    <AddToParentView Field="UMHSID" ParentView="USR_V_QUERY_UMHS_DATA" ParentViewRelatedField="ID" PathAlias="MIMED Notes" DisplayAliasResourceKey="$$notes" />
+    <!--<AddToParentView Field="CONSTITUENTID" ParentView="V_QUERY_RECORD" ParentViewRelatedField="ID" PathAlias="Notes" DisplayAliasResourceKey="$$notes" />
+    <AddToParentView Field="CONSTITUENTID" ParentView="V_QUERY_ORGANIZATION" ParentViewRelatedField="ID" PathAlias="Notes" DisplayAliasResourceKey="$$notes" />
+    <AddToParentView Field="CONSTITUENTID" ParentView="V_QUERY_STUDENT" ParentViewRelatedField="ID" PathAlias="Notes" DisplayAliasResourceKey="$$notes" />
+    <AddToParentView Field="CONSTITUENTID" ParentView="V_QUERY_FACULTY" ParentViewRelatedField="ID" PathAlias="Notes" DisplayAliasResourceKey="$$notes" />-->
+  </RelationshipOperations>
+
+</QueryViewSpec>
+

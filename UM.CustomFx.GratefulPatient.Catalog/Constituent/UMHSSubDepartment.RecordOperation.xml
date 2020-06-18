@@ -1,0 +1,58 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="8dd15487-999d-48ac-bfb7-5b267ec79b8b" 
+	Name="MIMED Sub Department Record Operation" 
+	Description="This handles the deletion of an MIMED subdepartment."
+	Author="UM Dev"
+	OperationType="Delete"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Department.DataList" />
+
+  <SPRecord>
+		<SPOperationImplementation SPName="USR_UM_USP_RECORDOPERATION_UMHSSUBDEPARTMENT">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+          create procedure dbo.USR_UM_USP_RECORDOPERATION_UMHSSUBDEPARTMENT
+          (
+                        @ID uniqueidentifier,
+                        @CHANGEAGENTID uniqueidentifier
+                    )
+                    as
+                        set nocount on;
+                         
+                        declare @CURRENTDATE datetime = getdate();
+                         
+                        if exists(select object_id from sys.objects where type = 'U' and name = 'BATCHDEPARTMENT')
+                            update
+                                dbo.BATCHDEPARTMENT
+                            set
+                                DEPARTMENTID = null,
+                                CHANGEDBYID = @CHANGEAGENTID,
+                                DATECHANGED = @CURRENTDATE
+                            where
+                                DEPARTMENTID = @ID;
+                         
+                        exec dbo.USP_USR_UMHS_SUBDEPARTMENT_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID;
+                        return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+  <ExpectedOperationDBExceptions>
+    <Constraints xmlns="bb_appfx_commontypes">
+      <Constraint Name="FK_UMHS_SUBDEPARTMENTID" Type="ForeignKey">
+        <CustomErrorMsg>This subdepartment cannot be deleted because it is associated with a department.</CustomErrorMsg>
+      </Constraint>
+        <Constraint Name="FK_USR_UMHS_NAMEFORMAT_SUBDEPARTMENTID" Type="ForeignKey">
+          <CustomErrorMsg>This subdepartment cannot be deleted because it is associated with a name format.</CustomErrorMsg>
+        </Constraint>
+      </Constraints>
+  </ExpectedOperationDBExceptions>
+  </SPRecord>
+  <Prompt>
+    <StandardPrompt Text="Are you sure you want to delete this subdepartment?" TextResourceKey="$$are_you_sure_you_want_to_delete_this_subdepartment?" />
+  </Prompt>
+
+</RecordOperationSpec>

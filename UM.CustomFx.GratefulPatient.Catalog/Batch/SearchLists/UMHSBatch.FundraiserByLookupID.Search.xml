@@ -1,0 +1,89 @@
+﻿<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="fb4a0305-70bc-4409-b3c2-ba672bf49626"
+    Name="Fundraiser Search By Lookup ID"
+    Description="A search list for locating fundraiser by lookup id records"
+    Author="BrightVine Solutions"
+    RecordType="Fundraiser By LookupI D"
+    TranslationFunctionID="EC1BC00B-FC28-435A-A6AD-07938211558F" QuickFindCriteriaFieldID="LOOKUPID"
+	>
+	<!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be used to limit the number of rows returned to a reasonable number. -->
+	<SPSearchList SPName="USR_USP_SEARCHLIST_FUNDRAISERBYLOOKUPID">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+      CREATE PROCEDURE DBO.USR_USP_SEARCHLIST_FUNDRAISERBYLOOKUPID
+      (
+	      @LOOKUPID NVARCHAR(100) = NULL,
+	      @MAXROWS SMALLINT = 500
+      )
+      AS
+	      set @LOOKUPID = dbo.UFN_SEARCHCRITERIA_GETLIKEPARAMETERVALUE(@LOOKUPID, 0, null);
+
+        DECLARE @CURRENTDATE DATETIME = GETDATE();
+        DECLARE @CURRENTDATEEARLIESTTIME DATE = @CURRENTDATE;
+
+        SELECT TOP (@MAXROWS) CONSTITUENT.ID                                              [ID],
+                              NULL                                                        [SORTCONSTITUENTNAME],
+                              ADDRESS.CITY                                                [CITY],
+                              DBO.UFN_STATE_GETDESCRIPTION(ADDRESS.STATEID)               [STATE],
+                              ADDRESS.POSTCODE                                            [POSTCODE],
+                              PHONE.NUMBER                                                [PHONE],
+                              CASE WHEN CONSTITUENT.ISGROUP = 0
+                                   AND CONSTITUENT.ISORGANIZATION = 0 THEN 'INDIVIDUAL'
+                                WHEN CONSTITUENT.ISORGANIZATION = 1 THEN 'ORGANIZATION'
+                                WHEN GD.GROUPTYPECODE = 0 THEN 'HOUSEHOLD'
+                              ELSE 'GROUP'
+                              END                                                         [CONSTITUENTTYPE],
+                              ( COALESCE((SELECT DBO.UDA_BUILDLIST(SITE.NAME)
+                                          FROM   DBO.SITE
+                                                 LEFT JOIN DBO.CONSTITUENTSITE ON CONSTITUENTSITE.CONSTITUENTID = CONSTITUENT.ID
+                                          WHERE  CONSTITUENTSITE.SITEID = SITE.ID), '') ) [SITE],
+                              NF.NAME                                                     [NAME]
+        FROM   DBO.CONSTITUENT
+               OUTER APPLY DBO.UFN_CONSTITUENT_DISPLAYNAME(CONSTITUENT.ID) NF
+               LEFT OUTER JOIN ADDRESS ON CONSTITUENT.ID    = ADDRESS.CONSTITUENTID
+                                      AND ADDRESS.ISPRIMARY = 1
+               LEFT OUTER JOIN PHONE ON CONSTITUENT.ID  = PHONE.CONSTITUENTID
+                                    AND PHONE.ISPRIMARY = 1
+               LEFT OUTER JOIN DBO.GROUPDATA GD ON CONSTITUENT.ID = GD.ID
+               INNER JOIN DBO.FUNDRAISERDATERANGE ON FUNDRAISERDATERANGE.CONSTITUENTID = CONSTITUENT.ID AND ( FUNDRAISERDATERANGE.DATEFROM      <= @CURRENTDATEEARLIESTTIME OR FUNDRAISERDATERANGE.DATEFROM IS NULL )
+                                                 AND ( @CURRENTDATEEARLIESTTIME <= FUNDRAISERDATERANGE.DATETO OR FUNDRAISERDATERANGE.DATETO IS NULL )
+        WHERE  CONSTITUENT.LOOKUPID LIKE @LOOKUPID
+               AND CONSTITUENT.ISCONSTITUENT = 1
+               AND NOT EXISTS (SELECT TOP 1 ID
+                               FROM   DBO.DECEASEDCONSTITUENT
+                               WHERE  DECEASEDCONSTITUENT.ID = CONSTITUENT.ID)
+               AND CONSTITUENT.ISORGANIZATION = 0
+               AND CONSTITUENT.ISGROUP = 0
+               AND CONSTITUENT.ISINACTIVE = 0
+        ORDER  BY CONSTITUENT.KEYNAME,
+                  CONSTITUENT.FIRSTNAME,
+                  CONSTITUENT.MIDDLENAME; 
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+			<FormField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String" MaxLength="100" />
+		</FormFields>
+	</FormMetaData>
+
+	<!-- also describe the output fields for the search screen -->
+	<Output TranslationField="Name">
+		<OutputFields>
+			<OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+			<OutputField FieldID="SORTCONSTITUENTNAME" Caption="SORT CONSTITUENT NAME" DataType="String" />
+			<OutputField FieldID="CITY" Caption="CITY" DataType="String" />
+      <OutputField FieldID="STATE" Caption="STATE" DataType="String" />
+      <OutputField FieldID="POSTCODE" Caption="POSTCODE" DataType="String" />
+      <OutputField FieldID="PHONE" Caption="PHONE" DataType="String" />
+      <OutputField FieldID="CONSTITUENTTYPE" Caption="CONSTITUENT TYPE" DataType="String" />
+      <OutputField FieldID="SITE" Caption="SITE" DataType="String" />
+      <OutputField FieldID="NAME" Caption="NAME" DataType="String" />
+		</OutputFields>
+	</Output>
+</SearchListSpec>
+

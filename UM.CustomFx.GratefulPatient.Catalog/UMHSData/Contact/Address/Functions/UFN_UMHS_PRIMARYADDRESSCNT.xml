@@ -1,0 +1,32 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="128507b1-1050-40fb-9933-23f648d78a02"
+	Name="USR_UFN_UMHS_PRIMARYADDRESSCNT"
+	Description="USR_UFN_UMHS_PRIMARYADDRESSCNT"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_PRIMARYADDRESSCNT"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_PRIMARYADDRESSCNT(@UMHSID uniqueidentifier)
+returns int
+with execute as caller
+as begin
+	declare @cnt int;
+  set @cnt=0;
+  
+  select 
+    @cnt=count(UMHSID)
+  from dbo.USR_UMHS_ADDRESS a
+  where
+      a.UMHSID=@UMHSID
+  and a.ISPRIMARY=1
+  
+	return @cnt;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

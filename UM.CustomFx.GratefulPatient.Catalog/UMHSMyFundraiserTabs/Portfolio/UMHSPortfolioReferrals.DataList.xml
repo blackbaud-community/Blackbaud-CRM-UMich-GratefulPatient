@@ -1,0 +1,107 @@
+<DataListSpec 
+    xmlns="bb_appfx_datalist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="1071c8eb-4c82-4fd1-9e35-6aace93a01ec"
+    Name="MIMED Portfolio Referrals Data List"
+    Description="A data list showing MIMED portfolio referrals records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    >
+  <ResourceFile AssemblyName="Blackbaud.AppFx.MajorGiving.Catalog.dll" ClassName="Blackbaud.AppFx.MajorGiving.Catalog.FundraisingManagerProspects.DataList" />
+
+  <!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSPORTFOLIOREFERRALS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+      create procedure dbo.USR_UM_USP_DATALIST_UMHSPORTFOLIOREFERRALS
+      (
+        @FUNDRAISERID uniqueidentifier
+       , @INCLUDEHISTORICAL bit = 1
+      )
+        as
+	        set nocount on;
+ IF @INCLUDEHISTORICAL = 1 --show all
+          begin 
+            SELECT REF.[ID],
+                   U.CONSTITUENTID,
+                   REF.REFERRERID,
+                   CONCAT(U.FIRSTNAME, ' ', U.KEYNAME)   PROSEPCT,
+                   RC.NAME                               REFERRER,
+                   USR_UMHS_REFERRERROLECODE.DESCRIPTION REFERRERROLE,
+                   REF.[REFERRALDATE],
+                   D.NAME                                AS DEPARTMENTNAME,
+                   SD.NAME                               AS SUBDEPARTMENTNAME,
+                   REF.FOLLOWUPCOMPLETED,
+                   REF.FOLLOWUPSTATUS,
+                   REF.[COMMENTS]
+            FROM   USR_UMHS_REFERRAL REF
+                   JOIN DBO.USR_UMHS_DATA U ON REF.UMHSID = U.ID
+                   LEFT JOIN CONSTITUENT RC ON RC.ID = REF.REFERRERID
+                   LEFT JOIN CONSTITUENT MEDSTAFF ON MEDSTAFF.ID = REF.[UMHSDEVSTAFFID]
+                   LEFT JOIN DBO.USR_UMHS_REFERRERROLECODE ON REF.[REFERRERROLECODEID] = USR_UMHS_REFERRERROLECODE.ID
+                   LEFT JOIN USR_UMHS_DEPARTMENT D ON D.[ID] = REF.[DEPARTMENTID]
+                   LEFT JOIN USR_UMHS_SUBDEPARTMENT SD ON SD.[ID] = REF.[SUBDEPARTMENTID]
+            WHERE  REF.UMHSDEVSTAFFID = @FUNDRAISERID 
+         end
+ELSE
+         begin
+            SELECT DISTINCT REF.[ID],
+                   U.CONSTITUENTID,
+                   REF.REFERRERID,
+                   CONCAT(U.FIRSTNAME, ' ', U.KEYNAME)   PROSEPCT,
+                   RC.NAME                               REFERRER,
+                   USR_UMHS_REFERRERROLECODE.DESCRIPTION REFERRERROLE,
+                   REF.[REFERRALDATE],
+                   D.NAME                                AS DEPARTMENTNAME,
+                   SD.NAME                               AS SUBDEPARTMENTNAME,
+                   REF.FOLLOWUPCOMPLETED,
+                   REF.FOLLOWUPSTATUS,
+                   REF.[COMMENTS]
+            FROM   USR_UMHS_REFERRAL REF
+                   JOIN DBO.USR_UMHS_DATA U ON REF.UMHSID = U.ID
+                   LEFT JOIN CONSTITUENT RC ON RC.ID = REF.REFERRERID
+                   LEFT JOIN CONSTITUENT MEDSTAFF ON MEDSTAFF.ID = REF.[UMHSDEVSTAFFID]
+                   LEFT JOIN DBO.USR_UMHS_REFERRERROLECODE ON REF.[REFERRERROLECODEID] = USR_UMHS_REFERRERROLECODE.ID
+                   LEFT JOIN USR_UMHS_DEPARTMENT D ON D.[ID] = REF.[DEPARTMENTID]
+                   LEFT JOIN USR_UMHS_SUBDEPARTMENT SD ON SD.[ID] = REF.[SUBDEPARTMENTID]
+            WHERE  REF.UMHSDEVSTAFFID = @FUNDRAISERID  and REF.FOLLOWUPCOMPLETED = 0
+         end
+          
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+  <Context ContextRecordType="Constituent" RecordIDParameter="FUNDRAISERID" />
+  <!-- define the output fields in the list -->
+  <Parameters>
+    <c:FormMetaData xmlns="bb_appfx_commontypes">
+      <c:FormFields>
+        <c:FormField FieldID="INCLUDEHISTORICAL" DataType="Boolean" Caption="Show historical" DefaultValueText="1" CaptionResourceKey="$$show_historical"  />
+      </c:FormFields>
+      <c:WebUIComponent>
+        <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDPortfolioReferralsDataListUIModel" />
+        <c:WebUI>
+          <c:DefaultWebUI />
+        </c:WebUI>
+      </c:WebUIComponent>
+    </c:FormMetaData>
+  </Parameters>
+ 
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="CONSTITUENTID" Caption="CONSTITUENTID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="REFERRERID" Caption="Referre ID" DataType="Guid" IsHidden="true" />
+      <OutputField FieldID="PROSPECT" Caption="MIMED Friend" DataType="String" />
+      <OutputField FieldID="REFERRER" Caption="Referrer" DataType="String" />
+      <OutputField FieldID="REFERRERROLECODEID" Caption="Referrer role" DataType="String" />
+      <OutputField FieldID="REFERRALDATE" Caption="Referral date" DataType="Date" />
+      <OutputField FieldID="DEPARTMENTNAME" Caption="Referrer department" DataType="Guid" />
+      <OutputField FieldID="SUBDEPARTMENTNAME" Caption="Referrer subdepartment" DataType="Guid" />
+      <OutputField FieldID="FOLLOWUPCOMPLETED" DataType="Boolean" Caption="Follow-up completed" />
+      <OutputField FieldID="FOLLOWUPSTATUS" DataType="TinyInt" Caption="Follow-up status" />
+      <OutputField FieldID="COMMENTS" Caption="Comments" DataType="String" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

@@ -1,0 +1,127 @@
+<DataListSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="0be3adc4-1803-43f1-9b81-9d3aea33cb9c"
+    Name="MIMED Email Address Data List"
+    Description="Returns all MIMED Email addresses."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+    <SPDataList SPName="USR_USP_DATALIST_USR_UMHS_EMAILADDRESS">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+        create procedure dbo.USR_USP_DATALIST_USR_UMHS_EMAILADDRESS
+        (
+            @UMHSID uniqueidentifier, 
+            @INCLUDEFORMER bit  = 0
+        )
+        as
+            set nocount on;
+ 
+            declare @CURRENTDATE datetime = dbo.UFN_DATE_GETEARLIESTTIME(getdate());
+ 
+         WITH [CONTACTINFO_CTE] AS (
+                          --Emails
+                          SELECT EMAILADDRESS.ID,
+                                 --case when EMAILADDRESS.ISCONFIDENTIAL = 0
+                                 --  then EMAILADDRESS.EMAILADDRESS
+                                 -- else N'(Confidential) ' + EMAILADDRESS.EMAILADDRESS
+                                 -- end 
+                                 EMAILADDRESS.EMAILADDRESS                                                        AS CONTACTINFO,
+                                 DBO.UFN_EMAILADDRESSTYPECODE_GETDESCRIPTION(EMAILADDRESS.EMAILADDRESSTYPECODEID) AS TYPE,
+                                 EMAILADDRESS.ISPRIMARY,
+                                 CASE WHEN EMAILADDRESS.DONOTEMAIL = 0 THEN ''
+                                 ELSE 'Do not email'
+                                 END                                                                              AS DONOTCONTACT,
+                                 EMAILADDRESS.STARTDATE,
+                                 EMAILADDRESS.ENDDATE,
+                                 CASE WHEN EMAILADDRESS.STARTDATE IS NULL THEN '0001-01-01'
+                                 ELSE CAST(EMAILADDRESS.STARTDATE AS DATE)
+                                 END                                                                              AS [STARTDATE_SORT],
+                                 CASE WHEN EMAILADDRESS.ENDDATE IS NULL THEN '0001-01-01'
+                                 ELSE CAST(EMAILADDRESS.ENDDATE AS DATE)
+                                 END                                                                              AS [ENDDATE_SORT],
+                                 EMAILADDRESS.DATEADDED,
+                                 CASE WHEN EXISTS(SELECT ID
+                                             FROM   DBO.EMAILINVALIDRECIPIENT
+                                             WHERE
+                                                  EMAILINVALIDRECIPIENT.ADDRESS       = EMAILADDRESS.EMAILADDRESS
+                                              AND EMAILINVALIDRECIPIENT.ISBLACKLISTED = 1) THEN 1
+                                 ELSE 0
+                                 END                                                                              AS INVALIDEMAIL,
+                                 ISCONFIDENTIAL
+                           FROM   DBO.USR_UMHS_EMAILADDRESS EMAILADDRESS
+                           WHERE
+                            EMAILADDRESS.UMHSID = @UMHSID)
+          SELECT ID,
+                 CONTACTINFO,
+                 CASE WHEN ( ( ENDDATE IS NULL )
+                         OR ( ENDDATE > @CURRENTDATE ) ) THEN COALESCE(TYPE, N'') + N' (Current)'
+                 ELSE COALESCE(TYPE, N'') + N' (Former)'
+                 END AS TYPE,
+                 CASE WHEN ISPRIMARY = 0 THEN ''
+                 ELSE 'Yes'
+                 END AS ISPRIMARY,
+                 DONOTCONTACT,
+                 CASE WHEN ( ( ENDDATE IS NULL )
+                         OR ( ENDDATE > @CURRENTDATE ) ) THEN 0
+                 ELSE 1
+                 END AS ISFORMER,
+                 STARTDATE,
+                 ENDDATE,
+                 CASE
+		          --WHEN ISCONFIDENTIAL = 1 THEN 'RES:padlock'
+		          WHEN DONOTCONTACT = 'Do not email' THEN 'RES:warning'
+		          WHEN INVALIDEMAIL = 1 THEN 'RES:do_not_symbol'
+		          ELSE 'RES:lv_spacer'
+                 END AS IMAGEKEY,
+                 INVALIDEMAIL
+          FROM   [CONTACTINFO_CTE]
+          WHERE  @INCLUDEFORMER = 1 OR ((ENDDATE IS NULL) OR (ENDDATE > @CURRENTDATE))
+          ORDER  BY ISPRIMARY DESC,
+                    ISFORMER ASC,
+                    ENDDATE_SORT DESC,
+                    STARTDATE_SORT DESC,
+                    DATEADDED DESC 
+
+
+        ]]>
+        </c:CreateProcedureSQL>
+      </SPDataList>
+      <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+      <Parameters>
+        <FormMetaData xmlns="bb_appfx_commontypes">
+          <FormFields>
+            <FormField FieldID="INCLUDEFORMER" DataType="Boolean" Caption="Show former contact information" DefaultValueText="0" CaptionResourceKey="$$show_former_contact_information" />
+          </FormFields>
+        </FormMetaData>
+      </Parameters>
+      <Output>
+        <OutputFields>
+          <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="CONTACTINFO" Caption="Contact information" DataType="String" />
+          <OutputField FieldID="TYPE" Caption="Type" DataType="String">
+            <InstalledProductList xmlns="bb_appfx_commontypes">
+              <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+              <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+              <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+              <InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+            </InstalledProductList>
+          </OutputField>
+          <OutputField FieldID="ISPRIMARY" Caption="Primary" DataType="String" />
+          <OutputField FieldID="DONOTCONTACT" Caption="Do not contact" DataType="String" >
+            <InstalledProductList xmlns="bb_appfx_commontypes">
+              <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+              <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+              <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+              <InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+            </InstalledProductList>
+          </OutputField>
+          <OutputField FieldID="ISFORMER" Caption="IsFormer" IsHidden="true" DataType="Boolean" />
+          <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date"  />
+          <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date"  />
+          <OutputField FieldID="IMAGEKEY" Caption="ImageKey" IsHidden="true" DataType="String" IsImageKey="true" />
+          <OutputField FieldID="INVALIDEMAIL" Caption="Invalid email" IsHidden="true" DataType="Boolean" />
+        </OutputFields>
+      </Output>
+</DataListSpec>

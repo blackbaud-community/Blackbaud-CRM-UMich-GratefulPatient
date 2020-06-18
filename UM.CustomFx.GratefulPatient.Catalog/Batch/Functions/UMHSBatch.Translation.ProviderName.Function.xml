@@ -1,0 +1,36 @@
+﻿<TranslationFunctionSpec
+	xmlns="bb_appfx_translationfunction"
+	xmlns:c="bb_appfx_commontypes"
+	ID="09755eab-3180-42d1-bf8a-1df7c5bc43f4"
+	Name="USR_UFN_TRANSLATIONFUNCTION_UMSH_BATCH_PROVIDERNAME"
+	Description="Get the Provider's name"
+	Author="UM Dev"
+	RecordType="MIMED Data"
+	>
+
+	<SQLTranslationFunction FNName="USR_UFN_TRANSLATIONFUNCTION_UMSH_BATCH_PROVIDERNAME">
+		<c:CreateFunctionSQL>
+			<![CDATA[
+create function dbo.USR_UFN_TRANSLATIONFUNCTION_UMSH_BATCH_PROVIDERNAME
+(
+	@ID uniqueidentifier
+) 
+returns nvarchar(200) 
+as
+begin
+	declare @NAME nvarchar(200);
+  
+  select 
+    @NAME=c.NAME 
+  from dbo.USR_UMHS_PROVIDERS p
+  inner join dbo.CONSTITUENT c on c.ID=p.CONSTITUENTID
+  where 
+    p.ID=@ID
+  
+	return @NAME;
+end	
+			]]>
+		</c:CreateFunctionSQL>
+	</SQLTranslationFunction>
+
+</TranslationFunctionSpec>

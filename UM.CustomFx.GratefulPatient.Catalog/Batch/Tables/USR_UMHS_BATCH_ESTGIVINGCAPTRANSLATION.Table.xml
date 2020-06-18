@@ -1,0 +1,17 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="61d3fe1f-2380-4a67-8ce0-4f998d91ecfa"
+	Name="UMHS"
+	Description="Translation of imported Giving Capacity from MIMED to DART"
+	Author="UM Dev"
+	Tablename="USR_UMHS_BATCH_GIVINGCAPACITYTRANSLATION"		   
+	IsBuiltIn="false"
+	>
+
+	<Fields>
+    <ForeignKeyField Name="GIVINGCAPACITYID" ForeignTable="WEESTGIVCAPACITYCODE" Description="Estimated Giving Capacity Code ID for the Wealth Engine Est Giv Capacity (Med) field" />
+    <TextField Name="DESCRIPTION" Description="MIMED Giving Capacity text to transalated to DART" Length="200" />
+	</Fields>
+
+</TableSpec>

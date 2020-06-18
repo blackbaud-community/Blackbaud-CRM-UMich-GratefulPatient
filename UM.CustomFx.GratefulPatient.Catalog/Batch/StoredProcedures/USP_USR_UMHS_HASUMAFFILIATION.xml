@@ -1,0 +1,97 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ff91b9e0-e9c6-4f45-bcc3-a8f383dde686"
+	Name="USP_USR_UMHS_HASUMAFFILIATION"
+	Description="Test if a constituent is Faculty, Staff, Board Member or Spouse of these U-M affiliations."
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_HASUMAFFILIATION"
+  GrantServiceRolePermission="true"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_HASUMAFFILIATION
+(
+   @CONSTITUENTID uniqueidentifier
+  ,@HASUMAFFILIATION bit OUTPUT
+)
+as
+set nocount on;
+begin
+
+  set @HASUMAFFILIATION = 0;
+  
+  if @CONSTITUENTID is NULL
+  begin
+    return;
+  end
+  
+  declare @BOARDMEMBERCONSTITUENCYTEXT nvarchar(100);
+  declare @CONSTITUENTSPOUSEPARTNERID uniqueidentifier;
+  declare @CURRENTAPPUSERID uniqueidentifier=null;
+  
+  select @CURRENTAPPUSERID=ID from APPUSER where WINDOWSUSERNAME=SUSER_NAME();
+
+  set @HASUMAFFILIATION=0;
+
+  /* Active Faculty or Staff? */
+  if exists(
+	  select 1
+	  FROM dbo.USR_CONSTITUENTAFFILIATION ca
+	  inner join dbo.USR_CONSTITUENTAFFILIATIONBASE cab on ca.AFFILIATIONBASENAMECODEID = cab.ID
+	  inner join dbo.USR_CONSTITUENTAFFILIATIONCATEGORYTYPECODE cat on cab.[CONSTITUENTAFFILIATIONCATEGORYCODEID] = cat.ID
+	  where
+	    ca.[CONSTITUENTID] = @CONSTITUENTID            
+	    and ca.AFFILIATIONENDDATE is null
+	    and cab.ID in ('F039E43C-0C9D-470A-AB9F-1D831DEB81A8', '20C8E83D-AD3C-4125-9717-604835115CAC')
+      and cat.ID = '91853F90-5D7D-46AA-B85A-B24F8CB4C384' -- U-M Employment
+      and cat.ACTIVE=1
+  )
+  begin
+    set @HASUMAFFILIATION = 1;
+  end 
+  
+  /*
+   * Board member/Regent (past or present)?
+   */
+  if @HASUMAFFILIATION=0
+  begin
+    select @HASUMAFFILIATION=1 from dbo.BOARDMEMBERDATERANGE where CONSTITUENTID=@CONSTITUENTID
+  end
+  
+  /* Spouse/Partner a U-M Affiliation? */
+  if @HASUMAFFILIATION=0
+  begin
+
+    exec dbo.USP_USR_UMHS_GETSPOUSEPARTNERID @CONSTITUENTID=@CONSTITUENTID, @CONSTITUENTSPOUSEPARTNERID=@CONSTITUENTSPOUSEPARTNERID output
+ 
+	  /* Spouse/Partner Active Faculty or Staff? */
+    if exists(
+	    select 1
+	    FROM dbo.USR_CONSTITUENTAFFILIATION ca
+	    inner join dbo.USR_CONSTITUENTAFFILIATIONBASE cab on ca.AFFILIATIONBASENAMECODEID = cab.ID
+	    inner join dbo.USR_CONSTITUENTAFFILIATIONCATEGORYTYPECODE cat on cab.[CONSTITUENTAFFILIATIONCATEGORYCODEID] = cat.ID
+	    where
+	      ca.[CONSTITUENTID] = @CONSTITUENTSPOUSEPARTNERID            
+	      and ca.AFFILIATIONENDDATE is null
+	      and cab.ID in ('F039E43C-0C9D-470A-AB9F-1D831DEB81A8', '20C8E83D-AD3C-4125-9717-604835115CAC')
+        and cat.ID = '91853F90-5D7D-46AA-B85A-B24F8CB4C384' -- U-M Employment
+        and cat.ACTIVE=1
+    )
+    begin
+      set @HASUMAFFILIATION = 1;
+    end 
+
+	  if @HASUMAFFILIATION=0
+	  begin
+		  /* Spouse/Partner Board Member? */
+      select @HASUMAFFILIATION=1 from dbo.BOARDMEMBERDATERANGE where CONSTITUENTID=@CONSTITUENTSPOUSEPARTNERID
+	  end
+  end
+
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

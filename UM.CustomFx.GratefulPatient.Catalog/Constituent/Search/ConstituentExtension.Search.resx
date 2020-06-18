@@ -1,0 +1,308 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="$$constituent_search" xml:space="preserve">
+    <value>Constituent Search</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$id" xml:space="preserve">
+    <value>ID</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$name" xml:space="preserve">
+    <value>Name</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$address" xml:space="preserve">
+    <value>Address</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$city" xml:space="preserve">
+    <value>City</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$state" xml:space="preserve">
+    <value>State</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$zip/postal_code" xml:space="preserve">
+    <value>ZIP/Postal code</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$lookup_id" xml:space="preserve">
+    <value>Lookup ID</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$gives_anonymously" xml:space="preserve">
+    <value>Gives anonymously</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$primary_class_year" xml:space="preserve">
+    <value>Primary class year</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$primary_business" xml:space="preserve">
+    <value>Primary business</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$is_organization" xml:space="preserve">
+    <value>Is organization</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$constituent_type" xml:space="preserve">
+    <value>Constituent type</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$email_address" xml:space="preserve">
+    <value>Email address</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$is_group" xml:space="preserve">
+    <value>Is group</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$is_household" xml:space="preserve">
+    <value>Is household</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$middle_name" xml:space="preserve">
+    <value>Middle name</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$suffix" xml:space="preserve">
+    <value>Suffix</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$phone" xml:space="preserve">
+    <value>Phone</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$prospect_manager" xml:space="preserve">
+    <value>Prospect manager</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$country" xml:space="preserve">
+    <value>Country</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$first_name" xml:space="preserve">
+    <value>First name</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$nickname" xml:space="preserve">
+    <value>Nickname</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$last/org_name" xml:space="preserve">
+    <value>Last/Org name</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$include_inactive" xml:space="preserve">
+    <value>Include inactive</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$include_deceased" xml:space="preserve">
+    <value>Include deceased</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$only_search_primary_addresses" xml:space="preserve">
+    <value>Only search primary addresses</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$match_all_criteria_exactly" xml:space="preserve">
+    <value>Match all criteria exactly</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$check_nickname" xml:space="preserve">
+    <value>Check nickname</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$check_aliases" xml:space="preserve">
+    <value>Check aliases</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$check_merged_constituents" xml:space="preserve">
+    <value>Check merged constituents</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$minimum_date" xml:space="preserve">
+    <value>Minimum date</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$exclude_custom_groups" xml:space="preserve">
+    <value>Exclude custom groups</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$exclude_households" xml:space="preserve">
+    <value>Exclude households</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$individuals" xml:space="preserve">
+    <value>Individuals</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$organizations" xml:space="preserve">
+    <value>Organizations</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$groups/households" xml:space="preserve">
+    <value>Groups/Households</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$check_alternate_lookup_ids" xml:space="preserve">
+    <value>Check alternate lookup IDs</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$include_fuzzy_search_on_name" xml:space="preserve">
+    <value>Include fuzzy search on name</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$phone_number" xml:space="preserve">
+    <value>Phone number</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$prospect_manager0" xml:space="preserve">
+    <value>Prospect Manager</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$constituency" xml:space="preserve">
+    <value>Constituency</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$source_code" xml:space="preserve">
+    <value>Source code</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$search_in" xml:space="preserve">
+    <value>Search in</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$show_advanced_search_options" xml:space="preserve">
+    <value>Show advanced search options</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$hide_advanced_search_options" xml:space="preserve">
+    <value>Hide advanced search options</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+  <data name="$$advanced_search_options" xml:space="preserve">
+    <value>Advanced search options</value>
+    <comment>*** AUTO-GENERATED.  DO NOT EDIT ***</comment>
+  </data>
+</root>

@@ -1,0 +1,149 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="731303bf-d141-46c1-9f48-fbfbf928659c" 
+	Name="MIMED Documentation Edit Data Form"
+	Description="A data form for editing MIMED documentation records" 
+	Author="UM Dev"
+	DataFormInstanceID="1aa3d040-b173-49b0-ae92-2c3d1d4a63c1" 
+	RecordType="MIMED Documentation"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Edit a note"
+  FormHeaderResourceKey="$$edit_a_note"
+	>
+
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSDOCUMENTATION">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSDOCUMENTATION
+(
+            @ID uniqueidentifier,
+						@DATALOADED bit = 0 output,
+						@DATEENTERED datetime = null output, 
+						@TITLE nvarchar(50) = null output,
+						@AUTHORID uniqueidentifier = null output,
+						@TEXTNOTE nvarchar(max) = null output,
+						@NOTETYPECODEID uniqueidentifier = null output,
+						@CONTEXTTYPE smallint = null output,
+						@TSLONG bigint = 0 output,
+						@HTMLNOTE nvarchar(max) = null output
+)
+as
+
+	set nocount on;
+
+	          set @CONTEXTTYPE = 0; --constituent
+						set @DATALOADED = 0;
+						set @TSLONG = 0;
+
+	
+						select 
+							@DATALOADED = 1,
+							@DATEENTERED=[DATEENTERED],
+							@TITLE=[TITLE],
+							@AUTHORID=[AUTHORID],
+							@TEXTNOTE=[TEXTNOTE],
+							@NOTETYPECODEID=[UMHSNOTETYPECODEID],
+							@HTMLNOTE = [HTMLNOTE],
+							@TSLONG=[TSLONG]
+						from
+							dbo.[USR_UMHS_NOTE]
+						where
+							[ID] = @ID;
+							
+						return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_EDIT_UMHSDOCUMENTATION">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_EDIT_UMHSDOCUMENTATION 
+(
+	@ID uniqueidentifier,
+						@CHANGEAGENTID uniqueidentifier = null,
+						@DATEENTERED datetime, 
+						@TITLE nvarchar(50),
+						@AUTHORID uniqueidentifier,
+						@TEXTNOTE nvarchar(max),
+						@NOTETYPECODEID uniqueidentifier,
+						@HTMLNOTE nvarchar(max)
+)
+as
+
+	set nocount on;
+						
+						declare @CURRENTDATE datetime;
+						
+						begin try
+							if @CHANGEAGENTID is null  
+								exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+								
+							set @CURRENTDATE = getdate();
+							
+							update
+								dbo.[USR_UMHS_NOTE]
+							set [DATEENTERED] = @DATEENTERED,
+								[TITLE] = @TITLE,
+								[AUTHORID] = @AUTHORID,
+								[TEXTNOTE] = @TEXTNOTE,
+								[UMHSNOTETYPECODEID] = @NOTETYPECODEID,
+								[HTMLNOTE] = @HTMLNOTE,
+								[CHANGEDBYID] = @CHANGEAGENTID,
+								[DATECHANGED] = @CURRENTDATE
+							where
+								[ID] = @ID;
+						end try
+					
+						begin catch
+							exec dbo.USP_RAISE_ERROR;
+							return 1;
+						end catch
+						
+						return 0;
+				]]>
+			</c:CreateProcedureSQL>	
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+  <c:ExpectedDBExceptions>
+    <c:Constraints>
+      <c:Constraint Name="FK_USR_UMHS_NOTE_UMHSNOTETYPECODEID" Field="NOTETYPECODEID" Type="ForeignKey" />
+      <c:Constraint Name="USR_UMHS_NOTE.DATEENTERED" Field="DATEENTERED" Type="Required" />
+      <c:Constraint Name="USR_UMHS_NOTE.UMHSNOTETYPECODEID" Field="NOTETYPECODEID" Type="Required" />
+      <c:Constraint Name="FK_USR_UMHS_NOTE_AUTHORID" Field="AUTHORID" Type="ForeignKey" />
+    </c:Constraints>
+  </c:ExpectedDBExceptions>
+  
+  </SaveImplementation>
+  </SPDataForm>
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="CONTEXTTYPE" DataType="Integer" ReadOnly="true" Hidden="true" Caption="Context type" />
+      <c:FormField FieldID="TITLE" MaxLength="50" Caption="Title" Description="The title of this note" CaptionResourceKey="$$title" />
+      <c:FormField FieldID="DATEENTERED" DataType="Date" Required="true" Caption="Date" Description="The date this note was entered" CaptionResourceKey="$$date" />
+      <c:FormField FieldID="AUTHORID" DataType="Guid" Caption="Author" Description="The author of this note" CaptionResourceKey="$$author">
+        <c:SearchList SearchListID="23c5c603-d7d8-4106-aecc-65392b563887" EnableQuickFind="true" />
+      </c:FormField>
+      <c:FormField FieldID="NOTETYPECODEID" DataType="Guid" Required="true" Caption="Type" Description="The user-defined type of this note" CaptionResourceKey="$$type">
+        <c:CodeTable CodeTableName="USR_UMHS_NOTETYPECODE" />
+      </c:FormField>
+      <c:FormField FieldID="TEXTNOTE" Hidden="true" Caption="Notes" Description="The plain text that comprises this note" CaptionResourceKey="$$notes" />
+      <c:FormField FieldID="HTMLNOTE" Caption="Notes" Description="The HTML that comprises this note" CaptionResourceKey="$$notes">
+        <c:Html PlainTextFieldID="TEXTNOTE" />
+      </c:FormField>
+    </c:FormFields>
+    <c:WebUIComponent>
+      <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDocumentationFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSDocumentationForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>
+
+  </c:FormMetaData>
+
+</EditDataFormTemplateSpec>

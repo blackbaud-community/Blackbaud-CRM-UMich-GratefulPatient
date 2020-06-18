@@ -1,0 +1,194 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="dffae252-c9f7-4708-9c13-b7eaa1a3c829"
+	Name="MIMED Data"
+	Description="Stores information about MIMED Data records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_DATA"		   
+	IsBuiltIn="false" 
+  >
+	<!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Description="Foreign key to the constituent record of patient." Name="CONSTITUENTID" Cardinality="OneToOne" Required="true" ForeignTable="CONSTITUENT" OnDelete="CascadeDelete" />
+    <TextField Description="For individuals, medical record number." Name="MRN" Length="50"  IsUnique="true" />
+    <TextField Description="For individuals, CPI sequence." Name="CPISEQUENCE" Length="50" IsUnique="true" />
+    <TextField Description="For individuals, stores the first name." Name="FIRSTNAME" Length="100"/>
+    <TextField Description="For individuals, stores the middle name." Name="MIDDLENAME" Length="100" />
+    <TextField Description="For individuals, stores the nick name." Name="NICKNAME" Length="100" />
+    <TextField Description="For individuals, stores the last name." Name="KEYNAME" Length="200" />
+    <FuzzyDateField Description="Patient date of birth." Name="BIRTHDATE" />
+    <ComputedColumnField Description="Patient age." Name="AGE" Expression="([dbo].[UFN_AGEFROMFUZZYDATE]([USR_UMHS_DATA].[BIRTHDATE],getdate()))" />
+    <CodeTableField CodeTable="TITLECODE" Name="TITLECODEID" Description="first title code in the record"/>
+    <CodeTableField CodeTable="TITLECODE" Name="TITLE2CODEID" Description="second title code in the record"/>
+    <CodeTableField CodeTable="SUFFIXCODE" Name="SUFFIXCODEID" Description="second title code in the record"/>
+    <CodeTableField CodeTable="SUFFIXCODE" Name="SUFFIX2CODEID" Description="first suffix code in the record"/>
+    <CodeTableField Name="INFOSOURCECODEID" CodeTable="INFOSOURCECODE"  />
+    <BooleanField Description="Indicates if this person can be solicited." Name="ISDMINELIGIBLE" DefaultValue="false" />
+    <CodeTableField Name="DMINELIGIBLEREASONCODEID" CodeTable="USR_UMHS_DMINELIGIBLEREASONCODE" />
+    <EnumField Name="GENDERCODE" DefaultValue="0">
+      <EnumValues>
+        <EnumValue ID="0" Translation="Unknown"/>
+        <EnumValue ID="1" Translation="Male"/>
+        <EnumValue ID="2" Translation="Female"/>
+      </EnumValues>
+    </EnumField>
+    <DateField Name="UMHSDATA_LASTPROCDATE" Description="Date on the records imported from the UMHSDATA datamart." />
+  </Fields>  
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="KEYNAME" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ID" />
+        <IncludeField Name="FIRSTNAME" />
+        <IncludeField Name="MIDDLENAME" />        
+      </IncludeFields>
+    </Index>       
+    <Index>
+      <IndexFields>
+        <IndexField Name="MRN"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+        <IndexField Name="MRN"/>        
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="KEYNAME" />
+        <IncludeField Name="FIRSTNAME" />
+        <IncludeField Name="MIDDLENAME" />
+        <IncludeField Name="GENDERCODE" />
+        <IncludeField Name="TITLECODEID" />
+        <IncludeField Name="SUFFIXCODEID" />
+        <IncludeField Name="DATECHANGED" />
+        <IncludeField Name="BIRTHDATE" />
+      </IncludeFields>
+    </Index>
+  </Indexes>
+  <Triggers>
+    <Trigger Name="TR_UMHS_INSERT_SEARCHPATIENT">
+      <CreateTriggerSQL>
+        <![CDATA[
+          CREATE TRIGGER TR_UMHS_INSERT_SEARCHPATIENT ON DBO.USR_UMHS_DATA AFTER INSERT NOT FOR REPLICATION
+          AS BEGIN
+                -- add name-only rows to USR_UMHS_DATA, these will be removed once addresses are added
+                INSERT INTO DBO.USR_UMHS_SEARCHPATIENT (
+                  ID,
+                  UMHSID,
+                  CONSTITUENTID,
+                  KEYNAME,
+                  FIRSTNAME,
+                  MIDDLENAME,
+                  NICKNAME,
+                  TITLECODEID,
+                  SUFFIXCODEID
+                )
+                SELECT  NEWID(),
+                        INSERTED.ID,
+                        INSERTED.CONSTITUENTID,
+                        UPPER(INSERTED.KEYNAME),
+                        UPPER(INSERTED.FIRSTNAME),
+                        UPPER(INSERTED.MIDDLENAME),
+                        UPPER(INSERTED.NICKNAME),
+                        INSERTED.TITLECODEID,
+                        INSERTED.SUFFIXCODEID
+                FROM INSERTED
+                --INNER JOIN DBO.USR_UMHS_V_PATIENTALLNAMES C ON C.ID = INSERTED.ID
+                --WHERE C.KEYNAME <> ''
+          end
+        ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHS_UPDATE_SEARCHPATIENT">
+      <CreateTriggerSQL>
+        <![CDATA[
+        CREATE TRIGGER TR_UMHS_UPDATE_SEARCHPATIENT ON DBO.USR_UMHS_DATA AFTER UPDATE NOT FOR REPLICATION
+        AS
+          BEGIN
+                    IF UPDATE(KEYNAME)
+                        OR UPDATE(FIRSTNAME)
+                        OR UPDATE(MIDDLENAME)
+                        OR UPDATE(TITLECODEID)
+                        OR UPDATE(SUFFIXCODEID)
+                        OR UPDATE(NICKNAME)
+                      BEGIN
+                          IF NOT EXISTS(SELECT S.ID 
+                                        FROM INSERTED 
+                                        JOIN USR_UMHS_SEARCHPATIENT S ON S.CONSTITUENTID = INSERTED.CONSTITUENTID
+                                        )
+                            INSERT INTO DBO.USR_UMHS_SEARCHPATIENT (
+                              ID,
+                              UMHSID,
+                              CONSTITUENTID,
+                              KEYNAME,
+                              FIRSTNAME,
+                              MIDDLENAME,
+                              NICKNAME,
+                              TITLECODEID,
+                              SUFFIXCODEID
+                            )
+                            SELECT  NEWID(),
+                                    INSERTED.ID,
+                                    INSERTED.CONSTITUENTID,
+                                    UPPER(INSERTED.KEYNAME),
+                                    UPPER(INSERTED.FIRSTNAME),
+                                    UPPER(INSERTED.MIDDLENAME),
+                                    UPPER(INSERTED.NICKNAME),
+                                    INSERTED.TITLECODEID,
+                                    INSERTED.SUFFIXCODEID
+                            FROM INSERTED
+                          ELSE
+                          BEGIN
+                            -- Update the constituent information for the updated names.
+                            UPDATE S
+                            SET    TITLECODEID = INSERTED.TITLECODEID,
+                                   FIRSTNAME = UPPER(INSERTED.FIRSTNAME),
+                                   MIDDLENAME = UPPER(INSERTED.MIDDLENAME),
+                                   KEYNAME = UPPER(INSERTED.KEYNAME),
+                                   NICKNAME = UPPER(INSERTED.NICKNAME),
+                                   SUFFIXCODEID = INSERTED.SUFFIXCODEID
+                            FROM   INSERTED
+                                    JOIN DBO.USR_UMHS_SEARCHPATIENT S ON S.UMHSID = INSERTED.ID
+                            WHERE  INSERTED.KEYNAME <> ''
+
+                            -- Delete name and nickname rows where keyname is now blank.
+                            IF UPDATE(KEYNAME)
+                              DELETE FROM DBO.USR_UMHS_SEARCHPATIENT
+                              WHERE  CONSTITUENTID IN(SELECT ID
+                                                      FROM   INSERTED
+                                                      WHERE
+                                                        LTRIM(RTRIM(REPLACE(REPLACE(INSERTED.KEYNAME, '.', ''), '''', ''))) = '')
+                          END
+                                         
+                      END
+          END 
+
+      ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHS_DELETE_SEARCHCPATIENT">
+      <CreateTriggerSQL>
+      <![CDATA[
+        CREATE TRIGGER TR_UMHS_DELETE_SEARCHCPATIENT ON DBO.USR_UMHS_DATA AFTER DELETE
+        as begin
+          delete from dbo.USR_UMHS_SEARCHPATIENT
+          where CONSTITUENTID in (select CONSTITUENTID from deleted)
+        end
+      ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+  </Triggers>
+</TableSpec>

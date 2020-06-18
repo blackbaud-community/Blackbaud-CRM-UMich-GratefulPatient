@@ -1,0 +1,24 @@
+﻿<TaskSpec
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="5cf8f37a-ea86-42ee-b354-4297ed2808b1"
+	Name="MIMED History Report"
+	Description="View the UM MIMED History Report Report"
+	Author="UM Dev"
+	FunctionalAreaID="00050ce8-8abb-4a86-b9af-70a035ce0582"
+  TaskGroup="Reports"
+	Sequence="101"
+	ImageKey="RES:Reports"
+	>
+
+	<!-- indicate what this task should do (navigate to a page, show a form, etc. -->
+  <ShowReport ReportID="9702af99-888a-43d0-940c-e65a98ea4a46" Caption="MIMED History Report" DisplayPromptArea="true" xmlns ="bb_appfx_commontypes">
+    <ParameterValues>
+      <ParameterValue ID="UMHSID" xmlns ="bb_appfx_commontypes">
+        <Value>
+          <PageContextID />
+        </Value>
+      </ParameterValue>
+    </ParameterValues>
+  </ShowReport>
+</TaskSpec>

@@ -1,0 +1,255 @@
+<EditDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="a3c641c0-ff71-4085-bb09-6c798e615149"
+    Name="MIMED Address Edit Form"
+    Description="Used for editing the given MIMED Address"
+    Author="UM Dev"
+    RecordType="MIMED Address"
+    DataFormInstanceID="d2a7d0aa-44c6-46a3-8789-e704a719f0c2"
+    c:SecurityUIFolder="MIMED Data"
+    OwnerIDMapperID="00000000-0000-0000-0000-000000000000"
+    xmlns="bb_appfx_editdataformtemplate" 
+    FormHeader="Edit MIMED Address"
+    >
+    <SPDataForm>
+      <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_ADDRESS">
+        <c:CreateProcedureSQL>
+        <![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_ADDRESS
+        (
+            @ID uniqueidentifier,
+            @DATALOADED bit = 0 output,
+            @TSLONG bigint = 0 output,
+            @ADDRESSTYPECODEID uniqueidentifier = null output,
+            @ISPRIMARY bit = null output,
+            @DONOTMAIL bit = null output,
+            @COUNTRYID uniqueidentifier = null output,
+            @STATEID uniqueidentifier = null output,
+            @ADDRESSBLOCK nvarchar(150) = null output,
+            @CITY nvarchar(50) = null output,
+            @POSTCODE nvarchar(12) = null output,
+            @DONOTMAILREASONCODEID uniqueidentifier = null output,
+            @HISTORICALSTARTDATE datetime = null output,
+            @HISTORICALENDDATE datetime = null output,
+            @ISCONFIDENTIAL bit = null output,
+            @INFOSOURCECODEID UNIQUEIDENTIFIER = NULL output,
+            @INFOSOURCECOMMENTS NVARCHAR(256)  = null output
+    
+        )
+        as
+
+	        set nocount on;
+
+	        -- be sure to set these, in case the select returns no rows
+	        set @DATALOADED = 0
+	        set @TSLONG = 0
+
+	        -- populate the output parameters, which correspond to fields on the form.  Note that
+	        -- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+	        -- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+	        -- can be considered.
+	        select
+		        @DATALOADED = 1,
+		        @TSLONG = TSLONG,
+                @ADDRESSTYPECODEID = ADDRESSTYPECODEID, 
+                @ISPRIMARY = ISPRIMARY, 
+                @DONOTMAIL = DONOTMAIL, 
+                @COUNTRYID = COUNTRYID, 
+                @STATEID = STATEID, 
+                @ADDRESSBLOCK = ADDRESSBLOCK, 
+                @CITY = CITY, 
+                @POSTCODE = POSTCODE, 
+                @DONOTMAILREASONCODEID = DONOTMAILREASONCODEID, 
+                @HISTORICALSTARTDATE = HISTORICALSTARTDATE, 
+                @HISTORICALENDDATE = HISTORICALENDDATE, 
+                @ISCONFIDENTIAL = ISCONFIDENTIAL,
+                @INFOSOURCECODEID = INFOSOURCECODEID,
+                @INFOSOURCECOMMENTS = INFOSOURCECOMMENTS
+	        from dbo.USR_UMHS_ADDRESS
+	        where ID = @ID
+
+	        return 0;
+        ]]>
+        </c:CreateProcedureSQL>
+      </LoadImplementation>
+      <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_ADDRESS">
+          <c:CreateProcedureSQL>
+            <![CDATA[
+            create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_ADDRESS
+            (
+	            @ID uniqueidentifier,
+	            @CHANGEAGENTID uniqueidentifier = null,
+                @ADDRESSTYPECODEID uniqueidentifier,
+                @ISPRIMARY bit,
+                @DONOTMAIL bit,
+                @COUNTRYID uniqueidentifier,
+                @STATEID uniqueidentifier,
+                @ADDRESSBLOCK nvarchar(150),
+                @CITY nvarchar(50),
+                @POSTCODE nvarchar(12),
+                @DONOTMAILREASONCODEID uniqueidentifier,
+                @HISTORICALSTARTDATE datetime,
+                @HISTORICALENDDATE datetime,
+                @ISCONFIDENTIAL bit,
+                @INFOSOURCECODEID      UNIQUEIDENTIFIER,
+                @INFOSOURCECOMMENTS    NVARCHAR(256)
+            )
+            as
+
+	            set nocount on;
+
+	            if @CHANGEAGENTID is null  
+		            exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+						            if @ISPRIMARY = 0 and (select count(*) from dbo.USR_UMHS_ADDRESS where UMHSID = (select UMHSID from USR_UMHS_ADDRESS as ADDSUB where ADDSUB.ID = @ID) and ISPRIMARY = 1) = 0
+                  raiserror('ERR_ADDRESS_MUSTHAVEPRIMARY', 13, 1);
+			
+                    --set @CURRENTDATE = getdate();
+					
+				            declare @UMHSID uniqueidentifier;
+				            declare @OLDCOUNTRYID uniqueidentifier;
+				            declare @OLDSTATEID uniqueidentifier;
+				            declare @OLDADDRESSBLOCK nvarchar(150);
+				            declare @OLDCITY nvarchar(50);
+				            declare @OLDPOSTCODE nvarchar(12);
+				
+				            select
+					            @UMHSID = USR_UMHS_ADDRESS.[UMHSID],
+					            @OLDCOUNTRYID = USR_UMHS_ADDRESS.[COUNTRYID],
+					            @OLDADDRESSBLOCK  = USR_UMHS_ADDRESS.[ADDRESSBLOCK],
+					            @OLDCITY  = USR_UMHS_ADDRESS.[CITY],
+					            @OLDSTATEID  = USR_UMHS_ADDRESS.[STATEID],
+					            @OLDPOSTCODE  = USR_UMHS_ADDRESS.[POSTCODE]
+				            from
+					            dbo.USR_UMHS_ADDRESS
+				            where
+					            USR_UMHS_ADDRESS.[ID] = @ID;
+					
+		            --		if @CERTIFICATIONDATA is null
+				            --	set @CERTIFICATIONDATA = 0;
+          
+          
+              
+	            begin try
+  
+              if @ISPRIMARY = 1
+						            update
+							            dbo.[USR_UMHS_ADDRESS]
+						            set
+							            ISPRIMARY = 0,
+							            DATECHANGED = getdate(),
+							            CHANGEDBYID = @CHANGEAGENTID
+						            where
+							            UMHSID = @UMHSID and ISPRIMARY = 1 and ID <> @ID;
+              
+              
+		            -- handle updating the data
+		            update dbo.USR_UMHS_ADDRESS set
+                        ADDRESSTYPECODEID = @ADDRESSTYPECODEID,
+                        ISPRIMARY = @ISPRIMARY,
+                        DONOTMAIL = @DONOTMAIL,
+                        INFOSOURCECODEID = @INFOSOURCECODEID,
+                        INFOSOURCECOMMENTS = @INFOSOURCECOMMENTS,
+                        COUNTRYID = @COUNTRYID,
+                        STATEID = @STATEID,
+                        ADDRESSBLOCK = @ADDRESSBLOCK,
+                        CITY = @CITY,
+                        POSTCODE = @POSTCODE,
+                        DONOTMAILREASONCODEID = @DONOTMAILREASONCODEID,
+                        HISTORICALSTARTDATE = @HISTORICALSTARTDATE,
+                        HISTORICALENDDATE = @HISTORICALENDDATE,
+                        ISCONFIDENTIAL = @ISCONFIDENTIAL,
+			                  CHANGEDBYID = @CHANGEAGENTID,
+			                  DATECHANGED = getdate()
+		            where ID = @ID
+	            end try
+	            begin catch
+		            exec dbo.USP_RAISE_ERROR
+		            return 1
+	            end catch
+
+            return 0;
+            ]]>
+          </c:CreateProcedureSQL>
+          <c:ExpectedDBExceptions xmlns="bb_appfx_commontypes">
+            <Constraints>
+              <Constraint Name="CK_USR_UMHS_ADDRESS_PRIMARYCOUNT" Field="ISPRIMARY" Type="Format">
+                <CustomErrorMsg>There is already a primary address for this contact.</CustomErrorMsg>
+              </Constraint>
+              <Constraint Name="CK_USR_UMHS_ADDRESS_VALIDHISTORICALDATERANGE" Field="HISTORICALENDDATE" Type="Format">
+                <CustomErrorMsg>The start date must be on or before the end date.</CustomErrorMsg>
+              </Constraint>
+              <Constraint Name="CK_USR_UMHS_ADDRESS_ENDDATEINVALIDIFPRIMARY" Field="HISTORICALENDDATE" Type="Format">
+                <c:CustomErrorMsg>Primary address cannot have an end date.</c:CustomErrorMsg>
+              </Constraint>
+              <Constraint Name="CK_USR_UMHS_ADDRESS_UNIQUEADDRESSANDTYPE" Field="ADDRESSBLOCK" Type="Format">
+                <CustomErrorMsg>The address you entered already exists for this contact.</CustomErrorMsg>
+              </Constraint>
+            </Constraints>
+          </c:ExpectedDBExceptions>
+      </SaveImplementation>
+    </SPDataForm>
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="ADDRESSTYPECODEID" DataType="Guid" Caption="Address type">
+        <CodeTable CodeTableName="ADDRESSTYPECODE" />
+      </FormField>
+      <FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Set as primary address" />
+      <!--<FormField FieldID="STARTDATE" DataType="MonthDay" Caption="Start date" />
+      <FormField FieldID="ENDDATE" DataType="MonthDay" Caption="End date" />-->
+      <FormField FieldID="ADDRESSBLOCK" MaxLength="150" Caption="Address" Multiline="true" />
+      <FormField FieldID="CITY" MaxLength="50" Caption="City" />
+      <FormField FieldID="STATEID" DataType="Guid" Caption="State" CaptionResourceKey="$$state">
+        <SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7">
+          <Params>
+            <Param ID="COUNTRYID">
+              <Value>Fields!COUNTRYID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="COUNTRYID" DataType="Guid" Required="true" Caption="Country">
+        <SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+      </FormField>
+      <FormField FieldID="POSTCODE" MaxLength="12" Caption="ZIP" DefaultValueText="">
+        <SearchList SearchListID="e5de8c33-de58-4dc6-9a13-48be9f03db81" DisplayTextIsValue="true" />
+      </FormField>
+      <FormField FieldID="DONOTMAIL" DataType="Boolean" Caption="Do not send mail to this address" />
+      <FormField FieldID="DONOTMAILREASONCODEID" DataType="Guid" Caption="Reason">
+        <CodeTable CodeTableName="DONOTMAILREASONCODE" />
+      </FormField>
+      <FormField FieldID="HISTORICALSTARTDATE" DataType="Date" Caption="Start date" />
+      <FormField FieldID="HISTORICALENDDATE" DataType="Date" Caption="End date" />
+      <FormField FieldID="ISCONFIDENTIAL" DataType="Boolean" Caption="This address is confidential" />
+      <FormField FieldID="INFOSOURCECODEID" DataType="Guid" Caption="Information source">
+        <CodeTable CodeTableName="INFOSOURCECODE" />
+      </FormField>
+      <c:FormField FieldID="INFOSOURCECOMMENTS" MaxLength="256" Caption="Comments" Multiline="true" />
+    </FormFields>
+    <WebUIComponent>
+      <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSAddressFormUIModel" />
+      <WebUI>
+        <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSAddressForm.html" />
+      </WebUI>
+    </WebUIComponent>
+    <FieldGroups>
+      <FieldGroup ID="ADDRESSINFORMATION" Caption="Address information" CaptionResourceKey="$$address_information">
+        <Fields>
+          <Field>ADDRESSTYPECODEID</Field>
+          <Field>COUNTRYID</Field>
+          <Field>ADDRESSBLOCK</Field>
+          <Field>CITY</Field>
+          <Field>STATEID</Field>
+          <Field>POSTCODE</Field>
+          <Field>ISPRIMARY</Field>
+          <Field>DONOTMAIL</Field>
+          <Field>DONOTMAILREASONCODEID</Field>
+          <Field>ISCONFIDENTIAL</Field>
+          <Field>HISTORICALSTARTDATE</Field>
+          <Field>HISTORICALENDDATE</Field>
+        </Fields>
+      </FieldGroup>
+      
+    </FieldGroups>
+    
+  </FormMetaData>
+  </EditDataFormTemplateSpec>

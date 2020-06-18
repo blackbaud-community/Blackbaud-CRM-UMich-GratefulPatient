@@ -1,0 +1,40 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="37a52574-5bdd-4ac1-ac06-862079aa45bc" 
+	Name="MIMED Affiliation Batch Delete Record Operation" 
+	Description="Deletes a MIMED Affiliation batch record"
+	Author="UM Dev"
+	OperationType="Delete"
+	RecordType="MIMED Affiliation Batch"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_USP_RECORDOPERATION_UMHSAFFILIATIONBATCHDELETE">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_RECORDOPERATION_UMHSAFFILIATIONBATCHDELETE
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as begin
+	--check deletion rules, if any
+
+	-- use the system generated delete routine to allow proper recording of the deleting agent
+	exec USP_USR_UMHS_AFFILIATIONBATCH_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	return 0;
+	
+end
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+	<!-- optionally, offer a prompt before executing the record operation -->
+	<Prompt>
+		<StandardPrompt Text="Are you sure you want to continue?" />
+	</Prompt>
+
+</RecordOperationSpec>

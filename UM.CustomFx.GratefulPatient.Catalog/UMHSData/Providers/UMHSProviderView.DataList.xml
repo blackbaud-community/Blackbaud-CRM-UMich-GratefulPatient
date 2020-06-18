@@ -1,0 +1,130 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="52dea511-53e1-47bd-b560-1e3655ebbde6" 
+	Name="MIMED Provider View Data List"
+	Description="A data list showing provider view records." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_PROVIDERVIEW">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_DATALIST_PROVIDERVIEW
+(
+	 @UMHSID uniqueidentifier,
+              --@MSG  NVARCHAR(100) = NULL OUTPUT,
+              @CURRENTAPPUSERID  uniqueidentifier
+)
+as
+	set nocount on;
+
+	select DISTINCT
+          p.ID,
+          c.ID as CONSTITUENTID,
+          c.NAME as PROVIDERNAME,
+          p.PROVIDERDRNUMBER,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when sd.ID is NOT null
+            then
+              sd.NAME
+            else
+              N''
+          end as SUBDEPARTMENT,
+          p.ADMITDOCTORIND,
+          p.ATTENDDOCTORIND,
+          p.RESIDENTDOCTORIND,
+          p.CONSULTDOCTORIND,         
+          dbo.USR_UFN_UM_FORMATPHONE(p.PHONE) as PHONE 
+          
+        from dbo.USR_UMHS_PROVIDERS p
+        inner join USR_UMHS_VISITS v on v.providerid = p.ID
+        inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+        left join USR_UMHS_DATA u on u.ID = v.UMHSID
+        --left outer join [STATE] s on s.ID = p.STATEID
+        left outer join USR_UMHS_DEPARTMENT d on d.ID = p.DEPARTMENTID
+        left outer join USR_UMHS_SUBDEPARTMENT sd on sd.ID = p.SUBDEPARTMENTID
+        WHERE v.UMHSID = @UMHSID
+                         /* --Audit code start */
+	              DECLARE @USERNAME VARCHAR(100)
+	              DECLARE @DISPLAYNAME VARCHAR(100)
+	              DECLARE @NAME VARCHAR(200)
+	              DECLARE @EVENTMESSAGE VARCHAR(1000)
+	              DECLARE @PID VARCHAR(100)
+	              DECLARE @PATIENTONLY BIT
+	              DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	              SELECT @USERNAME = USERNAME
+	                           ,@DISPLAYNAME = DISPLAYNAME
+		              FROM APPUSER 
+	              WHERE ID = @CURRENTAPPUSERID
+  	              SELECT @NAME = NAME
+	                           ,@PID = LOOKUPID
+	                            FROM CONSTITUENT
+	              inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		               WHERE gp.ID = @UMHSID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='3f47b8c0-4552-4b85-a8ef-ed4cf8733b46' --MIMED Provider subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @UMHSID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              --set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+
+	<!-- describe any parameters (other than the context ID) defined on the SP
+	<Parameters>
+		<FormMetaData xmlns="bb_appfx_commontypes">
+			<FormFields>
+				<FormField FieldID="PARAMETER1" Caption="Paramter1" DataType="REPLACE_WITH_DATATYPE"/>
+			</FormFields>
+		</FormMetaData>
+	</Parameters>-->
+
+	<!-- define the output fields in the list -->
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+      <OutputField FieldID="CONSTITUENTID" Caption="Constituent" DataType="Guid" IsHidden="true"/>
+      <OutputField FieldID="PROVIDERNAME" Caption="Provider Name" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="DEPARTMENT" Caption="MIMED department" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="SUBDEPARTMENT" Caption="MIMED subdepartment" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="ADMITDOCTORIND" Caption="Admitting Provider?" DataType="Boolean" IsHidden="true"/>
+      <OutputField FieldID="ATTENDDOCTORIND" Caption="Attending Provider?" DataType="Boolean" IsHidden="true"/>
+      <OutputField FieldID="RESIDENTDOCTORIND" Caption="Resident Provider?" DataType="Boolean" IsHidden="true"/>
+      <OutputField FieldID="CONSULTDOCTORIND" Caption="Consulting Provider?" DataType="Boolean" IsHidden="true"/>
+      <OutputField FieldID="PHONE" Caption="Provider Phone" DataType="String" IsHidden="true"/>
+    </OutputFields>
+  </Output>
+
+</DataListSpec>

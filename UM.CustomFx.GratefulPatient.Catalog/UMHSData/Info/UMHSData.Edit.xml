@@ -1,0 +1,216 @@
+<EditDataFormTemplateSpec
+    xmlns:c="bb_appfx_commontypes"
+    ID="28885461-3661-4eae-8acb-4a8d227526a2"
+    Name="MIMED Data Edit Form"
+    Description="Used for editing the given MIMED Data"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    DataFormInstanceID="78513c45-a301-4dc8-8623-23ae2bcb350c"
+    c:SecurityUIFolder="MIMED Data"
+    OwnerIDMapperID="00000000-0000-0000-0000-000000000000"
+    xmlns="bb_appfx_editdataformtemplate" 
+    FormHeader="MIMED Info"
+    >
+  <SPDataForm>
+    <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_DATA">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_DATA (@ID                       UNIQUEIDENTIFIER,
+                                                                         @DATALOADED                BIT = 0 OUTPUT,
+                                                                         @TSLONG                    BIGINT = 0 OUTPUT,
+                                                                         @MRN                       NVARCHAR(50) = NULL OUTPUT,
+                                                                         @CPISEQUENCE               NVARCHAR(50) = NULL OUTPUT,
+                                                                         @FIRSTNAME                 NVARCHAR(50) = NULL OUTPUT,
+                                                                         @MIDDLENAME                NVARCHAR(50) = NULL OUTPUT,
+                                                                         @NICKNAME                  NVARCHAR(50) = NULL OUTPUT,
+                                                                         @KEYNAME                   NVARCHAR(100) = NULL OUTPUT,
+                                                                         @BIRTHDATE                 DBO.UDT_FUZZYDATE = NULL OUTPUT,
+                                                                         @AGE                       TINYINT = NULL OUTPUT,
+                                                                         @TITLECODEID               UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @TITLE2CODEID              UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @SUFFIXCODEID              UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @SUFFIX2CODEID             UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @LOOKUPID                  NVARCHAR(100) = NULL OUTPUT,
+                                                                         @INFOSOURCECODEID          UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @ISDMINELIGIBLE            BIT = NULL OUTPUT,
+                                                                         @DMINELIGIBLEREASONCODEID  UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @GENDERCODE                TINYINT = NULL OUTPUT--,
+                                                                        )
+        AS
+            SET NOCOUNT ON;
+            -- be sure to set these, in case the select returns no rows
+            SET @DATALOADED = 0
+            SET @TSLONG = 0
+
+            -- populate the output parameters, which correspond to fields on the form.  Note that
+            -- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+            -- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+            -- can be considered.
+            SELECT @DATALOADED = 1,
+                   @TSLONG = d.TSLONG,
+                   @MRN = d.MRN,
+                   @CPISEQUENCE = d.CPISEQUENCE,
+                   @FIRSTNAME = d.FIRSTNAME,
+                   @MIDDLENAME = d.MIDDLENAME,
+                   @NICKNAME = d.NICKNAME,
+                   @KEYNAME = d.KEYNAME,
+                   @BIRTHDATE = d.BIRTHDATE,
+                   @AGE = d.AGE,
+                   @TITLECODEID = d.TITLECODEID,
+                   @TITLE2CODEID = d.TITLE2CODEID,
+                   @SUFFIXCODEID = d.SUFFIXCODEID,
+                   @SUFFIX2CODEID = d.SUFFIX2CODEID,
+                   @LOOKUPID = c.LOOKUPID,
+                   @INFOSOURCECODEID = d.INFOSOURCECODEID,
+                   @ISDMINELIGIBLE = d.ISDMINELIGIBLE,
+                   @DMINELIGIBLEREASONCODEID = d.DMINELIGIBLEREASONCODEID,
+                   @GENDERCODE = d.GENDERCODE
+            FROM   DBO.USR_UMHS_DATA d
+            INNER JOIN CONSTITUENT c on c.ID=d.CONSTITUENTID
+            WHERE  
+              d.CONSTITUENTID = @ID
+
+            RETURN 0; 
+
+        ]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_DATA">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_DATA (@ID                        UNIQUEIDENTIFIER,
+                                                                     @CHANGEAGENTID             UNIQUEIDENTIFIER = NULL,
+                                                                     @MRN                       NVARCHAR(50),
+                                                                     @CPISEQUENCE               NVARCHAR(50),
+                                                                     @FIRSTNAME                 NVARCHAR(50),
+                                                                     @MIDDLENAME                NVARCHAR(50),
+                                                                     @NICKNAME                  NVARCHAR(50),
+                                                                     @KEYNAME                   NVARCHAR(100),
+                                                                     @BIRTHDATE                 DBO.UDT_FUZZYDATE,
+                                                                     @TITLECODEID               UNIQUEIDENTIFIER,
+                                                                     @TITLE2CODEID              UNIQUEIDENTIFIER,
+                                                                     @SUFFIXCODEID              UNIQUEIDENTIFIER,
+                                                                     @SUFFIX2CODEID             UNIQUEIDENTIFIER,
+                                                                     @INFOSOURCECODEID          UNIQUEIDENTIFIER,
+                                                                     @ISDMINELIGIBLE            BIT,
+                                                                     @DMINELIGIBLEREASONCODEID  UNIQUEIDENTIFIER,
+                                                                     @GENDERCODE                TINYINT
+        )
+        AS
+            SET NOCOUNT ON;
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+          BEGIN TRY
+              -- handle updating the data
+              UPDATE DBO.USR_UMHS_DATA
+              SET    MRN = ltrim(rtrim(@MRN)),
+                     CPISEQUENCE = @CPISEQUENCE,
+                     FIRSTNAME = @FIRSTNAME,
+                     MIDDLENAME = @MIDDLENAME,
+                     NICKNAME = isnull(@NICKNAME,''),
+                     KEYNAME = @KEYNAME,
+                     BIRTHDATE = @BIRTHDATE,
+                     TITLECODEID = @TITLECODEID,
+                     TITLE2CODEID = @TITLE2CODEID,
+                     SUFFIXCODEID = @SUFFIXCODEID,
+                     SUFFIX2CODEID = @SUFFIX2CODEID,
+                     GENDERCODE = @GENDERCODE,
+                     INFOSOURCECODEID = @INFOSOURCECODEID,
+                     ISDMINELIGIBLE = isnull(@ISDMINELIGIBLE,0),
+                     DMINELIGIBLEREASONCODEID = @DMINELIGIBLEREASONCODEID,
+                     CHANGEDBYID = @CHANGEAGENTID,
+                     DATECHANGED = GETDATE()
+              WHERE  CONSTITUENTID = @ID
+              
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+
+            RETURN 0; 
+
+        ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="CK_USR_UMHS_DATA_BIRTHDATE" Field="BIRTHDATE" Type="Format" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_TITLECODEID" Field="TITLECODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_TITLECODEID" Field="TITLE2CODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_SUFFIXCODEID" Field="SUFFIXCODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_SUFFIX2CODEID" Field="SUFFIX2CODEID" Type="ForeignKey" />
+          <c:Constraint Name="UIX_V_USR_UMHS_DATA_UNIQUE_MRN" Field="MRN" Type="Unique" >
+            <c:CustomErrorMsg>This MRN already exists in the system. Enter another MRN.</c:CustomErrorMsg>
+          </c:Constraint>
+          <c:Constraint Name="UIX_V_USR_UMHS_DATA_UNIQUE_CPISEQUENCE" Field="CPISEQUENCE" Type="Unique" >
+            <c:CustomErrorMsg>This CPI Sequence already exists in the system. Enter another CPI Sequence.</c:CustomErrorMsg>
+          </c:Constraint>
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="MRN" MaxLength="50" Caption="MRN" />
+      <c:FormField FieldID="CPISEQUENCE" MaxLength="50" Caption="CPI seq" />
+      <c:FormField FieldID="FIRSTNAME" MaxLength="50" Caption="First name" />
+      <c:FormField FieldID="MIDDLENAME" MaxLength="50" Caption="Middle name" />
+      <c:FormField FieldID="NICKNAME" MaxLength="50" Caption="Nickname" />
+      <c:FormField FieldID="KEYNAME" MaxLength="100" Caption="Last name" />
+      <c:FormField FieldID="BIRTHDATE" DataType="FuzzyDate" Caption="Birth date" />
+      <c:FormField FieldID="AGE" ReadOnly="true" Caption="Age" />
+      <c:FormField FieldID="TITLECODEID" DataType="Guid" Caption="Title">
+        <c:CodeTable CodeTableName="TITLECODE" />
+      </c:FormField>
+      <c:FormField FieldID="TITLE2CODEID" DataType="Guid" Caption="Title 2">
+        <c:CodeTable CodeTableName="TITLECODE" />
+      </c:FormField>
+      <c:FormField FieldID="SUFFIXCODEID" DataType="Guid" Caption="Suffix">
+        <c:CodeTable CodeTableName="SUFFIXCODE" />
+      </c:FormField>
+      <c:FormField FieldID="SUFFIX2CODEID" DataType="Guid" Caption="Suffix 2">
+        <c:CodeTable CodeTableName="SUFFIXCODE" />
+      </c:FormField>
+      <c:FormField FieldID="LOOKUPID" DataType="String" Caption="Lookup ID" ReadOnly="true" ></c:FormField>
+      <c:FormField FieldID="INFOSOURCECODEID" DataType="Guid" Caption="Information source">
+        <c:CodeTable CodeTableName="INFOSOURCECODE" />
+      </c:FormField>
+      <c:FormField FieldID="ISDMINELIGIBLE" DataType="Boolean" Caption="Direct Mail Ineligible" />
+      <c:FormField FieldID="DMINELIGIBLEREASONCODEID" DataType="Guid" Caption="Reason">
+        <c:CodeTable CodeTableName="USR_UMHS_DMINELIGIBLEREASONCODE" />
+      </c:FormField>
+      <c:FormField FieldID="GENDERCODE" DataType="TinyInt" Caption="Gender" DefaultValueText="0">
+        <c:ValueList>
+          <c:Items>
+            <c:Item>
+              <c:Value>0</c:Value>
+              <c:Label>Unknown</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>1</c:Value>
+              <c:Label>Male</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>2</c:Value>
+              <c:Label>Female</c:Label>
+            </c:Item>
+          </c:Items>
+        </c:ValueList>
+      </c:FormField>
+    
+    </c:FormFields>
+    <c:WebUIComponent>
+      <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDataFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSDataForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>
+
+  </c:FormMetaData>
+
+</EditDataFormTemplateSpec>

@@ -1,0 +1,84 @@
+﻿<TableSpec xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xmlns="bb_appfx_table" 
+           ID="AB835350-0C49-46AA-A30B-2C7281B11175" 
+           Name="Patient Constituent" 
+           Description="Unifies the data used by patient search/matching algorithms for performance purposes." 
+           Author="UM Dev" 
+           Tablename="USR_UMHS_SEARCHPATIENT" 
+           IsBuiltIn="false"
+           IsCustomizable="true" 
+           EnableAuditTrail="false" 
+           FileGroup="BIOGROUP" 
+           WarnOnMissingIndexes="false"
+  >
+  <Fields>
+    <GuidField Name="CONSTITUENTID" Required="true" />
+    <GuidField Name="UMHSID" Required="true" />
+    <GuidField Name="ADDRESSID" />
+    <TextField Description="For individuals, medical record number." Name="MRN" Length="50"  IsUnique="true" />
+    <TextField Description="For individuals, CPI sequence." Name="CPISEQUENCE" Length="50" />
+    <TextField Description="Constituent.keyname" Name="KEYNAME" Length="100" Required="true" />
+    <TextField Description="Constituent.firstname" Name="FIRSTNAME" Length="50" />
+    <TextField Description="Constituent.middlename" Name="MIDDLENAME" Length="50" />
+    <TextField Description="Constituent.nickname" Name="NICKNAME" Length="50" />
+    <GuidField Description="Constituent.titlecodeid" Name="TITLECODEID" />
+    <GuidField Description="Constituent.suffixcodeid" Name="SUFFIXCODEID" />
+    <GuidField Description="Address.countryid" Name="COUNTRYID" />
+    <TextField Description="Address.postcode w/ the +4 removed from ZIP+4." Name="POSTCODE" Length="12" />
+    <TextField Description="Street number parsed out of address.addressblock." Name="STREETNUMBER" Length="12" />
+    <TextField Description="Street name parsed out of address.addressblock." Name="STREETNAME" Length="150" />
+    <GuidField Name="ALIASID" />
+    <ComputedColumnField Name="KEYNAME4" Expression="left(KEYNAME,4)" />
+    <ComputedColumnField Name="KEYNAMESOUNDEX" Expression="soundex(KEYNAME)" />
+    <ComputedColumnField Name="STREETNAME4" Expression="left(STREETNAME,4)" />
+    <ComputedColumnField Name="STREETNAMESOUNDEX" Expression="soundex(STREETNAME)" />
+    <ComputedColumnField Name="FIRSTNAME3" Expression="left(FIRSTNAME,3)" />
+    <ComputedColumnField Name="POSTCODE3" Expression="left(POSTCODE,3)" />
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ADDRESSID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ALIASID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="POSTCODE" />
+        <IndexField Name="KEYNAME4" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="POSTCODE" />
+        <IndexField Name="STREETNAMESOUNDEX" />
+        <IndexField Name="FIRSTNAME3" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="POSTCODE3" />
+        <IndexField Name="KEYNAMESOUNDEX" />
+        <IndexField Name="STREETNAME4" />
+        <IndexField Name="STREETNUMBER" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="KEYNAME" />
+        <IndexField Name="FIRSTNAME3" />
+        <IndexField Name="POSTCODE" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

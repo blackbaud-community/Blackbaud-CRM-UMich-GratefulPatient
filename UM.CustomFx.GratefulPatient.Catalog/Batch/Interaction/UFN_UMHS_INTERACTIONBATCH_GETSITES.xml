@@ -1,0 +1,24 @@
+﻿<SQLFunctionSpec 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="bb_appfx_sqlfunction" 
+  ID="EF2F2A03-4013-4DBA-9FBF-6EBCD0689E56" 
+  Name="USR_UFN_UMHS_INTERACTIONBATCH_GETSITES" 
+  Description="retrieves that MIMED interaction batch sites." 
+  Author="UM Dev" 
+  DBFunctionName="USR_UFN_UMHS_INTERACTIONBATCH_GETSITES">
+  <CreateFunctionSQL>
+    <![CDATA[
+    CREATE FUNCTION DBO.USR_UFN_UMHS_INTERACTIONBATCH_GETSITES (@BATCHINTERACTIONID UNIQUEIDENTIFIER)
+    RETURNS TABLE
+    AS
+        RETURN
+          (SELECT ID,
+                  SITEID
+           FROM   DBO.USR_UMHS_INTERACTIONBATCHSITE
+           WHERE  BATCHINTERACTIONID = @BATCHINTERACTIONID)
+                   
+    ]]>
+  </CreateFunctionSQL>
+  <CreateChildCollectionFunction RootElementName="SITES" BaseTableName="USR_UMHS_INTERACTIONBATCHSITE" ParentIDColumn="BATCHINTERACTIONID" />
+</SQLFunctionSpec>

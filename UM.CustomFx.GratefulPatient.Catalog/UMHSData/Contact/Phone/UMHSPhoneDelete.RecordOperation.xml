@@ -1,0 +1,62 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="5eaee431-25d1-4824-9a4b-1e67274de179"
+    Name="MIMED Phone Delete"
+    Description="Used to delete the given MIMED Phone"
+    Author="UM Dev"
+    RecordType="MIMED Phone"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_UMHS_PHONE_DELETE">
+            <c:CreateProcedureSQL>
+<![CDATA[
+create procedure dbo.USR_USP_UMHS_PHONE_DELETE
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as 
+	--check deletion rules, if any
+        if (select
+							count(NONPRIMARY.ID)
+						from
+							dbo.USR_UMHS_PHONE [TODELETE]
+						left join
+							dbo.USR_UMHS_PHONE [NONPRIMARY]
+						on
+							TODELETE.UMHSID = NONPRIMARY.UMHSID
+						where
+							TODELETE.ID = @ID and
+							TODELETE.ISPRIMARY = 1 and
+							NONPRIMARY.ISPRIMARY = 0 ) > 0
+						begin
+							raiserror ('ERR_PRIMARY_PHONE_DELETE',13,1);
+							return 0;
+						end
+	          
+            exec USP_USR_UMHS_PHONE_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	          return 0;	
+
+]]>
+</c:CreateProcedureSQL>
+        </SPOperationImplementation>
+      <ExpectedOperationDBExceptions>
+        <!--<c:Constraints>
+          <c:Constraint Name="FK_SALESORDER_PHONEID" Type="ForeignKey">
+            <c:CustomErrorMsg>This phone number is associated with a sales order and cannot be deleted.</c:CustomErrorMsg>
+          </c:Constraint>
+        </c:Constraints>-->
+        <c:CustomExceptions>
+          <c:Exception SearchText="ERR_PRIMARY_PHONE_DELETE">
+            <c:CustomErrorMsg>A primary phone number cannot be deleted unless it is a constituent's only phone number.</c:CustomErrorMsg>
+          </c:Exception>
+        </c:CustomExceptions>
+      </ExpectedOperationDBExceptions>
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this MIMED phone number?" />
+    </Prompt>
+</RecordOperationSpec>

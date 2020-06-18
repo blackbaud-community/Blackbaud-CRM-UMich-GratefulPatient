@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>MIMEDHistory.Report.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>MIMEDHistoryReportUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>MIMEDHistoryReport.html</HtmlFile>
+    <HtmlFolder>htmlforms\custom\um.customfx.gratefulpatient\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

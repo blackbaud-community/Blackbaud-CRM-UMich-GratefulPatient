@@ -1,0 +1,183 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ca69def7-79a1-48fc-9077-daf7be3f0b22"
+	Name="USR_USP_UMHS_CREATEFROMCONSTITUENT"
+	Description="Prepopulates data from constituent to MIMED"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_CREATEFROMCONSTITUENT"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+CREATE PROCEDURE DBO.USR_USP_UMHS_CREATEFROMCONSTITUENT (@UMHSID        UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                         @CONSTITUENTID UNIQUEIDENTIFIER)
+AS
+  BEGIN
+      DECLARE @ID                     UNIQUEIDENTIFIER = NULL,
+              @CHANGEAGENTID          UNIQUEIDENTIFIER = NULL,
+              @ADDRESSTYPECODEID      UNIQUEIDENTIFIER = NULL,
+              @ISPRIMARY              BIT = 0,
+              @DONOTMAIL              BIT = 0,
+              @COUNTRYID              UNIQUEIDENTIFIER,
+              @STATEID                UNIQUEIDENTIFIER = NULL,
+              @ADDRESSBLOCK           NVARCHAR(150) = '',
+              @CITY                   NVARCHAR(50) = '',
+              @POSTCODE               NVARCHAR(12) = '',
+              @DONOTMAILREASONCODEID  UNIQUEIDENTIFIER = NULL,
+              @HISTORICALSTARTDATE    DATETIME = NULL,
+              @HISTORICALENDDATE      DATETIME = NULL,
+              @ISCONFIDENTIAL         BIT = 0,
+              @INFOSOURCECODEID       UNIQUEIDENTIFIER = NULL,
+              @INFOSOURCECOMMENTS     NVARCHAR(256) = '',
+              @EMAILADDRESSTYPECODEID UNIQUEIDENTIFIER = NULL,
+              @EMAILADDRESS           DBO.UDT_EMAILADDRESS = NULL,
+              @DONOTEMAIL             BIT = 0,
+              @STARTDATE              DATETIME = NULL,
+              @ENDDATE                DATETIME = NULL,
+              @PHONETYPECODEID        UNIQUEIDENTIFIER = NULL,
+              @NUMBER                 NVARCHAR(100),
+              @DONOTCALL              BIT = 0,
+              @DONOTCALLREASONCODEID  UNIQUEIDENTIFIER = NULL,
+              @CALLBEFORE             TIME(0) = NULL,
+              @CALLAFTER              TIME(0) = NULL
+      
+      --constituent
+      DECLARE @LOOKUPID   NVARCHAR(100) = NULL,
+              @FIRSTNAME  NVARCHAR(50) = NULL,
+              @MIDDLENAME NVARCHAR(50) = NULL,
+              @KEYNAME    NVARCHAR(100) = NULL
+
+      if @UMHSID IS NULL --being called from somewhere other than the MIMED Add
+      BEGIN
+
+        --pull the basic constituent data
+        SELECT @LOOKUPID = LOOKUPID,
+               @FIRSTNAME = FIRSTNAME,
+               @KEYNAME = KEYNAME,
+               @MIDDLENAME = MIDDLENAME
+        FROM   DBO.CONSTITUENT
+        WHERE  ID = @CONSTITUENTID
+
+        --add the MIMED record
+        EXEC DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA
+          @ID = @UMHSID OUTPUT,
+          @CHANGEAGENTID = @CHANGEAGENTID,
+          @CONSTITUENTID = @CONSTITUENTID,
+          @FIRSTNAME = @FIRSTNAME,
+          @MIDDLENAME = @MIDDLENAME,
+          @KEYNAME = @KEYNAME,
+          @MRN = '',
+          @CPISEQUENCE = '',
+          @BIRTHDATE = '00000000',
+          @PREPOPULATEMIMED = 0
+      END
+
+      --add the primary address to MIMED
+      SELECT @ADDRESSTYPECODEID = ADDRESSTYPECODEID,
+             @ISPRIMARY = ISPRIMARY,
+             @DONOTMAIL = DONOTMAIL,
+             @COUNTRYID = COUNTRYID,
+             @STATEID = STATEID,
+             @ADDRESSBLOCK = ADDRESSBLOCK,
+             @CITY = CITY,
+             @POSTCODE = POSTCODE,
+             @DONOTMAILREASONCODEID = DONOTMAILREASONCODEID,
+             @HISTORICALSTARTDATE = HISTORICALSTARTDATE,
+             @HISTORICALENDDATE = HISTORICALENDDATE,
+             @ISCONFIDENTIAL = ISCONFIDENTIAL
+      FROM   ADDRESS A
+      WHERE  CONSTITUENTID = @CONSTITUENTID
+             AND A.ISPRIMARY = 1
+             
+      IF LEN(@ADDRESSBLOCK) > 0
+        EXEC DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_ADDRESS
+          @ID = @ID,
+          @CHANGEAGENTID = @CHANGEAGENTID,
+          @UMHSID = @UMHSID,
+          @ADDRESSTYPECODEID = @ADDRESSTYPECODEID,
+          @ISPRIMARY = @ISPRIMARY,
+          @DONOTMAIL = @DONOTMAIL,
+          @COUNTRYID = @COUNTRYID,
+          @STATEID = @STATEID,
+          @ADDRESSBLOCK = @ADDRESSBLOCK,
+          @CITY = @CITY,
+          @POSTCODE = @POSTCODE,
+          @DONOTMAILREASONCODEID = @DONOTMAILREASONCODEID,
+          @HISTORICALSTARTDATE = @HISTORICALSTARTDATE,
+          @HISTORICALENDDATE = @HISTORICALENDDATE,
+          @ISCONFIDENTIAL = @ISCONFIDENTIAL,
+          @INFOSOURCECODEID = @INFOSOURCECODEID,
+          @INFOSOURCECOMMENTS = @INFOSOURCECOMMENTS
+
+      --add the primary email to MIMED
+      SELECT @EMAILADDRESSTYPECODEID = EMAILADDRESSTYPECODEID,
+             @EMAILADDRESS = EMAILADDRESS,
+             @ISPRIMARY = ISPRIMARY,
+             @DONOTEMAIL = DONOTEMAIL,
+             @INFOSOURCECODEID = INFOSOURCECODEID,
+             @INFOSOURCECOMMENTS = INFOSOURCECOMMENTS,
+             @STARTDATE = STARTDATE,
+             @ENDDATE = ENDDATE,
+             @ISCONFIDENTIAL = 0
+      FROM   EMAILADDRESS E
+      WHERE  CONSTITUENTID = @CONSTITUENTID
+             AND E.ISPRIMARY = 1
+
+      IF LEN(@EMAILADDRESS) > 0
+        EXEC DBO.USR_USP_DATAFORMTEMPLATE_ADD_USR_UMHS_EMAILADDRESS
+          @ID = @ID,
+          @CHANGEAGENTID = @CHANGEAGENTID,
+          @UMHSID = @UMHSID,
+          @EMAILADDRESSTYPECODEID = @EMAILADDRESSTYPECODEID,
+          @EMAILADDRESS = @EMAILADDRESS,
+          @ISPRIMARY = @ISPRIMARY,
+          @DONOTEMAIL = @DONOTEMAIL,
+          @INFOSOURCECODEID = @INFOSOURCECODEID,
+          @INFOSOURCECOMMENTS = @INFOSOURCECOMMENTS,
+          @STARTDATE = @STARTDATE,
+          @ENDDATE = @ENDDATE,
+          @ISCONFIDENTIAL = @ISCONFIDENTIAL
+
+      --add the primary phone to MIMED
+      SELECT @PHONETYPECODEID = PHONETYPECODEID,
+             @NUMBER = NUMBER,
+             @ISPRIMARY = ISPRIMARY,
+             @DONOTCALL = DONOTCALL,
+             @INFOSOURCECODEID = INFOSOURCECODEID,
+             @INFOSOURCECOMMENTS = INFOSOURCECOMMENTS,
+             @STARTDATE = STARTDATE,
+             @ENDDATE = ENDDATE,
+             @DONOTCALLREASONCODEID = DONOTCALLREASONCODEID,
+             @COUNTRYID = COUNTRYID,
+             @CALLBEFORE = STARTTIME,
+             @CALLAFTER = ENDTIME,
+             @ISCONFIDENTIAL = ISCONFIDENTIAL
+      FROM   PHONE P
+      WHERE  CONSTITUENTID = @CONSTITUENTID
+             AND P.ISPRIMARY = 1
+             
+      IF LEN(@NUMBER) > 0
+        EXEC DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_PHONE
+          @ID = @ID,
+          @UMHSID = @UMHSID,
+          @CHANGEAGENTID = @CHANGEAGENTID,
+          @PHONETYPECODEID = @PHONETYPECODEID,
+          @NUMBER = @NUMBER,
+          @ISPRIMARY = @ISPRIMARY,
+          @DONOTCALL = @DONOTCALL,
+          @INFOSOURCECODEID = @INFOSOURCECODEID,
+          @INFOSOURCECOMMENTS = @INFOSOURCECOMMENTS,
+          @STARTDATE = @STARTDATE,
+          @ENDDATE = @ENDDATE,
+          @DONOTCALLREASONCODEID = @DONOTCALLREASONCODEID,
+          @COUNTRYID = @COUNTRYID,
+          @CALLBEFORE = @CALLBEFORE,
+          @CALLAFTER = @CALLAFTER,
+          @ISCONFIDENTIAL = @ISCONFIDENTIAL
+  END 
+
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

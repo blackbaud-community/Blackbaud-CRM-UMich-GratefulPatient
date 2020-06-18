@@ -1,0 +1,105 @@
+﻿<PageDefinitionSpec 
+    xmlns="bb_appfx_pagedefinition" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="a764147d-1b60-412f-b187-9bf683ca2bd8"
+    Name="MIMED Sub Department Page"
+    Description="A page for displaying information about MIMED subdepartment records"
+    Author="UM Dev"
+    ExpressionDataFormID ="b3523f55-d8cb-46ce-a8a7-c6818ff705de"
+    ContextRecordType="MIMED Department"	
+    >
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Department.DataList" />
+
+  <!-- Note:  A page can optionally have a view form associated with it as the "Expression form".  While implemented as a view data form,
+	this form has no UI in this context, and is simply used as a way of loading additional information associated with the page.  The fields
+	returned by the expression form can be used as expressions in various properties throughout the page.  To specify an expression form for this
+	page, add the following attribute:		ExpressionDataFormID="<some guid>"-->
+
+	<!-- define how the page header should appear -->
+  <PageHeader Caption="= Page.Fields!DEPARTMENTNAME + &quot; subdepartments&quot;" ImageKey="catalog:Blackbaud.AppFx.Constituent.Catalog.dll,Blackbaud.AppFx.Constituent.Catalog.interactions.png" >
+    <ContextLinks>
+      <ContextLink ID="00000000-0000-0000-0000-000000000000" PageID="1e35d32d-3e70-4585-90e3-493b89031db7">
+        <Caption CaptionResourceKey="$$manage_UMHS_departments">Manage MIMED departments</Caption>
+      </ContextLink>
+    </ContextLinks>
+  </PageHeader>
+
+	<!-- define the tabs for the page - note that if only one tab is present, then that tab's sections are promoted to the page level (ie., the tab
+	itself isn't shown -->
+  <Tabs>
+    <Tab Caption="Subdepartment" ID="9a8419a1-5812-47b6-a028-902e3522e4cb">
+      <Sections>
+        <Section ID="45056da7-1d8b-4708-9302-947e2a47b5dc" Caption="= Page.Fields!DEPARTMENTNAME + &quot; subdepartments&quot;">
+          <DataList ID="54c76fc6-9f5c-4513-be07-8ba277efead9">
+            <RenderStyle>
+              <StandardView />
+            </RenderStyle>
+          </DataList>
+          <Actions>
+            <Action ID="1d840eef-88b8-4990-bbb8-c8b59c9bc8fe" Caption="Re-order subdepartments" Visible="=(Page.Fields!SORTMETHODCODE = 1)" CaptionResourceKey="$$re-order_subdepartments">
+              <ShowDataForm xmlns="bb_appfx_commontypes" DataFormID="76e138f7-7af2-4ed6-bf7c-f9ebe2e766a7">
+                <ActionContext>
+                  <PageContextID />
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshSection />
+                </PostActionEvent>
+              </ShowDataForm>             
+            </Action>
+            <Action ID="c5ed5c77-ac9a-4e10-94f9-0966c27e4b80" Caption="Add" ImageKey="RES:NewItem" CaptionResourceKey="$$add">
+              <ShowAddDataForm xmlns="bb_appfx_commontypes" DataFormID="ce2d1c08-af11-4453-87d2-94c5bdba65c5">
+                <ActionContext>
+                  <PageContextID />
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ShowAddDataForm>              
+            </Action>
+            <Action ID="af61825c-d748-44db-9eb7-f959346b1b76" Caption="Edit" ImageKey="RES:Edit" DefaultAction="true" CaptionResourceKey="$$edit">
+              <ShowDataForm xmlns="bb_appfx_commontypes" DataFormID="abc7f65b-afa7-433a-92cd-246ff372762b">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshSection />
+                </PostActionEvent>
+              </ShowDataForm>             
+            </Action>
+            <Action ID="292eed96-b468-4d53-9c7c-26469a957259" Caption="Mark inactive" ImageKey="RES:RecordOperationSpec" Visible="= CBOOL(Fields!ISACTIVE)" CaptionResourceKey="$$mark_inactive">
+              <ExecuteRecordOperation xmlns="bb_appfx_commontypes" RecordOperationID="50184d3a-4b9f-49e2-a708-90859a3f3fa4">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ExecuteRecordOperation>
+            </Action>
+            <Action ID="932b8cf7-5d89-403f-9475-30246b8c35f9" Caption="Mark active" ImageKey="RES:RecordOperationSpec" Visible="= Not CBOOL(Fields!ISACTIVE)" CaptionResourceKey="$$mark_active">
+              <ExecuteRecordOperation xmlns="bb_appfx_commontypes" RecordOperationID="a22169c8-793a-4674-a327-cdf54440f76a">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ExecuteRecordOperation>              
+            </Action>
+           <Action ID="79759863-10e9-4f45-8481-ecdeb2c6c463" Caption="Delete" ImageKey="RES:Delete" CaptionResourceKey="$$delete">
+              <ExecuteRecordOperation xmlns="bb_appfx_commontypes" RecordOperationID="8dd15487-999d-48ac-bfb7-5b267ec79b8b">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ExecuteRecordOperation>
+             </Action> 
+          </Actions>
+        </Section>
+      </Sections>
+    </Tab>
+  </Tabs>
+ 
+</PageDefinitionSpec>

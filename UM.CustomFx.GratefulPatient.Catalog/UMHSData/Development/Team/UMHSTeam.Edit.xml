@@ -1,0 +1,123 @@
+<EditDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="1e197387-d61c-48d1-8871-f1a546c3633a"
+    Name="MIMED Team Edit Form"
+    Description="Used for editing the given MIMED Team"
+    Author="UM Dev"
+    RecordType="MIMED Team"
+    DataFormInstanceID="b827de23-7950-43c9-bd61-7b3863c062c6"
+    c:SecurityUIFolder="MIMED Data"
+    OwnerIDMapperID="00000000-0000-0000-0000-000000000000"
+    xmlns="bb_appfx_editdataformtemplate"
+    FormHeader="Edit MIMED Team"
+    >
+    <SPDataForm>
+        <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_TEAM">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHS_TEAM (@ID             UNIQUEIDENTIFIER,
+                                                                              @DATALOADED     BIT = 0 OUTPUT,
+                                                                              @TSLONG         BIGINT = 0 OUTPUT,
+                                                                              @TEAMMEMBERID   UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @SITEID         UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @TEAMROLECODEID UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @STARTDATE      DATETIME = NULL OUTPUT,
+                                                                              @ENDDATE        DATETIME = NULL OUTPUT)
+            AS
+                SET NOCOUNT ON;
+                -- be sure to set these, in case the select returns no rows
+                SET @DATALOADED = 0
+                SET @TSLONG = 0
+
+                -- populate the output parameters, which correspond to fields on the form.  Note that
+                -- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+                -- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+                -- can be considered.
+                SELECT @DATALOADED = 1,
+                       @TSLONG = TSLONG,
+                       @TEAMMEMBERID = TEAMMEMBERID,
+                       @SITEID = SITEID,
+                       @TEAMROLECODEID = TEAMROLECODEID,
+                       @STARTDATE = STARTDATE,
+                       @ENDDATE = ENDDATE
+                FROM   DBO.USR_UMHS_TEAM
+                WHERE  ID = @ID
+
+                RETURN 0; 
+
+            ]]>
+            </c:CreateProcedureSQL>
+        </LoadImplementation>
+        <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_TEAM">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_TEAM (@ID             UNIQUEIDENTIFIER,
+                                                                          @CHANGEAGENTID  UNIQUEIDENTIFIER = NULL,
+                                                                          @TEAMMEMBERID   UNIQUEIDENTIFIER,
+                                                                          @SITEID         UNIQUEIDENTIFIER,
+                                                                          @TEAMROLECODEID UNIQUEIDENTIFIER,
+                                                                          @STARTDATE      DATETIME,
+                                                                          @ENDDATE        DATETIME)
+            AS
+                SET NOCOUNT ON;
+
+                IF @CHANGEAGENTID IS NULL
+                  EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                    @CHANGEAGENTID OUTPUT
+
+              BEGIN TRY
+                  -- handle updating the data
+                  UPDATE DBO.USR_UMHS_TEAM
+                  SET    TEAMMEMBERID = @TEAMMEMBERID,
+                         SITEID = @SITEID,
+                         TEAMROLECODEID = @TEAMROLECODEID,
+                         STARTDATE = @STARTDATE,
+                         ENDDATE = @ENDDATE,
+                         CHANGEDBYID = @CHANGEAGENTID,
+                         DATECHANGED = GETDATE()
+                  WHERE  ID = @ID
+              END TRY
+
+              BEGIN CATCH
+                  EXEC DBO.USP_RAISE_ERROR
+
+                  RETURN 1
+              END CATCH
+
+                RETURN 0; 
+
+            ]]>
+            </c:CreateProcedureSQL>
+            <c:ExpectedDBExceptions>
+                <c:Constraints>
+                    <c:Constraint Name="FK_USR_UMHS_TEAM_TEAMMEMBERID" Field="TEAMMEMBERID" Type="ForeignKey" />
+                    <c:Constraint Name="FK_USR_UMHS_TEAM_TEAMROLECODEID" Field="TEAMROLECODEID" Type="ForeignKey" />
+                </c:Constraints>
+            </c:ExpectedDBExceptions>
+        </SaveImplementation>
+    </SPDataForm>
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="TEAMMEMBERID" DataType="Guid" Caption="Team member" Required="true">
+        <SearchList SearchListID="35fa0186-b669-436f-913a-5e9fd5e59982" EnableQuickFind="true"  />
+      </FormField>
+      <FormField FieldID="SITEID" DataType="Guid" Required="false" Caption="Site" CaptionResourceKey="$$site">
+        <SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+          <SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="TEAMROLECODEID" DataType="Guid" Caption="Team role" Required="true">
+        <CodeTable CodeTableName="USR_UMHS_TEAMROLECODE" />
+      </FormField>
+      <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Required="true" />
+      <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+    </FormFields>
+
+    <WebUIComponent>
+      <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDTeamAddFormUIModel" />
+      <WebUI>
+        <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/MIMEDTeamAddForm.html" />
+      </WebUI>
+    </WebUIComponent>
+  </FormMetaData>
+</EditDataFormTemplateSpec>

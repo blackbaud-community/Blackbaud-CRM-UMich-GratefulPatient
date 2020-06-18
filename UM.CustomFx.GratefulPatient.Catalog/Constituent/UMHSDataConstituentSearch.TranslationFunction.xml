@@ -1,0 +1,36 @@
+﻿<TranslationFunctionSpec
+	xmlns="bb_appfx_translationfunction"
+	xmlns:c="bb_appfx_commontypes"
+	ID="85dc28ea-ec58-4648-be80-196f8d635728"
+	Name="USR_UFN_TRANSLATIONFUNCTION_UMHSDATA_SEARCH"
+	Description="returns a readable value for MIMED Data search"
+	Author="UM Dev"
+	RecordType="MIMED Data"
+	>
+
+	<SQLTranslationFunction FNName="USR_UFN_TRANSLATIONFUNCTION_UMHSDATA_SEARCH">
+		<c:CreateFunctionSQL>
+			<![CDATA[
+      CREATE FUNCTION DBO.USR_UFN_TRANSLATIONFUNCTION_UMHSDATA_SEARCH (@ID UNIQUEIDENTIFIER)
+      RETURNS NVARCHAR(50)
+      AS
+        BEGIN
+            DECLARE @S NVARCHAR(50);
+
+
+            IF EXISTS(SELECT ID FROM   DBO.USR_UMHS_DATA D WHERE ID = @ID)
+              SELECT @S = CONCAT(D.FIRSTNAME, ' ', D.KEYNAME)
+              FROM   DBO.USR_UMHS_DATA D
+              WHERE  D.ID = @ID
+            ELSE
+              SELECT @S = CONCAT(C.FIRSTNAME, ' ', C.KEYNAME)
+              FROM   DBO.CONSTITUENT C
+              WHERE  ID = @ID
+
+            RETURN @S;
+        END 
+			]]>
+		</c:CreateFunctionSQL>
+	</SQLTranslationFunction>
+
+</TranslationFunctionSpec>

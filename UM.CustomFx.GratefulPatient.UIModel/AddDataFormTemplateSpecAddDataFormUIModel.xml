@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>MIMEDAddDataFormTemplateSpec.Add.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>AddDataFormTemplateSpecAddDataFormUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>AddDataFormTemplateSpecAddDataForm.html</HtmlFile>
+    <HtmlFolder>htmlforms\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

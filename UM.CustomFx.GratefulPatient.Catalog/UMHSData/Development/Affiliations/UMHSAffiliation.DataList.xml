@@ -1,0 +1,196 @@
+<DataListSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="368939de-2808-4eb4-adea-9f825e1da1e9"
+    Name="MIMED Affiliation List"
+    Description="Returns all MIMED Affiliation records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+    <SPDataList SPName="USR_USP_DATALIST_UMHS_AFFILIATION">
+        <c:CreateProcedureSQL>
+        <![CDATA[
+       create procedure dbo.USR_USP_DATALIST_UMHS_AFFILIATION(
+        @UMHSID as uniqueidentifier,
+        @CATEGORYFILTER uniqueidentifier = null,
+        @CURRENTAPPUSERID uniqueidentifier,
+        @INCLUDECURRENTONLY bit = 0,
+          @MSG  NVARCHAR(100) = NULL OUTPUT--,
+          --@CURRENTAPPUSERID  uniqueidentifier
+      )
+      as
+    set nocount on;
+     
+    --declare @CATEGORYFILTER uniqueidentifier
+    BEGIN
+     
+    declare @CURRENTDATE datetime = dbo.UFN_DATE_GETEARLIESTTIME(getdate());
+     
+    IF @CATEGORYFILTER IS NULL
+    BEGIN
+        SELECT 
+        UA.[ID],
+        UA.[UMHSID],
+        UA.AFFILIATIONBASENAMECODEID,
+        uab.UMHSAFFILIATIONBASENAME,
+        UA.[STARTDATE],
+        UA.[ENDDATE],
+        uatc.ID AS CATEGORYID,
+        uatc.DESCRIPTION AS CATEGORYDESCRIPTION,
+        S.[ID] AS SITEID,
+        S.[NAME] AS SITE,
+        D.[ID] as DEPARTMENTID,
+        SD.[ID] as SUBDEPARTMENTID,
+        D.[NAME] as DEPARTMENT,
+        SD.[NAME] as SUBDEPARTMENT,
+       -- UA.[OPTOUT],
+        UA.[COMMENTS]--,
+      --  INFOSOURCECODE.DESCRIPTION [INFORMATIONSOURCECODE]
+        FROM dbo.USR_UMHS_AFFILIATION UA
+        inner join dbo.USR_UMHS_AFFILIATIONBASE uab 
+        on UA.AFFILIATIONBASENAMECODEID = uab.ID
+             
+        left join dbo.USR_UMHS_AFFILIATIONCATEGORYTYPECODE uatc 
+        on uab.[UMHSAFFILIATIONCATEGORYCODEID] = uatc.ID
+        
+        left join SITE S
+        on S.[ID] = UA.[SITEID]
+        
+        left join USR_UMHS_DEPARTMENT D
+        on D.[ID] = UA.[DEPARTMENTID]
+        
+        left join USR_UMHS_SUBDEPARTMENT SD
+        on SD.[ID] = UA.[SUBDEPARTMENTID]
+        
+       -- left join INFOSOURCECODE infosourcecode
+       -- on UA.INFOSOURCECODEID = INFOSOURCECODE.ID
+        where UA.[UMHSID] = @UMHSID
+          and
+        (@INCLUDECURRENTONLY = 0 or (@INCLUDECURRENTONLY = 1 and ((ENDDATE is null) or (ENDDATE >= @CURRENTDATE))))   
+    END
+    ELSE
+        BEGIN
+        SELECT 
+        UA.[ID],
+        UA.[UMHSID],
+        UA.AFFILIATIONBASENAMECODEID,
+        uab.UMHSAFFILIATIONBASENAME,
+        UA.[STARTDATE],
+        UA.[ENDDATE],
+        uatc.ID AS CATEGORYID,
+        uatc.DESCRIPTION AS CATEGORYDESCRIPTION,
+        S.[ID] AS SITEID,
+        S.[NAME] AS SITE,
+        D.[ID] as DEPARTMENTID,
+        SD.[ID] as SUBDEPARTMENTID,
+        D.[NAME] as DEPARTMENT,
+        SD.[NAME] as SUBDEPARTMENT,
+       -- UA.[OPTOUT],
+        UA.[COMMENTS]--,
+       -- INFOSOURCECODE.DESCRIPTION [INFORMATIONSOURCECODE]
+        FROM dbo.USR_UMHS_AFFILIATION UA
+        inner join dbo.USR_UMHS_AFFILIATIONBASE uab 
+        on UA.AFFILIATIONBASENAMECODEID = uab.ID
+             
+        left join dbo.USR_UMHS_AFFILIATIONCATEGORYTYPECODE uatc
+        on uab.[UMHSAFFILIATIONCATEGORYCODEID] = uatc.ID
+        
+        left join SITE S
+        on S.[ID] = UA.[SITEID]
+        
+        left join USR_UMHS_DEPARTMENT D
+        on D.[ID] = UA.[DEPARTMENTID]
+        
+        left join USR_UMHS_SUBDEPARTMENT SD
+        on SD.[ID] = UA.[SUBDEPARTMENTID]
+        
+        --left join INFOSOURCECODE infosourcecode
+        --on UA.INFOSOURCECODEID = INFOSOURCECODE.ID
+        where UA.[UMHSID] = @UMHSID
+        and uab.[UMHSAFFILIATIONCATEGORYCODEID] = @CATEGORYFILTER
+         
+        AND
+     
+          (@INCLUDECURRENTONLY = 0 or (@INCLUDECURRENTONLY = 1 and ((ENDDATE is null) or (ENDDATE >= @CURRENTDATE))))
+        END
+        /* --Audit code start */
+	DECLARE @USERNAME VARCHAR(100)
+	DECLARE @DISPLAYNAME VARCHAR(100)
+	DECLARE @NAME VARCHAR(200)
+	DECLARE @EVENTMESSAGE VARCHAR(1000)
+	DECLARE @PID VARCHAR(100)
+	DECLARE @PATIENTONLY BIT
+	DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	SELECT @USERNAME = USERNAME
+	             ,@DISPLAYNAME = DISPLAYNAME
+		FROM APPUSER 
+	WHERE ID = @CURRENTAPPUSERID
+  	SELECT @NAME = NAME
+	             ,@PID = LOOKUPID
+	              FROM CONSTITUENT
+	inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		 WHERE gp.ID = @UMHSID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='e2980b90-93c0-4d24-9907-148bc61a3d34' --MIMED Developmnet subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @UMHSID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+            
+    END
+ 
+
+        ]]>
+        </c:CreateProcedureSQL>
+    </SPDataList>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID"/>
+
+  <Parameters>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="CATEGORYFILTER" DataType="Guid" Caption="Category">
+          <CodeTable CodeTableName="USR_UMHS_AFFILIATIONCATEGORYTYPECODE" />
+        </FormField>
+        <FormField FieldID="INCLUDECURRENTONLY" DataType="Boolean" Caption="Only display current affiliations" />
+        <FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100" Hidden="true" />
+      </FormFields>
+    </FormMetaData>
+  </Parameters>
+  
+    <Output>
+        <OutputFields>
+          <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="UMHSID" Caption="MIMED ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="AFFILIATIONBASENAMECODEID" Caption="Name ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="AFFILIATIONBASENAME" Caption="Name" DataType="String" />
+          <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date" />
+          <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date" />
+          <OutputField FieldID="CATEGORYID" Caption="Category ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="CATEGORYDESCRIPTION" Caption="Category" DataType="String" />
+          <OutputField FieldID="SITEID" Caption="Site ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="SITE" Caption="Site" DataType="String"/>
+          <OutputField FieldID="DEPARTMENTID" Caption="Department ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="SUBDEPARTMENTID" Caption="SubDepartment ID" IsHidden="true" DataType="Guid" />
+          <OutputField FieldID="DEPARTMENT" Caption="MIMED department" DataType="String"/>
+          <OutputField FieldID="SUBDEPARTMENT" Caption="MIMED subdepartment" DataType="String"/>
+          <OutputField FieldID="COMMENTS" Caption="Comments" DataType="String" />
+        </OutputFields>
+    </Output>
+</DataListSpec>

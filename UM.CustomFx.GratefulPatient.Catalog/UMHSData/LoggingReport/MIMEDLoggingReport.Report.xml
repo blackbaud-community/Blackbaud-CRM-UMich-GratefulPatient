@@ -1,0 +1,138 @@
+<ReportSpec
+   xmlns="bb_appfx_report"
+   xmlns:c="bb_appfx_commontypes"
+   ID="37522b76-f66d-4c94-9538-c13d2f2a0883"
+   Name="MIMED Logging Report Report"
+   Description="A report showing information about mimed logging report records"
+   Author="UM Dev"
+    >
+
+  <RDLFileName>MIMEDLoggingReport.rdl</RDLFileName>
+  <Folder>MIMED Data</Folder>
+
+  <DataRetrieval>
+    <CreateSQL ObjectName="dbo.USR_USP_UMHS_MIMEDLOGGINGREPORT" ObjectType="SQLStoredProc">
+      <![CDATA[
+        create procedure dbo.USR_USP_UMHS_MIMEDLOGGINGREPORT(
+             --declare   
+			 @DATERAGESTART DATETIME = null,
+                @DATERAGEEND DATETIME = null,
+                @USERID uniqueidentifier = null,
+                @TABID uniqueidentifier = null --'9BD55710-E3FE-4210-AFF2-279AC0570F37'
+              )
+              as
+              begin
+	                
+                  -- Use internal variables to solve parameter sniffing issues
+                  DECLARE @USERIDInternal AS uniqueidentifier;
+                  DECLARE @TABIDInternal as uniqueidentifier;
+                    -- Copy the parameters into the internal variables
+                   SET @USERIDInternal = @USERID ;
+                  SET @TABIDInternal = @TABID ;                  
+                  
+                  declare @USERNAME nvarchar(128);
+                  --declare @TABNAME nvarchar(50);
+				          if not @USERIDInternal is null
+					          select 
+						          @USERNAME = USERNAME 
+					          from dbo.APPUSER 
+					          where APPUSER.ID = @USERIDInternal;
+				          else
+					          set @USERNAME = '';
+          
+                   SELECT 
+                  a.constituentid,				 
+                  a.displayname as USERNAME, --show
+                  l.contextrecordid,                  
+				          c.LOOKUPID as [LOOKUPID],
+				          c.NAME as [CONSTITENT NAME],                  
+				          CASE u.[FIRSTNAME] when '' then '' else u.[FIRSTNAME] +' ' end 
+				                + case u.[MIDDLENAME] when '' then '' else left(u.[MIDDLENAME],(1))+'. ' end 
+				                + u.[KEYNAME] as [MIMED CONSTITUENT NAME],				 				  
+                  CASE
+				  
+                  WHEN l.SUBTABID = '9bd55710-e3fe-4210-aff2-279ac0570f37' THEN 'MIMED Info'
+                  WHEN l.SUBTABID = '1ccf9d10-57fa-425c-8c18-9d3286fe6a26' THEN 'Contact'
+                  WHEN l.SUBTABID = 'e2980b90-93c0-4d24-9907-148bc61a3d34' THEN 'MIMED Development'
+                  WHEN l.SUBTABID = '3f786808-afe8-465e-9125-d8ebce7a63a9' THEN 'Referrals'
+                  WHEN l.SUBTABID = 'c912b1cd-cbc9-41d4-ae73-f7be642a6087' THEN 'Visits Summary'
+                  WHEN l.SUBTABID = '33e31e17-aa65-42db-ad1a-06563999b697' THEN 'Visits Detail'
+                  WHEN l.SUBTABID = '3f47b8c0-4552-4b85-a8ef-ed4cf8733b46' THEN 'Providers'
+                  WHEN l.SUBTABID = '2605d220-0622-4020-9fad-98aa7ba742bd' THEN 'Documentation Note'
+                  WHEN l.SUBTABID = 'eba534f5-fca2-4c08-97a5-0cb2d3bdfe35' THEN 'MIMED History'
+                  END
+                  AS [TAB NAME],  --show
+                  l.DATECHANGED as [TAB ACCESSED DATETIME] --show
+                  FROM  [dbo].[USR_UMHS_MIMEDTABVIEWLOG] l
+                  left join dbo.APPUSER a on a.ID = l.APPUSERID
+				          left join dbo.usr_umhs_data u on u.id = l.contextrecordid
+				          left join dbo.constituent c on c.id = u.constituentid
+                 WHERE l.DATECHANGED between (COALESCE(NULLIF(@DATERAGESTART,''),l.DATECHANGED)) and (COALESCE(NULLIF(@DATERAGEEND + 12/24,''),l.DATECHANGED))
+                 AND a.USERNAME = COALESCE(NULLIF(@USERNAME, ''), a.USERNAME)  
+                 AND l.SUBTABID = COALESCE(@TABIDINternal, l.SUBTABID) 
+                 ORDER BY l.DATECHANGED desc;
+              end
+              
+			]]>
+    </CreateSQL>
+  </DataRetrieval>
+  <FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="USERID" DataType="Guid" Caption="User" Description="Filter the list based on the user who made the change." CaptionResourceKey="$$user" DescriptionResourceKey="$$filter_the_list_based_on_the_user_who_made_the_change">
+        <SimpleDataList SimpleDataListID="c8f924ea-3aaf-4025-bd9e-36bc9fadee75" />
+      </FormField>
+      <FormField FieldID="TABNAME" DataType="String" Caption="TabName" Description="Filter the list based on the Tabs that was accessed." CaptionResourceKey="$$tabname" DescriptionResourceKey="$$filter_the_list_based_on_the_user_who_made_the_change">
+        <SimpleDataList SimpleDataListID="c8f924ea-3aaf-4025-bd9e-36bc9fadee75" />
+      </FormField>
+      <FormField FieldID="DATETYPE" DataType="SmallInt" Required="true" Caption="Show" Description="Filter the list based on a time frame." DefaultValueText="56" CaptionResourceKey="$$show" DescriptionResourceKey="$$filter_the_list_based_on_a_time_frame">
+        <ValueList>
+          <Items>
+            <Item LabelResourceKey="$$specific_date">
+              <Value>0</Value>
+              <Label>Specific Date</Label>
+            </Item>
+            <Item LabelResourceKey="$$all_dates">
+              <Value>1</Value>
+              <Label>All Dates</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_30_days">
+              <Value>56</Value>
+              <Label>Last 30 days</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_60_days">
+              <Value>57</Value>
+              <Label>Last 60 days</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_90_days">
+              <Value>46</Value>
+              <Label>Last 90 days</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_6_months">
+              <Value>47</Value>
+              <Label>Last 6 months</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_year">
+              <Value>48</Value>
+              <Label>Last year</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_5_years">
+              <Value>58</Value>
+              <Label>Last 5 years</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="DATERAGESTART" DataType="Date" Caption="Start date" Description="Beginning of the date range on which to filter the list." CaptionResourceKey="$$start_date" DescriptionResourceKey="$$beginning_of_the_date_range_on_which_to_filter_the_list" />
+      <FormField FieldID="DATERAGEEND" DataType="Date" Caption="End date" Description="End of the date range on which to filter the list." CaptionResourceKey="$$end_date" DescriptionResourceKey="$$end_of_the_date_range_on_which_to_filter_the_list" />
+      <FormField FieldID="DATERANGEDISPLAY" Hidden="true" />
+
+    </FormFields>
+
+    <WebUIComponent>
+      <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDLoggingReportReportUIModel" />
+      <WebUI>
+        <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/MIMEDLoggingReportReport.html" />
+      </WebUI>
+    </WebUIComponent>
+  </FormMetaData>
+</ReportSpec>

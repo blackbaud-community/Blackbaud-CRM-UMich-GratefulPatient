@@ -1,0 +1,32 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="818857f5-f2ed-4f05-9d21-fb89d93a2771"
+	Name="MIMED Department"
+	Description="Stores information about MIMED department records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_DEPARTMENT"		   
+	IsBuiltIn="false"
+  IsCustomizable="true"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <TextField Name="NAME" Length="100" Required="true" />
+    <BooleanField Description="Indicates whether or not the record is inactive." Name="ISINACTIVE" />
+    <EnumField Description="Sort Method" Name="SORTMETHODCODE" DefaultValue="0">
+      <EnumValues>
+        <EnumValue ID="0" Translation="Alpha" />
+        <EnumValue ID="1" Translation="User-Defined" />
+      </EnumValues>
+    </EnumField>
+  </Fields>
+  <Indexes>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="NAME" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+
+</TableSpec>

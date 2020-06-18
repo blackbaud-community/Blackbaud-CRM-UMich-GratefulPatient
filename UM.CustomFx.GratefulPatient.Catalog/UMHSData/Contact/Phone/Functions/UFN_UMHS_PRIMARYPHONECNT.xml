@@ -1,0 +1,32 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="6bb90bd5-ed1e-4466-a2b7-8072b1a3028c"
+	Name="USR_UFN_UMHS_PRIMARYPHONECNT"
+	Description="Return the number of phone number(s) are Primary for an individual"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_PRIMARYPHONECNT"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_PRIMARYPHONECNT(@UMHSID uniqueidentifier)
+returns int
+with execute as caller
+as begin
+	declare @cnt int;
+  set @cnt=0;
+  
+  select 
+    @cnt=count(UMHSID)
+  from dbo.USR_UMHS_PHONE p
+  where
+      p.UMHSID=@UMHSID
+  and p.ISPRIMARY=1
+  
+	return @cnt;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

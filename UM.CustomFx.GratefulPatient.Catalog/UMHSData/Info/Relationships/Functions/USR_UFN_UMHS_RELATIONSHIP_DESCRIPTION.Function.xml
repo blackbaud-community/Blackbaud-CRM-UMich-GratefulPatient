@@ -1,0 +1,42 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="b317fa9e-470a-481a-928a-afe12749ac16"
+	Name="USR_UFN_UMHS_RELATIONSHIP_DESCRIPTION"
+	Description="Gets relationship description for an individual"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_RELATIONSHIP_DESCRIPTION"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_RELATIONSHIP_DESCRIPTION(@UMHSID uniqueidentifier, @NAMEFORMAT nvarchar(400))
+returns nvarchar(700)
+with execute as caller
+as begin
+  declare @NAMEFORMATFUNCTIONID uniqueidentifier;
+  declare @NAME nvarchar(700);
+  
+  select @NAMEFORMATFUNCTIONID=ID from dbo.NAMEFORMATFUNCTION where FORMATSQLFUNCTION=@NAMEFORMAT;
+      
+  if @NAMEFORMATFUNCTIONID is null
+  begin
+    select top 1
+      @NAMEFORMATFUNCTIONID=ID
+    from NAMEFORMATFUNCTION 
+    order by SEQUENCE asc;
+  end
+  
+  select
+    @NAME=dbo.USR_UFN_UMHS_NAMEFORMAT_FROMID(@NAMEFORMATFUNCTIONID, d.ID) + N' - ' + dbo.UFN_RELATIONSHIPTYPECODE_GETDESCRIPTION(r.RECIPROCALTYPECODEID)
+  from dbo.USR_UMHS_RELATIONSHIP r
+	inner join dbo.USR_UMHS_DATA d on d.ID = r.RECIPROCALUMHSID
+  where
+    r.ID=@UMHSID
+    
+	return @NAME
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

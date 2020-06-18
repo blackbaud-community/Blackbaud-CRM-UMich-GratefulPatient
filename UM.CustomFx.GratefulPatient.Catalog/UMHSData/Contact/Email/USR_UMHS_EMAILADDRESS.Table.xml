@@ -1,0 +1,60 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="208deeb4-9176-40c3-867a-2b22e9e3c6bf"
+	Name="MIMED Email Address"
+	Description="Stores information about usr um UMHSEMAILADDRESS records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_EMAILADDRESS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Name="UMHSID" Required="true" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" />
+    <CodeTableField Name="EMAILADDRESSTYPECODEID" CodeTable="EMAILADDRESSTYPECODE" />
+    <EmailAddressField Description="The patient's email address." Name="EMAILADDRESS" Required="true"/>
+    <BooleanField Description="Indicates this email address is the primary email address." Name="ISPRIMARY" />
+    <BooleanField Description="Indicates this email address should not receive emails." Name="DONOTEMAIL" />
+    <SequenceField Description="Stores the user-defined sequence for email addresses on a constituent." Name="SEQUENCE" />
+    <CodeTableField Name="INFOSOURCECODEID" CodeTable="INFOSOURCECODE" />
+    <TextField Description="Contains additional comments about the information source." Name="INFOSOURCECOMMENTS" Length="256" />
+    <DateField Description="The date the email address becomes valid." Name="STARTDATE" />
+    <DateField Description="The date the email address becomes invalid." Name="ENDDATE" />
+    <BooleanField Description="Indicates this email address is confidential." Name="ISCONFIDENTIAL" />
+  </Fields>
+  <CheckConstraints>
+    <CheckConstraint Name="CK_USR_UMHS_EMAILADDRESS_PRIMARYCOUNT" CheckExpression="ISPRIMARY=0 or dbo.USR_UFN_UMHS_PRIMARYEMAILADDRESSCNT(UMHSID) &lt;= 1" />
+    <CheckConstraint Name="CK_USR_UMHS_EMAILADDRESS_VALIDDATERANGE" CheckExpression="dbo.USR_UFN_UMHS_VALIDATE_STARTEND_DATES(STARTDATE, ENDDATE) = 1" />
+    <CheckConstraint Name="CK_USR_UMHS_EMAILADDRESS_ENDDATEINVALIDIFPRIMARY" CheckExpression="ISPRIMARY=0 or (ISPRIMARY = 1 and ENDDATE is null)" />
+    <CheckConstraint Name="CK_USR_UMHS_EMAILADDRESS_UNIQUEEMAILADDRESSANDTYPE" CheckExpression="dbo.USR_UFN_UMHS_ISUNIQUEEMAILADDRESSANDTYPE(UMHSID,EMAILADDRESS,EMAILADDRESSTYPECODEID) = 1"/>
+  </CheckConstraints>  
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="ID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ISPRIMARY" />
+        <IncludeField Name="DONOTEMAIL" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+        <IndexField Name="ISPRIMARY" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ID" />
+        <IncludeField Name="EMAILADDRESS" />
+        <IncludeField Name="DONOTEMAIL" />
+        <IncludeField Name="DATECHANGED" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="EMAILADDRESS" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

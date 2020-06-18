@@ -1,0 +1,1254 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="UMHSDataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BATCHCONSTITUENTUPDATE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="BATCHID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SEQUENCE" Type="int" Nullable="false" />
+          <Property Name="PRIMARYRECORDID" Type="uniqueidentifier" />
+          <Property Name="CONSTITUENTTYPECODE" Type="tinyint" Nullable="false" />
+          <Property Name="CONSTITUENTTYPE" Type="nvarchar" MaxLength="17" StoreGeneratedPattern="Computed" />
+          <Property Name="BIRTHDATE" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="FIRSTNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="GENDERCODE" Type="tinyint" Nullable="false" />
+          <Property Name="GENDER" Type="nvarchar" MaxLength="7" StoreGeneratedPattern="Computed" />
+          <Property Name="GIVESANONYMOUSLY" Type="bit" Nullable="false" />
+          <Property Name="KEYNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="LOOKUP_ID" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="MAIDENNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="MIDDLENAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="NICKNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SUFFIXCODEID" Type="uniqueidentifier" />
+          <Property Name="TITLECODEID" Type="uniqueidentifier" />
+          <Property Name="WEBADDRESS" Type="nvarchar" MaxLength="2047" Nullable="false" />
+          <Property Name="DECEASED" Type="bit" Nullable="false" />
+          <Property Name="DECEASEDDATE" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="CONSTITUENT_SITEID" Type="uniqueidentifier" />
+          <Property Name="PROSPECTMANAGERFUNDRAISERID" Type="uniqueidentifier" />
+          <Property Name="GROUPTYPEID" Type="uniqueidentifier" />
+          <Property Name="GROUPDESCRIPTION" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="GROUPSTARTDATE" Type="date" />
+          <Property Name="ORG_INDUSTRYCODEID" Type="uniqueidentifier" />
+          <Property Name="ORG_NUMEMPLOYEES" Type="int" Nullable="false" />
+          <Property Name="ORG_NUMSUBSIDIARIES" Type="int" Nullable="false" />
+          <Property Name="ORG_PARENTCORPID" Type="uniqueidentifier" />
+          <Property Name="MARITALSTATUSCODEID" Type="uniqueidentifier" />
+          <Property Name="SPOUSE_ID" Type="uniqueidentifier" />
+          <Property Name="SPOUSE_TITLECODEID" Type="uniqueidentifier" />
+          <Property Name="SPOUSE_FIRSTNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SPOUSE_NICKNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SPOUSE_MIDDLENAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SPOUSE_MAIDENNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="SPOUSE_LASTNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="SPOUSE_SUFFIXCODEID" Type="uniqueidentifier" />
+          <Property Name="SPOUSE_BIRTHDATE" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="SPOUSE_GENDERCODE" Type="tinyint" Nullable="false" />
+          <Property Name="SPOUSE_GENDER" Type="nvarchar" MaxLength="7" StoreGeneratedPattern="Computed" />
+          <Property Name="SPOUSE_LOOKUPID" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="SPOUSE_RELATIONSHIPTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="SPOUSE_RECIPROCALTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_ID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_ADDRESSBLOCK" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="BUSINESS_ADDRESSTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_CART" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="BUSINESS_CITY" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="BUSINESS_COUNTRYID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_DONOTMAIL" Type="bit" Nullable="false" />
+          <Property Name="BUSINESS_DONOTMAILREASONCODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_DPC" Type="nvarchar" MaxLength="8" Nullable="false" />
+          <Property Name="BUSINESS_EMAILADDRESS" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="BUSINESS_EMAILADDRESSTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_INDUSTRYCODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_LOOKUPID" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="BUSINESS_LOT" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="BUSINESS_NAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="BUSINESS_NUMEMPLOYEES" Type="int" Nullable="false" />
+          <Property Name="BUSINESS_NUMSUBSIDIARIES" Type="int" Nullable="false" />
+          <Property Name="BUSINESS_PARENTCORPID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_PHONENUMBER" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="BUSINESS_PHONETYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_RELATIONSHIPTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_RECIPROCALTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_STATEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_WEBADDRESS" Type="nvarchar" MaxLength="2047" Nullable="false" />
+          <Property Name="BUSINESS_POSTCODE" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="BUSINESS_PHONE_COUNTRYID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" Type="bit" Nullable="false" />
+          <Property Name="BUSINESS_PRIMARYSOFTCREDITMATCHFACTOR" Type="decimal" Precision="5" Scale="2" Nullable="false" />
+          <Property Name="BUSINESS_PRIMARYRECOGNITIONTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" Type="bit" Nullable="false" />
+          <Property Name="BUSINESS_RECIPROCALSOFTCREDITMATCHFACTOR" Type="decimal" Precision="5" Scale="2" Nullable="false" />
+          <Property Name="BUSINESS_RECIPROCALRECOGNITIONTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="BUSINESS_EMAILADDRESSSTARTDATE" Type="date" />
+          <Property Name="SPOUSE_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" Type="bit" Nullable="false" />
+          <Property Name="SPOUSE_PRIMARYSOFTCREDITMATCHFACTOR" Type="decimal" Precision="5" Scale="2" Nullable="false" />
+          <Property Name="SPOUSE_PRIMARYRECOGNITIONTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="SPOUSE_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" Type="bit" Nullable="false" />
+          <Property Name="SPOUSE_RECIPROCALSOFTCREDITMATCHFACTOR" Type="decimal" Precision="5" Scale="2" Nullable="false" />
+          <Property Name="SPOUSE_RECIPROCALRECOGNITIONTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="REMOVESPOUSE" Type="bit" Nullable="false" />
+          <Property Name="DOMANUALREVIEWFORAUTOMATCH" Type="bit" Nullable="false" />
+          <Property Name="DIFFERENTPHONECODE" Type="tinyint" Nullable="false" />
+          <Property Name="NEWPHONEENDDATECODE" Type="tinyint" Nullable="false" />
+          <Property Name="NEWPHONEPRIMARYCODE" Type="tinyint" Nullable="false" />
+          <Property Name="DIFFERENTEMAILCODE" Type="tinyint" Nullable="false" />
+          <Property Name="NEWEMAILENDDATECODE" Type="tinyint" Nullable="false" />
+          <Property Name="NEWEMAILPRIMARYCODE" Type="tinyint" Nullable="false" />
+          <Property Name="USEGLOBALSETTINGS" Type="bit" Nullable="false" />
+          <Property Name="DIFFERENTEMAIL" Type="nvarchar" MaxLength="42" StoreGeneratedPattern="Computed" />
+          <Property Name="CREATEHISTORICALNAMECODE" Type="tinyint" Nullable="false" />
+          <Property Name="CREATEHISTORICALNAME" Type="nvarchar" MaxLength="3" StoreGeneratedPattern="Computed" />
+          <Property Name="NAMECODE" Type="tinyint" Nullable="false" />
+          <Property Name="SIMILARADDRESSCODE" Type="tinyint" Nullable="false" />
+          <Property Name="UNSIMILARADDRESSCODE" Type="tinyint" Nullable="false" />
+          <Property Name="UNSIMILARADDRESS" Type="nvarchar" MaxLength="42" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWADDRESSENDDATECODE" Type="tinyint" Nullable="false" />
+          <Property Name="NEWADDRESSPRIMARYCODE" Type="tinyint" Nullable="false" />
+          <Property Name="BIRTHDATERULECODE" Type="tinyint" Nullable="false" />
+          <Property Name="NAME" Type="nvarchar" MaxLength="42" StoreGeneratedPattern="Computed" />
+          <Property Name="SIMILARADDRESS" Type="nvarchar" MaxLength="63" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWADDRESSENDDATE" Type="nvarchar" MaxLength="30" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWADDRESSPRIMARY" Type="nvarchar" MaxLength="61" StoreGeneratedPattern="Computed" />
+          <Property Name="DIFFERENTPHONE" Type="nvarchar" MaxLength="42" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWPHONEENDDATE" Type="nvarchar" MaxLength="28" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWPHONEPRIMARY" Type="nvarchar" MaxLength="57" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWEMAILENDDATE" Type="nvarchar" MaxLength="36" StoreGeneratedPattern="Computed" />
+          <Property Name="NEWEMAILPRIMARY" Type="nvarchar" MaxLength="65" StoreGeneratedPattern="Computed" />
+          <Property Name="REQUESTSNOEMAIL" Type="bit" Nullable="false" />
+          <Property Name="BIRTHDATERULE" Type="nvarchar" MaxLength="17" StoreGeneratedPattern="Computed" />
+          <Property Name="ROWFROMBATCHUI" Type="bit" Nullable="false" />
+          <Property Name="ORIGINAL_KEYNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ORIGINAL_FIRSTNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BATCHCONSTITUENTUPDATEADDRESSES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="BATCHCONSTITUENTUPDATEID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SEQUENCE" Type="int" Nullable="false" />
+          <Property Name="ADDRESSTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="COUNTRYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="ADDRESSBLOCK" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="CITY" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="STATEID" Type="uniqueidentifier" />
+          <Property Name="POSTCODE" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="HISTORICALSTARTDATE" Type="date" />
+          <Property Name="ISPRIMARY" Type="bit" Nullable="false" />
+          <Property Name="DONOTMAIL" Type="bit" Nullable="false" />
+          <Property Name="DONOTMAILREASONCODEID" Type="uniqueidentifier" />
+          <Property Name="UPDATEHOUSEHOLD" Type="bit" Nullable="false" />
+          <Property Name="STARTDATE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="ENDDATE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="INFOSOURCECODEID" Type="uniqueidentifier" />
+          <Property Name="COUNTYCODEID" Type="uniqueidentifier" />
+          <Property Name="DPC" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="CART" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="LOT" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="REGIONCODEID" Type="uniqueidentifier" />
+          <Property Name="CONGRESSIONALDISTRICTCODEID" Type="uniqueidentifier" />
+          <Property Name="STATEHOUSEDISTRICTCODEID" Type="uniqueidentifier" />
+          <Property Name="STATESENATEDISTRICTCODEID" Type="uniqueidentifier" />
+          <Property Name="LOCALPRECINCTCODEID" Type="uniqueidentifier" />
+          <Property Name="CERTIFICATIONDATA" Type="int" Nullable="false" />
+          <Property Name="LASTVALIDATIONATTEMPTDATE" Type="date" />
+          <Property Name="OMITFROMVALIDATION" Type="bit" Nullable="false" />
+          <Property Name="VALIDATIONMESSAGE" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="ADDRESSID" Type="uniqueidentifier" />
+          <Property Name="INFOSOURCECOMMENTS" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="HISTORICALENDDATE" Type="date" />
+          <Property Name="ISMANUALEXCEPTION" Type="bit" Nullable="false" />
+          <Property Name="MANUALEXCEPTIONSIMILARADDRESSID" Type="uniqueidentifier" />
+          <Property Name="ROWORIGINCODE" Type="tinyint" Nullable="false" />
+          <Property Name="ROWORIGIN" Type="nvarchar" MaxLength="129" StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="BATCHCONSTITUENTUPDATEEMAILADDRESSES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="BATCHCONSTITUENTUPDATEID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SEQUENCE" Type="int" Nullable="false" />
+          <Property Name="EMAILADDRESSTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="EMAILADDRESS" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ISPRIMARY" Type="bit" Nullable="false" />
+          <Property Name="DONOTEMAIL" Type="bit" Nullable="false" />
+          <Property Name="UPDATEHOUSEHOLD" Type="bit" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="STARTDATE" Type="date" />
+          <Property Name="ENDDATE" Type="date" />
+          <Property Name="INFOSOURCECODEID" Type="uniqueidentifier" />
+          <Property Name="EMAILADDRESSID" Type="uniqueidentifier" />
+          <Property Name="ISMANUALEXCEPTION" Type="bit" Nullable="false" />
+          <Property Name="ROWORIGINCODE" Type="tinyint" Nullable="false" />
+          <Property Name="ROWORIGIN" Type="nvarchar" MaxLength="129" StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="BATCHCONSTITUENTUPDATEPHONES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="BATCHCONSTITUENTUPDATEID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="SEQUENCE" Type="int" Nullable="false" />
+          <Property Name="PHONETYPECODEID" Type="uniqueidentifier" />
+          <Property Name="NUMBER" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ISPRIMARY" Type="bit" Nullable="false" />
+          <Property Name="DONOTCALL" Type="bit" Nullable="false" />
+          <Property Name="UPDATEHOUSEHOLD" Type="bit" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="COUNTRYID" Type="uniqueidentifier" />
+          <Property Name="SEASONALSTARTDATE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="SEASONALENDDATE" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="STARTTIME" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="ENDTIME" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="STARTDATE" Type="date" />
+          <Property Name="ENDDATE" Type="date" />
+          <Property Name="INFOSOURCECODEID" Type="uniqueidentifier" />
+          <Property Name="PHONEID" Type="uniqueidentifier" />
+          <Property Name="ISMANUALEXCEPTION" Type="bit" Nullable="false" />
+          <Property Name="ROWORIGINCODE" Type="tinyint" Nullable="false" />
+          <Property Name="ROWORIGIN" Type="nvarchar" MaxLength="129" StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="BATCHREVENUECONSTITUENT">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="EXISTINGCONSTITUENTID" Type="uniqueidentifier" />
+          <Property Name="KEYNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="KEYNAMEPREFIX" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FIRSTNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="MIDDLENAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="MAIDENNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="NICKNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="TITLECODEID" Type="uniqueidentifier" />
+          <Property Name="SUFFIXCODEID" Type="uniqueidentifier" />
+          <Property Name="GENDERCODE" Type="tinyint" Nullable="false" />
+          <Property Name="GENDER" Type="nvarchar" MaxLength="7" StoreGeneratedPattern="Computed" />
+          <Property Name="BIRTHDATE" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="ISORGANIZATION" Type="bit" Nullable="false" />
+          <Property Name="MARITALSTATUSCODEID" Type="uniqueidentifier" />
+          <Property Name="INDUSTRYCODEID" Type="uniqueidentifier" />
+          <Property Name="NUMEMPLOYEES" Type="int" Nullable="false" />
+          <Property Name="NUMSUBSIDIARIES" Type="int" Nullable="false" />
+          <Property Name="PARENTCORPID" Type="uniqueidentifier" />
+          <Property Name="ADDRESSTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="DONOTMAIL" Type="bit" Nullable="false" />
+          <Property Name="COUNTRYID" Type="uniqueidentifier" />
+          <Property Name="STATEID" Type="uniqueidentifier" />
+          <Property Name="ADDRESSBLOCK" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="CITY" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="POSTCODE" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="PHONETYPECODEID" Type="uniqueidentifier" />
+          <Property Name="NUMBER" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="EMAILADDRESSTYPECODEID" Type="uniqueidentifier" />
+          <Property Name="EMAILADDRESS" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="CURRENTAPPUSERID" Type="uniqueidentifier" />
+          <Property Name="WEBADDRESS" Type="nvarchar" MaxLength="2047" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="ISGROUP" Type="bit" Nullable="false" />
+          <Property Name="GIVESANONYMOUSLY" Type="bit" Nullable="false" />
+          <Property Name="GROUPTYPECODE" Type="tinyint" Nullable="false" />
+          <Property Name="GROUPTYPE" Type="nvarchar" MaxLength="9" StoreGeneratedPattern="Computed" />
+          <Property Name="GROUPTYPEID" Type="uniqueidentifier" />
+          <Property Name="GROUPDESCRIPTION" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="GROUPSTARTDATE" Type="datetime" />
+          <Property Name="DPC" Type="nvarchar" MaxLength="8" Nullable="false" />
+          <Property Name="CART" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="LOT" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="OMITFROMVALIDATION" Type="bit" Nullable="false" />
+          <Property Name="COUNTYCODEID" Type="uniqueidentifier" />
+          <Property Name="CONGRESSIONALDISTRICTCODEID" Type="uniqueidentifier" />
+          <Property Name="LASTVALIDATIONATTEMPTDATE" Type="datetime" />
+          <Property Name="VALIDATIONMESSAGE" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="CERTIFICATIONDATA" Type="int" Nullable="false" />
+          <Property Name="DONOTMAILREASONCODEID" Type="uniqueidentifier" />
+          <Property Name="NAMEFORMATFUNCTIONID" Type="uniqueidentifier" />
+          <Property Name="DONOTCALL" Type="bit" Nullable="false" />
+          <Property Name="DONOTEMAIL" Type="bit" Nullable="false" />
+          <Property Name="NAME" Type="nvarchar" MaxLength="154" StoreGeneratedPattern="Computed" />
+          <Property Name="SITEID" Type="uniqueidentifier" />
+          <Property Name="CONSTITUENTSECURITYGROUPID" Type="uniqueidentifier" />
+          <Property Name="CONSTITUENCYCODEID" Type="uniqueidentifier" />
+          <Property Name="INFOSOURCECODEID" Type="uniqueidentifier" />
+          <Property Name="CLASSOF" Type="smallint" Nullable="false" />
+          <Property Name="NAMEFORMATS" Type="xml" />
+          <Property Name="ORIGINAL_LASTNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ORIGINAL_FIRSTNAME" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="USR_UMHS_DATA">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CONSTITUENTID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="MRN" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="CPISEQUENCE" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FIRSTNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="MIDDLENAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="NICKNAME" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="KEYNAME" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="BIRTHDATE" Type="char" MaxLength="8" Nullable="false" />
+          <Property Name="AGE" Type="int" StoreGeneratedPattern="Computed" />
+          <Property Name="TITLECODEID" Type="uniqueidentifier" />
+          <Property Name="TITLE2CODEID" Type="uniqueidentifier" />
+          <Property Name="SUFFIXCODEID" Type="uniqueidentifier" />
+          <Property Name="SUFFIX2CODEID" Type="uniqueidentifier" />
+          <Property Name="INFOSOURCECODEID" Type="uniqueidentifier" />
+          <Property Name="GENDERCODE" Type="tinyint" Nullable="false" />
+          <Property Name="GENDER" Type="nvarchar" MaxLength="7" StoreGeneratedPattern="Computed" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="ISDMINELIGIBLE" Type="bit" Nullable="false" />
+          <Property Name="DMINELIGIBLEREASONCODEID" Type="uniqueidentifier" />
+          <Property Name="UMHSDATA_LASTPROCDATE" Type="datetime" />
+        </EntityType>
+        <EntityType Name="USR_UMHS_PROVIDERS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CONSTITUENTID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DEPARTMENTID" Type="uniqueidentifier" />
+          <Property Name="SUBDEPARTMENTID" Type="uniqueidentifier" />
+          <Property Name="PROVIDERDRNUMBER" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ADMITDOCTORIND" Type="bit" Nullable="false" />
+          <Property Name="ATTENDDOCTORIND" Type="bit" Nullable="false" />
+          <Property Name="RESIDENTDOCTORIND" Type="bit" Nullable="false" />
+          <Property Name="CONSULTDOCTORIND" Type="bit" Nullable="false" />
+          <Property Name="PHONE" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="DATEADDED" Type="datetime" Nullable="false" />
+          <Property Name="DATECHANGED" Type="datetime" Nullable="false" />
+          <Property Name="TS" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="TSLONG" Type="bigint" StoreGeneratedPattern="Computed" />
+          <Property Name="UMHSDATA_LASTPROCDATE" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID">
+          <End Role="BATCHCONSTITUENTUPDATE" Type="Self.BATCHCONSTITUENTUPDATE" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BATCHCONSTITUENTUPDATEADDRESSES" Type="Self.BATCHCONSTITUENTUPDATEADDRESSES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BATCHCONSTITUENTUPDATE">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BATCHCONSTITUENTUPDATEADDRESSES">
+              <PropertyRef Name="BATCHCONSTITUENTUPDATEID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID">
+          <End Role="BATCHCONSTITUENTUPDATE" Type="Self.BATCHCONSTITUENTUPDATE" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BATCHCONSTITUENTUPDATEEMAILADDRESSES" Type="Self.BATCHCONSTITUENTUPDATEEMAILADDRESSES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BATCHCONSTITUENTUPDATE">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BATCHCONSTITUENTUPDATEEMAILADDRESSES">
+              <PropertyRef Name="BATCHCONSTITUENTUPDATEID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID">
+          <End Role="BATCHCONSTITUENTUPDATE" Type="Self.BATCHCONSTITUENTUPDATE" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BATCHCONSTITUENTUPDATEPHONES" Type="Self.BATCHCONSTITUENTUPDATEPHONES" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BATCHCONSTITUENTUPDATE">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BATCHCONSTITUENTUPDATEPHONES">
+              <PropertyRef Name="BATCHCONSTITUENTUPDATEID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="UMHSDataModelStoreContainer">
+          <EntitySet Name="BATCHCONSTITUENTUPDATE" EntityType="Self.BATCHCONSTITUENTUPDATE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BATCHCONSTITUENTUPDATEADDRESSES" EntityType="Self.BATCHCONSTITUENTUPDATEADDRESSES" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BATCHCONSTITUENTUPDATEEMAILADDRESSES" EntityType="Self.BATCHCONSTITUENTUPDATEEMAILADDRESSES" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BATCHCONSTITUENTUPDATEPHONES" EntityType="Self.BATCHCONSTITUENTUPDATEPHONES" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BATCHREVENUECONSTITUENT" EntityType="Self.BATCHREVENUECONSTITUENT" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="USR_UMHS_DATA" EntityType="Self.USR_UMHS_DATA" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="USR_UMHS_PROVIDERS" EntityType="Self.USR_UMHS_PROVIDERS" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID" Association="Self.FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID">
+            <End Role="BATCHCONSTITUENTUPDATE" EntitySet="BATCHCONSTITUENTUPDATE" />
+            <End Role="BATCHCONSTITUENTUPDATEADDRESSES" EntitySet="BATCHCONSTITUENTUPDATEADDRESSES" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID" Association="Self.FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID">
+            <End Role="BATCHCONSTITUENTUPDATE" EntitySet="BATCHCONSTITUENTUPDATE" />
+            <End Role="BATCHCONSTITUENTUPDATEEMAILADDRESSES" EntitySet="BATCHCONSTITUENTUPDATEEMAILADDRESSES" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID" Association="Self.FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID">
+            <End Role="BATCHCONSTITUENTUPDATE" EntitySet="BATCHCONSTITUENTUPDATE" />
+            <End Role="BATCHCONSTITUENTUPDATEPHONES" EntitySet="BATCHCONSTITUENTUPDATEPHONES" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="UMHSDataModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="UMHSDataEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BATCHCONSTITUENTUPDATEs" EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATE" />
+          <EntitySet Name="BATCHCONSTITUENTUPDATEADDRESSES" EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATEADDRESS" />
+          <EntitySet Name="BATCHCONSTITUENTUPDATEEMAILADDRESSES" EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATEEMAILADDRESS" />
+          <EntitySet Name="BATCHCONSTITUENTUPDATEPHONES" EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATEPHONE" />
+          <AssociationSet Name="FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID" Association="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID">
+            <End Role="BATCHCONSTITUENTUPDATE" EntitySet="BATCHCONSTITUENTUPDATEs" />
+            <End Role="BATCHCONSTITUENTUPDATEADDRESS" EntitySet="BATCHCONSTITUENTUPDATEADDRESSES" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID" Association="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID">
+            <End Role="BATCHCONSTITUENTUPDATE" EntitySet="BATCHCONSTITUENTUPDATEs" />
+            <End Role="BATCHCONSTITUENTUPDATEEMAILADDRESS" EntitySet="BATCHCONSTITUENTUPDATEEMAILADDRESSES" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID" Association="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID">
+            <End Role="BATCHCONSTITUENTUPDATE" EntitySet="BATCHCONSTITUENTUPDATEs" />
+            <End Role="BATCHCONSTITUENTUPDATEPHONE" EntitySet="BATCHCONSTITUENTUPDATEPHONES" />
+          </AssociationSet>
+          <EntitySet Name="USR_UMHS_DATA" EntityType="UMHSDataModel.USR_UMHS_DATA" />
+          <EntitySet Name="BATCHREVENUECONSTITUENTs" EntityType="UMHSDataModel.BATCHREVENUECONSTITUENT" />
+          <EntitySet Name="USR_UMHS_PROVIDERS" EntityType="UMHSDataModel.USR_UMHS_PROVIDERS" />
+        </EntityContainer>
+        <EntityType Name="BATCHCONSTITUENTUPDATE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="BATCHID" Type="Guid" Nullable="false" />
+          <Property Name="SEQUENCE" Type="Int32" Nullable="false" />
+          <Property Name="PRIMARYRECORDID" Type="Guid" />
+          <Property Name="CONSTITUENTTYPECODE" Type="Byte" Nullable="false" />
+          <Property Name="CONSTITUENTTYPE" Type="String" MaxLength="17" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="BIRTHDATE" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="FIRSTNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GENDERCODE" Type="Byte" Nullable="false" />
+          <Property Name="GENDER" Type="String" MaxLength="7" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="GIVESANONYMOUSLY" Type="Boolean" Nullable="false" />
+          <Property Name="KEYNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LOOKUP_ID" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MAIDENNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MIDDLENAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NICKNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SUFFIXCODEID" Type="Guid" />
+          <Property Name="TITLECODEID" Type="Guid" />
+          <Property Name="WEBADDRESS" Type="String" Nullable="false" MaxLength="2047" FixedLength="false" Unicode="true" />
+          <Property Name="DECEASED" Type="Boolean" Nullable="false" />
+          <Property Name="DECEASEDDATE" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="CONSTITUENT_SITEID" Type="Guid" />
+          <Property Name="PROSPECTMANAGERFUNDRAISERID" Type="Guid" />
+          <Property Name="GROUPTYPEID" Type="Guid" />
+          <Property Name="GROUPDESCRIPTION" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="GROUPSTARTDATE" Type="DateTime" Precision="0" />
+          <Property Name="ORG_INDUSTRYCODEID" Type="Guid" />
+          <Property Name="ORG_NUMEMPLOYEES" Type="Int32" Nullable="false" />
+          <Property Name="ORG_NUMSUBSIDIARIES" Type="Int32" Nullable="false" />
+          <Property Name="ORG_PARENTCORPID" Type="Guid" />
+          <Property Name="MARITALSTATUSCODEID" Type="Guid" />
+          <Property Name="SPOUSE_ID" Type="Guid" />
+          <Property Name="SPOUSE_TITLECODEID" Type="Guid" />
+          <Property Name="SPOUSE_FIRSTNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SPOUSE_NICKNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SPOUSE_MIDDLENAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="SPOUSE_MAIDENNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="SPOUSE_LASTNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="SPOUSE_SUFFIXCODEID" Type="Guid" />
+          <Property Name="SPOUSE_BIRTHDATE" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="SPOUSE_GENDERCODE" Type="Byte" Nullable="false" />
+          <Property Name="SPOUSE_GENDER" Type="String" MaxLength="7" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="SPOUSE_LOOKUPID" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="SPOUSE_RELATIONSHIPTYPECODEID" Type="Guid" />
+          <Property Name="SPOUSE_RECIPROCALTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_ID" Type="Guid" />
+          <Property Name="BUSINESS_ADDRESSBLOCK" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_ADDRESSTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_CART" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_CITY" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_COUNTRYID" Type="Guid" />
+          <Property Name="BUSINESS_DONOTMAIL" Type="Boolean" Nullable="false" />
+          <Property Name="BUSINESS_DONOTMAILREASONCODEID" Type="Guid" />
+          <Property Name="BUSINESS_DPC" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_EMAILADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_EMAILADDRESSTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_INDUSTRYCODEID" Type="Guid" />
+          <Property Name="BUSINESS_LOOKUPID" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_LOT" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_NAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_NUMEMPLOYEES" Type="Int32" Nullable="false" />
+          <Property Name="BUSINESS_NUMSUBSIDIARIES" Type="Int32" Nullable="false" />
+          <Property Name="BUSINESS_PARENTCORPID" Type="Guid" />
+          <Property Name="BUSINESS_PHONENUMBER" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_PHONETYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_RELATIONSHIPTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_RECIPROCALTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_STATEID" Type="Guid" />
+          <Property Name="BUSINESS_WEBADDRESS" Type="String" Nullable="false" MaxLength="2047" FixedLength="false" Unicode="true" />
+          <Property Name="BUSINESS_POSTCODE" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="BUSINESS_PHONE_COUNTRYID" Type="Guid" />
+          <Property Name="BUSINESS_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" Type="Boolean" Nullable="false" />
+          <Property Name="BUSINESS_PRIMARYSOFTCREDITMATCHFACTOR" Type="Decimal" Nullable="false" Precision="5" Scale="2" />
+          <Property Name="BUSINESS_PRIMARYRECOGNITIONTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" Type="Boolean" Nullable="false" />
+          <Property Name="BUSINESS_RECIPROCALSOFTCREDITMATCHFACTOR" Type="Decimal" Nullable="false" Precision="5" Scale="2" />
+          <Property Name="BUSINESS_RECIPROCALRECOGNITIONTYPECODEID" Type="Guid" />
+          <Property Name="BUSINESS_EMAILADDRESSSTARTDATE" Type="DateTime" Precision="0" />
+          <Property Name="SPOUSE_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" Type="Boolean" Nullable="false" />
+          <Property Name="SPOUSE_PRIMARYSOFTCREDITMATCHFACTOR" Type="Decimal" Nullable="false" Precision="5" Scale="2" />
+          <Property Name="SPOUSE_PRIMARYRECOGNITIONTYPECODEID" Type="Guid" />
+          <Property Name="SPOUSE_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" Type="Boolean" Nullable="false" />
+          <Property Name="SPOUSE_RECIPROCALSOFTCREDITMATCHFACTOR" Type="Decimal" Nullable="false" Precision="5" Scale="2" />
+          <Property Name="SPOUSE_RECIPROCALRECOGNITIONTYPECODEID" Type="Guid" />
+          <Property Name="REMOVESPOUSE" Type="Boolean" Nullable="false" />
+          <Property Name="DOMANUALREVIEWFORAUTOMATCH" Type="Boolean" Nullable="false" />
+          <Property Name="DIFFERENTPHONECODE" Type="Byte" Nullable="false" />
+          <Property Name="NEWPHONEENDDATECODE" Type="Byte" Nullable="false" />
+          <Property Name="NEWPHONEPRIMARYCODE" Type="Byte" Nullable="false" />
+          <Property Name="DIFFERENTEMAILCODE" Type="Byte" Nullable="false" />
+          <Property Name="NEWEMAILENDDATECODE" Type="Byte" Nullable="false" />
+          <Property Name="NEWEMAILPRIMARYCODE" Type="Byte" Nullable="false" />
+          <Property Name="USEGLOBALSETTINGS" Type="Boolean" Nullable="false" />
+          <Property Name="DIFFERENTEMAIL" Type="String" MaxLength="42" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="CREATEHISTORICALNAMECODE" Type="Byte" Nullable="false" />
+          <Property Name="CREATEHISTORICALNAME" Type="String" MaxLength="3" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NAMECODE" Type="Byte" Nullable="false" />
+          <Property Name="SIMILARADDRESSCODE" Type="Byte" Nullable="false" />
+          <Property Name="UNSIMILARADDRESSCODE" Type="Byte" Nullable="false" />
+          <Property Name="UNSIMILARADDRESS" Type="String" MaxLength="42" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWADDRESSENDDATECODE" Type="Byte" Nullable="false" />
+          <Property Name="NEWADDRESSPRIMARYCODE" Type="Byte" Nullable="false" />
+          <Property Name="BIRTHDATERULECODE" Type="Byte" Nullable="false" />
+          <Property Name="NAME" Type="String" MaxLength="42" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="SIMILARADDRESS" Type="String" MaxLength="63" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWADDRESSENDDATE" Type="String" MaxLength="30" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWADDRESSPRIMARY" Type="String" MaxLength="61" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="DIFFERENTPHONE" Type="String" MaxLength="42" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWPHONEENDDATE" Type="String" MaxLength="28" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWPHONEPRIMARY" Type="String" MaxLength="57" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWEMAILENDDATE" Type="String" MaxLength="36" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="NEWEMAILPRIMARY" Type="String" MaxLength="65" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="REQUESTSNOEMAIL" Type="Boolean" Nullable="false" />
+          <Property Name="BIRTHDATERULE" Type="String" MaxLength="17" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ROWFROMBATCHUI" Type="Boolean" Nullable="false" />
+          <Property Name="ORIGINAL_KEYNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ORIGINAL_FIRSTNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BATCHCONSTITUENTUPDATEADDRESSES" Relationship="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID" FromRole="BATCHCONSTITUENTUPDATE" ToRole="BATCHCONSTITUENTUPDATEADDRESS" />
+          <NavigationProperty Name="BATCHCONSTITUENTUPDATEEMAILADDRESSES" Relationship="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID" FromRole="BATCHCONSTITUENTUPDATE" ToRole="BATCHCONSTITUENTUPDATEEMAILADDRESS" />
+          <NavigationProperty Name="BATCHCONSTITUENTUPDATEPHONES" Relationship="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID" FromRole="BATCHCONSTITUENTUPDATE" ToRole="BATCHCONSTITUENTUPDATEPHONE" />
+        </EntityType>
+        <EntityType Name="BATCHCONSTITUENTUPDATEADDRESS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="BATCHCONSTITUENTUPDATEID" Type="Guid" Nullable="false" />
+          <Property Name="SEQUENCE" Type="Int32" Nullable="false" />
+          <Property Name="ADDRESSTYPECODEID" Type="Guid" />
+          <Property Name="COUNTRYID" Type="Guid" Nullable="false" />
+          <Property Name="ADDRESSBLOCK" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="CITY" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="STATEID" Type="Guid" />
+          <Property Name="POSTCODE" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="HISTORICALSTARTDATE" Type="DateTime" Precision="0" />
+          <Property Name="ISPRIMARY" Type="Boolean" Nullable="false" />
+          <Property Name="DONOTMAIL" Type="Boolean" Nullable="false" />
+          <Property Name="DONOTMAILREASONCODEID" Type="Guid" />
+          <Property Name="UPDATEHOUSEHOLD" Type="Boolean" Nullable="false" />
+          <Property Name="STARTDATE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="ENDDATE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="INFOSOURCECODEID" Type="Guid" />
+          <Property Name="COUNTYCODEID" Type="Guid" />
+          <Property Name="DPC" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CART" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LOT" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="REGIONCODEID" Type="Guid" />
+          <Property Name="CONGRESSIONALDISTRICTCODEID" Type="Guid" />
+          <Property Name="STATEHOUSEDISTRICTCODEID" Type="Guid" />
+          <Property Name="STATESENATEDISTRICTCODEID" Type="Guid" />
+          <Property Name="LOCALPRECINCTCODEID" Type="Guid" />
+          <Property Name="CERTIFICATIONDATA" Type="Int32" Nullable="false" />
+          <Property Name="LASTVALIDATIONATTEMPTDATE" Type="DateTime" Precision="0" />
+          <Property Name="OMITFROMVALIDATION" Type="Boolean" Nullable="false" />
+          <Property Name="VALIDATIONMESSAGE" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ADDRESSID" Type="Guid" />
+          <Property Name="INFOSOURCECOMMENTS" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="HISTORICALENDDATE" Type="DateTime" Precision="0" />
+          <Property Name="ISMANUALEXCEPTION" Type="Boolean" Nullable="false" />
+          <Property Name="MANUALEXCEPTIONSIMILARADDRESSID" Type="Guid" />
+          <Property Name="ROWORIGINCODE" Type="Byte" Nullable="false" />
+          <Property Name="ROWORIGIN" Type="String" MaxLength="129" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="BATCHCONSTITUENTUPDATE" Relationship="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID" FromRole="BATCHCONSTITUENTUPDATEADDRESS" ToRole="BATCHCONSTITUENTUPDATE" />
+        </EntityType>
+        <EntityType Name="BATCHCONSTITUENTUPDATEEMAILADDRESS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="BATCHCONSTITUENTUPDATEID" Type="Guid" Nullable="false" />
+          <Property Name="SEQUENCE" Type="Int32" Nullable="false" />
+          <Property Name="EMAILADDRESSTYPECODEID" Type="Guid" />
+          <Property Name="EMAILADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ISPRIMARY" Type="Boolean" Nullable="false" />
+          <Property Name="DONOTEMAIL" Type="Boolean" Nullable="false" />
+          <Property Name="UPDATEHOUSEHOLD" Type="Boolean" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="STARTDATE" Type="DateTime" Precision="0" />
+          <Property Name="ENDDATE" Type="DateTime" Precision="0" />
+          <Property Name="INFOSOURCECODEID" Type="Guid" />
+          <Property Name="EMAILADDRESSID" Type="Guid" />
+          <Property Name="ISMANUALEXCEPTION" Type="Boolean" Nullable="false" />
+          <Property Name="ROWORIGINCODE" Type="Byte" Nullable="false" />
+          <Property Name="ROWORIGIN" Type="String" MaxLength="129" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="BATCHCONSTITUENTUPDATE" Relationship="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID" FromRole="BATCHCONSTITUENTUPDATEEMAILADDRESS" ToRole="BATCHCONSTITUENTUPDATE" />
+        </EntityType>
+        <EntityType Name="BATCHCONSTITUENTUPDATEPHONE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="BATCHCONSTITUENTUPDATEID" Type="Guid" Nullable="false" />
+          <Property Name="SEQUENCE" Type="Int32" Nullable="false" />
+          <Property Name="PHONETYPECODEID" Type="Guid" />
+          <Property Name="NUMBER" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ISPRIMARY" Type="Boolean" Nullable="false" />
+          <Property Name="DONOTCALL" Type="Boolean" Nullable="false" />
+          <Property Name="UPDATEHOUSEHOLD" Type="Boolean" Nullable="false" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="COUNTRYID" Type="Guid" />
+          <Property Name="SEASONALSTARTDATE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="SEASONALENDDATE" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="STARTTIME" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="ENDTIME" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="STARTDATE" Type="DateTime" Precision="0" />
+          <Property Name="ENDDATE" Type="DateTime" Precision="0" />
+          <Property Name="INFOSOURCECODEID" Type="Guid" />
+          <Property Name="PHONEID" Type="Guid" />
+          <Property Name="ISMANUALEXCEPTION" Type="Boolean" Nullable="false" />
+          <Property Name="ROWORIGINCODE" Type="Byte" Nullable="false" />
+          <Property Name="ROWORIGIN" Type="String" MaxLength="129" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="BATCHCONSTITUENTUPDATE" Relationship="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID" FromRole="BATCHCONSTITUENTUPDATEPHONE" ToRole="BATCHCONSTITUENTUPDATE" />
+        </EntityType>
+        <Association Name="FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID">
+          <End Type="UMHSDataModel.BATCHCONSTITUENTUPDATE" Role="BATCHCONSTITUENTUPDATE" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UMHSDataModel.BATCHCONSTITUENTUPDATEADDRESS" Role="BATCHCONSTITUENTUPDATEADDRESS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BATCHCONSTITUENTUPDATE">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BATCHCONSTITUENTUPDATEADDRESS">
+              <PropertyRef Name="BATCHCONSTITUENTUPDATEID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID">
+          <End Type="UMHSDataModel.BATCHCONSTITUENTUPDATE" Role="BATCHCONSTITUENTUPDATE" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UMHSDataModel.BATCHCONSTITUENTUPDATEEMAILADDRESS" Role="BATCHCONSTITUENTUPDATEEMAILADDRESS" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BATCHCONSTITUENTUPDATE">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BATCHCONSTITUENTUPDATEEMAILADDRESS">
+              <PropertyRef Name="BATCHCONSTITUENTUPDATEID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID">
+          <End Type="UMHSDataModel.BATCHCONSTITUENTUPDATE" Role="BATCHCONSTITUENTUPDATE" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="UMHSDataModel.BATCHCONSTITUENTUPDATEPHONE" Role="BATCHCONSTITUENTUPDATEPHONE" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BATCHCONSTITUENTUPDATE">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BATCHCONSTITUENTUPDATEPHONE">
+              <PropertyRef Name="BATCHCONSTITUENTUPDATEID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="USR_UMHS_DATA">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="CONSTITUENTID" Type="Guid" Nullable="false" />
+          <Property Name="MRN" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CPISEQUENCE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FIRSTNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MIDDLENAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="NICKNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="KEYNAME" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="BIRTHDATE" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="AGE" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TITLECODEID" Type="Guid" />
+          <Property Name="TITLE2CODEID" Type="Guid" />
+          <Property Name="SUFFIXCODEID" Type="Guid" />
+          <Property Name="SUFFIX2CODEID" Type="Guid" />
+          <Property Name="INFOSOURCECODEID" Type="Guid" />
+          <Property Name="GENDERCODE" Type="Byte" Nullable="false" />
+          <Property Name="GENDER" Type="String" MaxLength="7" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ISDMINELIGIBLE" Type="Boolean" Nullable="false" />
+          <Property Name="DMINELIGIBLEREASONCODEID" Type="Guid" />
+          <Property Name="UMHSDATA_LASTPROCDATE" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="BATCHREVENUECONSTITUENT">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="EXISTINGCONSTITUENTID" Type="Guid" />
+          <Property Name="KEYNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="KEYNAMEPREFIX" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FIRSTNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MIDDLENAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MAIDENNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="NICKNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TITLECODEID" Type="Guid" />
+          <Property Name="SUFFIXCODEID" Type="Guid" />
+          <Property Name="GENDERCODE" Type="Byte" Nullable="false" />
+          <Property Name="GENDER" Type="String" MaxLength="7" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="BIRTHDATE" Type="String" Nullable="false" MaxLength="8" FixedLength="true" Unicode="false" />
+          <Property Name="ISORGANIZATION" Type="Boolean" Nullable="false" />
+          <Property Name="MARITALSTATUSCODEID" Type="Guid" />
+          <Property Name="INDUSTRYCODEID" Type="Guid" />
+          <Property Name="NUMEMPLOYEES" Type="Int32" Nullable="false" />
+          <Property Name="NUMSUBSIDIARIES" Type="Int32" Nullable="false" />
+          <Property Name="PARENTCORPID" Type="Guid" />
+          <Property Name="ADDRESSTYPECODEID" Type="Guid" />
+          <Property Name="DONOTMAIL" Type="Boolean" Nullable="false" />
+          <Property Name="COUNTRYID" Type="Guid" />
+          <Property Name="STATEID" Type="Guid" />
+          <Property Name="ADDRESSBLOCK" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="CITY" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="POSTCODE" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="PHONETYPECODEID" Type="Guid" />
+          <Property Name="NUMBER" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="EMAILADDRESSTYPECODEID" Type="Guid" />
+          <Property Name="EMAILADDRESS" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CURRENTAPPUSERID" Type="Guid" />
+          <Property Name="WEBADDRESS" Type="String" Nullable="false" MaxLength="2047" FixedLength="false" Unicode="true" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ISGROUP" Type="Boolean" Nullable="false" />
+          <Property Name="GIVESANONYMOUSLY" Type="Boolean" Nullable="false" />
+          <Property Name="GROUPTYPECODE" Type="Byte" Nullable="false" />
+          <Property Name="GROUPTYPE" Type="String" MaxLength="9" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="GROUPTYPEID" Type="Guid" />
+          <Property Name="GROUPDESCRIPTION" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="GROUPSTARTDATE" Type="DateTime" Precision="3" />
+          <Property Name="DPC" Type="String" Nullable="false" MaxLength="8" FixedLength="false" Unicode="true" />
+          <Property Name="CART" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="LOT" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="OMITFROMVALIDATION" Type="Boolean" Nullable="false" />
+          <Property Name="COUNTYCODEID" Type="Guid" />
+          <Property Name="CONGRESSIONALDISTRICTCODEID" Type="Guid" />
+          <Property Name="LASTVALIDATIONATTEMPTDATE" Type="DateTime" Precision="3" />
+          <Property Name="VALIDATIONMESSAGE" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="CERTIFICATIONDATA" Type="Int32" Nullable="false" />
+          <Property Name="DONOTMAILREASONCODEID" Type="Guid" />
+          <Property Name="NAMEFORMATFUNCTIONID" Type="Guid" />
+          <Property Name="DONOTCALL" Type="Boolean" Nullable="false" />
+          <Property Name="DONOTEMAIL" Type="Boolean" Nullable="false" />
+          <Property Name="NAME" Type="String" MaxLength="154" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="SITEID" Type="Guid" />
+          <Property Name="CONSTITUENTSECURITYGROUPID" Type="Guid" />
+          <Property Name="CONSTITUENCYCODEID" Type="Guid" />
+          <Property Name="INFOSOURCECODEID" Type="Guid" />
+          <Property Name="CLASSOF" Type="Int16" Nullable="false" />
+          <Property Name="NAMEFORMATS" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ORIGINAL_LASTNAME" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ORIGINAL_FIRSTNAME" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="USR_UMHS_PROVIDERS">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="CONSTITUENTID" Type="Guid" Nullable="false" />
+          <Property Name="DEPARTMENTID" Type="Guid" />
+          <Property Name="SUBDEPARTMENTID" Type="Guid" />
+          <Property Name="PROVIDERDRNUMBER" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ADMITDOCTORIND" Type="Boolean" Nullable="false" />
+          <Property Name="ATTENDDOCTORIND" Type="Boolean" Nullable="false" />
+          <Property Name="RESIDENTDOCTORIND" Type="Boolean" Nullable="false" />
+          <Property Name="CONSULTDOCTORIND" Type="Boolean" Nullable="false" />
+          <Property Name="PHONE" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ADDEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="CHANGEDBYID" Type="Guid" Nullable="false" />
+          <Property Name="DATEADDED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DATECHANGED" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TS" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TSLONG" Type="Int64" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="UMHSDATA_LASTPROCDATE" Type="DateTime" Precision="3" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="UMHSDataModelStoreContainer" CdmEntityContainer="UMHSDataEntities">
+          <EntitySetMapping Name="BATCHCONSTITUENTUPDATEs">
+            <EntityTypeMapping TypeName="UMHSDataModel.BATCHCONSTITUENTUPDATE">
+              <MappingFragment StoreEntitySet="BATCHCONSTITUENTUPDATE">
+                <ScalarProperty Name="ORIGINAL_FIRSTNAME" ColumnName="ORIGINAL_FIRSTNAME" />
+                <ScalarProperty Name="ORIGINAL_KEYNAME" ColumnName="ORIGINAL_KEYNAME" />
+                <ScalarProperty Name="ROWFROMBATCHUI" ColumnName="ROWFROMBATCHUI" />
+                <ScalarProperty Name="BIRTHDATERULE" ColumnName="BIRTHDATERULE" />
+                <ScalarProperty Name="REQUESTSNOEMAIL" ColumnName="REQUESTSNOEMAIL" />
+                <ScalarProperty Name="NEWEMAILPRIMARY" ColumnName="NEWEMAILPRIMARY" />
+                <ScalarProperty Name="NEWEMAILENDDATE" ColumnName="NEWEMAILENDDATE" />
+                <ScalarProperty Name="NEWPHONEPRIMARY" ColumnName="NEWPHONEPRIMARY" />
+                <ScalarProperty Name="NEWPHONEENDDATE" ColumnName="NEWPHONEENDDATE" />
+                <ScalarProperty Name="DIFFERENTPHONE" ColumnName="DIFFERENTPHONE" />
+                <ScalarProperty Name="NEWADDRESSPRIMARY" ColumnName="NEWADDRESSPRIMARY" />
+                <ScalarProperty Name="NEWADDRESSENDDATE" ColumnName="NEWADDRESSENDDATE" />
+                <ScalarProperty Name="SIMILARADDRESS" ColumnName="SIMILARADDRESS" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="BIRTHDATERULECODE" ColumnName="BIRTHDATERULECODE" />
+                <ScalarProperty Name="NEWADDRESSPRIMARYCODE" ColumnName="NEWADDRESSPRIMARYCODE" />
+                <ScalarProperty Name="NEWADDRESSENDDATECODE" ColumnName="NEWADDRESSENDDATECODE" />
+                <ScalarProperty Name="UNSIMILARADDRESS" ColumnName="UNSIMILARADDRESS" />
+                <ScalarProperty Name="UNSIMILARADDRESSCODE" ColumnName="UNSIMILARADDRESSCODE" />
+                <ScalarProperty Name="SIMILARADDRESSCODE" ColumnName="SIMILARADDRESSCODE" />
+                <ScalarProperty Name="NAMECODE" ColumnName="NAMECODE" />
+                <ScalarProperty Name="CREATEHISTORICALNAME" ColumnName="CREATEHISTORICALNAME" />
+                <ScalarProperty Name="CREATEHISTORICALNAMECODE" ColumnName="CREATEHISTORICALNAMECODE" />
+                <ScalarProperty Name="DIFFERENTEMAIL" ColumnName="DIFFERENTEMAIL" />
+                <ScalarProperty Name="USEGLOBALSETTINGS" ColumnName="USEGLOBALSETTINGS" />
+                <ScalarProperty Name="NEWEMAILPRIMARYCODE" ColumnName="NEWEMAILPRIMARYCODE" />
+                <ScalarProperty Name="NEWEMAILENDDATECODE" ColumnName="NEWEMAILENDDATECODE" />
+                <ScalarProperty Name="DIFFERENTEMAILCODE" ColumnName="DIFFERENTEMAILCODE" />
+                <ScalarProperty Name="NEWPHONEPRIMARYCODE" ColumnName="NEWPHONEPRIMARYCODE" />
+                <ScalarProperty Name="NEWPHONEENDDATECODE" ColumnName="NEWPHONEENDDATECODE" />
+                <ScalarProperty Name="DIFFERENTPHONECODE" ColumnName="DIFFERENTPHONECODE" />
+                <ScalarProperty Name="DOMANUALREVIEWFORAUTOMATCH" ColumnName="DOMANUALREVIEWFORAUTOMATCH" />
+                <ScalarProperty Name="REMOVESPOUSE" ColumnName="REMOVESPOUSE" />
+                <ScalarProperty Name="SPOUSE_RECIPROCALRECOGNITIONTYPECODEID" ColumnName="SPOUSE_RECIPROCALRECOGNITIONTYPECODEID" />
+                <ScalarProperty Name="SPOUSE_RECIPROCALSOFTCREDITMATCHFACTOR" ColumnName="SPOUSE_RECIPROCALSOFTCREDITMATCHFACTOR" />
+                <ScalarProperty Name="SPOUSE_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" ColumnName="SPOUSE_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" />
+                <ScalarProperty Name="SPOUSE_PRIMARYRECOGNITIONTYPECODEID" ColumnName="SPOUSE_PRIMARYRECOGNITIONTYPECODEID" />
+                <ScalarProperty Name="SPOUSE_PRIMARYSOFTCREDITMATCHFACTOR" ColumnName="SPOUSE_PRIMARYSOFTCREDITMATCHFACTOR" />
+                <ScalarProperty Name="SPOUSE_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" ColumnName="SPOUSE_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" />
+                <ScalarProperty Name="BUSINESS_EMAILADDRESSSTARTDATE" ColumnName="BUSINESS_EMAILADDRESSSTARTDATE" />
+                <ScalarProperty Name="BUSINESS_RECIPROCALRECOGNITIONTYPECODEID" ColumnName="BUSINESS_RECIPROCALRECOGNITIONTYPECODEID" />
+                <ScalarProperty Name="BUSINESS_RECIPROCALSOFTCREDITMATCHFACTOR" ColumnName="BUSINESS_RECIPROCALSOFTCREDITMATCHFACTOR" />
+                <ScalarProperty Name="BUSINESS_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" ColumnName="BUSINESS_RECIPROCALSOFTCREDITRELATIONSHIPEXISTS" />
+                <ScalarProperty Name="BUSINESS_PRIMARYRECOGNITIONTYPECODEID" ColumnName="BUSINESS_PRIMARYRECOGNITIONTYPECODEID" />
+                <ScalarProperty Name="BUSINESS_PRIMARYSOFTCREDITMATCHFACTOR" ColumnName="BUSINESS_PRIMARYSOFTCREDITMATCHFACTOR" />
+                <ScalarProperty Name="BUSINESS_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" ColumnName="BUSINESS_PRIMARYSOFTCREDITRELATIONSHIPEXISTS" />
+                <ScalarProperty Name="BUSINESS_PHONE_COUNTRYID" ColumnName="BUSINESS_PHONE_COUNTRYID" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="BUSINESS_POSTCODE" ColumnName="BUSINESS_POSTCODE" />
+                <ScalarProperty Name="BUSINESS_WEBADDRESS" ColumnName="BUSINESS_WEBADDRESS" />
+                <ScalarProperty Name="BUSINESS_STATEID" ColumnName="BUSINESS_STATEID" />
+                <ScalarProperty Name="BUSINESS_RECIPROCALTYPECODEID" ColumnName="BUSINESS_RECIPROCALTYPECODEID" />
+                <ScalarProperty Name="BUSINESS_RELATIONSHIPTYPECODEID" ColumnName="BUSINESS_RELATIONSHIPTYPECODEID" />
+                <ScalarProperty Name="BUSINESS_PHONETYPECODEID" ColumnName="BUSINESS_PHONETYPECODEID" />
+                <ScalarProperty Name="BUSINESS_PHONENUMBER" ColumnName="BUSINESS_PHONENUMBER" />
+                <ScalarProperty Name="BUSINESS_PARENTCORPID" ColumnName="BUSINESS_PARENTCORPID" />
+                <ScalarProperty Name="BUSINESS_NUMSUBSIDIARIES" ColumnName="BUSINESS_NUMSUBSIDIARIES" />
+                <ScalarProperty Name="BUSINESS_NUMEMPLOYEES" ColumnName="BUSINESS_NUMEMPLOYEES" />
+                <ScalarProperty Name="BUSINESS_NAME" ColumnName="BUSINESS_NAME" />
+                <ScalarProperty Name="BUSINESS_LOT" ColumnName="BUSINESS_LOT" />
+                <ScalarProperty Name="BUSINESS_LOOKUPID" ColumnName="BUSINESS_LOOKUPID" />
+                <ScalarProperty Name="BUSINESS_INDUSTRYCODEID" ColumnName="BUSINESS_INDUSTRYCODEID" />
+                <ScalarProperty Name="BUSINESS_EMAILADDRESSTYPECODEID" ColumnName="BUSINESS_EMAILADDRESSTYPECODEID" />
+                <ScalarProperty Name="BUSINESS_EMAILADDRESS" ColumnName="BUSINESS_EMAILADDRESS" />
+                <ScalarProperty Name="BUSINESS_DPC" ColumnName="BUSINESS_DPC" />
+                <ScalarProperty Name="BUSINESS_DONOTMAILREASONCODEID" ColumnName="BUSINESS_DONOTMAILREASONCODEID" />
+                <ScalarProperty Name="BUSINESS_DONOTMAIL" ColumnName="BUSINESS_DONOTMAIL" />
+                <ScalarProperty Name="BUSINESS_COUNTRYID" ColumnName="BUSINESS_COUNTRYID" />
+                <ScalarProperty Name="BUSINESS_CITY" ColumnName="BUSINESS_CITY" />
+                <ScalarProperty Name="BUSINESS_CART" ColumnName="BUSINESS_CART" />
+                <ScalarProperty Name="BUSINESS_ADDRESSTYPECODEID" ColumnName="BUSINESS_ADDRESSTYPECODEID" />
+                <ScalarProperty Name="BUSINESS_ADDRESSBLOCK" ColumnName="BUSINESS_ADDRESSBLOCK" />
+                <ScalarProperty Name="BUSINESS_ID" ColumnName="BUSINESS_ID" />
+                <ScalarProperty Name="SPOUSE_RECIPROCALTYPECODEID" ColumnName="SPOUSE_RECIPROCALTYPECODEID" />
+                <ScalarProperty Name="SPOUSE_RELATIONSHIPTYPECODEID" ColumnName="SPOUSE_RELATIONSHIPTYPECODEID" />
+                <ScalarProperty Name="SPOUSE_LOOKUPID" ColumnName="SPOUSE_LOOKUPID" />
+                <ScalarProperty Name="SPOUSE_GENDER" ColumnName="SPOUSE_GENDER" />
+                <ScalarProperty Name="SPOUSE_GENDERCODE" ColumnName="SPOUSE_GENDERCODE" />
+                <ScalarProperty Name="SPOUSE_BIRTHDATE" ColumnName="SPOUSE_BIRTHDATE" />
+                <ScalarProperty Name="SPOUSE_SUFFIXCODEID" ColumnName="SPOUSE_SUFFIXCODEID" />
+                <ScalarProperty Name="SPOUSE_LASTNAME" ColumnName="SPOUSE_LASTNAME" />
+                <ScalarProperty Name="SPOUSE_MAIDENNAME" ColumnName="SPOUSE_MAIDENNAME" />
+                <ScalarProperty Name="SPOUSE_MIDDLENAME" ColumnName="SPOUSE_MIDDLENAME" />
+                <ScalarProperty Name="SPOUSE_NICKNAME" ColumnName="SPOUSE_NICKNAME" />
+                <ScalarProperty Name="SPOUSE_FIRSTNAME" ColumnName="SPOUSE_FIRSTNAME" />
+                <ScalarProperty Name="SPOUSE_TITLECODEID" ColumnName="SPOUSE_TITLECODEID" />
+                <ScalarProperty Name="SPOUSE_ID" ColumnName="SPOUSE_ID" />
+                <ScalarProperty Name="MARITALSTATUSCODEID" ColumnName="MARITALSTATUSCODEID" />
+                <ScalarProperty Name="ORG_PARENTCORPID" ColumnName="ORG_PARENTCORPID" />
+                <ScalarProperty Name="ORG_NUMSUBSIDIARIES" ColumnName="ORG_NUMSUBSIDIARIES" />
+                <ScalarProperty Name="ORG_NUMEMPLOYEES" ColumnName="ORG_NUMEMPLOYEES" />
+                <ScalarProperty Name="ORG_INDUSTRYCODEID" ColumnName="ORG_INDUSTRYCODEID" />
+                <ScalarProperty Name="GROUPSTARTDATE" ColumnName="GROUPSTARTDATE" />
+                <ScalarProperty Name="GROUPDESCRIPTION" ColumnName="GROUPDESCRIPTION" />
+                <ScalarProperty Name="GROUPTYPEID" ColumnName="GROUPTYPEID" />
+                <ScalarProperty Name="PROSPECTMANAGERFUNDRAISERID" ColumnName="PROSPECTMANAGERFUNDRAISERID" />
+                <ScalarProperty Name="CONSTITUENT_SITEID" ColumnName="CONSTITUENT_SITEID" />
+                <ScalarProperty Name="DECEASEDDATE" ColumnName="DECEASEDDATE" />
+                <ScalarProperty Name="DECEASED" ColumnName="DECEASED" />
+                <ScalarProperty Name="WEBADDRESS" ColumnName="WEBADDRESS" />
+                <ScalarProperty Name="TITLECODEID" ColumnName="TITLECODEID" />
+                <ScalarProperty Name="SUFFIXCODEID" ColumnName="SUFFIXCODEID" />
+                <ScalarProperty Name="NICKNAME" ColumnName="NICKNAME" />
+                <ScalarProperty Name="MIDDLENAME" ColumnName="MIDDLENAME" />
+                <ScalarProperty Name="MAIDENNAME" ColumnName="MAIDENNAME" />
+                <ScalarProperty Name="LOOKUP_ID" ColumnName="LOOKUP_ID" />
+                <ScalarProperty Name="KEYNAME" ColumnName="KEYNAME" />
+                <ScalarProperty Name="GIVESANONYMOUSLY" ColumnName="GIVESANONYMOUSLY" />
+                <ScalarProperty Name="GENDER" ColumnName="GENDER" />
+                <ScalarProperty Name="GENDERCODE" ColumnName="GENDERCODE" />
+                <ScalarProperty Name="FIRSTNAME" ColumnName="FIRSTNAME" />
+                <ScalarProperty Name="BIRTHDATE" ColumnName="BIRTHDATE" />
+                <ScalarProperty Name="CONSTITUENTTYPE" ColumnName="CONSTITUENTTYPE" />
+                <ScalarProperty Name="CONSTITUENTTYPECODE" ColumnName="CONSTITUENTTYPECODE" />
+                <ScalarProperty Name="PRIMARYRECORDID" ColumnName="PRIMARYRECORDID" />
+                <ScalarProperty Name="SEQUENCE" ColumnName="SEQUENCE" />
+                <ScalarProperty Name="BATCHID" ColumnName="BATCHID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BATCHCONSTITUENTUPDATEADDRESSES">
+            <EntityTypeMapping TypeName="UMHSDataModel.BATCHCONSTITUENTUPDATEADDRESS">
+              <MappingFragment StoreEntitySet="BATCHCONSTITUENTUPDATEADDRESSES">
+                <ScalarProperty Name="ROWORIGIN" ColumnName="ROWORIGIN" />
+                <ScalarProperty Name="ROWORIGINCODE" ColumnName="ROWORIGINCODE" />
+                <ScalarProperty Name="MANUALEXCEPTIONSIMILARADDRESSID" ColumnName="MANUALEXCEPTIONSIMILARADDRESSID" />
+                <ScalarProperty Name="ISMANUALEXCEPTION" ColumnName="ISMANUALEXCEPTION" />
+                <ScalarProperty Name="HISTORICALENDDATE" ColumnName="HISTORICALENDDATE" />
+                <ScalarProperty Name="INFOSOURCECOMMENTS" ColumnName="INFOSOURCECOMMENTS" />
+                <ScalarProperty Name="ADDRESSID" ColumnName="ADDRESSID" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="VALIDATIONMESSAGE" ColumnName="VALIDATIONMESSAGE" />
+                <ScalarProperty Name="OMITFROMVALIDATION" ColumnName="OMITFROMVALIDATION" />
+                <ScalarProperty Name="LASTVALIDATIONATTEMPTDATE" ColumnName="LASTVALIDATIONATTEMPTDATE" />
+                <ScalarProperty Name="CERTIFICATIONDATA" ColumnName="CERTIFICATIONDATA" />
+                <ScalarProperty Name="LOCALPRECINCTCODEID" ColumnName="LOCALPRECINCTCODEID" />
+                <ScalarProperty Name="STATESENATEDISTRICTCODEID" ColumnName="STATESENATEDISTRICTCODEID" />
+                <ScalarProperty Name="STATEHOUSEDISTRICTCODEID" ColumnName="STATEHOUSEDISTRICTCODEID" />
+                <ScalarProperty Name="CONGRESSIONALDISTRICTCODEID" ColumnName="CONGRESSIONALDISTRICTCODEID" />
+                <ScalarProperty Name="REGIONCODEID" ColumnName="REGIONCODEID" />
+                <ScalarProperty Name="LOT" ColumnName="LOT" />
+                <ScalarProperty Name="CART" ColumnName="CART" />
+                <ScalarProperty Name="DPC" ColumnName="DPC" />
+                <ScalarProperty Name="COUNTYCODEID" ColumnName="COUNTYCODEID" />
+                <ScalarProperty Name="INFOSOURCECODEID" ColumnName="INFOSOURCECODEID" />
+                <ScalarProperty Name="ENDDATE" ColumnName="ENDDATE" />
+                <ScalarProperty Name="STARTDATE" ColumnName="STARTDATE" />
+                <ScalarProperty Name="UPDATEHOUSEHOLD" ColumnName="UPDATEHOUSEHOLD" />
+                <ScalarProperty Name="DONOTMAILREASONCODEID" ColumnName="DONOTMAILREASONCODEID" />
+                <ScalarProperty Name="DONOTMAIL" ColumnName="DONOTMAIL" />
+                <ScalarProperty Name="ISPRIMARY" ColumnName="ISPRIMARY" />
+                <ScalarProperty Name="HISTORICALSTARTDATE" ColumnName="HISTORICALSTARTDATE" />
+                <ScalarProperty Name="POSTCODE" ColumnName="POSTCODE" />
+                <ScalarProperty Name="STATEID" ColumnName="STATEID" />
+                <ScalarProperty Name="CITY" ColumnName="CITY" />
+                <ScalarProperty Name="ADDRESSBLOCK" ColumnName="ADDRESSBLOCK" />
+                <ScalarProperty Name="COUNTRYID" ColumnName="COUNTRYID" />
+                <ScalarProperty Name="ADDRESSTYPECODEID" ColumnName="ADDRESSTYPECODEID" />
+                <ScalarProperty Name="SEQUENCE" ColumnName="SEQUENCE" />
+                <ScalarProperty Name="BATCHCONSTITUENTUPDATEID" ColumnName="BATCHCONSTITUENTUPDATEID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BATCHCONSTITUENTUPDATEEMAILADDRESSES">
+            <EntityTypeMapping TypeName="UMHSDataModel.BATCHCONSTITUENTUPDATEEMAILADDRESS">
+              <MappingFragment StoreEntitySet="BATCHCONSTITUENTUPDATEEMAILADDRESSES">
+                <ScalarProperty Name="ROWORIGIN" ColumnName="ROWORIGIN" />
+                <ScalarProperty Name="ROWORIGINCODE" ColumnName="ROWORIGINCODE" />
+                <ScalarProperty Name="ISMANUALEXCEPTION" ColumnName="ISMANUALEXCEPTION" />
+                <ScalarProperty Name="EMAILADDRESSID" ColumnName="EMAILADDRESSID" />
+                <ScalarProperty Name="INFOSOURCECODEID" ColumnName="INFOSOURCECODEID" />
+                <ScalarProperty Name="ENDDATE" ColumnName="ENDDATE" />
+                <ScalarProperty Name="STARTDATE" ColumnName="STARTDATE" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="UPDATEHOUSEHOLD" ColumnName="UPDATEHOUSEHOLD" />
+                <ScalarProperty Name="DONOTEMAIL" ColumnName="DONOTEMAIL" />
+                <ScalarProperty Name="ISPRIMARY" ColumnName="ISPRIMARY" />
+                <ScalarProperty Name="EMAILADDRESS" ColumnName="EMAILADDRESS" />
+                <ScalarProperty Name="EMAILADDRESSTYPECODEID" ColumnName="EMAILADDRESSTYPECODEID" />
+                <ScalarProperty Name="SEQUENCE" ColumnName="SEQUENCE" />
+                <ScalarProperty Name="BATCHCONSTITUENTUPDATEID" ColumnName="BATCHCONSTITUENTUPDATEID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BATCHCONSTITUENTUPDATEPHONES">
+            <EntityTypeMapping TypeName="UMHSDataModel.BATCHCONSTITUENTUPDATEPHONE">
+              <MappingFragment StoreEntitySet="BATCHCONSTITUENTUPDATEPHONES">
+                <ScalarProperty Name="ROWORIGIN" ColumnName="ROWORIGIN" />
+                <ScalarProperty Name="ROWORIGINCODE" ColumnName="ROWORIGINCODE" />
+                <ScalarProperty Name="ISMANUALEXCEPTION" ColumnName="ISMANUALEXCEPTION" />
+                <ScalarProperty Name="PHONEID" ColumnName="PHONEID" />
+                <ScalarProperty Name="INFOSOURCECODEID" ColumnName="INFOSOURCECODEID" />
+                <ScalarProperty Name="ENDDATE" ColumnName="ENDDATE" />
+                <ScalarProperty Name="STARTDATE" ColumnName="STARTDATE" />
+                <ScalarProperty Name="ENDTIME" ColumnName="ENDTIME" />
+                <ScalarProperty Name="STARTTIME" ColumnName="STARTTIME" />
+                <ScalarProperty Name="SEASONALENDDATE" ColumnName="SEASONALENDDATE" />
+                <ScalarProperty Name="SEASONALSTARTDATE" ColumnName="SEASONALSTARTDATE" />
+                <ScalarProperty Name="COUNTRYID" ColumnName="COUNTRYID" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="UPDATEHOUSEHOLD" ColumnName="UPDATEHOUSEHOLD" />
+                <ScalarProperty Name="DONOTCALL" ColumnName="DONOTCALL" />
+                <ScalarProperty Name="ISPRIMARY" ColumnName="ISPRIMARY" />
+                <ScalarProperty Name="NUMBER" ColumnName="NUMBER" />
+                <ScalarProperty Name="PHONETYPECODEID" ColumnName="PHONETYPECODEID" />
+                <ScalarProperty Name="SEQUENCE" ColumnName="SEQUENCE" />
+                <ScalarProperty Name="BATCHCONSTITUENTUPDATEID" ColumnName="BATCHCONSTITUENTUPDATEID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="USR_UMHS_DATA">
+            <EntityTypeMapping TypeName="UMHSDataModel.USR_UMHS_DATA">
+              <MappingFragment StoreEntitySet="USR_UMHS_DATA">
+                <ScalarProperty Name="UMHSDATA_LASTPROCDATE" ColumnName="UMHSDATA_LASTPROCDATE" />
+                <ScalarProperty Name="DMINELIGIBLEREASONCODEID" ColumnName="DMINELIGIBLEREASONCODEID" />
+                <ScalarProperty Name="ISDMINELIGIBLE" ColumnName="ISDMINELIGIBLE" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="GENDER" ColumnName="GENDER" />
+                <ScalarProperty Name="GENDERCODE" ColumnName="GENDERCODE" />
+                <ScalarProperty Name="INFOSOURCECODEID" ColumnName="INFOSOURCECODEID" />
+                <ScalarProperty Name="SUFFIX2CODEID" ColumnName="SUFFIX2CODEID" />
+                <ScalarProperty Name="SUFFIXCODEID" ColumnName="SUFFIXCODEID" />
+                <ScalarProperty Name="TITLE2CODEID" ColumnName="TITLE2CODEID" />
+                <ScalarProperty Name="TITLECODEID" ColumnName="TITLECODEID" />
+                <ScalarProperty Name="AGE" ColumnName="AGE" />
+                <ScalarProperty Name="BIRTHDATE" ColumnName="BIRTHDATE" />
+                <ScalarProperty Name="KEYNAME" ColumnName="KEYNAME" />
+                <ScalarProperty Name="NICKNAME" ColumnName="NICKNAME" />
+                <ScalarProperty Name="MIDDLENAME" ColumnName="MIDDLENAME" />
+                <ScalarProperty Name="FIRSTNAME" ColumnName="FIRSTNAME" />
+                <ScalarProperty Name="CPISEQUENCE" ColumnName="CPISEQUENCE" />
+                <ScalarProperty Name="MRN" ColumnName="MRN" />
+                <ScalarProperty Name="CONSTITUENTID" ColumnName="CONSTITUENTID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BATCHREVENUECONSTITUENTs">
+            <EntityTypeMapping TypeName="UMHSDataModel.BATCHREVENUECONSTITUENT">
+              <MappingFragment StoreEntitySet="BATCHREVENUECONSTITUENT">
+                <ScalarProperty Name="ORIGINAL_FIRSTNAME" ColumnName="ORIGINAL_FIRSTNAME" />
+                <ScalarProperty Name="ORIGINAL_LASTNAME" ColumnName="ORIGINAL_LASTNAME" />
+                <ScalarProperty Name="NAMEFORMATS" ColumnName="NAMEFORMATS" />
+                <ScalarProperty Name="CLASSOF" ColumnName="CLASSOF" />
+                <ScalarProperty Name="INFOSOURCECODEID" ColumnName="INFOSOURCECODEID" />
+                <ScalarProperty Name="CONSTITUENCYCODEID" ColumnName="CONSTITUENCYCODEID" />
+                <ScalarProperty Name="CONSTITUENTSECURITYGROUPID" ColumnName="CONSTITUENTSECURITYGROUPID" />
+                <ScalarProperty Name="SITEID" ColumnName="SITEID" />
+                <ScalarProperty Name="NAME" ColumnName="NAME" />
+                <ScalarProperty Name="DONOTEMAIL" ColumnName="DONOTEMAIL" />
+                <ScalarProperty Name="DONOTCALL" ColumnName="DONOTCALL" />
+                <ScalarProperty Name="NAMEFORMATFUNCTIONID" ColumnName="NAMEFORMATFUNCTIONID" />
+                <ScalarProperty Name="DONOTMAILREASONCODEID" ColumnName="DONOTMAILREASONCODEID" />
+                <ScalarProperty Name="CERTIFICATIONDATA" ColumnName="CERTIFICATIONDATA" />
+                <ScalarProperty Name="VALIDATIONMESSAGE" ColumnName="VALIDATIONMESSAGE" />
+                <ScalarProperty Name="LASTVALIDATIONATTEMPTDATE" ColumnName="LASTVALIDATIONATTEMPTDATE" />
+                <ScalarProperty Name="CONGRESSIONALDISTRICTCODEID" ColumnName="CONGRESSIONALDISTRICTCODEID" />
+                <ScalarProperty Name="COUNTYCODEID" ColumnName="COUNTYCODEID" />
+                <ScalarProperty Name="OMITFROMVALIDATION" ColumnName="OMITFROMVALIDATION" />
+                <ScalarProperty Name="LOT" ColumnName="LOT" />
+                <ScalarProperty Name="CART" ColumnName="CART" />
+                <ScalarProperty Name="DPC" ColumnName="DPC" />
+                <ScalarProperty Name="GROUPSTARTDATE" ColumnName="GROUPSTARTDATE" />
+                <ScalarProperty Name="GROUPDESCRIPTION" ColumnName="GROUPDESCRIPTION" />
+                <ScalarProperty Name="GROUPTYPEID" ColumnName="GROUPTYPEID" />
+                <ScalarProperty Name="GROUPTYPE" ColumnName="GROUPTYPE" />
+                <ScalarProperty Name="GROUPTYPECODE" ColumnName="GROUPTYPECODE" />
+                <ScalarProperty Name="GIVESANONYMOUSLY" ColumnName="GIVESANONYMOUSLY" />
+                <ScalarProperty Name="ISGROUP" ColumnName="ISGROUP" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="WEBADDRESS" ColumnName="WEBADDRESS" />
+                <ScalarProperty Name="CURRENTAPPUSERID" ColumnName="CURRENTAPPUSERID" />
+                <ScalarProperty Name="EMAILADDRESS" ColumnName="EMAILADDRESS" />
+                <ScalarProperty Name="EMAILADDRESSTYPECODEID" ColumnName="EMAILADDRESSTYPECODEID" />
+                <ScalarProperty Name="NUMBER" ColumnName="NUMBER" />
+                <ScalarProperty Name="PHONETYPECODEID" ColumnName="PHONETYPECODEID" />
+                <ScalarProperty Name="POSTCODE" ColumnName="POSTCODE" />
+                <ScalarProperty Name="CITY" ColumnName="CITY" />
+                <ScalarProperty Name="ADDRESSBLOCK" ColumnName="ADDRESSBLOCK" />
+                <ScalarProperty Name="STATEID" ColumnName="STATEID" />
+                <ScalarProperty Name="COUNTRYID" ColumnName="COUNTRYID" />
+                <ScalarProperty Name="DONOTMAIL" ColumnName="DONOTMAIL" />
+                <ScalarProperty Name="ADDRESSTYPECODEID" ColumnName="ADDRESSTYPECODEID" />
+                <ScalarProperty Name="PARENTCORPID" ColumnName="PARENTCORPID" />
+                <ScalarProperty Name="NUMSUBSIDIARIES" ColumnName="NUMSUBSIDIARIES" />
+                <ScalarProperty Name="NUMEMPLOYEES" ColumnName="NUMEMPLOYEES" />
+                <ScalarProperty Name="INDUSTRYCODEID" ColumnName="INDUSTRYCODEID" />
+                <ScalarProperty Name="MARITALSTATUSCODEID" ColumnName="MARITALSTATUSCODEID" />
+                <ScalarProperty Name="ISORGANIZATION" ColumnName="ISORGANIZATION" />
+                <ScalarProperty Name="BIRTHDATE" ColumnName="BIRTHDATE" />
+                <ScalarProperty Name="GENDER" ColumnName="GENDER" />
+                <ScalarProperty Name="GENDERCODE" ColumnName="GENDERCODE" />
+                <ScalarProperty Name="SUFFIXCODEID" ColumnName="SUFFIXCODEID" />
+                <ScalarProperty Name="TITLECODEID" ColumnName="TITLECODEID" />
+                <ScalarProperty Name="NICKNAME" ColumnName="NICKNAME" />
+                <ScalarProperty Name="MAIDENNAME" ColumnName="MAIDENNAME" />
+                <ScalarProperty Name="MIDDLENAME" ColumnName="MIDDLENAME" />
+                <ScalarProperty Name="FIRSTNAME" ColumnName="FIRSTNAME" />
+                <ScalarProperty Name="KEYNAMEPREFIX" ColumnName="KEYNAMEPREFIX" />
+                <ScalarProperty Name="KEYNAME" ColumnName="KEYNAME" />
+                <ScalarProperty Name="EXISTINGCONSTITUENTID" ColumnName="EXISTINGCONSTITUENTID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="USR_UMHS_PROVIDERS">
+            <EntityTypeMapping TypeName="UMHSDataModel.USR_UMHS_PROVIDERS">
+              <MappingFragment StoreEntitySet="USR_UMHS_PROVIDERS">
+                <ScalarProperty Name="UMHSDATA_LASTPROCDATE" ColumnName="UMHSDATA_LASTPROCDATE" />
+                <ScalarProperty Name="TSLONG" ColumnName="TSLONG" />
+                <ScalarProperty Name="TS" ColumnName="TS" />
+                <ScalarProperty Name="DATECHANGED" ColumnName="DATECHANGED" />
+                <ScalarProperty Name="DATEADDED" ColumnName="DATEADDED" />
+                <ScalarProperty Name="CHANGEDBYID" ColumnName="CHANGEDBYID" />
+                <ScalarProperty Name="ADDEDBYID" ColumnName="ADDEDBYID" />
+                <ScalarProperty Name="PHONE" ColumnName="PHONE" />
+                <ScalarProperty Name="CONSULTDOCTORIND" ColumnName="CONSULTDOCTORIND" />
+                <ScalarProperty Name="RESIDENTDOCTORIND" ColumnName="RESIDENTDOCTORIND" />
+                <ScalarProperty Name="ATTENDDOCTORIND" ColumnName="ATTENDDOCTORIND" />
+                <ScalarProperty Name="ADMITDOCTORIND" ColumnName="ADMITDOCTORIND" />
+                <ScalarProperty Name="PROVIDERDRNUMBER" ColumnName="PROVIDERDRNUMBER" />
+                <ScalarProperty Name="SUBDEPARTMENTID" ColumnName="SUBDEPARTMENTID" />
+                <ScalarProperty Name="DEPARTMENTID" ColumnName="DEPARTMENTID" />
+                <ScalarProperty Name="CONSTITUENTID" ColumnName="CONSTITUENTID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,113 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="5c4e1faa-0853-4f4b-a8e5-4c8efc07e114" 
+	Name="MIMED subdepartment Edit Form"
+	Description="A data form for editing MIMED sub department records" 
+	Author="UM Dev"
+	DataFormInstanceID="abc7f65b-afa7-433a-92cd-246ff372762b" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Edit MIMED subdepartment"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Department.DataList" />
+
+  <SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSSUBDEPARTMENT">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+                create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSSUBDEPARTMENT
+                (
+                    @ID uniqueidentifier,
+                    @DATALOADED bit = 0 output,
+                    @TSLONG bigint = 0 output,
+                    @NAME nvarchar(100) = null output,
+                    @ISINACTIVE bit = null output
+                )
+                as
+                    set nocount on;
+                     
+                    set @DATALOADED = 0;
+                    set @TSLONG = 0;
+                     
+                    select
+                        @DATALOADED = 1,
+                        @NAME = NAME,
+                        @ISINACTIVE = ISINACTIVE,
+                        @TSLONG = TSLONG
+                    from
+                        dbo.USR_UMHS_SUBDEPARTMENT
+                    where
+                        ID = @ID;
+                     
+                    return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_EDIT_UMHSSUBDEPARTMENT">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+            create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_EDIT_UMHSSUBDEPARTMENT 
+            (
+	            @ID uniqueidentifier,
+                    @CHANGEAGENTID uniqueidentifier = null,
+                    @NAME nvarchar(100),
+                    @ISINACTIVE bit
+                )
+                as
+                    set nocount on;
+                                         
+                    declare @CURRENTDATE datetime;
+                     
+                    if @CHANGEAGENTID is null  
+                        exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+                         
+                    set @CURRENTDATE = getdate();
+                         
+                    begin try
+                        update
+                            dbo.USR_UMHS_SUBDEPARTMENT
+                        set
+                            NAME = @NAME,
+                            ISINACTIVE = @ISINACTIVE,
+                            DATECHANGED = @CURRENTDATE,
+                            CHANGEDBYID = @CHANGEAGENTID
+                        where 
+                            ID = @ID;
+                                      
+                    end try
+                    begin catch
+                        exec dbo.USP_RAISE_ERROR;
+                        return 1;
+                    end catch
+                             
+                    return 0;
+				]]>
+			</c:CreateProcedureSQL>
+      <ExpectedDBExceptions xmlns="bb_appfx_commontypes">
+        <Constraints>
+          <Constraint Name="CK_USR_UMHS_SUBDEPARTMENT_NAME" Field="NAME" Type="Unique">
+            <CustomErrorMsg>There is an existing sub department in this department with the same name.</CustomErrorMsg>
+          </Constraint>
+        </Constraints>
+      </ExpectedDBExceptions>
+		</SaveImplementation>
+
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+  
+  
+  <FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="NAME" Required="true" MaxLength="100" Caption="Name" CaptionResourceKey="$$name" />
+      <FormField FieldID="ISINACTIVE" DataType="Boolean" Caption="Inactive" CaptionResourceKey="$$inactive" />
+    </FormFields>
+    
+  </FormMetaData>
+
+</EditDataFormTemplateSpec>

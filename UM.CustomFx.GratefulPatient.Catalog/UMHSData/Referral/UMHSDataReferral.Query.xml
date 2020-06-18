@@ -1,0 +1,92 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="d2317a5e-dfdc-44a6-b4ed-d1d6a5d1636b"
+	Name="MIMED Referral Query"
+	Description="A view defined for querying on MIMED referral records"
+	Author="UM Dev"
+	IsRoot="true"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_UM_V_QUERY_UMHSDATAREFERRAL">
+		<ViewSQL>
+			<![CDATA[
+      
+        SELECT REF.[ID],
+                REF.UMHSID,
+                 --CONCAT(U.FIRSTNAME, ' ', U.KEYNAME)   PATIENT,
+                 RC.NAME                               REFERRER,
+                 USR_UMHS_REFERRERROLECODE.DESCRIPTION REFERRERROLE,
+                 REF.[REFERRALDATE],
+                 MEDSTAFF.NAME STAFFNAME,
+                 --REF.[UMHSDEVSTAFFASSIGNMENTDATE],
+                 REF.[DEPARTMENTID],
+                 REF.[SUBDEPARTMENTID],
+                 D.NAME as DEPARTMENTNAME,
+                 SD.NAME as SUBDEPARTMENTNAME,
+                 REF.FOLLOWUPCOMPLETED,
+                 REF.FOLLOWUPSTATUS,
+                 REF.[COMMENTS],
+                 [ADDEDBY].APPLICATIONNAME   AS [ADDEDBY_APPLICATION],
+                  [ADDEDBY].USERNAME          AS [ADDEDBY_USERNAME],
+                  [CHANGEDBY].APPLICATIONNAME AS [CHANGEDBY_APPLICATION],
+                  [CHANGEDBY].USERNAME        AS [CHANGEDBY_USERNAME],
+                  REF.DATEADDED,
+                  REF.DATECHANGED
+          FROM   USR_UMHS_REFERRAL REF
+                 --JOIN USR_UMHS_RELATIONSHIP C ON C.UMHSID = REF.UMHSID  -- C.ID = REF.UMHSDATACONNECTIONID
+                 LEFT jOIN USR_UMHS_DATA U ON U.ID = REF.UMHSID
+                 LEFT JOIN CONSTITUENT RC ON RC.ID = REF.REFERRERID
+                 LEFT JOIN CONSTITUENT MEDSTAFF ON MEDSTAFF.ID = REF.[UMHSDEVSTAFFID]
+                 LEFT JOIN DBO.USR_UMHS_REFERRERROLECODE ON REF.[REFERRERROLECODEID] = USR_UMHS_REFERRERROLECODE.ID
+                 LEFT JOIN USR_UMHS_DEPARTMENT D on D.[ID] = REF.[DEPARTMENTID]
+                 LEFT JOIN USR_UMHS_SUBDEPARTMENT SD on SD.[ID] = REF.[SUBDEPARTMENTID]
+                 LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON ADDEDBY.ID = REF.ADDEDBYID
+        LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON CHANGEDBY.ID = REF.CHANGEDBYID 		
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>		
+      <OutputFields>
+        <OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+        <OutputField Caption="MIMED ID"  Category="System Fields" Name="UMHSID" />
+        <OutputField Name="REFERRER" Caption="Referrer" DataType="Guid" />
+        <OutputField Name="REFERRERROLE" Caption="Referrer role" DataType="String" />
+        <OutputField Name="REFERRALDATE" Caption="Referral date" DataType="Date" />
+        <OutputField Name="STAFFNAME" Caption="MIMED Development staff" DataType="String" />
+        <OutputField Caption="DEPARTMENTID" Name="DEPARTMENTID" IsHidden="true" DataType="Guid" ></OutputField>
+        <OutputField Caption="SUBDEPARTMENTID" Name="SUBDEPARTMENTID" IsHidden="true" DataType="Guid"></OutputField>
+        <OutputField Caption="Referrer department" Name="DEPARTMENTNAME">
+          <LookupInfo IDField="DEPARTMENTID">
+            <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+            </SimpleDataList>
+          </LookupInfo>
+        </OutputField>
+        <OutputField Caption="Referrer subdepartment" Name="SUBDEPARTMENTNAME">
+          <LookupInfo IDField="SUBDEPARTMENTID">
+            <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+            </SimpleDataList>
+          </LookupInfo>
+        </OutputField>
+        <OutputField Name="FOLLOWUPCOMPLETED" Caption="Follow-up completed" />
+        <OutputField Name="FOLLOWUPSTATUS"  Caption="Follow-up status" />
+        <OutputField Name="COMMENTS" Caption="Comments" DataType="String" />
+        <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+        <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+        <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+        <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+        <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+        <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+      </OutputFields>		
+	</Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Referral"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

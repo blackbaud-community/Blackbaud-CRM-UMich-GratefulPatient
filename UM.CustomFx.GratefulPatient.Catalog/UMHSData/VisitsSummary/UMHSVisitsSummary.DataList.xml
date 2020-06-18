@@ -1,0 +1,160 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0d7c5842-9c2d-486c-a648-0643cde0bbd4" 
+	Name="MIMED Visits Summary Data List View"
+	Description="A data list showing umhs visists summary records for Auditing Views." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_USP_UMHS_UMHSVISITSSUMMARY_VIEW">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_USP_UMHS_UMHSVISITSSUMMARY_VIEW
+          (
+            @UMHSID uniqueidentifier = null,
+              --@MSG  NVARCHAR(100) = NULL OUTPUT,
+              @CURRENTAPPUSERID  uniqueidentifier
+          )
+         as 
+          select DISTINCT
+		      v.PROVIDERID,	  
+          p.PROVIDERDRNUMBER,
+          c.ID as CONSTITUENTID,
+          c.NAME as PROVIDERFULLNAME,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when s.ID is NOT null
+            then
+              s.NAME
+            else
+              N''
+          end as SUBDEPARTMENT --,
+		  ,(SELECT COUNT(PROVIDERID) FROM dbo.USR_UMHS_VISITS AS NUMBEROFVISITS 
+          inner join dbo.USR_UMHS_DATA d8a on d8a.ID = NUMBEROFVISITS.UMHSID
+          inner join dbo.USR_UMHS_PROVIDERS p on p.ID = NUMBEROFVISITS.PROVIDERID
+          inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+          left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = NUMBEROFVISITS.DEPARTMENTID
+          left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = NUMBEROFVISITS.SUBDEPARTMENTID
+          WHERE NUMBEROFVISITS.PROVIDERID = v.PROVIDERID and NUMBEROFVISITS.UMHSID =  @UMHSID --'D13308AC-355A-44C4-BAB0-E1CEC43BD33C'
+		  )
+    AS NUMBEROFVISITS  
+          --SUM() + 1 as NUMBEROFVISITS 
+      ,CASE WHEN (SELECT COUNT(VISITTYPE) FROM dbo.USR_UMHS_VISITS AS VT
+			inner join dbo.USR_UMHS_DATA d8a on d8a.ID = vt.UMHSID
+			inner join dbo.USR_UMHS_PROVIDERS p on p.ID = vt.PROVIDERID
+			inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+			left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = vt.DEPARTMENTID
+			left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = vt.SUBDEPARTMENTID
+			WHERE vt.PROVIDERID = v.PROVIDERID  and vt.UMHSID =  v.UMHSID and v.VISITTYPE <> vt.VISITTYPE) > 0 THEN 'Multiple'
+			ELSE 			
+				CASE WHEN VISITTYPE = 'I' THEN 'Inpatient'
+				WHEN VISITTYPE = 'O' THEN 'Outpatient'
+				WHEN ISNULL(VISITTYPE,'')='' THEN 'Unknown'
+			END
+		END as
+		  VISITTYPE
+      ,(SELECT MIN(VISITSTARTDATE) FROM USR_UMHS_VISITS sdt  
+		  inner join dbo.USR_UMHS_DATA d8a on d8a.ID = sdt.UMHSID
+			inner join dbo.USR_UMHS_PROVIDERS p on p.ID = sdt.PROVIDERID
+			inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+			left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = sdt.DEPARTMENTID
+			left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = sdt.SUBDEPARTMENTID
+		  WHERE sdt.PROVIDERID = v.PROVIDERID  and sdt.UMHSID =  v.UMHSID) as FIRSTCONTACTDATE
+		  ,(SELECT MAX(VISITENDDATE) FROM USR_UMHS_VISITS edt 
+		   inner join dbo.USR_UMHS_DATA d8a on d8a.ID = edt.UMHSID
+			inner join dbo.USR_UMHS_PROVIDERS p on p.ID = edt.PROVIDERID
+			inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+			left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = edt.DEPARTMENTID
+			left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = edt.SUBDEPARTMENTID 
+		  WHERE edt.PROVIDERID = v.PROVIDERID  and edt.UMHSID =  v.UMHSID) as MOSTRECENTDATE
+
+      from dbo.USR_UMHS_VISITS v
+      inner join dbo.USR_UMHS_DATA d8a on d8a.ID = v.UMHSID
+      inner join dbo.USR_UMHS_PROVIDERS p on p.ID = v.PROVIDERID
+      inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+      left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID = v.DEPARTMENTID
+      left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID = v.SUBDEPARTMENTID
+	  where v.UMHSID =  @UMHSID
+    
+    /* --Audit code start */
+	              DECLARE @USERNAME VARCHAR(100)
+	              DECLARE @DISPLAYNAME VARCHAR(100)
+	              DECLARE @NAME VARCHAR(200)
+	              DECLARE @EVENTMESSAGE VARCHAR(1000)
+	              DECLARE @PID VARCHAR(100)
+	              DECLARE @PATIENTONLY BIT
+	              DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	              SELECT @USERNAME = USERNAME
+	                           ,@DISPLAYNAME = DISPLAYNAME
+		              FROM APPUSER 
+	              WHERE ID = @CURRENTAPPUSERID
+  	              SELECT @NAME = NAME
+	                           ,@PID = LOOKUPID
+	                            FROM CONSTITUENT
+	              inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		               WHERE gp.ID = @UMHSID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='c912b1cd-cbc9-41d4-ae73-f7be642a6087' --MIMED Visists Summary subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @UMHSID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              --set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+    
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+
+  <!-- describe any parameters (other than the context ID) defined on the SP
+	<Parameters>
+		<FormMetaData xmlns="bb_appfx_commontypes">
+			<FormFields>
+				<FormField FieldID="PARAMETER1" Caption="Paramter1" DataType="REPLACE_WITH_DATATYPE"/>
+			</FormFields>
+		</FormMetaData>
+	</Parameters>-->
+
+	<!-- define the output fields in the list -->
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" IsHidden="true" />
+      <OutputField FieldID="CONSTITUENTID" Caption="Constituent ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="PROVIDERFULLNAME" Caption="Provider full name" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="DEPARTMENT" Caption="Provider department" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="SUBDEPARTMENT" Caption="Provider subdepartment" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="NUMBEROFVISITS" Caption="Number of visits" DataType="Integer" IsHidden="true"/>
+      <OutputField FieldID="PROVIDERID" Caption="PROVIDERID" DataType="Guid" IsHidden="true" />
+      <OutputField FieldID="VISITTYPE" Caption="Visit Type" DataType="String" IsHidden="true"/>
+      <OutputField FieldID="FIRSTCONTACTDATE" Caption="First contact date" DataType="Date" IsHidden="true"/>
+      <OutputField FieldID="MOSTRECENTDATE" Caption="Most recent date" DataType="Date" IsHidden="true"/>
+    </OutputFields>
+  </Output>
+</DataListSpec>

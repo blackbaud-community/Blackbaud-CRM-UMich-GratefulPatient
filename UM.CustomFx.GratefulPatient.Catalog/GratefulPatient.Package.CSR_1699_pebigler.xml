@@ -1,0 +1,15 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="1771CF35-AED5-4A61-85AE-753CB02933CE"
+    Name="Package for CSR-DRT-1699_peb"
+    Description="CSR-DRT-1699_peb: Fix for properly setting time portion on the UMHSDATA_LASTPROCDATE field on a MIMED Contact (INC1544899)"
+    Author="UM Dev"
+    >
+
+	<c:DependencyList>
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_EDIT_INDIVIDUAL.xml" />
+  </c:DependencyList>
+
+</PackageSpec>

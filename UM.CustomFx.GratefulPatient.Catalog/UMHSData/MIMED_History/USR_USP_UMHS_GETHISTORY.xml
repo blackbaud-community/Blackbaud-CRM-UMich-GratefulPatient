@@ -1,0 +1,159 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="f68c4da2-60e8-47e8-b607-f48f1659034e"
+	Name="USR_USP_UMHS_GETHISTORY"
+	Description="USR_USP_UMHS_GETHISTORY"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_GETHISTORY"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+CREATE procedure dbo.USR_USP_UMHS_GETHISTORY
+			(
+			--declare 
+				@UMHSID uniqueidentifier, -- = '2FC48B50-2886-4484-A190-18F1658C4B5C',
+				@CONSTITUENTID uniqueidentifier,
+				@USERID uniqueidentifier,
+				@ACTIONTYPECODE tinyint = 0,
+				@STARTDATE datetime,
+				@ENDDATE datetime,
+				@RECORDTYPECODE tinyint = 0
+			) as
+				set nocount on;
+				
+				declare @UMHSDATEADDED datetime;
+				select
+					@UMHSDATEADDED = DATEADDED
+				from dbo.USR_UMHS_DATA
+				where ID = @UMHSID;
+
+				declare @USERNAME nvarchar(128);
+				if not @USERID is null
+					select 
+						@USERNAME = USERNAME 
+					from dbo.APPUSER 
+					where APPUSER.ID = @USERID;
+				else
+					set @USERNAME = '';
+				
+				declare @TEMP table
+				(
+					RECORDID uniqueidentifier,
+					AUDITDATE datetime,
+					CHANGEDBYUSER nvarchar(128),
+					PROCESS nvarchar(255),
+					FIELD nvarchar(128),
+					OLD nvarchar(4000),
+					NEW nvarchar(4000),
+					SEQUENCE int,
+					ACTION nvarchar(8),
+					CHANGEDBYAPP nvarchar(200)
+				)
+				
+				set @CONSTITUENTID = (select CONSTITUENTID from USR_UMHS_DATA where ID = @UMHSID)
+				--MIMED data information 
+				if @RECORDTYPECODE = 0 or @RECORDTYPECODE = 1
+				begin
+					-- Get the insert into the USR_UMHS_DATA table
+					if @ACTIONTYPECODE = 0 or @ACTIONTYPECODE = 1
+						insert into @TEMP(RECORDID, AUDITDATE, ACTION, FIELD, OLD, NEW, CHANGEDBYUSER, PROCESS, CHANGEDBYAPP, SEQUENCE)
+							select 
+								RECORDID,
+								DATEADDED,
+								'Insert' as [ACTION],
+								FIELD,
+								OLD,
+								NEW,
+								CHANGEDBYUSER,
+								PROCESS,
+								CHANGEDBYAPP,
+								-1 as [SEQUENCE]					
+							from dbo.UFN_AUDIT_GETINSERTS_FORTABLE('USR_UMHS_DATA', 'ID', @UMHSID, 0, null)
+							where (@USERID is null or CHANGEDBYUSER = @USERNAME)
+								and (@STARTDATE is null or DATEADDED >= @STARTDATE)
+								and (@ENDDATE is null or DATEADDED <= @ENDDATE)
+					
+					-- Get updates to the MIMED data table
+					insert into @TEMP(RECORDID, AUDITDATE, ACTION, FIELD, OLD, NEW, CHANGEDBYUSER, PROCESS, CHANGEDBYAPP, SEQUENCE)
+						select
+							@UMHSID as [RECORDID],
+							[CHANGES].DATECHANGED,
+							'Update' as [ACTION],
+							[DETAIL].FIELD,
+							[DETAIL].OLD,
+							[DETAIL].NEW,
+							[CHANGES].CHANGEDBYUSER,
+							'' as [PROCESS],
+							[CHANGES].CHANGEDBYAPP,
+							0 as [SEQUENCE]
+						from dbo.UFN_AUDIT_GETRECENTCHANGES_FORTABLE('USR_UMHS_DATA', 500, null, null, 0, 1, 0, null, null, @UMHSID) as [CHANGES]
+						cross apply dbo.UFN_AUDIT_GETDETAIL('USR_UMHS_DATAAUDIT', [CHANGES].AUDITKEY, @UMHSID ) as [DETAIL]					
+						where( [DETAIL].FIELD <> 'DATECHANGED' and [DETAIL].FIELD <> 'CHANGEDBYID' and [DETAIL].FIELD <> 'ADDEDBYID' and [DETAIL].FIELD <> 'DATEADDED')
+							and (@USERID is null or CHANGEDBYUSER = @USERNAME)
+							and (@ACTIONTYPECODE = 0 or @ACTIONTYPECODE = 2)
+							and (@STARTDATE is null or [CHANGES].DATECHANGED >= @STARTDATE)
+							and (@ENDDATE is null or [CHANGES].DATECHANGED <= @ENDDATE)
+				end
+
+									
+				--- Get changes to application user information
+				if @RECORDTYPECODE = 0 or @RECORDTYPECODE = 4
+					insert into @TEMP(RECORDID, AUDITDATE, ACTION, FIELD, OLD, NEW, CHANGEDBYUSER, PROCESS, CHANGEDBYAPP, SEQUENCE)
+					select 
+						RECORDID,
+						AUDITDATE,
+						ACTION,
+						FIELD,
+						OLD,
+						NEW,
+						CHANGEDBYUSER,
+						PROCESS,
+						CHANGEDBYAPP,
+						30 as [SEQUENCE]					
+					from dbo.USR_UFN_UMHSHISTORY_APPUSER_AUDIT(@UMHSID, @CONSTITUENTID, @UMHSDATEADDED, @ACTIONTYPECODE) 
+					where (@USERID is null or CHANGEDBYUSER = @USERNAME)
+						and (@STARTDATE is null or AUDITDATE >= @STARTDATE)
+						and (@ENDDATE is null or AUDITDATE <= @ENDDATE)
+					
+				-- Get changes to tables related to constituent
+				insert into @TEMP(RECORDID, AUDITDATE, ACTION, FIELD, OLD, NEW, CHANGEDBYUSER, PROCESS, CHANGEDBYAPP, SEQUENCE)
+					select
+						RECORDID,
+						AUDITDATE,
+						ACTION,
+						FIELD,
+						OLD,
+						NEW,
+						CHANGEDBYUSER,
+						PROCESS,
+						CHANGEDBYAPP,
+						SEQUENCE					
+					from dbo.USR_UFN_UMHSHISTORY_UMHSCHILDTABLES_RECORDTYPE_AUDIT(@UMHSID, @UMHSDATEADDED, @ACTIONTYPECODE, @RECORDTYPECODE)
+					where (@USERID is null or CHANGEDBYUSER = @USERNAME)
+						and (@STARTDATE is null or AUDITDATE >= @STARTDATE)
+						and (@ENDDATE is null or AUDITDATE <= @ENDDATE);
+				
+				select 
+					RECORDID, 
+					AUDITDATE, 
+					case when ACTION = 'Insert' then 'Add' when ACTION = 'Update' then 'Edit' else ACTION end as [ACTION], 
+					FIELD, 
+					case when FIELD = 'SSN' then '***-**-****' else OLD end ValueBefore, 
+					case when FIELD = 'SSN' then '***-**-****' else NEW end ValueAfter, 
+					CHANGEDBYUSER, 
+					PROCESS, 
+					CHANGEDBYAPP, 
+					SEQUENCE,
+					case when ACTION = 'Delete' then 0 when ACTION = 'Update' then 1 else 2 end as [ACTIONSORT]
+				from
+					@TEMP
+				where
+					FIELD <> 'SSNINDEX'
+				order by
+					AUDITDATE, [ACTIONSORT] asc, SEQUENCE asc, RECORDID, FIELD;
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

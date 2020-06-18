@@ -1,0 +1,68 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="389f45e8-b1f7-47f8-96a7-0d52d8ac8f12"
+	Name="MIMED Interaction Participant Query"
+	Description="A view defined for querying on MIMED interaction participant records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSINTERACTIONPARTICIPANT">
+		<ViewSQL>
+			<![CDATA[
+      SELECT IP.ID,
+             
+             IP.INTERACTIONID,
+             IP.CONSTITUENTID,             
+             IP.DATEADDED,
+             IP.DATECHANGED,
+             ADDEDBY.APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             ADDEDBY.USERNAME          AS ADDEDBY_USERNAME,
+             CHANGEDBY.APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             CHANGEDBY.USERNAME        AS CHANGEDBY_USERNAME
+      FROM   DBO.USR_UMHS_INTERACTIONPARTICIPANT IP
+             LEFT OUTER JOIN DBO.CHANGEAGENT ADDEDBY ON ADDEDBY.ID = IP.ADDEDBYID
+             LEFT OUTER JOIN DBO.CHANGEAGENT CHANGEDBY ON CHANGEDBY.ID = IP.CHANGEDBYID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Caption="System Record ID" Name="ID" Category="System Fields"/>
+      <OutputField Caption="Interaction Record ID" Name="INTERACTIONID" Category="System Fields"  />
+      <OutputField Caption="Constituent Record ID" Name="CONSTITUENTID" Category="System Fields" />
+      <OutputField Caption="Date added" Category="System Fields" Name="DATEADDED"/>
+      <OutputField Caption="Date changed" Category="System Fields" Name="DATECHANGED" />
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" Category="System Fields" >
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="37E3E458-AF0D-4dbc-8A18-A93885521A42" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" Category="System Fields" >
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="CEA15E1C-E455-41be-9ECF-6B5453FA96A4" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" Category="System Fields" >
+      <LookupInfo>
+          <SimpleDataList SimpleDataListID="37E3E458-AF0D-4dbc-8A18-A93885521A42" />
+        </LookupInfo></OutputField>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" Category="System Fields"  >
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="CEA15E1C-E455-41be-9ECF-6B5453FA96A4" />
+        </LookupInfo>
+      </OutputField>
+    </OutputFields>
+  </Output>
+  <RelationshipOperations>
+    <AddRelatedView RelatedView="V_QUERY_CONSTITUENT" RelatedField="ID" Field="CONSTITUENTID" PathAlias="Participants" DisplayAliasResourceKey="$$participants" />
+    <!--<AddRelatedView RelatedView="USR_V_QUERY_UMHS_DATA" RelatedField="ID" Field="UMHSID" PathAlias="Participants" DisplayAliasResourceKey="$$participants" />-->
+  </RelationshipOperations>
+</QueryViewSpec>

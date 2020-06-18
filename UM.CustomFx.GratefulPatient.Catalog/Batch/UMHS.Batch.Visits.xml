@@ -1,0 +1,92 @@
+﻿<BatchTypeSpec
+	xmlns="bb_appfx_batchtype"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="39affd79-fb8e-4ab5-acc6-9615eaf7b0d7" 
+	Name="MIMED Visits Data Batch"
+	Description="A batch type for adding MIMED Data Visits records" 
+	Author="UM Dev"
+	BaseTableName="USR_UMHS_BATCH_VISITS" 
+	Category="MIMED Data" 
+	>
+  
+  <c:DependencyList>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.Visits.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Visits.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.Visits.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.Visits.RecordOperation.xml"/>
+  </c:DependencyList>
+  
+	<!-- indicate the form used to add a row to the batch (note that this is the template ID, not the instance ID) -->
+	<AddRowDataFormTemplate CatalogItemID="3e487fe5-26fd-4fd4-947c-bd5dd086b57a" />
+
+  <!-- indicate the form used to edit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<EditRowDataFormTemplate CatalogItemID="60d56531-4a2e-4d41-b9ac-f28bed2f3a0d" />
+
+	<!-- indicate the form used to commit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<CommitRowDataForms>
+		<CommitRowAddDataFormTemplate CatalogItemID="aa5ea87d-cf7f-4234-be7b-2d9cc41476a6" />
+  </CommitRowDataForms>
+	
+	<!-- Record operation to delete a row from the UMHS (Visits) batch -->
+	<BatchDeleteRowRecordOperation CatalogItemID="19c2e0d1-e391-471b-83d7-526e8b0902e9" />
+
+  <!-- Record operation to delete a UMHS (Visits) Batch -->
+  <DeleteBatchRecordOperation CatalogItemID="35975872-5e8f-4100-8f5e-ae90783d60d4"/>
+
+  <!--
+  <DefaultSelectedFields>
+    <Field>PROVIDERID</Field>
+    <Field>CONSTITUENTID</Field>
+    <Field>PROVIDERDRNUMBER</Field>
+    <Field>UMEMPLID</Field>
+    <Field>UMUNIQUENAME</Field>
+    <Field>LASTNAME</Field>
+    <Field>FIRSTNAME</Field>
+  </DefaultSelectedFields>
+  -->
+  
+  <!-- optionally, you can override the default 'batch delete' behavior by specifying the record operation to use deleting a batch of this type -->
+	<!--<DeleteBatchRecordOperation CatalogItemID="REPLACE_WITH_RECORDOPERATIONID" />-->
+
+	<!-- optionally, describe the batch row context window -->
+	<!--<RowContextWindow Caption="REPLACE_WITH_CAPTION" 
+				      ViewDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  EditDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  ImageKey="REPLACE_WITH_IMAGEKEY" 
+					  RecordType="REPLACE_WITH_RECORDTYPE" 
+					  ContextFieldID="REPLACE_WITH_CONTEXTFIELDID" 
+					  />-->
+
+	<!-- optionally, you can indicate a report to use as the validation report for the batch -->
+	<!--<ValidationReport CatalogItemID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe a control report for batches of this type -->
+	<!--<ControlReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				   QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+				   ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe an exception report for batches of this type -->
+	<!--<ExceptionReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				     QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+					 ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe the client-side summary panel for batches of this type.  This should refer to a class that inherits 
+	from Browser.Batch.BatchSummaryPanelHandler -->
+	<!--<SummaryPanelHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />-->
+
+	<!-- optionally, list any client-side event handlers that will be plugged into the event model for the batch data entry form.  Each handler
+	refers to a class that inherits from Browser.Batch.BatchEntryHandler -->
+	<!--<EventHandlers>
+		<BatchEventHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />
+	</EventHandlers>-->
+
+	<!-- optionally, indicate a list of fields from the Add/Edit form that should be included by default in the batch design.  This list
+	does not need to include required or hidden fields, as they are already included by default.	
+	-->
+	<!--<DefaultSelectedFields>
+		<Field>FIELD1</Field>
+		<Field>FIELD2</Field>
+		<Field>FIELD3</Field>
+	</DefaultSelectedFields>-->
+
+</BatchTypeSpec>

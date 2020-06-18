@@ -1,0 +1,30 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9aa99a66-4332-4604-b249-fac251c7dbaf"
+	Name="Deleted MIMED Contacts and Friend (shell) records"
+	Description="Records the statistics of the deletion of matched MIMED Contact and Friend (shell) records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <GuidField Description="ID to the Match Set" Name="MATCHSETID" Required="true" IsUnique="true"/>
+    <NumberField Description="Count of MIMED Friend (shell) records that were deleted" Name="MIMEDFRIENDRECORDS" Type="int" DefaultValue="0" />
+    <NumberField Description="Count of MIMED Contact records that were deleted who were linked to DART constituents" Name="MIMEDUMHSDATARECORDS" Type="int" DefaultValue="0" />
+    <ComputedColumnField Description="Status" Name="STATUS" Expression="CASE WHEN NULLIF(ISNULL(MESSAGE, N''), N'') IS NULL THEN N'Success' ELSE N'Error' END" />
+    <TextField Description="Message" Name="MESSAGE" Length="4000" DefaultValue="" />
+	</Fields>
+
+	<!-- define any indexes on the table -->
+	<Indexes>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="MATCHSETID"/>
+      </IndexFields>
+    </Index>
+	</Indexes>
+		
+</TableSpec>

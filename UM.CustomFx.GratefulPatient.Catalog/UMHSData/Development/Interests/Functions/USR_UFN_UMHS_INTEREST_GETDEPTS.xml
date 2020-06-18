@@ -1,0 +1,25 @@
+﻿<SQLFunctionSpec 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="bb_appfx_sqlfunction" 
+  ID="50CBD11D-5F72-4566-AB29-1D3D2147ECDE" 
+  Name="USR_UFN_UMHS_INTEREST_GETDEPTS" 
+  Description="retrieves that MIMED interest departments subdepartments" 
+  Author="UM Dev" 
+  DBFunctionName="USR_UFN_UMHS_INTEREST_GETDEPTS">
+  <CreateFunctionSQL>
+    <![CDATA[
+    CREATE FUNCTION DBO.USR_UFN_UMHS_INTEREST_GETDEPTS (@INTERESTID UNIQUEIDENTIFIER)
+    RETURNS TABLE
+    AS
+        RETURN
+          (SELECT ID,
+                  DEPARTMENTID,
+                  SUBDEPARTMENTID
+           FROM   DBO.USR_UMHS_INTERESTDEPTSUBDEPT
+           WHERE  INTERESTID = @INTERESTID)
+                   
+    ]]>
+  </CreateFunctionSQL>
+  <CreateChildCollectionFunction RootElementName="DEPARTMENTS" BaseTableName="USR_UMHS_INTERESTDEPTSUBDEPT" ParentIDColumn="INTERESTID" />
+</SQLFunctionSpec>

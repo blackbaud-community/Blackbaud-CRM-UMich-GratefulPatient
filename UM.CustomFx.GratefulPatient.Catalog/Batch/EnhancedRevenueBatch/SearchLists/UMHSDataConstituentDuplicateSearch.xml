@@ -1,0 +1,528 @@
+﻿<SearchListSpec xmlns:c="bb_appfx_commontypes"
+                xmlns="bb_appfx_searchlist"
+                ID="60DCA9C9-9C1A-4F50-B255-EF0EB1414779"
+                Name="Revenue Batch MIMED Duplicate Constituent Search"
+                Description="Search for Duplicate MIMED Constituents in Revenue Batch."
+                Author="UM Dev"
+                RecordType="Revenue"
+                TranslationFunctionID="ec1bc00b-fc28-435a-a6ad-07938211558f"
+                NameResourceKey="$$revenue_batch_duplicate_constituent_search"
+                HelpKey="DATABatchDedupe.html"
+                c:SecurityUIFolder="Revenue\Batch"
+                DetailViewFormInstanceId="00000000-0000-0000-0000-000000000000"
+>
+  <c:InstalledProductList>
+    <c:InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <c:InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+  </c:InstalledProductList>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Fundraising.Catalog.dll" ClassName="Blackbaud.AppFx.Fundraising.Catalog.RevenueBatchDuplicateConstituent.Search" />
+  <SPSearchList SPName="USR_UMHS_USP_SEARCHLIST_REVENUEBATCHDUPLICATECONSTITUENT">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+      CREATE PROCEDURE DBO.USR_UMHS_USP_SEARCHLIST_REVENUEBATCHDUPLICATECONSTITUENT (@CONSTITUENTID          UNIQUEIDENTIFIER = NULL,
+                                                                                     @CONSTITUENTLOOKUPID    UNIQUEIDENTIFIER = NULL,
+                                                                                     @NEWCONSTITUENT         XML = NULL,
+                                                                                     @MAXROWS                SMALLINT = 500,
+                                                                                     @OVERALLMATCHTHRESHOLD  DECIMAL(20, 4) = NULL,
+                                                                                     @AUTOMATCHTHRESHOLD     DECIMAL(20, 4) = NULL,
+                                                                                     @EDITCONSTITUENTCONTEXT NVARCHAR(110) = NULL,
+                                                                                     @CURRENTAPPUSERID       UNIQUEIDENTIFIER = NULL,
+                                                                                     @BATCHID                UNIQUEIDENTIFIER = NULL)
+      AS
+          SET NOCOUNT ON
+
+          DECLARE @NAME              NVARCHAR(100),
+                  @KEYNAME           NVARCHAR(100),
+                  @FIRSTNAME         NVARCHAR(50),
+                  @POSTCODE          NVARCHAR(12),
+                  @ADDRESSBLOCK      NVARCHAR(150),
+                  @ISORGANIZATION    BIT,
+                  @ISGROUP           BIT,
+                  @TITLECODEID       UNIQUEIDENTIFIER,
+                  @MIDDLENAME        NVARCHAR(50),
+                  @SUFFIXCODEID      UNIQUEIDENTIFIER,
+                  @COUNTRYID         UNIQUEIDENTIFIER,
+                  @EMAILADDRESS      NVARCHAR(100),
+                  @PHONENUMBER       NVARCHAR(100),
+                  @ADDRESSTYPECODEID UNIQUEIDENTIFIER,
+                  @PHONETYPECODEID   UNIQUEIDENTIFIER,
+                  @EMAILTYPECODEID   UNIQUEIDENTIFIER
+
+          IF ( @CONSTITUENTID IS NULL AND @CONSTITUENTLOOKUPID IS NULL )
+            BEGIN
+                SELECT @NAME = LASTNAME,
+                       @KEYNAME = LASTNAME,
+                       @FIRSTNAME = FIRSTNAME,
+                       @POSTCODE = ADDRESS_POSTCODE,
+                       @ADDRESSBLOCK = ADDRESS_ADDRESSBLOCK,
+                       @ISORGANIZATION = ISORGANIZATION,
+                       @ISGROUP = ISGROUP,
+                       @TITLECODEID = TITLECODEID,
+                       @MIDDLENAME = MIDDLENAME,
+                       @SUFFIXCODEID = SUFFIXCODEID,
+                       @COUNTRYID = ADDRESS_COUNTRYID,
+                       @EMAILADDRESS = EMAILADDRESS_EMAILADDRESS,
+                       @PHONENUMBER = PHONE_NUMBER,
+                       @ADDRESSTYPECODEID = ADDRESS_ADDRESSTYPECODEID,
+                       @PHONETYPECODEID = PHONE_PHONETYPECODEID,
+                       @EMAILTYPECODEID = EMAILADDRESS_EMAILADDRESSTYPECODEID
+                FROM   DBO.UFN_REVENUEBATCH_GETNEWCONSTITUENT_FROMITEMLISTXML(@NEWCONSTITUENT)
+            END
+
+          IF @KEYNAME IS NULL
+            BEGIN
+                IF EXISTS (SELECT ID FROM DBO.BATCHREVENUECONSTITUENT WHERE ID = @CONSTITUENTID)
+                  BEGIN
+                      SELECT @KEYNAME = KEYNAME,
+                             @NAME = NAME,
+                             @FIRSTNAME = FIRSTNAME,
+                             @POSTCODE = POSTCODE,
+                             @ADDRESSBLOCK = ADDRESSBLOCK,
+                             @ISORGANIZATION = ISORGANIZATION,
+                             @ISGROUP = ISGROUP,
+                             @TITLECODEID = TITLECODEID,
+                             @MIDDLENAME = MIDDLENAME,
+                             @SUFFIXCODEID = SUFFIXCODEID,
+                             @COUNTRYID = COUNTRYID,
+                             @EMAILADDRESS = EMAILADDRESS,
+                             @PHONENUMBER = NUMBER,
+                             @ADDRESSTYPECODEID = ADDRESSTYPECODEID,
+                             @PHONETYPECODEID = PHONETYPECODEID,
+                             @EMAILTYPECODEID = EMAILADDRESSTYPECODEID
+                      FROM   DBO.BATCHREVENUECONSTITUENT
+                      WHERE  ID = @CONSTITUENTID
+                  END
+            END
+
+          DECLARE @CANDIDATE TABLE (
+            CONSTITUENTID      UNIQUEIDENTIFIER,
+            ADDRESSID          UNIQUEIDENTIFIER,
+            EMAILADDRESSID     UNIQUEIDENTIFIER,
+            PHONEID            UNIQUEIDENTIFIER,
+            MATCHPERCENTAGE    NUMERIC(5, 2),
+            STREETNUMBERRESULT TINYINT,
+            STREETNAMERESULT   TINYINT,
+            POSTCODERESULT     TINYINT
+          )
+
+          IF @OVERALLMATCHTHRESHOLD IS NULL
+             AND @BATCHID IS NOT NULL
+            BEGIN
+                SELECT @OVERALLMATCHTHRESHOLD = OVERALLMATCHTHRESHOLD,
+                       @AUTOMATCHTHRESHOLD = AUTOMATCHTHRESHOLD
+                FROM   DBO.BATCH
+                WHERE  ID = @BATCHID
+            END
+
+          IF @KEYNAME IS NOT NULL
+            INSERT INTO @CANDIDATE
+                        (CONSTITUENTID,
+                         ADDRESSID,
+                         EMAILADDRESSID,
+                         PHONEID,
+                         MATCHPERCENTAGE,
+                         STREETNUMBERRESULT,
+                         STREETNAMERESULT,
+                         POSTCODERESULT)
+            SELECT CONSTITUENTID,
+                   ADDRESSID,
+                   EMAILADDRESSID,
+                   PHONEID,
+                   MATCHPERCENTAGE,
+                   STREETNUMBERRESULT,
+                   STREETNAMERESULT,
+                   POSTCODERESULT
+            FROM DBO.USR_UMHS_UFN_FINDCONSTITUENTMATCHES_COMPOSITETHRESHOLD (@TITLECODEID, @FIRSTNAME, @MIDDLENAME, @KEYNAME, @SUFFIXCODEID, @ADDRESSBLOCK, @POSTCODE, @COUNTRYID, @ISORGANIZATION, @ISGROUP, NULL, NULL, @EMAILADDRESS, @PHONENUMBER, @OVERALLMATCHTHRESHOLD, @AUTOMATCHTHRESHOLD) DUPLICATES
+          ELSE IF @EDITCONSTITUENTCONTEXT IS NOT NULL
+            BEGIN
+                DECLARE @BATCHCONSTITUENTUPDATEID UNIQUEIDENTIFIER = CONVERT(UNIQUEIDENTIFIER, SUBSTRING(@EDITCONSTITUENTCONTEXT, 75, 36))
+                DECLARE @PRIMARYRECORDID UNIQUEIDENTIFIER = CONVERT(UNIQUEIDENTIFIER, SUBSTRING(@EDITCONSTITUENTCONTEXT, 1, 36))
+
+                IF EXISTS(SELECT DOMANUALREVIEWFORAUTOMATCH
+                          FROM   DBO.BATCHCONSTITUENTUPDATE
+                          WHERE  ID = @BATCHCONSTITUENTUPDATEID AND DOMANUALREVIEWFORAUTOMATCH = 1)
+                  BEGIN
+                      -- if none of the addresses generated an exception we need to find a possible match for it
+                      IF NOT EXISTS (SELECT 'x'
+                                     FROM   DBO.BATCHCONSTITUENTUPDATEADDRESSES
+                                     WHERE BATCHCONSTITUENTUPDATEID = @BATCHCONSTITUENTUPDATEID AND ISMANUALEXCEPTION        = 1)
+                        BEGIN
+                            SELECT TOP 1 @POSTCODE = POSTCODE,
+                                         @ADDRESSBLOCK = ADDRESSBLOCK,
+                                         @COUNTRYID = COUNTRYID
+                            FROM   DBO.BATCHCONSTITUENTUPDATEADDRESSES
+                            WHERE  BATCHCONSTITUENTUPDATEID = @BATCHCONSTITUENTUPDATEID
+                            ORDER  BY CASE WHEN ISPRIMARY = 1 THEN 1
+                                      ELSE 2
+                                      END,
+                                      SEQUENCE
+
+                            DECLARE @ADDRESSMATCHTHRESHOLD DECIMAL(20, 4);
+
+                            SELECT TOP 1 @ADDRESSMATCHTHRESHOLD = ADDRESSMATCHTHRESHOLD
+                            FROM   DBO.CONSTITUENTDUPLICATESEARCHSETTINGS;
+
+                            INSERT INTO @CANDIDATE
+                                        (CONSTITUENTID,
+                                         ADDRESSID,
+                                         STREETNUMBERRESULT,
+                                         STREETNAMERESULT,
+                                         POSTCODERESULT)
+                            SELECT @PRIMARYRECORDID,
+                                   DUPLICATES.ADDRESSID,
+                                   STREETNUMBERRESULT,
+                                   STREETNAMERESULT,
+                                   POSTCODERESULT
+                            FROM   DBO.UFN_FINDADDRESSMATCH_CONSTITUENTUPDATEBATCH(@PRIMARYRECORDID, @ADDRESSBLOCK, @POSTCODE, @COUNTRYID, '', NULL, NULL, @ADDRESSMATCHTHRESHOLD, NULL) DUPLICATES
+                        END
+                      ELSE -- if there where addresses that generate an exception select the one that was similar, otherwise do nothing.
+                        BEGIN
+                            INSERT INTO @CANDIDATE
+                                        (CONSTITUENTID,
+                                         ADDRESSID)
+                            SELECT TOP 1 @PRIMARYRECORDID,
+                                         MANUALEXCEPTIONSIMILARADDRESSID
+                            FROM   DBO.BATCHCONSTITUENTUPDATEADDRESSES
+                            WHERE  BATCHCONSTITUENTUPDATEID = @BATCHCONSTITUENTUPDATEID AND ISMANUALEXCEPTION = 1
+                            ORDER  BY CASE WHEN ISPRIMARY = 1 THEN 1
+                                      ELSE 2
+                                      END,
+                                      SEQUENCE;
+                        END
+
+                      --make sure we always return the auto-matched constituent id
+                      IF NOT EXISTS(SELECT CONSTITUENTID FROM @CANDIDATE)
+                        INSERT INTO @CANDIDATE
+                                    (CONSTITUENTID)
+                        VALUES      (@PRIMARYRECORDID);
+                  END
+            END
+
+          DECLARE @ISADMIN BIT = DBO.UFN_APPUSER_ISSYSADMIN(@CURRENTAPPUSERID);
+          DECLARE @APPUSER_IN_NONRACROLE BIT = DBO.UFN_SECURITY_APPUSER_IN_NONRACROLE(@CURRENTAPPUSERID);
+          DECLARE @APPUSER_IN_NOSECGROUPROLE BIT = DBO.UFN_SECURITY_APPUSER_IN_NO_SECURITY_GROUP_ROLE(@CURRENTAPPUSERID);
+          DECLARE @NULLVALUE UNIQUEIDENTIFIER = (SELECT CAST(CAST(0 AS BINARY) AS UNIQUEIDENTIFIER))
+
+          SELECT TOP(@MAXROWS) C.ID,
+                               D.MATCHPERCENTAGE,
+                               C.NAME,
+                               A.ADDRESSBLOCK,
+                               A.CITY,
+                               S.ABBREVIATION,
+                               A.POSTCODE,
+                               C.LOOKUPID,
+                               C.DATECHANGED,
+                               A.ID ADDRESSID,
+                               D.EMAILADDRESSID,
+                               D.PHONEID,
+                               D.STREETNUMBERRESULT,
+                               D.STREETNAMERESULT,
+                               D.POSTCODERESULT,
+                               CASE WHEN ADDRESSID IS NOT NULL THEN DBO.UFN_BUILDFULLADDRESS(ADDRESSID, A.ADDRESSBLOCK, A.CITY, A.STATEID, A.POSTCODE, A.COUNTRYID)
+                               ELSE DBO.UFN_CONSTITUENTDUPLICATESEARCH_DEFAULTADDRESS(C.ID, @ADDRESSTYPECODEID)
+                               END  AS FULLADDRESS
+          FROM   @CANDIDATE D
+                 INNER JOIN DBO.CONSTITUENT C ON D.CONSTITUENTID = C.ID
+                 LEFT JOIN DBO.ADDRESS A ON D.ADDRESSID = A.ID
+                 LEFT JOIN DBO.STATE S ON A.STATEID = S.ID
+                 LEFT JOIN DBO.PHONE P ON D.PHONEID = P.ID
+                 LEFT JOIN DBO.EMAILADDRESS E ON D.EMAILADDRESSID = E.ID
+          WHERE
+            (     @ISADMIN                                                                                                           = 1
+               OR @CURRENTAPPUSERID IS NULL
+               OR @APPUSER_IN_NONRACROLE                                                                                             = 1
+               OR DBO.UFN_SECURITY_APPUSER_GRANTED_CONSTITID_FORREPORT(@CURRENTAPPUSERID, D.CONSTITUENTID, @APPUSER_IN_NOSECGROUPROLE) = 1 )
+          ORDER  BY D.MATCHPERCENTAGE DESC,
+                    C.KEYNAME,
+                    C.FIRSTNAME,
+                    CASE WHEN ISNULL(A.ADDRESSTYPECODEID, @NULLVALUE) = ISNULL(@ADDRESSTYPECODEID, @NULLVALUE) THEN 1
+                    ELSE 2
+                    END,
+                    CASE WHEN ISNULL(P.PHONETYPECODEID, @NULLVALUE) = ISNULL(@PHONETYPECODEID, @NULLVALUE) THEN 1
+                    ELSE 2
+                    END,
+                    CASE WHEN ISNULL(E.EMAILADDRESSTYPECODEID, @NULLVALUE) = ISNULL(@EMAILTYPECODEID, @NULLVALUE) THEN 1
+                    ELSE 2
+                    END,
+                    CASE WHEN ISNULL(A.ADDRESSBLOCK, '') = ISNULL(@ADDRESSBLOCK, '') THEN 1
+                    ELSE 2
+                    END,
+                    A.ISPRIMARY DESC,
+                    P.ISPRIMARY DESC,
+                    E.ISPRIMARY DESC 
+
+      ]]>
+
+    </c:CreateProcedureSQL>
+  </SPSearchList>
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="EDITCONSTITUENTCONTEXT" Hidden="true" MaxLength="110" Caption="EDITCONSTITUENTCONTEXT" />
+      <c:FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Constituent ID" CaptionResourceKey="$$constituent_id" />
+      <c:FormField FieldID="CONSTITUENTLOOKUPID" DataType="Guid" Caption="Lookup ID" CaptionResourceKey="$$lookup_id">
+        <c:SearchList SearchListID="6c1da9a2-766e-4b02-8878-5f5af7ec527e" EnableQuickFind="true">
+          <c:AddDataForms>
+            <c:AddDataForm ID="98819aef-f26b-48ab-ae31-146720533211" Caption="Individual" CaptionResourceKey="$$individual" />
+            <c:AddDataForm ID="6dd8c507-481a-430b-925c-4b6a3a8663ae" Caption="Household" CaptionResourceKey="$$household" />
+            <c:AddDataForm ID="6e0e7fb5-4551-4135-bebf-c4356bc25fd5" Caption="Group" CaptionResourceKey="$$group" />
+            <c:AddDataForm ID="f38b0a00-51cb-43a6-8c82-a4f0ee371435" Caption="Organization" CaptionResourceKey="$$organization" />
+          </c:AddDataForms>
+        </c:SearchList>
+      </c:FormField>
+      <c:FormField FieldID="NEWCONSTITUENT" DataType="XML" Hidden="true" Caption="New constituent">
+        <c:Collection AllowSingleRowOnly="true">
+          <c:Fields>
+            <c:FormField FieldID="ISORGANIZATION" DataType="Boolean" Caption="Is organization" CaptionResourceKey="$$is_organization" />
+            <c:FormField FieldID="ISGROUP" DataType="Boolean" Caption="Is group" CaptionResourceKey="$$is_group" />
+            <c:FormField FieldID="ISHOUSEHOLD" DataType="Boolean" Caption="Is household" CaptionResourceKey="$$is_household" />
+            <c:FormField FieldID="LASTNAME" Required="true" Caption="Last\org\group\household name" CaptionResourceKey="$$last\org\group\household_name" />
+            <c:FormField FieldID="FIRSTNAME" Caption="First name" CaptionResourceKey="$$first_name" />
+            <c:FormField FieldID="MIDDLENAME" Caption="Middle name" CaptionResourceKey="$$middle_name" />
+            <c:FormField FieldID="TITLECODEID" DataType="Guid" Caption="Title" CaptionResourceKey="$$title">
+              <c:CodeTable CodeTableName="TITLECODE" />
+            </c:FormField>
+            <c:FormField FieldID="SUFFIXCODEID" DataType="Guid" Caption="Suffix" CaptionResourceKey="$$suffix">
+              <c:CodeTable CodeTableName="SUFFIXCODE" />
+            </c:FormField>
+            <c:FormField FieldID="NICKNAME" Caption="Nickname" CaptionResourceKey="$$nickname" />
+            <c:FormField FieldID="MAIDENNAME" Caption="Maiden name" CaptionResourceKey="$$maiden_name" />
+            <c:FormField FieldID="BIRTHDATE" DataType="FuzzyDate" Caption="Birth date" AllowMonthDayOnFuzzyDate="true" CaptionResourceKey="$$birth_date" />
+            <c:FormField FieldID="GENDERCODE" DataType="TinyInt" Caption="Gender" DefaultValueText="0" CaptionResourceKey="$$gender">
+              <c:ValueList>
+                <c:Items>
+                  <c:Item LabelResourceKey="$$unknown">
+                    <c:Value>0</c:Value>
+                    <c:Label>Unknown</c:Label>
+                  </c:Item>
+                  <c:Item LabelResourceKey="$$male">
+                    <c:Value>1</c:Value>
+                    <c:Label>Male</c:Label>
+                  </c:Item>
+                  <c:Item LabelResourceKey="$$female">
+                    <c:Value>2</c:Value>
+                    <c:Label>Female</c:Label>
+                  </c:Item>
+                </c:Items>
+              </c:ValueList>
+            </c:FormField>
+            <c:FormField FieldID="MARITALSTATUSCODEID" DataType="Guid" Caption="Marital status" CaptionResourceKey="$$marital_status">
+              <c:CodeTable CodeTableName="MARITALSTATUSCODE" />
+            </c:FormField>
+            <c:FormField FieldID="WEBADDRESS" Caption="Website" DefaultValueText="" CaptionResourceKey="$$website" />
+            <c:FormField FieldID="INDUSTRYCODEID" DataType="Guid" Caption="Industry" CaptionResourceKey="$$industry">
+              <c:CodeTable CodeTableName="INDUSTRYCODE" />
+            </c:FormField>
+            <c:FormField FieldID="NUMEMPLOYEES" DataType="Integer" Caption="No. of employees" DefaultValueText="0" CaptionResourceKey="$$no_of_employees" />
+            <c:FormField FieldID="NUMSUBSIDIARIES" DataType="Integer" Caption="No. of subsidiary orgs" DefaultValueText="0" CaptionResourceKey="$$no_of_subsidiary_orgs" />
+            <c:FormField FieldID="PARENTCORPID" DataType="Guid" Caption="Parent org" CaptionResourceKey="$$parent_org">
+              <c:SearchList SearchListID="ef1da4e7-0631-49de-bd60-7d084cb7cb2b" />
+            </c:FormField>
+            <c:FormField FieldID="ADDRESS_ADDRESSTYPECODEID" DataType="Guid" Caption="Address type" CaptionResourceKey="$$address_type">
+              <c:CodeTable CodeTableName="ADDRESSTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="ADDRESS_COUNTRYID" DataType="Guid" Caption="Country" CaptionResourceKey="$$country">
+              <c:SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+            </c:FormField>
+            <c:FormField FieldID="ADDRESS_ADDRESSBLOCK" Caption="Address" CaptionResourceKey="$$address" />
+            <c:FormField FieldID="ADDRESS_CITY" Caption="City" CaptionResourceKey="$$city" />
+            <c:FormField FieldID="ADDRESS_STATEID" DataType="Guid" Caption="State" CaptionResourceKey="$$state">
+              <c:SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7">
+                <c:Params>
+                  <c:Param ID="COUNTRYID">
+                    <c:Value>Fields!ADDRESS_COUNTRYID</c:Value>
+                  </c:Param>
+                </c:Params>
+              </c:SimpleDataList>
+            </c:FormField>
+            <c:FormField FieldID="ADDRESS_POSTCODE" Caption="ZIP" CaptionResourceKey="$$zip" />
+            <c:FormField FieldID="ADDRESS_DONOTMAIL" DataType="Boolean" Caption="Do not send mail to this address" CaptionResourceKey="$$do_not_send_mail_to_this_address" />
+            <c:FormField FieldID="PHONE_PHONETYPECODEID" DataType="Guid" Caption="Phone type" CaptionResourceKey="$$phone_type">
+              <c:CodeTable CodeTableName="PHONETYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="PHONE_NUMBER" Caption="Phone number" DefaultValueText="" CaptionResourceKey="$$phone_number" ApplyPhoneFormatting="true" />
+            <c:FormField FieldID="EMAILADDRESS_EMAILADDRESSTYPECODEID" DataType="Guid" Caption="Email type" CaptionResourceKey="$$email_type">
+              <c:CodeTable CodeTableName="EMAILADDRESSTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="EMAILADDRESS_EMAILADDRESS" Caption="Email address" CaptionResourceKey="$$email_address" />
+            <c:FormField FieldID="EXISTINGSPOUSE" DataType="Boolean" Caption="Existing constituent" CaptionResourceKey="$$existing_constituent" />
+            <c:FormField FieldID="SPOUSEID" DataType="Guid" Caption="Spouse full name" CaptionResourceKey="$$spouse_full_name">
+              <c:SearchList SearchListID="4685952f-6964-486c-9acd-5560a8a30862" />
+            </c:FormField>
+            <c:FormField FieldID="SPOUSE_LASTNAME" Caption="Spouse last name" CaptionResourceKey="$$spouse_last_name" />
+            <c:FormField FieldID="SPOUSE_FIRSTNAME" Caption="Spouse first name" CaptionResourceKey="$$spouse_first_name" />
+            <c:FormField FieldID="SPOUSE_MIDDLENAME" Caption="Spouse middle name" CaptionResourceKey="$$spouse_middle_name" />
+            <c:FormField FieldID="SPOUSE_TITLECODEID" DataType="Guid" Caption="Spouse title" CaptionResourceKey="$$spouse_title">
+              <c:CodeTable CodeTableName="TITLECODE" />
+            </c:FormField>
+            <c:FormField FieldID="SPOUSE_SUFFIXCODEID" DataType="Guid" Caption="Spouse suffix" CaptionResourceKey="$$spouse_suffix">
+              <c:CodeTable CodeTableName="SUFFIXCODE" />
+            </c:FormField>
+            <c:FormField FieldID="SPOUSE_NICKNAME" Caption="Spouse nickname" CaptionResourceKey="$$spouse_nickname" />
+            <c:FormField FieldID="SPOUSE_MAIDENNAME" Caption="Spouse maiden name" CaptionResourceKey="$$spouse_maiden_name" />
+            <c:FormField FieldID="SPOUSE_BIRTHDATE" DataType="FuzzyDate" Caption="Spouse birth date" AllowMonthDayOnFuzzyDate="true" CaptionResourceKey="$$spouse_birth_date" />
+            <c:FormField FieldID="SPOUSE_GENDERCODE" DataType="TinyInt" Caption="Spouse gender" DefaultValueText="0" CaptionResourceKey="$$spouse_gender">
+              <c:ValueList>
+                <c:Items>
+                  <c:Item LabelResourceKey="$$unknown">
+                    <c:Value>0</c:Value>
+                    <c:Label>Unknown</c:Label>
+                  </c:Item>
+                  <c:Item LabelResourceKey="$$male">
+                    <c:Value>1</c:Value>
+                    <c:Label>Male</c:Label>
+                  </c:Item>
+                  <c:Item LabelResourceKey="$$female">
+                    <c:Value>2</c:Value>
+                    <c:Label>Female</c:Label>
+                  </c:Item>
+                </c:Items>
+              </c:ValueList>
+            </c:FormField>
+            <c:FormField FieldID="SPOUSE_RELATIONSHIPTYPECODEID" DataType="Guid" Caption="Spouse relationship type" CaptionResourceKey="$$spouse_relationship_type">
+              <c:CodeTable CodeTableName="RELATIONSHIPTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="SPOUSE_RECIPROCALTYPECODEID" DataType="Guid" Caption="Spouse reciprocal relationship type" CaptionResourceKey="$$spouse_reciprocal_relationship_type">
+              <c:CodeTable CodeTableName="RELATIONSHIPTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="SPOUSE_STARTDATE" DataType="Date" Caption="Spouse start date" CaptionResourceKey="$$spouse_start_date" />
+            <c:FormField FieldID="SPOUSE_ISSPOUSE" DataType="Boolean" Caption="Is spouse" CaptionResourceKey="$$is_spouse" />
+            <c:FormField FieldID="COPYPRIMARYINFORMATION" DataType="Boolean" Caption="Copy primary information" DefaultValueText="1" CaptionResourceKey="$$copy_primary_information" />
+            <c:FormField FieldID="PRIMARYRELATIONSHIPEXISTS" DataType="Boolean" Caption="Apply recognition credit to individual for constituent's payments" DefaultValueText="0" CaptionResourceKey="$$apply_recognition_credit_to_individual_for_constituent's_payments" />
+            <c:FormField FieldID="PRIMARYMATCHFACTOR" DataType="Decimal" Caption="Primary recognition credit factor" DefaultValueText="100" CaptionResourceKey="$$primary_recognition_credit_factor" />
+            <c:FormField FieldID="RECIPROCALRELATIONSHIPEXISTS" DataType="Boolean" Caption="Apply recognition credit to constituent for individual's payments" DefaultValueText="0" CaptionResourceKey="$$apply_recognition_credit_to_constituent_for_individual's_payments" />
+            <c:FormField FieldID="RECIPROCALMATCHFACTOR" DataType="Decimal" Caption="Reciprocal recognition credit factor" DefaultValueText="100" CaptionResourceKey="$$reciprocal_recognition_credit_factor" />
+            <c:FormField FieldID="EXISTINGBUSINESS" Caption="Business is existing constituent" CaptionResourceKey="$$business_is_existing_constituent" />
+            <c:FormField FieldID="BUSINESSID" Caption="Org name" CaptionResourceKey="$$org_name">
+              <c:SearchList SearchListID="ef1da4e7-0631-49de-bd60-7d084cb7cb2b" />
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_NAME" Caption="Business organization name" CaptionResourceKey="$$business_organization_name" />
+            <c:FormField FieldID="BUSINESS_ADDRESSTYPECODEID" DataType="Guid" Caption="Business address type" CaptionResourceKey="$$business_address_type">
+              <c:CodeTable CodeTableName="ADDRESSTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_COUNTRYID" DataType="Guid" Caption="Business country" CaptionResourceKey="$$business_country">
+              <c:SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_ADDRESSBLOCK" Caption="Business address" CaptionResourceKey="$$business_address" />
+            <c:FormField FieldID="BUSINESS_CITY" Caption="Business city" CaptionResourceKey="$$business_city" />
+            <c:FormField FieldID="BUSINESS_STATEID" DataType="Guid" Caption="Business state" CaptionResourceKey="$$business_state">
+              <c:SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7">
+                <c:Params>
+                  <c:Param ID="COUNTRYID">
+                    <c:Value>Fields!ADDRESS_COUNTRYID</c:Value>
+                  </c:Param>
+                </c:Params>
+              </c:SimpleDataList>
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_POSTCODE" Caption="Business ZIP" CaptionResourceKey="$$business_zip" />
+            <c:FormField FieldID="BUSINESS_DONOTMAIL" DataType="Boolean" Caption="Business do not send mail to this address" CaptionResourceKey="$$business_do_not_send_mail_to_this_address" />
+            <c:FormField FieldID="BUSINESS_PHONETYPECODEID" DataType="Guid" Caption="Business phone type" CaptionResourceKey="$$business_phone_type">
+              <c:CodeTable CodeTableName="PHONETYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_NUMBER" Caption="Business phone number" DefaultValueText="" CaptionResourceKey="$$business_phone_number" ApplyPhoneFormatting="true" />
+            <c:FormField FieldID="BUSINESS_RELATIONSHIPTYPECODEID" DataType="Guid" Caption="Business relationship type" CaptionResourceKey="$$business_relationship_type">
+              <c:CodeTable CodeTableName="RELATIONSHIPTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_RECIPROCALTYPECODEID" DataType="Guid" Caption="Business reciprocal relationship type" CaptionResourceKey="$$business_reciprocal_relationship_type">
+              <c:CodeTable CodeTableName="RELATIONSHIPTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="BUSINESS_STARTDATE" DataType="Date" Caption="Business start date" CaptionResourceKey="$$business_start_date" />
+            <c:FormField FieldID="ISCONTACT" DataType="Boolean" Caption="Is contact" CaptionResourceKey="$$is_contact" />
+            <c:FormField FieldID="CONTACTTYPECODEID" DataType="Guid" Caption="Contact type" CaptionResourceKey="$$contact_type">
+              <c:CodeTable CodeTableName="CONTACTTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="ISPRIMARYCONTACT" DataType="Boolean" Caption="Primary contact" CaptionResourceKey="$$primary_contact" />
+            <c:FormField FieldID="POSITION" Caption="Position" CaptionResourceKey="$$position" />
+            <c:FormField FieldID="ISMATCHINGGIFTRELATIONSHIP" DataType="Boolean" Caption="This organization will match individual's contributions" CaptionResourceKey="$$this_organization_will_match_individual's_contributions" />
+            <c:FormField FieldID="GIVESANONYMOUSLY" DataType="Boolean" Caption="Gives anonymously" CaptionResourceKey="$$gives_anonymously" />
+            <c:FormField FieldID="GROUP_DESCRIPTION" Caption="Group\household description" CaptionResourceKey="$$group\household_description" />
+            <c:FormField FieldID="GROUP_PRIMARYCONTACT" DataType="Guid" Caption="Group primary contact" CaptionResourceKey="$$group_primary_contact">
+              <c:SearchList SearchListID="8d689026-e3b8-4d0e-8cbd-ac640039783c" />
+            </c:FormField>
+            <c:FormField FieldID="GROUP_STARTDATE" DataType="Date" Caption="Group start date" CaptionResourceKey="$$group_start_date" />
+            <c:FormField FieldID="GROUP_GROUPTYPEID" DataType="Guid" Caption="Group type" CaptionResourceKey="$$group_type">
+              <c:SimpleDataList SimpleDataListID="927b11bc-3f88-44b0-a8fb-cfc1d5c627ea" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACTID" DataType="Guid" Caption="Existing household primary contact" CaptionResourceKey="$$existing_household_primary_contact">
+              <c:SearchList SearchListID="4685952f-6964-486c-9acd-5560a8a30862" EnableQuickFind="true" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACT_KEYNAME" Caption="New household primary contact last name" CaptionResourceKey="$$new_household_primary_contact_last_name" />
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACT_FIRSTNAME" Caption="New household primary contact first name" CaptionResourceKey="$$new_household_primary_contact_first_name" />
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACT_MIDDLENAME" Caption="New household primary contact middle initial" CaptionResourceKey="$$new_household_primary_contact_middle_initial" />
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACT_TITLECODEID" DataType="Guid" Caption="New household primary contact title" CaptionResourceKey="$$new_household_primary_contact_title">
+              <c:CodeTable CodeTableName="TITLECODE" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACT_SUFFIXCODEID" DataType="Guid" Caption="New household primary contact suffix" CaptionResourceKey="$$new_household_primary_contact_suffix">
+              <c:CodeTable CodeTableName="SUFFIXCODE" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_PRIMARYCONTACT_COPYHOUSEHOLDCONTACT" DataType="Boolean" Caption="New household primary contact copy household contact information" CaptionResourceKey="$$new_household_primary_contact_copy_household_contact_information" />
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBERID" DataType="Guid" Caption="Existing second household member" CaptionResourceKey="$$existing_second_household_member">
+              <c:SearchList SearchListID="4685952f-6964-486c-9acd-5560a8a30862" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_KEYNAME" Caption="New second household member last name" CaptionResourceKey="$$new_second_household_member_last_name" />
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_FIRSTNAME" Caption="New second household member first name" CaptionResourceKey="$$new_second_household_member_first_name" />
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_MIDDLENAME" Caption="New second household member middle initial" CaptionResourceKey="$$new_second_household_member_middle_initial" />
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_TITLECODEID" DataType="Guid" Caption="New second household member title" CaptionResourceKey="$$new_second_household_member_title">
+              <c:CodeTable CodeTableName="TITLECODE" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_SUFFIXCODEID" DataType="Guid" Caption="New second household member suffix" CaptionResourceKey="$$new_second_household_member_suffix">
+              <c:CodeTable CodeTableName="SUFFIXCODE" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_COPYHOUSEHOLDCONTACT" DataType="Boolean" Caption="New second household member copy household contact information" CaptionResourceKey="$$new_second_household_member_copy_household_contact_information" />
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_RELATIONSHIP_RECIPROCALTYPECODEID" DataType="Guid" Caption="Household members reciprocal relationship type" CaptionResourceKey="$$household_members_reciprocal_relationship_type">
+              <c:CodeTable CodeTableName="RELATIONSHIPTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_RELATIONSHIP_RELATIONSHIPTYPECODEID" DataType="Guid" Caption="Household members relationship type" CaptionResourceKey="$$household_members_relationship_type">
+              <c:CodeTable CodeTableName="RELATIONSHIPTYPECODE" />
+            </c:FormField>
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_RELATIONSHIP_STARTDATE" DataType="Date" Caption="Household members relationship start date" CaptionResourceKey="$$household_members_relationship_start_date" />
+            <c:FormField FieldID="HOUSEHOLD_SECONDMEMBER_RELATIONSHIP_ISSPOUSE" DataType="Boolean" Caption="Households members relationship is spousal" CaptionResourceKey="$$households_members_relationship_is_spousal" />
+          </c:Fields>
+        </c:Collection>
+      </c:FormField>
+      <c:FormField FieldID="OVERALLMATCHTHRESHOLD" DataType="Decimal" Hidden="true" Caption="Overall match threshold" Precision="20" Scale="4" AvailableToClient="false" />
+      <c:FormField FieldID="AUTOMATCHTHRESHOLD" DataType="Decimal" Hidden="true" Caption="Auto match threshold" Precision="20" Scale="4" AvailableToClient="false" />
+      <c:FormField FieldID="BATCHID" DataType="Guid" Hidden="true" Caption="BATCHID" />
+    </c:FormFields>
+    <c:WebUIComponent>
+      <c:UIModel AssemblyName="Blackbaud.AppFx.Constituent.UIModel.dll" ClassName="Blackbaud.AppFx.Constituent.UIModel.DuplicateConstituentSearchUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/constituent/duplicatecheck/DuplicateConstituentSearch.html" />
+      </c:WebUI>
+    </c:WebUIComponent>
+    <!--<c:WebUIComponent>
+      <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDuplicateConstituentSearchUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/constituent/duplicatecheck/DuplicateConstituentSearch.html" />
+      </c:WebUI>
+    </c:WebUIComponent>-->
+    <c:UIFields>
+      <c:FormField FieldID="CONSTITUENTNAME" />
+      <c:FormField FieldID="CONSTITUENTADDRESS" />
+      <c:FormField FieldID="GOTONEXTRECORD" DataType="Boolean" Caption="Automatically go to the next duplicate exception" DefaultValueText="true" CaptionResourceKey="$$automatically_go_to_the_next_duplicate_exception" />
+    </c:UIFields>
+    <c:UIActions>
+      <c:UIAction ActionID="SAVE" Caption="Skip" CaptionResourceKey="$$skip" />
+      <c:UIAction ActionID="CANCEL" Caption="Cancel" CaptionResourceKey="$$cancel" />
+    </c:UIActions>
+  </c:FormMetaData>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="Constituent ID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$constituent_id" />
+      <OutputField FieldID="MATCHPERCENTAGE" Caption="% Match" DataType="Decimal" CaptionResourceKey="$$%_match" />
+      <OutputField FieldID="NAME" Caption="Name" DataType="String" CaptionResourceKey="$$name" />
+      <OutputField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" CaptionResourceKey="$$address" />
+      <OutputField FieldID="CITY" Caption="City" DataType="String" CaptionResourceKey="$$city" />
+      <OutputField FieldID="ABBREVIATION" Caption="State" DataType="String" CaptionResourceKey="$$state" />
+      <OutputField FieldID="POSTCODE" Caption="ZIP/Postal Code" DataType="String" CaptionResourceKey="$$zip/postal_code" />
+      <OutputField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String" CaptionResourceKey="$$lookup_id" />
+      <OutputField FieldID="DATECHANGED" Caption="Date changed" IsHidden="true" DataType="Date" CaptionResourceKey="$$date_changed" />
+      <OutputField FieldID="ADDRESSID" Caption="ADDRESSID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$addressid" />
+      <OutputField FieldID="EMAILADDRESSID" Caption="EMAILADDRESSID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$emailaddressid" />
+      <OutputField FieldID="PHONEID" Caption="PHONEID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$phoneid" />
+      <OutputField FieldID="STREETNUMBERRESULT" Caption="STREETNUMBERRESULT" IsHidden="true" DataType="TinyInt" CaptionResourceKey="$$streetnumberresult" />
+      <OutputField FieldID="STREETNAMERESULT" Caption="STREETNAMERESULT" IsHidden="true" DataType="TinyInt" CaptionResourceKey="$$streetnameresult" />
+      <OutputField FieldID="POSTCODERESULT" Caption="POSTCODERESULT" IsHidden="true" DataType="TinyInt" CaptionResourceKey="$$postcoderesult" />
+      <OutputField FieldID="FULLADDRESS" Caption="FULLADDRESS" IsHidden="true" DataType="String" CaptionResourceKey="$$fulladdress" />
+    </OutputFields>
+  </Output>
+</SearchListSpec>

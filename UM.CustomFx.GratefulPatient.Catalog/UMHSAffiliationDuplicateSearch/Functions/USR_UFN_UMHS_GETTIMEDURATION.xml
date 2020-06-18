@@ -1,0 +1,96 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="a3b6f781-6570-411c-9f7a-a0a5adc3462d"
+	Name="USR_UM_USR_UFN_UMHS_GETTIMEDURATION"
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	DBFunctionName="USR_UM_USR_UFN_UMHS_GETTIMEDURATION"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+    create function dbo.USR_UM_USR_UFN_UMHS_GETTIMEDURATION
+    (
+	    @starttime datetime,
+	    @endtime datetime
+    )
+    returns nvarchar(200)
+    with execute as caller
+    as
+    begin
+	      declare @duration nvarchar(200) = N''
+	      declare @durInMilliseconds int = 0
+	      declare @durInSeconds int = 0
+	      declare @durInMins int = 0
+	      declare @durInHours int = 0
+	      declare @durInDays int = 0
+
+	      set @durInMilliseconds = DATEDIFF(millisecond, @starttime, @endtime);
+
+	      if 1000 <= @durInMilliseconds 
+	      begin
+		        set @durInSeconds = @durInMilliseconds / 1000
+		        set @durInMilliseconds = @durInMilliseconds % 1000
+	      end
+
+	      if 60 <= @durInSeconds
+	      begin
+		        set @durInMins = @durInSeconds / 60
+		        set @durInSeconds = @durInSeconds % 60
+	      end
+
+	      if 60 <= @durInMins
+	      begin
+		        set @durInHours = @durInMins / 60
+		        set @durInMins = @durInMins % 60
+	      end
+
+	      if 24 <= @durInHours
+	      begin
+		        set @durInDays = @durInHours / 24
+		        set @durInHours = @durInHours % 24
+	      end
+
+        if (@durInDays > 0)
+	          set @duration=cast(@durInDays as nvarchar(10)) + ' day'
+  
+        if (@durInDays > 1)
+              set @duration = @duration + 's'
+
+        if (@durInHours > 0)
+        begin
+            if (@durInHours < 10)
+		            set @duration = @duration + ' 0' + cast(@durInHours as nvarchar(10)) + 'hr'
+            else
+                set @duration = @duration + ' ' + cast(@durInHours as nvarchar(10)) + 'hr'
+        end
+        else
+            set @duration = @duration + ' 00hr'
+
+        if (@durInMins > 0)
+        begin
+            if (@durInMins < 10)
+                set @duration = @duration + ' 0' + cast(@durInMins as nvarchar(10)) + 'min'
+            else 
+                set @duration = @duration + ' ' + cast(@durInMins as nvarchar(10)) + 'min'
+        end
+        else
+            set @duration = @duration + ' 00min'
+
+        if (@durInSeconds > 0)
+        begin
+            if (@durInSeconds < 10)
+              set @duration = @duration + ' 0' + cast(@durInSeconds as nvarchar(10)) + 's'
+            else 
+              set @duration = @duration + ' ' + cast(@durInSeconds as nvarchar(10)) + 's'
+        end
+        else
+            set @duration = @duration + ' 00s'
+
+        return @duration;
+    end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

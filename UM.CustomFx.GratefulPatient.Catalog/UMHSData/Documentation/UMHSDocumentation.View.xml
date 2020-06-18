@@ -1,0 +1,73 @@
+﻿<ViewDataFormTemplateSpec 
+	xmlns="bb_appfx_viewdataformtemplate" 
+	xmlns:c="bb_appfx_commontypes" 
+	ID="dcf0e514-eb82-4826-b903-e9a5b6adc11f" 
+	Name="MIMED Documentation View Form"
+	Description="A data form for viewing MIMED documentation records"
+	Author="UM Dev"
+	DataFormInstanceID="029aa8fa-1271-40f0-ae7f-6a467ced8da7" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the SP that returns the data used by the form -->
+	<SPDataForm SPName="USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSDOCUMENTATION">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSDOCUMENTATION
+(
+	        @ID uniqueidentifier,
+		      @DATALOADED bit = 0 output,
+					@DATEENTERED datetime = null output,
+					@TITLE nvarchar(50) = null output,
+          @TEXTNOTE nvarchar(max) = null output,
+					@AUTHOR nvarchar(700) = null output,
+					@NOTETYPE nvarchar(100) = null output
+)
+as
+	set nocount on;
+
+	          set @DATALOADED = 0;
+					
+					select
+						@DATALOADED = 1,
+						@DATEENTERED = UN.DATEENTERED,
+						@TITLE = UN.TITLE,
+					  @TEXTNOTE = UN.HTMLNOTE,
+						@AUTHOR = NF.NAME,
+						@NOTETYPE = UNC.DESCRIPTION
+          from 
+               dbo.USR_UMHS_NOTE UN
+					     inner join
+						   dbo.USR_UMHS_NOTETYPECODE UNC
+					on
+						   UNC.ID = UN.UMHSNOTETYPECODEID
+               outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(UN.AUTHORID) NF
+         where 
+               UN.ID = @ID;
+               return 0;
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the context @ID, @DATALOADED, and @CURRENTAPPUSERID need not be listed. -->
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="DATEENTERED" DataType="Date" Caption="Date" CaptionResourceKey="$$date" />
+      <c:FormField FieldID="TITLE" MaxLength="50" Caption="Title" CaptionResourceKey="$$title" />
+      <c:FormField FieldID="TEXTNOTE" Caption="Note" CaptionResourceKey="$$note">
+        <c:Html />
+      </c:FormField>
+      <c:FormField FieldID="AUTHOR" MaxLength="700" Caption="Author" CaptionResourceKey="$$author" />
+      <c:FormField FieldID="NOTETYPE" MaxLength="100" Caption="Type" CaptionResourceKey="$$type" />
+    </c:FormFields>
+    <c:WebUIComponent>
+      <c:UIModel AssemblyName="Blackbaud.AppFx.Documentation.UIModel.dll" ClassName="Blackbaud.AppFx.Documentation.UIModel.GenericNoteViewFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser\htmlforms\documentation\GenericNoteViewForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>
+  </c:FormMetaData>
+
+</ViewDataFormTemplateSpec>

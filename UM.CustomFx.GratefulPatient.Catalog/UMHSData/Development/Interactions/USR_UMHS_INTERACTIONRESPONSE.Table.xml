@@ -1,0 +1,32 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="640e3e25-1789-4ad4-af28-0d04fa556d63"
+	Name="USR_UMHS_INTERACTIONRESPONSE"
+	Description="Associates interactions with interaction responses."
+	Author="UM Dev"
+	Tablename="USR_UMHS_INTERACTIONRESPONSE"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+
+	</Fields>
+
+	<!-- define any additional check constraints on the table -->
+	<CheckConstraints>
+
+	</CheckConstraints>
+
+	<!-- define any indexes on the table -->
+	<Indexes>
+
+	</Indexes>
+		
+	<!-- define any triggers on the table -->
+	<Triggers>
+
+	</Triggers>
+
+</TableSpec>

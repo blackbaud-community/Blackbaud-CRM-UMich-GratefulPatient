@@ -1,0 +1,13 @@
+﻿<DataFormAddInSpec
+	xmlns="bb_appfx_dataformaddin"
+	xmlns:c="bb_appfx_commontypes"
+	ID="fb4f374f-6861-48cf-917d-8192d32fde93" 
+	Name="MIMED Constituent AddIn"
+	Description="An addin for the Individual, Spouse, Business Add Form data form" 
+	Author="UM Dev"
+	DataFormInstanceID="1f9671b3-6740-447c-ad15-ef2718c0e43a"
+	>
+
+	<DataFormAddIn AssemblyName="UM.CustomFx.GratefulPatient.UIModel" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSConstituentAddIn" />
+
+</DataFormAddInSpec>

@@ -1,0 +1,76 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="50184d3a-4b9f-49e2-a708-90859a3f3fa4" 
+	Name="MIMED Sub Department: Mark Inactive" 
+	Description="This record operation is used to mark a subdepartment inactive."
+	Author="UM Dev"
+	OperationType="Update"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Department.DataList" />
+
+  <SPRecord>
+		<SPOperationImplementation SPName="USR_UM_USP_RECORDOPERATION_UMHSSUBDEPARTMENTSETINACTIVE">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+          create procedure dbo.USR_UM_USP_RECORDOPERATION_UMHSSUBDEPARTMENTSETINACTIVE
+          (
+                    @ID uniqueidentifier,
+                    @CHANGEAGENTID uniqueidentifier = null
+                )
+                as
+                    set nocount on;
+                     
+                    if @CHANGEAGENTID is null  
+                        exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+                     
+                    update
+                        dbo.USR_UMHS_SUBDEPARTMENT
+                    set
+                        ISINACTIVE = 1,
+                        CHANGEDBYID = @CHANGEAGENTID,
+                        DATECHANGED = getdate()
+                    where
+                        ID = @ID;
+                         
+                    return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+  <Prompt>
+    <StandardPrompt Text="Are you sure you want to mark &quot;{0}&quot; inactive?" TextResourceKey="$$are_you_sure_you_want_to_mark_&quot;{0}&quot;_inactive?">
+      <PromptData>
+        <Arguments>
+          <Argument>NAME</Argument>
+        </Arguments>
+        <Provider SPName="USP_RECORDOPERATION_SUBDEPARTMENTMARKINACTIVEPROMPT">
+          <CreateProcedureSQL xmlns="bb_appfx_commontypes">
+          <![CDATA[
+            create procedure dbo.USP_RECORDOPERATION_SUBDEPARTMENTMARKINACTIVEPROMPT
+              (
+                @ID uniqueidentifier,
+                @NAME nvarchar(100) output
+              )
+                as
+                set nocount on;
+
+                select
+                @NAME = NAME
+                from
+                dbo.USR_UMHS_SUBDEPARTMENT
+                where
+                ID = @ID;
+
+              return 0;
+                    ]]>
+          </CreateProcedureSQL>
+        </Provider>
+      </PromptData>
+    </StandardPrompt>
+  </Prompt>
+
+</RecordOperationSpec>

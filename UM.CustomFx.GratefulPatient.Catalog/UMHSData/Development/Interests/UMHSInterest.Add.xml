@@ -1,0 +1,161 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="bedde000-4e46-4547-8679-9299e6296684"
+    Name="MIMED Interest Add Form"
+    Description="Used for adding a new MIMED Interest"
+    Author="UM Dev"
+    RecordType="MIMED Interest"
+    DataFormInstanceID="91e075c3-9fb3-4764-809b-9b43675477ab"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    >
+  <SPDataForm>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_INTEREST">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_INTEREST (@ID                 UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @CHANGEAGENTID      UNIQUEIDENTIFIER = NULL,
+                                                                         @UMHSID             UNIQUEIDENTIFIER,
+                                                                         @INTERESTTYPECODEID UNIQUEIDENTIFIER,
+                                                                         @INTERESTLEVELCODE  TINYINT = 2,
+                                                                         @DEPARTMENTS        XML = null,
+                                                                         @COMMENT            NVARCHAR(MAX) = '',
+                                                                         @DISCOVEREDBYID     UNIQUEIDENTIFIER = NULL,
+                                                                         @STARTDATE          DATETIME = NULL,
+                                                                         @ENDDATE            DATETIME = NULL)
+        AS
+            SET NOCOUNT ON;
+
+            IF @ID IS NULL
+              SET @ID = NEWID()
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+            DECLARE @CURRENTDATE DATETIME
+
+            SET @CURRENTDATE = GETDATE()
+
+          BEGIN TRY
+              -- handle inserting the data
+              INSERT INTO DBO.USR_UMHS_INTEREST
+                          (ID,
+                           UMHSID,
+                           INTERESTTYPECODEID,
+                           INTERESTLEVELCODE,
+                           COMMENT,
+                           DISCOVEREDBYID,
+                           STARTDATE,
+                           ENDDATE,
+                           ADDEDBYID,
+                           CHANGEDBYID,
+                           DATEADDED,
+                           DATECHANGED)
+              VALUES      (@ID,
+                           @UMHSID,
+                           @INTERESTTYPECODEID,
+                           @INTERESTLEVELCODE,
+                           @COMMENT,
+                           @DISCOVEREDBYID,
+                           @STARTDATE,
+                           @ENDDATE,
+                           @CHANGEAGENTID,
+                           @CHANGEAGENTID,
+                           @CURRENTDATE,
+                           @CURRENTDATE)
+                   
+            exec dbo.USR_USP_UMHS_INTEREST_GETDEPTS_ADDFROMXML @ID, @DEPARTMENTS, @CHANGEAGENTID, @CURRENTDATE; 
+                   
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+            RETURN 0 
+	      ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="FK_USR_UMHS_INTEREST_INTERESTTYPECODEID" Field="INTERESTTYPECODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_INTEREST_DISCOVEREDBYID" Field="DISCOVEREDBYID" Type="ForeignKey" />
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="INTERESTTYPECODEID" DataType="Guid" Required="true" Caption="Interest type">
+        <CodeTable CodeTableName="USR_UMHS_INTERESTTYPECODE" />
+      </FormField>
+      <FormField FieldID="INTERESTLEVELCODE" DataType="TinyInt" Caption="Interest level" DefaultValueText="2">
+        <ValueList>
+          <Items>
+            <Item>
+              <Value>4</Value>
+              <Label>Extremely positive</Label>
+            </Item>
+            <Item>
+              <Value>3</Value>
+              <Label>Somewhat positive</Label>
+            </Item>
+            <Item>
+              <Value>2</Value>
+              <Label>Neutral</Label>
+            </Item>
+            <Item>
+              <Value>1</Value>
+              <Label>Somewhat negative</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>Extremely negative</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      
+      <FormField FieldID="DEPARTMENTS" DataType="XML" Caption="MIMED departments">
+        <Collection>
+          <Fields>
+            <FormField FieldID="ID" DataType="Guid" Hidden="true" />
+            <FormField FieldID="DEPARTMENTID" DataType="Guid" Required="true" Caption="MIMED department">
+              <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+              </SimpleDataList>
+            </FormField>
+            <FormField FieldID="SUBDEPARTMENTID" DataType="Guid" Caption="MIMED subdepartment">
+              <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+                <Params>
+                  <Param ID="DEPARTMENTID">
+                    <Value>Fields!DEPARTMENTID</Value>
+                  </Param>
+                </Params>
+              </SimpleDataList>
+            </FormField>
+          </Fields>
+        </Collection>
+        <InstalledProductList>
+          <InstalledProduct ID="133f9bca-00f1-4007-9792-586b931340c6" />
+        </InstalledProductList>
+      </FormField>
+
+      <FormField FieldID="COMMENT" Caption="Comment" />
+      <FormField FieldID="DISCOVEREDBYID" DataType="Guid" Caption="Discovered by" Required="true">
+        <SearchList SearchListID="23c5c603-d7d8-4106-aecc-65392b563887" EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Required="true" />
+      <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+    </FormFields>
+    <FormUIComponent />
+
+        <WebUIComponent>
+            <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSInterestFormUIModel" />
+            <WebUI>
+                <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSInterestForm.html" />
+            </WebUI>
+        </WebUIComponent>
+  </FormMetaData>
+</AddDataFormTemplateSpec>

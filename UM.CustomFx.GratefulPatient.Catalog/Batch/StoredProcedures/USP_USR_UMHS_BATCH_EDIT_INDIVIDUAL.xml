@@ -1,0 +1,73 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="60dd9a5d-16e6-42d8-b2d1-85f95bafa595"
+	Name="USP_USR_UMHS_BATCH_EDIT_INDIVIDUAL"
+	Description="Edit MIMED Data Individual"
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_BATCH_EDIT_INDIVIDUAL"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_BATCH_EDIT_INDIVIDUAL
+(
+   @UMHSID        uniqueidentifier
+  ,@CONSTITUENTID uniqueidentifier    -- Primary record ID
+  ,@CHANGEAGENTID uniqueidentifier
+  ,@MRN           nvarchar(50)
+  ,@CPISEQUENCE   nvarchar(50)
+  ,@FIRSTNAME     nvarchar(50)
+  ,@MIDDLENAME    nvarchar(50) 
+  ,@LASTNAME      nvarchar(100)
+  ,@NICKNAME       nvarchar(50)
+  ,@BIRTHDATE     udt_fuzzydate = null
+  ,@GENDERCODE    tinyint
+  ,@TITLECODEID    uniqueidentifier
+  ,@TITLE2CODEID   uniqueidentifier
+  ,@SUFFIXCODEID  uniqueidentifier
+  ,@SUFFIX2CODEID  uniqueidentifier  
+  ,@INFOSOURCECODEID uniqueidentifier
+  ,@ISDMINELIGIBLE  bit
+  ,@DMINELIGIBLEREASONCODEID  uniqueidentifier
+  ,@UMHSDATA_LASTPROCDATE datetime = NULL
+)
+as
+begin
+  
+  exec dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHS_DATA
+       @ID=@CONSTITUENTID
+      ,@CHANGEAGENTID=@CHANGEAGENTID
+      ,@MRN=@MRN
+      ,@CPISEQUENCE=@CPISEQUENCE
+      ,@FIRSTNAME=@FIRSTNAME
+      ,@MIDDLENAME=@MIDDLENAME
+      ,@NICKNAME=@NICKNAME
+      ,@KEYNAME=@LASTNAME
+      ,@BIRTHDATE=@BIRTHDATE
+      ,@GENDERCODE=@GENDERCODE
+      ,@TITLECODEID=@TITLECODEID
+      ,@TITLE2CODEID=@TITLE2CODEID
+      ,@SUFFIXCODEID=@SUFFIXCODEID
+      ,@SUFFIX2CODEID=@SUFFIX2CODEID
+      ,@INFOSOURCECODEID=@INFOSOURCECODEID
+      ,@ISDMINELIGIBLE=@ISDMINELIGIBLE
+      ,@DMINELIGIBLEREASONCODEID=@DMINELIGIBLEREASONCODEID
+      
+  /* 
+   * Edit the UMHSDATA_LASTPROCDATE only if it is a date that is newer than the current UMHSDATA_LASTPROCDATE value.
+   */
+  if @UMHSDATA_LASTPROCDATE is not null
+  begin
+    update dbo.USR_UMHS_DATA 
+    set 
+      UMHSDATA_LASTPROCDATE=@UMHSDATA_LASTPROCDATE 
+    where 
+        ID=@UMHSID
+    and ((UMHSDATA_LASTPROCDATE is NULL) or (UMHSDATA_LASTPROCDATE < @UMHSDATA_LASTPROCDATE))
+  end
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

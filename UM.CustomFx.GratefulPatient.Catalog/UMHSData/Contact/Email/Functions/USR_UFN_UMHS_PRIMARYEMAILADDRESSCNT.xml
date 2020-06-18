@@ -1,0 +1,32 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="999a9771-f494-4322-a49c-4b4e13fd873a"
+	Name="USR_UFN_UMHS_PRIMARYEMAILADDRESSCNT"
+	Description="Return the number of email addresses that are Primary for an individual"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_PRIMARYEMAILADDRESSCNT"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_PRIMARYEMAILADDRESSCNT(@UMHSID uniqueidentifier)
+returns int
+with execute as caller
+as begin
+	declare @cnt int;
+  set @cnt=0;
+  
+  select 
+    @cnt=count(UMHSID)
+  from dbo.USR_UMHS_EMAILADDRESS e
+  where
+      e.UMHSID=@UMHSID
+  and e.ISPRIMARY=1
+  
+	return @cnt;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

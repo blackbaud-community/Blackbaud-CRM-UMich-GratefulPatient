@@ -1,0 +1,124 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9cd07521-0bbd-418e-a868-dc25e7a1eaec"
+	Name="MIMED Phone Query"
+	Description="A view defined for querying on MIMED phone records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSPHONE">
+		<ViewSQL>
+			<![CDATA[
+      SELECT P.ID,
+             UMHSID,
+             ISPRIMARY,
+             PTC.DESCRIPTION             PHONETYPE_DESCRIPTION,
+             NUMBER,
+             DONOTCALL,
+             DNC.DESCRIPTION             DONOTCALL_DESCRIPTION,
+             P.SEQUENCE,
+             I.DESCRIPTION               INFOSOURCE_DESCRIPTION,
+             INFOSOURCECOMMENTS,
+             STARTDATE,
+             ENDDATE,
+             COUNTRY.DESCRIPTION         COUNTRYID_TRANSLATION,
+             COUNTRY.ABBREVIATION        COUNTRYID_ABBREVIATION,
+             CALLBEFORE,
+             CALLAFTER,
+             ISCONFIDENTIAL,
+             [ADDEDBY].APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             [ADDEDBY].USERNAME          AS ADDEDBY_USERNAME,
+             [CHANGEDBY].APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             [CHANGEDBY].USERNAME        AS CHANGEDBY_USERNAME,
+             P.DATEADDED,
+             P.DATECHANGED,
+             PHONETYPECODEID,
+             INFOSOURCECODEID,
+             COUNTRYID,
+             DONOTCALLREASONCODEID
+      FROM   DBO.USR_UMHS_PHONE P
+             LEFT JOIN PHONETYPECODE PTC ON PTC.ID = P.PHONETYPECODEID
+             LEFT JOIN INFOSOURCECODE I ON I.ID = P.INFOSOURCECODEID
+             LEFT JOIN COUNTRY ON COUNTRY.ID = P.COUNTRYID
+             LEFT JOIN DONOTCALLREASONCODE DNC ON DNC.ID = P.DONOTCALLREASONCODEID
+             LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON [ADDEDBY].ID = P.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON [CHANGEDBY].ID = P.CHANGEDBYID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+			<OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="MIMED ID" Category="System Fields" Name="UMHSID" />
+      <OutputField Name="ISPRIMARY" Caption="Is primary" DataType="Boolean"/>
+      <OutputField Name="PHONETYPE_DESCRIPTION" Caption="Phone type" DataType="String">
+        <LookupInfo IDField="PHONETYPECODEID">
+          <CodeTable CodeTableName="PHONETYPECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="NUMBER" Caption="Phone number" DataType="String"></OutputField>
+      <OutputField Name="DONOTCALL" Caption="Do not call" DataType="Boolean"></OutputField>
+      <OutputField Name="DONOTCALL_DESCRIPTION" Caption="Do not call reason" DataType="String">
+        <LookupInfo IDField="DONOTCALLREASONCODEID">
+          <CodeTable CodeTableName="DONOTCALLREASONCODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="SEQUENCE" Caption="Sequence" DataType="Integer"/>
+      <OutputField Name="INFOSOURCE_DESCRIPTION" Caption="Information source" DataType="String">
+        <LookupInfo IDField="INFOSOURCECODEID">
+          <CodeTable CodeTableName="INFOSOURCECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="INFOSOURCECOMMENTS" Caption="Information source comments" DataType="String"/>
+      <OutputField Name="STARTDATE" Caption="Start date" DataType="Date"/>
+      <OutputField Name="ENDDATE" Caption="End date" DataType="Date"/>
+      <OutputField Caption="Country" Name="COUNTRYID_TRANSLATION">
+        <LookupInfo IDField="COUNTRYID">
+          <SimpleDataList SimpleDataListID="C9649672-353D-42E8-8C25-4D34BBABFBBA">
+            <Params xmlns="bb_appfx_commontypes">
+              <Param ID="INCLUDEINACTIVE">
+                <Value>1</Value>
+              </Param>
+            </Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Country abbreviation" Name="COUNTRYID_ABBREVIATION" CaptionResourceKey="$$country_abbreviation">
+        <LookupInfo IDField="COUNTRYID">
+          <SimpleDataList SimpleDataListID="0D730B19-FA6C-41d3-9C71-70906C5DCE5A">
+            <Params xmlns="bb_appfx_commontypes">
+              <Param ID="INCLUDEINACTIVE">
+                <Value>1</Value>
+              </Param>
+            </Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>      
+      <OutputField Name="CALLBEFORE" Caption="Call before" DataType="Time" />
+      <OutputField Name="CALLAFTER" Caption="Call after" DataType="Time" />
+      <OutputField Name="ISCONFIDENTIAL" Caption="Is confidential" DataType="Boolean"/>
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+      <OutputField Caption="PHONETYPECODEID" Name="PHONETYPECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="INFOSOURCECODEID" Name="INFOSOURCECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="COUNTRYID" Name="COUNTRYID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="DONOTCALLREASONCODEID" Name="DONOTCALLREASONCODEID" DataType="Guid" IsHidden="true" />      
+		</OutputFields>
+	</Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Phone"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

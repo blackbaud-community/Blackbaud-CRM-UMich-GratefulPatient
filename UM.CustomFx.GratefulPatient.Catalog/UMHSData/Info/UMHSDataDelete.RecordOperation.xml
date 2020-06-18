@@ -1,0 +1,80 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="a1d9dada-f4d0-4edf-a3e6-0587bafc1a33"
+    Name="MIMED Data Delete"
+    Description="Used to delete the given MIMED Data"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_UMHS_DATA_DELETE">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            create procedure dbo.USR_USP_UMHS_DATA_DELETE
+            (
+	            @ID uniqueidentifier,
+	            @CHANGEAGENTID uniqueidentifier = null
+            )
+            as begin
+              declare @ERRORMESSAGE NVARCHAR(4000)=null;
+              declare @ERRORSEVERITY INT;
+              declare @ERRORSTATE INT;
+              declare @RELATIONSHIPID uniqueidentifier;
+
+               if @CHANGEAGENTID is null  
+                exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+                
+              /*
+               * Delete relationships
+               */
+              declare e CURSOR FAST_FORWARD 
+	              FOR 
+		              select ID from dbo.USR_UMHS_RELATIONSHIP where UMHSID=@ID;
+
+              begin try     
+                open e;
+
+                -- Get 1st relationship ID
+                fetch next from e into @RELATIONSHIPID;
+
+                while @@FETCH_STATUS = 0
+                begin
+                
+                  -- Delete relationship
+	                exec dbo.USR_USP_USR_UMHS_RELATIONSHIP_DELETE @ID=@RELATIONSHIPID, @CHANGEAGENTID=@CHANGEAGENTID;
+                  
+	                -- Get next relationship ID
+                  fetch next from e into @RELATIONSHIPID;
+                end
+
+                close e;
+                deallocate e;
+              end try
+              begin catch
+                SELECT 
+                    @ERRORMESSAGE = ERROR_MESSAGE(),
+                    @ERRORSEVERITY = ERROR_SEVERITY(),
+                    @ERRORSTATE = ERROR_STATE();
+        
+                close e;
+                deallocate e;
+                
+                raiserror (@ErrorMessage, @ErrorSeverity, @ErrorState);
+              end catch
+
+	            -- use the system generated delete routine to allow proper recording of the deleting agent
+	            exec USP_USR_UMHS_DATA_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	            return 0;
+	
+            end
+            ]]>
+            </c:CreateProcedureSQL>
+        </SPOperationImplementation>
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this MIMED Data record?" />
+    </Prompt>
+</RecordOperationSpec>

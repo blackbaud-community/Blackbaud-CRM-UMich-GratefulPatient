@@ -1,0 +1,129 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="16c510d2-7b68-4f32-9585-72ef39f1f192"
+    Name="MIMED Affiliation Add Form"
+    Description="Used for adding a new MIMED Affiliation"
+    Author="UM Dev"
+    RecordType="MIMED Affiliation"
+    DataFormInstanceID="65adbaf0-2296-4adb-83c3-8547b71db0bb"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    > 
+    <SPDataForm>
+        <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_AFFILIATION">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_AFFILIATION (@ID                        UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                                @CHANGEAGENTID             UNIQUEIDENTIFIER = NULL,
+                                                                                @UMHSID                    UNIQUEIDENTIFIER,
+                                                                                @AFFILIATIONCATEGORYCODEID UNIQUEIDENTIFIER = NULL,
+                                                                                @AFFILIATIONBASENAMECODEID UNIQUEIDENTIFIER = NULL,
+                                                                                @STARTDATE                 DATETIME = NULL,
+                                                                                @ENDDATE                   DATETIME = NULL,
+                                                                                @SITEID                    UNIQUEIDENTIFIER = NULL,
+                                                                                @DEPARTMENTID              UNIQUEIDENTIFIER = NULL,
+                                                                                @SUBDEPARTMENTID           UNIQUEIDENTIFIER = NULL,
+                                                                                @COMMENTS                  NVARCHAR(MAX) = '')
+            AS
+                SET NOCOUNT ON;
+
+                IF @ID IS NULL
+                  SET @ID = NEWID()
+
+                IF @CHANGEAGENTID IS NULL
+                  EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                    @CHANGEAGENTID OUTPUT
+
+                DECLARE @CURRENTDATE DATETIME
+
+                SET @CURRENTDATE = GETDATE()
+
+              BEGIN TRY
+                  -- handle inserting the data
+                  INSERT INTO DBO.USR_UMHS_AFFILIATION
+                              (ID,
+                               UMHSID,                             
+                               AFFILIATIONBASENAMECODEID,
+                               STARTDATE,
+                               ENDDATE,
+                               SITEID,
+                               DEPARTMENTID,
+                               SUBDEPARTMENTID,                             
+                               COMMENTS,                            
+                               ADDEDBYID,
+                               CHANGEDBYID,
+                               DATEADDED,
+                               DATECHANGED)
+                  VALUES      (@ID,
+                               @UMHSID,
+                               @AFFILIATIONBASENAMECODEID,
+                               @STARTDATE,
+                               @ENDDATE,
+                               @SITEID,
+                               @DEPARTMENTID,
+                               @SUBDEPARTMENTID,                              
+                               @COMMENTS,                              
+                               @CHANGEAGENTID,
+                               @CHANGEAGENTID,
+                               @CURRENTDATE,
+                               @CURRENTDATE)
+              END TRY
+
+              BEGIN CATCH
+                  EXEC DBO.USP_RAISE_ERROR
+
+                  RETURN 1
+              END CATCH
+
+                RETURN 0 
+            ]]>
+            </c:CreateProcedureSQL>
+        </SaveImplementation>
+    </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+    <c:FormMetaData FixedDialog="true">
+        <c:FormFields>
+          <c:FormField FieldID="AFFILIATIONCATEGORYCODEID" DataType="Guid" Required="true" Caption="Category">
+            <c:CodeTable CodeTableName="USR_UMHS_AFFILIATIONCATEGORYTYPECODE" />
+          </c:FormField>
+             <c:FormField FieldID="AFFILIATIONBASENAMECODEID" DataType="Guid" Required="true" Caption="Name">
+              <c:SimpleDataList SimpleDataListID="4c646cee-0f5b-4197-b4d3-0869693cfc2d">
+                <c:Params>
+                  <c:Param ID="AFFILIATIONCATEGORYCODEID">
+                    <c:Value>Fields!AFFILIATIONCATEGORYCODEID</c:Value>
+                  </c:Param>
+                </c:Params>
+              </c:SimpleDataList>
+            </c:FormField>
+            <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Required="true" />
+            <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+          <c:FormField FieldID="SITEID" DataType="Guid" Caption="Site">
+            <c:SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+              <c:SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+            </c:SimpleDataList>
+          </c:FormField>
+          <c:FormField FieldID="DEPARTMENTID" DataType="Guid" Caption="MIMED department" Required="true">
+            <c:SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+            </c:SimpleDataList>            
+          </c:FormField>
+          <c:FormField FieldID="SUBDEPARTMENTID" DataType="Guid" Caption="MIMED subdepartment">
+            <c:SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+              <c:Params>
+                <c:Param ID="DEPARTMENTID">
+                  <c:Value>Fields!DEPARTMENTID</c:Value>
+                </c:Param>
+              </c:Params>
+            </c:SimpleDataList>
+          </c:FormField>
+            <c:FormField FieldID="COMMENTS" Caption="Comments" />
+        </c:FormFields>
+      <c:FormUIComponent />
+      <c:WebUIComponent>
+        <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSAffiliationDataFormUIModel" />
+        <c:WebUI>
+          <c:ExternalResource Url="browser/htmlforms/custom/UM.CustomFx.GratefulPatient/UMHSAffiliationDataForm.html" />
+        </c:WebUI>
+      </c:WebUIComponent>
+    </c:FormMetaData>
+   
+</AddDataFormTemplateSpec>

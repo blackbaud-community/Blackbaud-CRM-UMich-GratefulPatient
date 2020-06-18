@@ -1,0 +1,37 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="fc87eafd-8cd9-4703-a761-90b4fa5243aa"
+	Name="USR_UFN_UMHS_VALIDATE_STARTEND_DATES"
+	Description="Validate that the Start Date is before the End Date"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_VALIDATE_STARTEND_DATES"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_VALIDATE_STARTEND_DATES
+(
+	@STARTDATE date = '',
+	@ENDDATE date = ''
+)
+returns bit with execute as caller
+as 
+begin
+	if (@STARTDATE is not null) and (@STARTDATE <> '')
+		begin
+			if (@ENDDATE is null) or (@ENDDATE = '')
+				set @ENDDATE = @STARTDATE
+						
+			if @STARTDATE <= @ENDDATE
+				return 1
+			else
+				return 0
+		end
+					
+	return 1
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

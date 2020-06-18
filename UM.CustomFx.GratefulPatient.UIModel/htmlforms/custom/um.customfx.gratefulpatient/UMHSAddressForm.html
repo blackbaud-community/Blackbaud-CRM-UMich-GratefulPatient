@@ -1,0 +1,152 @@
+﻿<style type="text/css">
+    /*##MAP#STATEID_value,
+    ##MAP#POSTCODE_value,
+    ##MAP#HISTORICALSTARTDATE_value,
+    ##MAP#STARTDATE_value,
+    ##MAP#ENDDATE_value {
+        width: 85px;
+    }*/
+
+    ##MAP#DONOTMAILREASONCODEID_caption,
+    ##MAP#OLDADDRESSID_caption {
+        padding-left: 25px;
+    }
+</style>
+<div id="#MAP#UMHSAddressAddForm">
+  <h2 id="#MAP#FORMHEADER_value"></h2>
+    <table>
+    <tr>
+        <td colspan="3">
+            <h3 id="#MAP#ADDRESSINFORMATION_value"></h3>
+        </td>
+    </tr>
+
+    <tr>
+        <td><div class="bbui-forms-fieldset-column">
+    <table>
+        <tr id="#MAP#ADDRESSTYPECODEID_container">
+            <td>
+                <label id="#MAP#ADDRESSTYPECODEID_caption" for="#MAP#ADDRESSTYPECODEID_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#ADDRESSTYPECODEID_value" type="text" />
+            </td>
+        </tr>
+        <tr id="#MAP#COUNTRYID_container">
+            <td>
+                <label id="#MAP#COUNTRYID_caption" for="#MAP#COUNTRYID_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#COUNTRYID_value" type="text" />
+            </td>
+        </tr>
+        <tr id="#MAP#ADDRESSBLOCK_container">
+            <td valign="top">
+                <label id="#MAP#ADDRESSBLOCK_caption" for="#MAP#ADDRESSBLOCK_value"></label>
+            </td>
+            <td>
+                <textarea id="#MAP#ADDRESSBLOCK_value" rows="3" cols="1"></textarea>
+            </td>
+        </tr>
+        <tr id="#MAP#CITY_container">
+            <td>
+                <label id="#MAP#CITY_caption" for="#MAP#CITY_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#CITY_value" type="text" />
+            </td>
+        </tr>
+        <tr id="#MAP#STATEID_container">
+            <td>
+                <label id="#MAP#STATEID_caption" for="#MAP#STATEID_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#STATEID_value" type="text" />
+            </td>
+        </tr>
+        <tr id="#MAP#POSTCODE_container">
+            <td>
+                <label id="#MAP#POSTCODE_caption" for="#MAP#POSTCODE_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#POSTCODE_value" type="text" />
+            </td>
+        </tr>
+        <tr id="#MAP#HISTORICALSTARTDATE_container">
+            <td>
+                <label id="#MAP#HISTORICALSTARTDATE_caption" for="#MAP#HISTORICALSTARTDATE_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#HISTORICALSTARTDATE_value" type="text" />
+            </td>
+        </tr>
+        <tr id="#MAP#HISTORICALENDDATE_container">
+            <td>
+                <label id="#MAP#HISTORICALENDDATE_caption" for="#MAP#HISTORICALENDDATE_value"></label>
+            </td>
+            <td>
+                <input id="#MAP#HISTORICALENDDATE_value" type="text" />
+            </td>
+        </tr>
+    </table></div>
+</td>
+        <td style="vertical-align: top;">
+            <div class="bbui-forms-fieldset-column">
+                <table>
+                    <tr id="#MAP#ISPRIMARY_container">
+                        <td colspan="2"> <input id="#MAP#ISPRIMARY_value" type="checkbox" /><label for="#MAP#ISPRIMARY_value"></label> </td>
+                    </tr>
+                    <tr id="#MAP#DONOTMAIL_container">
+                        <td colspan="2"> <input id="#MAP#DONOTMAIL_value" type="checkbox" /><label for="#MAP#DONOTMAIL_value"></label> </td>
+                    </tr>
+                    <tr id="#MAP#DONOTMAILREASONCODEID_container">
+                        <td> <label id="#MAP#DONOTMAILREASONCODEID_caption" for="#MAP#DONOTMAILREASONCODEID_value"> </label> </td>
+                        <td> <input id="#MAP#DONOTMAILREASONCODEID_value" type="text" /> </td>
+                    </tr>                   
+                    <tr id="#MAP#ISCONFIDENTIAL_container">
+                        <td colspan="2"> <input id="#MAP#ISCONFIDENTIAL_value" type="checkbox" /> <label for="#MAP#ISCONFIDENTIAL_value"> </label> </td>
+                    </tr>
+
+                </table>
+           </div>
+</td>
+    </tr>
+
+    <tr>
+        <td colspan="3">
+            <h3 id="#MAP#ADDRESSSOURCE_value"></h3>
+        </td>
+    </tr>
+
+    <tr>
+        <td><div class="bbui-forms-fieldset-column">
+                <table>
+                    <tr id="#MAP#INFOSOURCECODEID_container">
+                        <td>
+                            <label id="#MAP#INFOSOURCECODEID_caption" for="#MAP#INFOSOURCECODEID_value"></label>
+                        </td>
+                        <td>
+                            <input id="#MAP#INFOSOURCECODEID_value" type="text" />
+                        </td>
+                    </tr>
+                    <tr id="#MAP#INFOSOURCECOMMENTS_container">
+                        <td valign="top">
+                            <label id="#MAP#INFOSOURCECOMMENTS_caption" for="#MAP#INFOSOURCECOMMENTS_value"></label>
+                        </td>
+                        <td>
+                            <textarea id="#MAP#INFOSOURCECOMMENTS_value" rows="3" cols="1"></textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+</td>
+    </tr>
+    </table>
+    
+            <!-- To define fields in multiple columns on the form, simply add/move the fields to this div
+                  <div class="bbui-forms-fieldset-column">
+                      <table>
+                      </table>
+                  </div>
+                  -->
+</div>

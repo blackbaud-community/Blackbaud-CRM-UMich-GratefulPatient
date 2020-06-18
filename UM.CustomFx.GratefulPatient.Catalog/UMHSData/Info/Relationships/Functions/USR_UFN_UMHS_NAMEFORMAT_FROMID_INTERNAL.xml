@@ -1,0 +1,76 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ac6006d2-2df9-4c6a-953f-0eb8c987414c"
+	Name="USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL"
+	Description="Function to create a name formats for Realtionship Query"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+      CREATE function dbo.USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL
+    (
+      @NAMEFORMATFUNCTIONID uniqueidentifier,
+      @UMHSID uniqueidentifier,
+      @EXCLUDESPOUSEINFO bit
+    )
+    returns nvarchar(700)
+    with execute as caller
+    as begin
+      declare @NAME nvarchar(700);
+
+      if @EXCLUDESPOUSEINFO = 0 
+        begin
+          select
+            @NAME = dbo.UFN_BUILDNAMEFORMAT(
+              @NAMEFORMATFUNCTIONID,
+              U.ID,
+              U.KEYNAME,
+              U.FIRSTNAME,
+              U.MIDDLENAME,
+              (select DESCRIPTION from dbo.TITLECODE where ID = U.TITLECODEID),
+              (select DESCRIPTION from dbo.SUFFIXCODE where ID = U.SUFFIXCODEID),
+              SPOUSE.KEYNAME,
+              SPOUSE.FIRSTNAME,
+              SPOUSE.MIDDLENAME,
+              (select DESCRIPTION from dbo.TITLECODE where ID = SPOUSE.TITLECODEID),
+              (select DESCRIPTION from dbo.SUFFIXCODE where ID = SPOUSE.SUFFIXCODEID)
+            )
+          from dbo.USR_UMHS_DATA as U
+          left outer join dbo.RELATIONSHIP on U.ID = RELATIONSHIP.RELATIONSHIPCONSTITUENTID and RELATIONSHIP.ISSPOUSE = 1
+          left outer join dbo.DECEASEDCONSTITUENT as SPOUSEDECEASEDCONSTIT on SPOUSEDECEASEDCONSTIT.ID = RELATIONSHIP.RECIPROCALCONSTITUENTID
+          left outer join dbo.CONSTITUENT as SPOUSE on SPOUSE.ID = RELATIONSHIP.RECIPROCALCONSTITUENTID and SPOUSEDECEASEDCONSTIT.ID is null and SPOUSE.ISINACTIVE = 0
+          where U.ID = @UMHSID;
+        end
+      else
+        begin
+          select
+            @NAME = dbo.UFN_BUILDNAMEFORMAT(
+              @NAMEFORMATFUNCTIONID,
+              U.ID,
+              U.KEYNAME,
+              U.FIRSTNAME,
+              U.MIDDLENAME,
+              (select DESCRIPTION from dbo.TITLECODE where ID = U.TITLECODEID),
+              (select DESCRIPTION from dbo.SUFFIXCODE where ID = U.SUFFIXCODEID),
+              '',
+              '',
+              '',
+              '',
+              ''
+            )
+          from dbo.USR_UMHS_DATA U
+          where U.ID = @UMHSID;
+        end
+
+      -- CONDBREAK is not currently handled anywhere, so just remove it, at least for now.
+      set @NAME = replace(@NAME, N'{CONDBREAK}', N' ');
+
+      return @NAME;
+end;
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

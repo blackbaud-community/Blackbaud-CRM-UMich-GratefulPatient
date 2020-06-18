@@ -1,0 +1,42 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="4616b191-28b9-4e5b-87f2-ff3c2d4d9612"
+	Name="MIMED Batch PROVIDERS"
+	Description="Stores information about usr MIMED Batch providers records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_BATCH_PROVIDERS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Name="BATCHID" Required="true" ForeignTable="BATCH" OnDelete="CascadeDelete"/>
+    <SequenceField Name="SEQUENCE" />
+    <ForeignKeyField Name="PROVIDERID" Description="Provider" ForeignTable="USR_UMHS_PROVIDERS" OnDelete="SetToNull" Required="false"/>
+    <ForeignKeyField Name="CONSTITUENTID" Description="Constituent" ForeignTable="CONSTITUENT" OnDelete="SetToNull" Required="false" />
+    <TextField Name="PROVIDERDRNUMBER" Description="Provider doctor number" Length="50" Required="true" />
+    <TextField Name="UMEMPLID" Description="U-M Employment ID" Length="200"  />
+    <TextField Name="UMUNIQUENAME" Description="U-M Unique Name" Length="200"  />
+    <TextField Name="LASTNAME" Description="Provider's last name" Length="200" Required="true"/>
+    <TextField Name="FIRSTNAME" Description="Provider's first name" Length="100"  Required="true"/>
+    <BooleanField Name="ADMITDOCTORIND" Description="Admitting Provider Y/N" DefaultValue="0"/>
+    <BooleanField Name="ATTENDDOCTORIND" Description="Attending Provider Y/N" DefaultValue="0"/>
+    <BooleanField Name="RESIDENTDOCTORIND" Description="Resident Provider Y/N" DefaultValue="0"/>
+    <BooleanField Name="CONSULTDOCTORIND" Description="Consulting Provider Y/N" DefaultValue="0"/>
+    <TextField Name="PHONE" Description="Provider phone" Length="200"/>
+    <ForeignKeyField Name="DEPARTMENTID" Description="MIMED department" ForeignTable="USR_UMHS_DEPARTMENT"/>
+    <ForeignKeyField Name="SUBDEPARTMENTID" Description="MIMED subdepartment" ForeignTable="USR_UMHS_SUBDEPARTMENT"/>
+    <DateField Name="UMHSDATA_LASTPROCDATE" Description="Date on the records imported from the UMHSDATA datamart." />
+  </Fields>
+
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+        <IndexField Name="PROVIDERDRNUMBER" Direction="ASC"/>
+      </IndexFields>
+    </Index>
+  </Indexes>
+		
+</TableSpec>

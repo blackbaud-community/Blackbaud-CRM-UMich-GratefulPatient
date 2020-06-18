@@ -1,0 +1,11 @@
+﻿<CodeTableSpec 
+	xmlns="bb_appfx_codetable" 
+	xmlns:c="bb_appfx_commontypes"
+	ID="ec4c9ae8-2e38-476f-a45a-cb4d9a77d7a5" 
+	Name="MIMED Follow-up Status"
+	Description="Stores translations for usr MIMED followup status codes"
+	Author="UM Dev"
+	DBTablename="USR_UMHS_MIMEDFOLLOWUPSTATUSCODE"
+	Category="MIMED Data"
+	SortMethod="Alpha"
+/>

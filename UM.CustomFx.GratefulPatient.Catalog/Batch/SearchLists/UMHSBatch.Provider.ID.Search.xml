@@ -1,0 +1,48 @@
+﻿<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="861770a7-f57c-42dc-b2ad-07c16f9f8aa1"
+    Name="Search list for locating the Provider's ID"
+    Description="Search list for locating the Provider's ID"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="09755eab-3180-42d1-bf8a-1df7c5bc43f4"
+	>
+
+	<!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be 
+	used to limit the number of rows returned to a reasonable number. -->
+	<SPSearchList SPName="USR_USP_SEARCHLIST_UMHS_BATCH_PROVIDER_ID">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_USP_SEARCHLIST_UMHS_BATCH_PROVIDER_ID
+(
+	@PROVIDERDRNUMBER nvarchar(50) = null,
+	@MAXROWS smallint = 500
+)
+as
+    select 
+      ID
+    from dbo.USR_UMHS_PROVIDERS 
+    where
+      PROVIDERDRNUMBER=@PROVIDERDRNUMBER
+    
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+			<FormField FieldID="PROVIDERDRNUMBER" Caption="Provider DR Number" DataType="String" MaxLength="50" />
+		</FormFields>
+	</FormMetaData>
+
+	<!-- also describe the output fields for the search screen -->
+	<Output>
+		<OutputFields>
+			<OutputField FieldID="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+		</OutputFields>
+	</Output>
+
+</SearchListSpec>
+

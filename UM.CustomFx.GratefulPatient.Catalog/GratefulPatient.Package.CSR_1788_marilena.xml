@@ -1,0 +1,23 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="efed3397-05f9-41aa-899f-5ec04d7e3fe7"
+    Name="Package for CSR-DRT-1788_marilena (Custom)"
+    Description="CSR-DRT-1788_marilena: Update MIMED Affiliations to use Site (JIRA DAR2-473)"
+    Author="UM Dev"
+    >
+  
+	<c:DependencyList>
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.USR_UMHS_AFFILIATIONBATCH.Table.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.USR_UMHS_AFFILIATION.Table.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.DataList.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.Add.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.Commit.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.Add.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.Edit.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.Edit.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.View.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.Query.xml" />
+    </c:DependencyList>
+</PackageSpec>

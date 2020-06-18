@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>UMHSEmailAddress.View.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>UMHSEmailAddressViewDataFormUIModel</ClassName>
+  <HtmlInfo GenerateHtml="false">
+    <HtmlFile />
+    <HtmlFolder>htmlforms\custom\um.customfx.gratefulpatient\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

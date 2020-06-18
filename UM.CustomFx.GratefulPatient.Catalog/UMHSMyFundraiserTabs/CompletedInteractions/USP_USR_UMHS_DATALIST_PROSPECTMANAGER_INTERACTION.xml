@@ -1,0 +1,136 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="33170d4d-674c-4377-ad1e-5c23d7481ff8"
+	Name="USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION"
+	Description="USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION"
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+CREATE PROCEDURE [DBO].[USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION](@FUNDRAISERID UNIQUEIDENTIFIER,
+                                                                           @DATEFILTER   TINYINT = 0,
+                                                                           @STARTDATE    DATETIME = NULL,
+                                                                           @ENDDATE      DATETIME = NULL,
+                                                                           @TYPEFILTER   UNIQUEIDENTIFIER = NULL,
+                                                                           @FILTERNAME   VARCHAR(MAX) = '')
+AS
+  BEGIN
+      SET NOCOUNT ON;
+
+      DECLARE @DATE DATETIME = GETDATE();
+      DECLARE @STATUSID TABLE (
+        ID UNIQUEIDENTIFIER
+      )
+
+      INSERT INTO @STATUSID
+      SELECT ISC.ID
+      FROM   DBO.USR_INTERACTION_STATUSCODE ISC
+      WHERE  ISC.DESCRIPTION IN ( 'Completed', 'Cancelled', 'Declined' )
+
+      -- If no status chosen then use all status ids
+      IF NOT EXISTS (SELECT NULL
+                     FROM   @STATUSID)
+        BEGIN
+            INSERT INTO @STATUSID
+            SELECT ID
+            FROM   DBO.USR_INTERACTION_STATUSCODE
+        END
+
+      DECLARE @TEMPSTARTDATE DATETIME
+      DECLARE @TEMPENDDATE DATETIME
+
+      EXEC DBO.USP_RESOLVEDATEFILTER
+        @DATEFILTER,
+        @TEMPSTARTDATE OUTPUT,
+        @TEMPENDDATE OUTPUT;
+
+      SET @STARTDATE = ISNULL(@STARTDATE, @TEMPSTARTDATE)
+      SET @ENDDATE = ISNULL(@ENDDATE, @TEMPENDDATE);
+
+      WITH INTERACTION_CTE
+           AS (SELECT INTERACTION.ID,
+                      INTERACTION.PROSPECTPLANID,
+                      INTERACTION.UMHSID,
+                      UD.CONSTITUENTID,
+                      INTERACTION.DATE,
+                      UIS.DESCRIPTION             AS STATUS,
+                      CASE WHEN INTERACTION.INTERACTIONBASETYPE = 2 THEN UD.CONSTITUENTID
+                      ELSE INTERACTION.FUNDRAISERID
+                      END                         AS OWNERID,
+                      INTERACTION.OBJECTIVE,
+                      INTERACTION.CONTACTMETHODCODEID,
+                      CASE WHEN EXISTS(SELECT 1
+                                  FROM   DBO.INTERACTIONNOTE
+                                  WHERE  INTERACTIONNOTE.INTERACTIONID = INTERACTION.ID)
+                            OR EXISTS(SELECT 1
+                                      FROM   DBO.INTERACTIONATTACHMENT
+                                      WHERE  INTERACTIONATTACHMENT.INTERACTIONID = INTERACTION.ID)
+                            OR EXISTS(SELECT 1
+                                      FROM   DBO.INTERACTIONMEDIALINK
+                                      WHERE  INTERACTIONMEDIALINK.INTERACTIONID = INTERACTION.ID) THEN 1
+                      ELSE 0
+                      END                         AS HASDOCUMENTATION,
+                      CASE WHEN INTERACTION.INTERACTIONBASETYPE = 1 THEN 1
+                      ELSE 0
+                      END                         AS ISMOVE,
+                      INTERACTION.EVENTID,
+                      CASE WHEN INTERACTION.INTERACTIONBASETYPE = 2 THEN 0
+                      ELSE
+                          CASE WHEN EXISTS (SELECT 1
+                                       FROM   DBO.INTERACTIONRESPONSE
+                                       WHERE  INTERACTIONRESPONSE.INTERACTIONID = INTERACTION.ID) THEN 1
+                          ELSE 0
+                          END
+                      END                         AS HASRESPONSES,
+                      INTERACTIONSUBCATEGORY.NAME AS SUBCATEGORY,
+                      INTERACTION.STARTTIME,
+                      INTERACTION.ENDTIME,
+                      INTERACTION.TIMEZONEENTRYID
+                  FROM   DBO.USR_V_UMHS_INTERACTION_ALL_STATUSES INTERACTION
+                         INNER JOIN DBO.USR_UMHS_DATA UD ON UD.ID = INTERACTION.UMHSID
+                         JOIN DBO.CONSTITUENT C ON C.ID = UD.CONSTITUENTID
+                         JOIN DBO.USR_INTERACTION_STATUSCODE UIS ON UIS.ID = INTERACTION.STATUSCODEID
+                         INNER JOIN @STATUSID S ON S.ID = INTERACTION.STATUSCODEID
+                         LEFT OUTER JOIN DBO.INTERACTIONSUBCATEGORY ON INTERACTIONSUBCATEGORY.ID = INTERACTION.INTERACTIONSUBCATEGORYID
+                         LEFT OUTER JOIN DBO.INTERACTIONCATEGORY IC ON IC.ID = INTERACTIONSUBCATEGORY.INTERACTIONCATEGORYID
+                         LEFT JOIN DBO.USR_UMHS_INTERACTIONPARTICIPANT INTERACTIONPARTICIPANT ON INTERACTIONPARTICIPANT.INTERACTIONID = INTERACTION.ID
+                  WHERE  INTERACTION.FUNDRAISERID = @FUNDRAISERID OR  INTERACTIONPARTICIPANT.CONSTITUENTID = @FUNDRAISERID
+                      AND ( ( INTERACTION.DATE BETWEEN @STARTDATE AND @ENDDATE )
+                             OR ( @STARTDATE IS NULL
+                                  AND @ENDDATE IS NULL )
+                             OR ( INTERACTION.DATE >= @STARTDATE
+                                  AND @ENDDATE IS NULL )
+                             OR ( @STARTDATE IS NULL
+                                  AND @ENDDATE >= INTERACTION.DATE ) )
+                      --AND ( NULLIF(@TYPEFILTER, CONVERT(UNIQUEIDENTIFIER, '00000000-0000-0000-0000-000000000000')) IS NULL
+                             --OR INTERACTION.INTERACTIONTYPECODEID = @TYPEFILTER )
+      )--end 'WITH CTE'
+	    SELECT distinct I.ID,
+             CON.FIRSTNAME + ' ' + CON.KEYNAME AS NAME,
+             CON.CONSTITUENTID AS CONID,
+             --CON.FIRSTNAME,
+             --CON.KEYNAME,
+             I.DATE,
+             I.STATUS,
+             FC.NAME                         AS OWNER,
+             I.OBJECTIVE,
+             INTERACTIONTYPECODE.DESCRIPTION AS TYPE,
+             DBO.USR_UFN_UMHS_INTERACTION_GETSITELIST(I.ID) AS SITES
+      FROM   INTERACTION_CTE I
+             LEFT OUTER JOIN PROSPECTPLAN PPL ON I.PROSPECTPLANID = PPL.ID
+             LEFT JOIN DBO.USR_UMHS_DATA CON ON I.CONSTITUENTID = CON.CONSTITUENTID
+             LEFT JOIN DBO.INTERACTIONTYPECODE ON I.CONTACTMETHODCODEID = INTERACTIONTYPECODE.ID
+             LEFT OUTER JOIN DBO.CONSTITUENT FC ON FC.ID = I.OWNERID
+             LEFT OUTER JOIN DBO.TIMEZONEENTRY ON I.TIMEZONEENTRYID = TIMEZONEENTRY.ID
+      WHERE  ( ( CON.KEYNAME LIKE '%' + @FILTERNAME + '%' )
+                OR ( CON.FIRSTNAME LIKE '%' + @FILTERNAME + '%' ) )
+      ORDER  BY I.DATE;
+  END 
+
+]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

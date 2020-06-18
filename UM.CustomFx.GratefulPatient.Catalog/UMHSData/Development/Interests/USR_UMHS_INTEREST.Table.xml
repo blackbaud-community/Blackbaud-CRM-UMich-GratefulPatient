@@ -1,0 +1,37 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="d1928971-b162-487c-b5aa-8ffd1a68421e"
+	Name="MIMED Interest"
+	Description="Stores information about MIMED interest records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_INTEREST"		   
+	IsBuiltIn="false"
+	>
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Name="UMHSID" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" Required="true"/>
+    <CodeTableField Name="INTERESTTYPECODEID" CodeTable="USR_UMHS_INTERESTTYPECODE" Required="true" />
+    <EnumField Name="INTERESTLEVELCODE" DefaultValue="2">
+      <EnumValues>
+        <EnumValue ID="4" Translation="Extremely positive" />
+        <EnumValue ID="3" Translation="Somewhat positive" />
+        <EnumValue ID="2" Translation="Neutral" />
+        <EnumValue ID="1" Translation="Somewhat negative" />
+        <EnumValue ID="0" Translation="Extremely negative" />
+      </EnumValues>
+    </EnumField>
+  
+    <MemoField Name="COMMENT" />
+    <ForeignKeyField Name="DISCOVEREDBYID" ForeignTable="CONSTITUENT"/>
+    <DateField Name="STARTDATE"/>
+    <DateField Name="ENDDATE"/>
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="DISCOVEREDBYID"/>
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

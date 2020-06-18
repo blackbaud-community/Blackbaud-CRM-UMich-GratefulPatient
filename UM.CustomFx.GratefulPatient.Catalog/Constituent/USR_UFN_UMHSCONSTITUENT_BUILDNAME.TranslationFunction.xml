@@ -1,0 +1,28 @@
+﻿<TranslationFunctionSpec
+	xmlns="bb_appfx_translationfunction"
+	xmlns:c="bb_appfx_commontypes"
+	ID="e991bb39-d0eb-4a11-8d5a-3fe12a6d29e9"
+	Name="USR_UFN_UMHSCONSTITUENT_BUILDNAME"
+	Description="Assembles a Patient or constituent's name components."
+	Author="UM Dev"
+	RecordType="UMHS Data"
+	>
+
+	<SQLTranslationFunction FNName="USR_UFN_UMHSCONSTITUENT_BUILDNAME">
+		<c:CreateFunctionSQL>
+			<![CDATA[
+      create function dbo.USR_UFN_UMHSCONSTITUENT_BUILDNAME
+      (
+	      @ID uniqueidentifier
+      ) 
+      returns nvarchar(154)
+			as begin
+				if @ID is null
+					return '';
+				return coalesce((select NAME from dbo.CONSTITUENT where ID=@ID), (select KEYNAME + ', ' + FIRSTNAME from dbo.USR_UMHS_DATA where ID=@ID), '');
+			end    		
+			]]>
+		</c:CreateFunctionSQL>
+	</SQLTranslationFunction>
+
+</TranslationFunctionSpec>

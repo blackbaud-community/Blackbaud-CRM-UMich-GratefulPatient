@@ -1,0 +1,104 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9c50957b-1392-4417-8ee0-b569ecabc6ea" 
+	Name="MIMED Sub Department Order Edit Form"
+	Description="A data form for editing MIMED sub department order records" 
+	Author="UM Dev"
+	DataFormInstanceID="76e138f7-7af2-4ed6-bf7c-f9ebe2e766a7" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Re-Order subdepartments"
+	>
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSSUBDEPARTMENTORDER">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+          create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSSUBDEPARTMENTORDER
+          (
+            @ID uniqueidentifier,
+					  @DATALOADED bit = 0 output,
+					  @TSLONG bigint = 0 output,
+					  @UMHSSUBDEPARTMENTS xml = null output
+				  )
+				  as
+					  set nocount on;
+					
+					  set @DATALOADED = 0;
+					  set @TSLONG = 0;
+
+					  select
+						  @DATALOADED = 1,
+						  @TSLONG = INTERACTIONCATEGORY.TSLONG,
+						  @UMHSSUBDEPARTMENTS = dbo.USR_UFN_UMHS_DEPARTMENT_GETSUBDEPARTMENT_TOITEMLISTXML(@ID)
+					  from
+						  dbo.INTERACTIONCATEGORY
+					  where
+						  INTERACTIONCATEGORY.ID = @ID;
+	          return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_EDIT_UMHSSUBDEPARTMENTORDER">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_EDIT_UMHSSUBDEPARTMENTORDER 
+        (
+					@ID uniqueidentifier,
+					@CHANGEAGENTID uniqueidentifier = null,
+					@UMHSSUBDEPARTMENTS xml
+				)
+				as
+					set nocount on;
+										
+					declare @CURRENTDATE datetime;
+					
+					if @CHANGEAGENTID is null  
+						exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+												
+					begin try
+						exec dbo.USR_USP_UMHS_DEPARTMENT_GETSUBDEPARTMENT_UPDATEFROMXML @ID, @UMHSSUBDEPARTMENTS, @CHANGEAGENTID;
+
+					end try
+					begin catch
+						exec dbo.USP_RAISE_ERROR;
+						return 1;
+					end catch
+							
+					return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="ID" DataType="Guid" Hidden="true" />
+      <c:FormField FieldID="UMHSSUBDEPARTMENTS" DataType="XML" Caption="Subdepartments" CaptionResourceKey="$$subcategories">
+        <c:Collection SequenceFieldID="SEQUENCE">
+          <c:Fields>
+            <c:FormField FieldID="ID" DataType="Guid" Hidden="true" Caption="ID" />
+            <c:FormField FieldID="NAME" Caption="Subcategory" CaptionResourceKey="$$subdepartment" />
+            <c:FormField FieldID="ISINACTIVE" DataType="Boolean" Hidden="true" Caption="Is inactive" CaptionResourceKey="$$is_inactive" />
+            <c:FormField FieldID="SEQUENCE" DataType="Integer" Hidden="true" Caption="Sequence" />
+          </c:Fields>
+        </c:Collection>
+      </c:FormField>
+    </c:FormFields>
+    <!--<c:WebUIComponent>
+      <c:UIModel AssemblyName="Blackbaud.AppFx.Constituent.UIModel.dll" ClassName="Blackbaud.AppFx.Constituent.UIModel.InteractionSubcategoryOrderEditFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/constituent/interaction/InteractionSubcategoryOrderEditForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>-->
+    <c:UIActions>
+      <c:UIAction ActionID="MOVESUBDEPARTMENTUPACTION" ImageKey="RES:up" />
+      <c:UIAction ActionID="MOVESUBDEPARTMENTDOWNACTION" ImageKey="RES:down" />
+    </c:UIActions>
+  </c:FormMetaData>
+</EditDataFormTemplateSpec>

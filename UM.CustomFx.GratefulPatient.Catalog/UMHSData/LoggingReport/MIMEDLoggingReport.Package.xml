@@ -1,0 +1,67 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="e3b48137-6e66-475a-8d2c-a98e3405b63a"
+    Name="MIMED Logging Report Package"
+    Description="A package defining specs related to mimed logging report records"
+    Author="UM Dev"
+    >
+
+	<!-- Note:  the order of the items listed here is important.  For example, you won't be able to load a data form that references 
+	a table that hasn't been loaded, etc.  In general, the following order is recommended:
+	
+		(functions and procedures first)
+		SQLFunctionSpec
+		SQLStoredProcedureSpec
+		TranslationFunctionSpec
+
+		(tables next)
+		CodeTableSpec
+		TableSpec
+		SQLViewSpec
+
+		(features next)
+		SimpleDataListSpec		
+		SearchListSpec
+		RecordOperationSpec
+		DataListSpec
+		
+		(forms next)
+		AddDataFormTemplateSpec
+		EditDataFormTemplateSpec
+		ViewDataFormTemplateSpec		
+
+		(more feature types)
+		BatchTypeSpec
+		BusinessProcessSpec
+		CalendarSpec
+		FlashDashSpec
+		GlobalChangeSpec
+		IDMapperSpec
+		KpiSpec
+		MapEntitySpec
+		MergeConfiguration
+		MergeTaskSpec
+		QueryViewSpec
+		ReportSpec
+		RelationshipMapSpec
+		SmartFieldSpec
+		SmartQuerySpec
+		WorkflowInboxSpec
+		WorkflowSpec
+		
+		(functional areas, pages, and tasks last)
+		PageDefinitionSpec
+		FunctionalAreaSpec
+		TaskSpec	
+	-->
+	
+	<c:DependencyList>
+        <!--<c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.LoggingReport.MIMEDLoggingReport.Report.xml" />-->
+    <!--Removing report spec for same reason explained in CSR.target file for CSR 1606_sas-->
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.LoggingReport.MIMEDLoggingReport.Page.xml" />
+        <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.LoggingReport.MIMEDLoggingReport.Task.xml" />
+	      <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.LoggingReport.MIMEDTabNames.SimpleList.xml" />
+    </c:DependencyList>
+
+</PackageSpec>

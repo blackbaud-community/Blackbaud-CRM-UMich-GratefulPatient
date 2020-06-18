@@ -1,0 +1,315 @@
+<AddDataFormTemplateSpec
+    xmlns:c="bb_appfx_commontypes"
+    ID="248a6bb9-dc11-4bb0-aaeb-c105ee489dd2"
+    Name="MIMED Relationship Add Form"
+    Description="Used for adding a new USR_UMHS_RELATIONSHIP"
+    Author="UM Dev"
+    RecordType="MIMED Relationship"
+    DataFormInstanceID="6f2b393b-80c9-474a-9ffb-f6dffd0f0f2d"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    FormHeader="Add patient relationship"
+    >
+  <SPDataForm>
+    <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_PRELOAD_ADD_UMHS_RELATIONSHIP">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_PRELOAD_ADD_UMHS_RELATIONSHIP
+        (
+          @UMHSID uniqueidentifier,
+          @PATIENTNAME nvarchar(700) = null output
+        )
+        as
+          set nocount on;
+ 
+          select 
+            @PATIENTNAME = CONCAT(P.FIRSTNAME,' ',P.KEYNAME)
+          from dbo.USR_UMHS_DATA P
+            --outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(CONSTITUENT.ID) NF
+          where ID = @UMHSID;
+      
+          return 0;
+
+        ]]>        
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_USR_UMHS_RELATIONSHIP">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_USR_UMHS_RELATIONSHIP (
+          @ID                         UNIQUEIDENTIFIER = NULL OUTPUT,
+          @CHANGEAGENTID              UNIQUEIDENTIFIER = NULL,
+          @UMHSID                     UNIQUEIDENTIFIER,
+          @RECIPROCALUMHSID           UNIQUEIDENTIFIER,
+          @RELATIONSHIPTYPECODEID     UNIQUEIDENTIFIER,
+          @RECIPROCALTYPECODEID       UNIQUEIDENTIFIER,
+          @STARTDATE                  DATETIME = NULL,
+          @ENDDATE                    DATETIME = NULL,
+         -- @ISSPOUSE                   BIT = 0,
+          @ISPRIMARYBUSINESS          BIT = 0,
+          @ISCONTACT                  BIT = 0,
+          @CONTACTTYPECODEID          UNIQUEIDENTIFIER = NULL,
+          @ISPRIMARYCONTACT           BIT = 0,
+          @ISMATCHINGGIFTRELATIONSHIP BIT = 0,
+          @RELATIONSHIPSETID          UNIQUEIDENTIFIER = NULL,
+          @COMMENTS                   NVARCHAR(MAX) = '',
+          @ISEMERGENCYCONTACT         BIT = 0,
+          @RECEIVESREPORTCARD         BIT = 0,
+          @ISGUARANTOR                BIT = 0
+        )
+        AS
+            SET NOCOUNT ON;
+
+            IF @ID IS NULL
+              SET @ID = NEWID()
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+            DECLARE @CURRENTDATE DATETIME = GETDATE()
+
+            BEGIN TRY
+            
+                SET @RECIPROCALUMHSID = (SELECT ID FROM USR_UMHS_DATA WHERE CONSTITUENTID = @RECIPROCALUMHSID)
+                
+                SET @RELATIONSHIPSETID = NEWID();
+                
+                INSERT INTO DBO.USR_UMHS_RELATIONSHIPSET
+                  (
+                    ID,
+                    ADDEDBYID,
+                    CHANGEDBYID,
+                    DATEADDED,
+                    DATECHANGED
+                  )
+                  VALUES
+                  (
+                    @RELATIONSHIPSETID,
+                    @CHANGEAGENTID,
+                    @CHANGEAGENTID,
+                    @CURRENTDATE,
+                    @CURRENTDATE
+                  );                
+                  
+      
+                IF EXISTS(SELECT 1 FROM USR_UMHS_RELATIONSHIP WHERE UMHSID = @UMHSID AND RECIPROCALUMHSID = @RECIPROCALUMHSID)
+                    DELETE FROM DBO.USR_UMHS_RELATIONSHIP WHERE UMHSID = @UMHSID                          
+                  
+                -- handle inserting the data
+                INSERT INTO DBO.USR_UMHS_RELATIONSHIP
+                            (ID,
+                             UMHSID,
+                             RECIPROCALUMHSID,
+                             RELATIONSHIPTYPECODEID,
+                             RECIPROCALTYPECODEID,
+                             STARTDATE,
+                             ENDDATE,
+                             --ISSPOUSE,
+                             ISPRIMARYBUSINESS,
+                             ISCONTACT,
+                             CONTACTTYPECODEID,
+                             ISPRIMARYCONTACT,
+                             ISMATCHINGGIFTRELATIONSHIP,
+                             RELATIONSHIPSETID,
+                             COMMENTS,
+                             ISEMERGENCYCONTACT,
+                             RECEIVESREPORTCARD,
+                             ISGUARANTOR,
+                             ADDEDBYID,
+                             CHANGEDBYID,
+                             DATEADDED,
+                             DATECHANGED)
+                VALUES      (@ID,
+                             @UMHSID,
+                             @RECIPROCALUMHSID,
+                             @RELATIONSHIPTYPECODEID,
+                             @RECIPROCALTYPECODEID,
+                             @STARTDATE,
+                             @ENDDATE,
+                             --@ISSPOUSE,
+                             @ISPRIMARYBUSINESS,
+                             @ISCONTACT,
+                             @CONTACTTYPECODEID,
+                             @ISPRIMARYCONTACT,
+                             @ISMATCHINGGIFTRELATIONSHIP,
+                             @RELATIONSHIPSETID,
+                             @COMMENTS,
+                             @ISEMERGENCYCONTACT,
+                             @RECEIVESREPORTCARD,
+                             @ISGUARANTOR,
+                             @CHANGEAGENTID,
+                             @CHANGEAGENTID,
+                             @CURRENTDATE,
+                             @CURRENTDATE
+                )
+                     
+                IF EXISTS(SELECT 1 FROM USR_UMHS_RELATIONSHIP WHERE RECIPROCALUMHSID = @UMHSID)
+                    DELETE FROM DBO.USR_UMHS_RELATIONSHIP WHERE RECIPROCALUMHSID = @UMHSID                      
+                    
+                --insert the reciprocal         
+                INSERT INTO DBO.USR_UMHS_RELATIONSHIP
+                            (ID,
+                              UMHSID,
+                              RECIPROCALUMHSID,
+                              RELATIONSHIPTYPECODEID,
+                              RECIPROCALTYPECODEID,
+                              STARTDATE,
+                              ENDDATE,
+                              --ISSPOUSE,
+                              ISPRIMARYBUSINESS,
+                              ISCONTACT,
+                              CONTACTTYPECODEID,
+                              ISPRIMARYCONTACT,
+                              ISMATCHINGGIFTRELATIONSHIP,
+                              RELATIONSHIPSETID,
+                              COMMENTS,
+                              ISEMERGENCYCONTACT,
+                              RECEIVESREPORTCARD,
+                              ISGUARANTOR,
+                              ADDEDBYID,
+                              CHANGEDBYID,
+                              DATEADDED,
+                              DATECHANGED)
+                VALUES      (newid(),
+                              @RECIPROCALUMHSID,
+                              @UMHSID,
+                              @RECIPROCALTYPECODEID,
+                              @RELATIONSHIPTYPECODEID,
+                              @STARTDATE,
+                              @ENDDATE,
+                              --@ISSPOUSE,
+                              @ISPRIMARYBUSINESS,
+                              @ISCONTACT,
+                              @CONTACTTYPECODEID,
+                              @ISPRIMARYCONTACT,
+                              @ISMATCHINGGIFTRELATIONSHIP,
+                              @RELATIONSHIPSETID,
+                              @COMMENTS,
+                              @ISEMERGENCYCONTACT,
+                              @RECEIVESREPORTCARD,
+                              @ISGUARANTOR,
+                              @CHANGEAGENTID,
+                              @CHANGEAGENTID,
+                              @CURRENTDATE,
+                              @CURRENTDATE)
+                              
+            END TRY
+            BEGIN CATCH
+                EXEC DBO.USP_RAISE_ERROR
+                RETURN 1
+            END CATCH
+
+            RETURN 0 
+		
+
+        ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RECIPROCALUMHSID" Field="RECIPROCALUMHSID" Type="ForeignKey" />
+          <!--<c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RELATIONSHIPTYPECODEID" Field="RELATIONSHIPTYPECODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RECIPROCALTYPECODEID" Field="RECIPROCALTYPECODEID" Type="ForeignKey" />-->
+          <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_CONTACTTYPECODEID" Field="CONTACTTYPECODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_RELATIONSHIP_RELATIONSHIPSETID" Field="RELATIONSHIPSETID" Type="ForeignKey" />          
+        </c:Constraints>
+        <c:CustomExceptions>
+          <c:Exception Field="RECIPROCALUMHSID" SearchText="Cannot insert the value NULL into column 'RECIPROCALUMHSID'" CustomErrorMsgResourceKey="$$reciprocalUMHSid">
+            <c:CustomErrorMsg>Selected individual does not exist in MIMED data. Please select a constituent that has MIMED data.</c:CustomErrorMsg>
+          </c:Exception>
+        </c:CustomExceptions>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="PATIENTNAME" ReadOnly="true" MaxLength="700" />
+      <c:FormField FieldID="RECIPROCALUMHSID" DataType="Guid" Required="true"  Caption="Related individual">
+        <c:SearchList SearchListID="747530a1-be80-4054-a021-d2a599248261">
+          <c:FormFieldOverrides>
+            <c:FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="true" />
+            <c:FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true" />
+            <c:FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false" />
+            <c:FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false" />
+          </c:FormFieldOverrides>
+        </c:SearchList>
+      </c:FormField>
+      <c:FormField FieldID="RELATIONSHIPTYPECODEID" DataType="Guid" Required="true" Caption="Relationship type">
+        <c:SimpleDataList SimpleDataListID="4e869c5a-9b9d-4e84-b6e0-1fc66bafbafc">
+          <c:Params>
+            <c:Param ID="CONSTITUENTID">
+              <c:Value>Form!ContextID</c:Value>
+            </c:Param>
+          </c:Params>
+        </c:SimpleDataList>
+      </c:FormField>
+      <c:FormField FieldID="RECIPROCALTYPECODEID" DataType="Guid" Required="true" Caption="Individual is the">
+        <c:SimpleDataList SimpleDataListID="c3018803-2ea5-4f62-91cf-412e88d15f9b">
+          <c:Params>
+            <c:Param ID="APPLIESTOCONSTITUENTTYPE">
+              <c:Value>Fields!CONSTITUENTTYPE</c:Value>
+            </c:Param>
+            <c:Param ID="CONSTITUENTID">
+              <c:Value>Fields!RECIPROCALCONSTITUENTID</c:Value>
+            </c:Param>
+            <c:Param ID="APPLIESTORELATIONSHIPTYPEID">
+              <c:Value>Fields!RELATIONSHIPTYPECODEID</c:Value>
+            </c:Param>
+          </c:Params>
+        </c:SimpleDataList>
+      </c:FormField>
+      <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" />
+      <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+      <c:FormField FieldID="CONTACTTYPECODEID" DataType="Guid" Caption="Contact type">
+        <c:CodeTable CodeTableName="CONTACTTYPECODE" />
+      </c:FormField>
+      <c:FormField FieldID="RELATIONSHIPSETID" DataType="Guid" Caption="Relationship set" Hidden="true" />
+      <!--<c:FormField FieldID="ISSPOUSE" DataType="Boolean" Caption="Spouse" />-->
+      <c:FormField FieldID="ISPRIMARYBUSINESS" DataType="Boolean" Caption="Primary business" />
+      <c:FormField FieldID="ISCONTACT" DataType="Boolean" Caption="Contact" />
+      <c:FormField FieldID="ISPRIMARYCONTACT" DataType="Boolean" Caption="Primary contact" />
+      <c:FormField FieldID="ISMATCHINGGIFTRELATIONSHIP" DataType="Boolean" Caption="Matching gift relationship" />
+      <c:FormField FieldID="ISEMERGENCYCONTACT" DataType="Boolean" Caption="Emergency contact" />
+      <c:FormField FieldID="RECEIVESREPORTCARD" DataType="Boolean" Caption="Receives report card" />
+      <c:FormField FieldID="ISGUARANTOR" DataType="Boolean" Caption="Is guarantor" />
+      <c:FormField FieldID="COMMENTS" Caption="Comments" />
+    </c:FormFields>
+    <c:FormUIComponent />
+    <c:WebUIComponent>
+      <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSRelationshipAddFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSRelationshipAddForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>
+    <c:FieldGroups>
+      <c:FieldGroup ID="RELATIONSHIPGROUP" Caption="Relationship">
+        <c:Fields>
+          <c:Field>PATIENTNAME</c:Field>
+          <c:Field>RECIPROCALUMHSID</c:Field>
+          <c:Field>RELATIONSHIPTYPECODEID</c:Field>
+          <c:Field>RECIPROCALTYPECODEID</c:Field>
+          <c:Field>STARTDATE</c:Field>
+          <c:Field>ENDDATE</c:Field>
+          <c:Field>CONTACTTYPECODEID</c:Field>
+          <c:Field>RELATIONSHIPSETID</c:Field>
+        </c:Fields>
+      </c:FieldGroup>
+      <c:FieldGroup ID="COMMENTSGROUP" Caption="Comments">
+        <c:Fields>
+          <c:Field>COMMENTS</c:Field>
+          <!--<c:Field>ISSPOUSE</c:Field>-->
+          <c:Field>ISPRIMARYBUSINESS</c:Field>
+          <c:Field>ISCONTACT</c:Field>
+          <c:Field>ISPRIMARYCONTACT</c:Field>
+          <c:Field>ISMATCHINGGIFTRELATIONSHIP</c:Field>
+          <c:Field>ISEMERGENCYCONTACT</c:Field>
+          <c:Field>RECEIVESREPORTCARD</c:Field>
+          <c:Field>ISGUARANTOR</c:Field>
+        </c:Fields>
+      </c:FieldGroup>
+    </c:FieldGroups>
+  </c:FormMetaData>
+</AddDataFormTemplateSpec>

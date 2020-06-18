@@ -1,0 +1,31 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="fa186f34-d728-4021-aac1-cd4393973ef0"
+	Name="USR_UFN_UMHS_INTERACTION_GETSITELIST"
+	Description="Returns a comma delimited list of sites associated with the given plan."
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_INTERACTION_GETSITELIST"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+      create function dbo.USR_UFN_UMHS_INTERACTION_GETSITELIST(
+				@INTERACTIONID uniqueidentifier
+			)
+			returns nvarchar(1024)
+			as
+			begin
+				declare @SITES nvarchar(1024) = (select dbo.UDA_BUILDLIST(SITE.NAME)
+					from dbo.USR_UFN_UMHS_INTERACTION_GETSITES(@INTERACTIONID) INTERACTIONSITE
+						inner join dbo.SITE on SITE.ID = INTERACTIONSITE.SITEID
+				);
+				
+				return @SITES;	
+        
+        
+			end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

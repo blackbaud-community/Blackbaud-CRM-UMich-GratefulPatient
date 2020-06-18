@@ -1,0 +1,16 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="5cae235d-4d0e-4d5c-b7e2-a318377ce757"
+    Name="Package for CSR-DRT-1700_peb"
+    Description="CSR-DRT-1700_peb: Fix to UMHS Provider record after a constituent merge and update to the handling of merging Providers (INC1556235)"
+    Author="UM Dev"
+    >
+
+	<c:DependencyList>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Providers.USR_UMHS_PROVIDERS.Table.xml" />
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.Providers.xml" />
+  </c:DependencyList>
+
+</PackageSpec>

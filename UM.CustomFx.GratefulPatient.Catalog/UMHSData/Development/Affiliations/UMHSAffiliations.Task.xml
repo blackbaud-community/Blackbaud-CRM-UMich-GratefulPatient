@@ -1,0 +1,19 @@
+﻿<TaskSpec
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="6f0e9e30-6839-454c-a15b-4f0fde97b29d"
+	Name="MIMED Affiliations"
+	Description="MIMED ffiliations task"
+	Author="UM Dev"
+	FunctionalAreaID="64bbf407-7062-4f63-bc7c-e947f3eef6aa"
+	Sequence="80"
+  DisplayAsAction="true"
+	TaskGroup="Configuration"
+  TaskGroupImageKey="RES:fa_Configuration"
+  ImageKey="RES:config_bullet"
+  >
+
+	<!-- indicate what this task should do (navigate to a page, show a form, etc. -->
+  <ShowPage PageID="75919bcc-5e6b-4e89-acae-2e75bd1fdbef" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes" />
+
+</TaskSpec>

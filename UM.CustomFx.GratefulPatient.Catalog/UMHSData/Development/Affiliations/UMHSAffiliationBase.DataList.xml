@@ -1,0 +1,42 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="cf9e44ce-c397-43b9-8157-3f20d14efb0f" 
+	Name="MIMED Affiliation Base Data List"
+	Description="A data list showing MIMED affiliation base records." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSAFFILIATIONBASE">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_DATALIST_UMHSAFFILIATIONBASE
+as
+    set nocount on;
+ 
+     SELECT
+    UAB.ID,
+    UAC.DESCRIPTION AS CONSTITUENTAFFILIATIONCATEGORY,
+    UAB.UMHSAFFILIATIONBASENAME,
+    UAB.UMHSAFFILIATIONBASEDESCRIPTION
+      
+    FROM dbo.USR_UMHS_AFFILIATIONBASE UAB
+    JOIN dbo.USR_UMHS_AFFILIATIONCATEGORYTYPECODE UAC
+    ON UAB.UMHSAFFILIATIONCATEGORYCODEID = UAC.ID
+    ORDER BY UAB.UMHSAFFILIATIONBASENAME
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="UMHSAFFILIATIONCATEGORY" Caption="MIMED Category" DataType="String" />
+      <OutputField FieldID="UMHSAFFILIATIONBASENAME" Caption="MIMED Affiliation name" DataType="String" />
+      <OutputField FieldID="UMHSAFFILIATIONBASEDESCRIPTION" Caption="MIMED Affiliation description" DataType="String" />
+    </OutputFields>
+	</Output>
+
+</DataListSpec>

@@ -1,0 +1,14 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="C535A63B-F82E-4AB1-86E3-CAEA68031EDA"
+    Name="Package for CSR-DRT-1768_jiac (Custom)"
+    Description="CSR-DRT-1768_jiac: Modify UMHS Interaction Copy to allow copying of comments. (INC1885765)"
+    Author="UM Dev"
+    >
+
+	<c:DependencyList>
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Copy.xml" />
+  </c:DependencyList>
+
+</PackageSpec>

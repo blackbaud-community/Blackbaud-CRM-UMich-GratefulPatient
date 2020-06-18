@@ -1,0 +1,117 @@
+<DataListSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="214b4790-23ec-4196-a53f-57c2546a5893"
+    Name="MIMED Phone List"
+    Description="Returns all MIMED Phone records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+    <SPDataList SPName="USR_USP_DATALIST_UMHS_PHONE">
+        <c:CreateProcedureSQL>
+<![CDATA[
+create procedure dbo.USR_USP_DATALIST_UMHS_PHONE
+(
+    @UMHSID uniqueidentifier, 
+    @INCLUDEFORMER bit  = 0
+)
+as
+    set nocount on;
+ 
+    declare @CURRENTDATE datetime = dbo.UFN_DATE_GETEARLIESTTIME(getdate());
+ 
+    with [CONTACTINFO_CTE] as
+    (
+        --Phones
+        select
+            PHONE.ID,
+            dbo.UFN_PHONE_GETINTERNATIONALNUMBER(PHONE.COUNTRYID, PHONE.NUMBER) as CONTACTINFO,
+            dbo.UFN_PHONETYPECODE_GETDESCRIPTION(PHONE.PHONETYPECODEID) as TYPE,
+            PHONE.ISPRIMARY,
+            case when PHONE.DONOTCALL = 0 then '' else 'Do not call' end as DONOTCONTACT,
+            PHONE.ISCONFIDENTIAL as ISCONFIDENTIAL,
+            PHONE.STARTDATE,
+            PHONE.ENDDATE,
+            case when PHONE.STARTDATE is null then '0001-01-01' else cast(PHONE.STARTDATE as date) end as [STARTDATE_SORT],
+            case when PHONE.ENDDATE is null then '0001-01-01' else cast(PHONE.ENDDATE as date) end as [ENDDATE_SORT],
+            PHONE.DATEADDED
+        from
+            dbo.USR_UMHS_PHONE PHONE
+        where
+            PHONE.UMHSID = @UMHSID
+    )
+    select 
+        ID,
+        case
+            when ISCONFIDENTIAL = 0
+                then CONTACTINFO
+            else
+                N'(Confidential) ' + CONTACTINFO
+        end as CONTACTINFO,
+        case
+            when ((ENDDATE is null) or (ENDDATE > @CURRENTDATE))
+                then coalesce(TYPE, N'') + N' (Current)'
+            else
+                coalesce(TYPE, N'') + N' (Former)'
+        end as TYPE,
+        case when ISPRIMARY = 0 then '' else 'Yes' end as ISPRIMARY,
+        DONOTCONTACT,
+        ISCONFIDENTIAL,
+        case when ((ENDDATE is null) or (ENDDATE > @CURRENTDATE)) then 0 else 1 end as ISFORMER,
+        STARTDATE,
+        ENDDATE,    
+        case
+            when ISCONFIDENTIAL = 1
+                then 'RES:padlock'
+            when Len(DONOTCONTACT) > 0
+                then 'RES:warning'
+            else
+                'RES:lv_spacer'
+        end as IMAGEKEY
+    from
+        [CONTACTINFO_CTE]
+    where
+        @INCLUDEFORMER = 1 or ((ENDDATE is null) or (ENDDATE > @CURRENTDATE))
+    order by
+        ISPRIMARY desc, ISFORMER asc, ENDDATE_SORT desc, STARTDATE_SORT desc, DATEADDED desc
+
+]]>
+</c:CreateProcedureSQL>
+    </SPDataList>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <Parameters>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="INCLUDEFORMER" DataType="Boolean" Caption="Show former contact information" DefaultValueText="0" />
+      </FormFields>
+    </FormMetaData>
+  </Parameters>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="CONTACTINFO" Caption="Contact information" DataType="String" />
+      <OutputField FieldID="TYPE" Caption="Type" DataType="String">
+        <InstalledProductList xmlns="bb_appfx_commontypes">
+          <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+          <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+          <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+          <InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+        </InstalledProductList>
+      </OutputField>
+      <OutputField FieldID="ISPRIMARY" Caption="Primary" DataType="String" />
+      <OutputField FieldID="DONOTCONTACT" Caption="Do not contact" DataType="String">
+        <InstalledProductList xmlns="bb_appfx_commontypes">
+          <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+          <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+          <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+          <InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+        </InstalledProductList>
+      </OutputField>
+      <OutputField FieldID="ISCONFIDENTIAL" Caption="Confidential" IsHidden="true" DataType="Boolean" />
+      <OutputField FieldID="ISFORMER" Caption="IsFormer" IsHidden="true" DataType="Boolean" />
+      <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date" />
+      <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date" />
+      <OutputField FieldID="IMAGEKEY" Caption="ImageKey" IsHidden="true" DataType="String" IsImageKey="true" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

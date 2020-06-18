@@ -1,0 +1,20 @@
+﻿<TaskSpec
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ed451646-c43c-45cf-9e5f-e065a5d16a6d"
+	Name="MIMED department Subdepartment"
+	Description="Provide an interface for managing MIMED departments and subdepartments"
+	Author="UM Dev"
+	FunctionalAreaID="00050ce8-8abb-4a86-b9af-70a035ce0582"
+  TaskGroup="Configuration"
+  TaskGroupImageKey="RES:fa_Configuration"
+	Sequence="1040"
+	ImageKey="RES:fa_Configuration"
+  SmallImageKey="RES:toolbox_16"
+  DisplayAsAction="true"
+	>
+
+	<!-- indicate what this task should do (navigate to a page, show a form, etc. -->
+	<c:ShowPage PageID="1e35d32d-3e70-4585-90e3-493b89031db7"  SectionID="6512a9d2-a16f-439b-b805-81bf5e5b6dd1" TabID="86a34a3c-145c-484f-98ac-1e3130011baf"/>
+
+</TaskSpec>

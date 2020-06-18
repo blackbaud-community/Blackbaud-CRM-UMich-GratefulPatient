@@ -1,0 +1,231 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c4e072a8-0f52-409c-8711-43c2bbac64dd" 
+	Name="MIMED Batch Edit Provider Data Form"
+	Description="MIMED Batch Edit Provider Data Form" 
+	Author="UM Dev"
+	DataFormInstanceID="8350f4f7-2d7d-44f1-b1ba-8008a55d6a5d" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Edit MIMED batch Provider data"
+	>
+
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH_PROVIDERS">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH_PROVIDERS
+(
+   @ID uniqueidentifier
+  ,@DATALOADED bit = 0  output
+  ,@TSLONG bigint = 0 output
+  ,@SEQUENCE int = null  output
+  -- Batch fields
+  ,@PROVIDERID uniqueidentifier = null output    -- Primary Record ID
+  ,@CONSTITUENTID uniqueidentifier = null output
+  ,@PROVIDERDRNUMBER nvarchar(50) = null output
+  ,@UMEMPLID nvarchar(200) = null output
+  ,@UMUNIQUENAME nvarchar(200) = null output
+  ,@LASTNAME nvarchar(200) = null output
+  ,@FIRSTNAME nvarchar(100) = null output  
+  ,@PHONE nvarchar(100) = null output
+  ,@ADMITDOCTORIND bit = null output
+  ,@ATTENDDOCTORIND bit = null output
+  ,@RESIDENTDOCTORIND bit = null output
+  ,@CONSULTDOCTORIND bit = null output
+  ,@DEPARTMENTID uniqueidentifier = null output
+  ,@SUBDEPARTMENTID uniqueidentifier = null output
+  ,@UMHSDATA_LASTPROCDATE datetime = null output
+)
+as
+
+	set nocount on;
+
+	set @DATALOADED = 0
+	set @TSLONG = 0
+
+	select
+		 @DATALOADED = 1
+		,@TSLONG = TSLONG
+    ,@SEQUENCE = SEQUENCE
+		,@PROVIDERID = PROVIDERID
+		,@CONSTITUENTID = CONSTITUENTID
+		,@PROVIDERDRNUMBER = PROVIDERDRNUMBER
+		,@UMEMPLID = UMEMPLID
+		,@UMUNIQUENAME = UMUNIQUENAME
+    ,@LASTNAME = LASTNAME
+    ,@FIRSTNAME = FIRSTNAME
+		,@PHONE = PHONE
+		,@ADMITDOCTORIND = ADMITDOCTORIND
+		,@ATTENDDOCTORIND = ATTENDDOCTORIND
+		,@RESIDENTDOCTORIND = RESIDENTDOCTORIND
+		,@CONSULTDOCTORIND = CONSULTDOCTORIND
+    ,@DEPARTMENTID = DEPARTMENTID
+    ,@SUBDEPARTMENTID = SUBDEPARTMENTID
+    ,@UMHSDATA_LASTPROCDATE = UMHSDATA_LASTPROCDATE
+  from dbo.USR_UMHS_BATCH_PROVIDERS
+	where ID = @ID
+
+	return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH_PROVIDERS">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH_PROVIDERS 
+(
+   @ID uniqueidentifier
+  ,@CHANGEAGENTID uniqueidentifier
+  ,@SEQUENCE int
+  -- Batch fields
+  ,@PROVIDERID uniqueidentifier    -- Primary Record ID
+  ,@CONSTITUENTID uniqueidentifier
+  ,@PROVIDERDRNUMBER nvarchar(50)
+  ,@UMEMPLID nvarchar(200)
+  ,@UMUNIQUENAME nvarchar(200)
+  ,@LASTNAME nvarchar(200)
+  ,@FIRSTNAME nvarchar(100)
+  ,@PHONE nvarchar(100)
+  ,@ADMITDOCTORIND bit
+  ,@ATTENDDOCTORIND bit
+  ,@RESIDENTDOCTORIND bit
+  ,@CONSULTDOCTORIND bit
+  ,@DEPARTMENTID uniqueidentifier
+  ,@SUBDEPARTMENTID uniqueidentifier
+  ,@UMHSDATA_LASTPROCDATE datetime
+)
+as
+
+	set nocount on;
+  
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate()
+
+	begin try
+  
+		-- handle updating the data
+		update dbo.USR_UMHS_BATCH_PROVIDERS set
+			 SEQUENCE = @SEQUENCE
+			,PROVIDERID = @PROVIDERID
+			,CONSTITUENTID = @CONSTITUENTID
+			,PROVIDERDRNUMBER = @PROVIDERDRNUMBER
+			,UMEMPLID = @UMEMPLID
+			,UMUNIQUENAME = @UMUNIQUENAME
+      ,LASTNAME = @LASTNAME
+      ,FIRSTNAME = @FIRSTNAME
+			,PHONE = @PHONE
+			,ADMITDOCTORIND = @ADMITDOCTORIND
+			,ATTENDDOCTORIND = @ATTENDDOCTORIND
+			,RESIDENTDOCTORIND = @RESIDENTDOCTORIND
+			,CONSULTDOCTORIND = @CONSULTDOCTORIND
+			,DEPARTMENTID = @DEPARTMENTID
+			,SUBDEPARTMENTID = @SUBDEPARTMENTID
+      ,UMHSDATA_LASTPROCDATE = @UMHSDATA_LASTPROCDATE
+      ,CHANGEDBYID = @CHANGEAGENTID
+			,DATECHANGED = @CURRENTDATE
+		where ID = @ID
+	end try
+	begin catch
+		exec dbo.USP_RAISE_ERROR
+		return 1
+	end catch
+
+return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="PROVIDERID" DataType="Guid" Caption="Provider" Hidden="false">
+        <SearchList SearchListID="861770a7-f57c-42dc-b2ad-07c16f9f8aa1"  EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Constituent" Hidden="false">
+        <SearchList SearchListID="27dffa05-1147-4ceb-a0da-36158da56b98"  EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="SEQUENCE" Caption="Sequence" DataType="Integer"  Required="true" Hidden="true" />
+      <FormField FieldID="PROVIDERDRNUMBER" Caption="Provider DR Number" Description="Provider DR Number" DataType="String" MaxLength="50" Required="true"/>
+      <FormField FieldID="UMEMPLID" Caption="U-M Employment ID" Description="U-M Employment ID" DataType="String" MaxLength="200"  />
+      <FormField FieldID="UMUNIQUENAME" Caption="U-M Unique Name" Description="U-M Unique Name" DataType="String" MaxLength="200"  />
+      <FormField FieldID="LASTNAME" Caption="Last Name" Description="Provider's last name" DataType="String" MaxLength="200" />
+      <FormField FieldID="FIRSTNAME" Caption="First Name" Description="Provider's first name" DataType="String" MaxLength="100" />
+      <FormField FieldID="PHONE" Caption="Phone" Description="Provider's Phone" MaxLength="100"  Category="Phone" DataType="String" ApplyPhoneFormatting="true"/>
+      <FormField FieldID="ADMITDOCTORIND" Caption="Admitting Provider" Description="Admitting Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="ATTENDDOCTORIND" Caption="Attending Provider" Description="Attending Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="RESIDENTDOCTORIND" Caption="Resident Provider" Description="Resident Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="CONSULTDOCTORIND" Caption="Consulting Provider" Description="Consulting Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="DEPARTMENTID" Caption="Department" Description="MIMED department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="df5aac7a-1861-4c47-8649-85f405d95ce7"/>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" Caption="Subdepartment" Description="MIMED Sub-Department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="287fe463-4ca5-40e7-8064-3df34dd15864" />
+      </FormField>
+      <FormField FieldID="UMHSDATA_LASTPROCDATE" Description="UMHSDATA Import of the Process Date." Caption="UMHSDATA Import process date" DataType="Date" IncludeTimeOnDate="true" Category="UMHSDATA Import (only)" />
+    </FormFields>
+	</FormMetaData>
+
+</EditDataFormTemplateSpec>

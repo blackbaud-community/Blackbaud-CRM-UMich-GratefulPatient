@@ -1,0 +1,62 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="3B3288ED-22B0-457D-9AC8-AB2DFB2BEC47"
+	Name="Matched MIMED Friend Contacts to U-M affiliations"
+	Description="MIMED Friend (shell) records who associated MIMED Contact data matches to a DART constituent who is affiliated to U-M"
+	Author="UM Dev"
+	Tablename="USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Description="DART Constituent ID" Name="CONSTITUENTID" ForeignTable="CONSTITUENT" OnDelete="CascadeDelete" Required="true" Cardinality="ManyToOne" />
+    <GuidField Description="Record set ID for a run of matching" Name="MATCHSETID" />
+    <TextField Description="MIMED UMSH Data MRN" Name="MRN" Length="50" Required="true" />
+    <GuidField Description="MIMED UMHS Data Constituent ID that could be a DART Constituent ID or a MIMED Friend (shell record) Constituent ID" Name="UMHSCONSTITUENTID" />
+    <GuidField Description="MIMED Shell Constituent address" Name="ADDRESSID" />
+    <GuidField Description="MIMED Shell Constituent email address" Name="EMAILADDRESSID" />
+    <GuidField Description="MIMED Shell Constituent phone" Name="PHONEID" />
+    <NumberField Description="Composite Score" Name="COMPOSITESCORE" Type="smallint" />
+    <EnumField Description="Review Status" Name="REVIEWSTATUSCODE" DefaultValue="0" >
+      <EnumValues>
+        <EnumValue ID="0" Translation="Review"/>
+        <EnumValue ID="1" Translation="Delete"/>
+        <EnumValue ID="2" Translation="Complete"/>
+      </EnumValues>
+    </EnumField>
+	</Fields>
+
+	<!-- define any indexes on the table -->
+	<Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="MATCHSETID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="MATCHSETID"/>
+        <IndexField Name="DATEADDED"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="MRN" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+        <IndexField Name="MRN" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+
+</TableSpec>

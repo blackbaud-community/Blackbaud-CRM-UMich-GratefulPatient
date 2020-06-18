@@ -1,0 +1,172 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="60d56531-4a2e-4d41-b9ac-f28bed2f3a0d" 
+	Name="MIMED Batch Edit Visit Data Form"
+	Description="MIMED Batch Edit Visit Data Form" 
+	Author="UM Dev"
+	DataFormInstanceID="6080b24f-c468-4377-9009-2f065fbe7f7a" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Edit MIMED batch Visit data"
+	>
+
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH_VISITS">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH_VISITS
+(
+   @ID uniqueidentifier
+  ,@DATALOADED bit = 0  output
+  ,@TSLONG bigint = 0 output
+  ,@SEQUENCE int = null  output
+  -- Batch fields
+  ,@MRN nvarchar(50) = null  output
+  ,@PROVIDERDRNUMBER nvarchar(50) = null  output
+  ,@LASTPROCDATE datetime = null  output
+  ,@VISITTYPE nvarchar(1) = null  output
+  ,@UMHSDATA_CSN bigint = null  output
+  ,@UMHSDATA_PROV_ID bigint = null  output
+  ,@VISITSTARTDATE datetime = null  output
+  ,@VISITENDDATE datetime = null  output
+  ,@PROVIDERROLE nvarchar(50) = null  output
+  ,@PATIENTHOSPITALROOM nvarchar(150) = null  output
+  ,@HOSPITALVISITDATE datetime = null  output
+  ,@DEPARTMENTID uniqueidentifier = null output
+  ,@SUBDEPARTMENTID uniqueidentifier = null output
+  ,@CATEGORYMEMBERDESCRIPTION nvarchar(500) = null output
+)
+as
+
+	set nocount on;
+
+	-- be sure to set these, in case the select returns no rows
+	set @DATALOADED = 0
+	set @TSLONG = 0
+
+	select
+	   @DATALOADED = 1
+    ,@SEQUENCE = SEQUENCE
+    -- Batch fields
+    ,@MRN = MRN
+    ,@PROVIDERDRNUMBER =  PROVIDERDRNUMBER
+    ,@LASTPROCDATE = LASTPROCDATE
+    ,@VISITTYPE = VISITTYPE
+    ,@UMHSDATA_CSN = UMHSDATA_CSN
+    ,@UMHSDATA_PROV_ID = UMHSDATA_PROV_ID
+    ,@VISITSTARTDATE = VISITSTARTDATE
+    ,@VISITENDDATE = VISITENDDATE
+    ,@PROVIDERROLE = PROVIDERROLE
+    ,@PATIENTHOSPITALROOM = PATIENTHOSPITALROOM
+    ,@HOSPITALVISITDATE = HOSPITALVISITDATE
+    ,@DEPARTMENTID = DEPARTMENTID
+    ,@SUBDEPARTMENTID = SUBDEPARTMENTID
+    ,@CATEGORYMEMBERDESCRIPTION = CATEGORYMEMBERDESCRIPTION
+	from dbo.USR_UMHS_BATCH_VISITS
+	where ID = @ID
+
+	return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH_VISITS">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH_VISITS 
+(
+   @ID uniqueidentifier
+  ,@CHANGEAGENTID uniqueidentifier
+  ,@SEQUENCE int
+  -- Batch fields
+  ,@MRN nvarchar(50)
+  ,@PROVIDERDRNUMBER nvarchar(50)
+  ,@LASTPROCDATE datetime
+  ,@VISITTYPE nvarchar(1)
+  ,@UMHSDATA_CSN bigint
+  ,@UMHSDATA_PROV_ID bigint
+  ,@VISITSTARTDATE datetime
+  ,@VISITENDDATE datetime
+  ,@PROVIDERROLE nvarchar(50)
+  ,@PATIENTHOSPITALROOM nvarchar(150)
+  ,@HOSPITALVISITDATE datetime
+  ,@DEPARTMENTID uniqueidentifier
+  ,@SUBDEPARTMENTID uniqueidentifier
+  ,@CATEGORYMEMBERDESCRIPTION nvarchar(500)
+)
+as
+
+	set nocount on;
+
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate()
+
+	begin try
+		-- handle updating the data
+		update dbo.USR_UMHS_BATCH_VISITS 
+    set
+       SEQUENCE = @SEQUENCE
+      ,MRN = @MRN
+      ,PROVIDERDRNUMBER = @PROVIDERDRNUMBER
+      ,LASTPROCDATE = @LASTPROCDATE
+      ,VISITTYPE = @VISITTYPE
+      ,UMHSDATA_CSN = @UMHSDATA_CSN
+      ,UMHSDATA_PROV_ID = @UMHSDATA_PROV_ID
+      ,VISITSTARTDATE = @VISITSTARTDATE
+      ,VISITENDDATE = @VISITENDDATE
+      ,PROVIDERROLE = @PROVIDERROLE
+      ,PATIENTHOSPITALROOM = @PATIENTHOSPITALROOM
+      ,HOSPITALVISITDATE = @HOSPITALVISITDATE
+      ,DEPARTMENTID = @DEPARTMENTID
+      ,SUBDEPARTMENTID = @SUBDEPARTMENTID
+      ,CATEGORYMEMBERDESCRIPTION = @CATEGORYMEMBERDESCRIPTION
+      ,CHANGEDBYID = @CHANGEAGENTID
+      ,DATECHANGED = @CURRENTDATE
+		where 
+      ID = @ID
+	end try
+	begin catch
+		exec dbo.USP_RAISE_ERROR
+		return 1
+	end catch
+
+return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+
+	</SPDataForm>
+  
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="SEQUENCE" Caption="Sequence" DataType="Integer"  Required="true" Hidden="true" />
+      <FormField FieldID="MRN" Caption="Medical Record Number (MRN)" DataType="String" Required="true" MaxLength="50" />
+      <FormField FieldID="PROVIDERDRNUMBER" Caption="Provider's doctor number" DataType="String" Required="true" MaxLength="50"/>
+      <FormField FieldID="LASTPROCDATE" Caption="Last process date" DataType="Date" IncludeTimeOnDate="true" Required="true" />
+      <FormField FieldID="VISITTYPE" Caption="Visit type" DataType="String" MaxLength="1" Required="true" DefaultValueText="O" />
+      <FormField FieldID="UMHSDATA_CSN" Caption="Contact Serial Number (CSN)" DataType="Long" Required="true"  DoNotApplyFormat="true"/>
+      <FormField FieldID="UMHSDATA_PROV_ID" Caption="Provider ID" DataType="Long" Required="true" DoNotApplyFormat="true"/>
+      <FormField FieldID="VISITSTARTDATE" Caption="Visit start date" DataType="Date" IncludeTimeOnDate="true" />
+      <FormField FieldID="VISITENDDATE" Caption="Visit end date" DataType="Date" IncludeTimeOnDate="true" />
+      <FormField FieldID="PROVIDERROLE" Caption="Provider role" DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="PATIENTHOSPITALROOM" Caption="Hospital room" DataType="String" MaxLength="150" />
+      <FormField FieldID="HOSPITALVISITDATE" Caption="Hospital visit date" DataType="Date" IncludeTimeOnDate="true" />
+      <FormField FieldID="DEPARTMENTID" Caption="Department" Description="MIMED department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="df5aac7a-1861-4c47-8649-85f405d95ce7"/>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" Caption="Subdepartment" Description="MIMED Sub-Department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="287fe463-4ca5-40e7-8064-3df34dd15864" />
+      </FormField>
+      <FormField FieldID="CATEGORYMEMBERDESCRIPTION" Description="Provider's Category of Member Description" Caption="Category of Member Description" DataType="String" MaxLength="500"/>
+    </FormFields>
+	</FormMetaData>
+
+</EditDataFormTemplateSpec>

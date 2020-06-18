@@ -1,0 +1,82 @@
+<DataListSpec 
+    xmlns="bb_appfx_datalist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="4cceb8ef-f245-4643-ad11-daa63ee7e277"
+    Name="MIMED Portfolio List"
+    Description="A data list showing MIMED portfolio records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    >
+  <InstalledProductList xmlns="bb_appfx_commontypes">
+    <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <InstalledProduct ID="a84df439-5a75-4a3b-b3f5-b47035ddd3ff" />
+    <InstalledProduct ID="ab25cd89-7288-4605-b0ea-48961960ec06" />
+  </InstalledProductList>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.MajorGiving.Catalog.dll" ClassName="Blackbaud.AppFx.MajorGiving.Catalog.FundraisingManagerProspects.DataList" />
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSFUNDRAISINGMANAGERPROSPECTS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+      create procedure dbo.USR_UM_USP_DATALIST_UMHSFUNDRAISINGMANAGERPROSPECTS
+      (
+	        @FUNDRAISERID uniqueidentifier,
+         @INCLUDEHISTORICAL bit = 0
+      )
+        as
+        IF @INCLUDEHISTORICAL = 1 
+          begin 
+            SELECT T.[ID],
+                   C.ID                                CONSTITUENTID,
+                   CONCAT(D.FIRSTNAME, ' ', D.KEYNAME) TEAMMEMBER,
+                   ISNULL(T.[STARTDATE],NULL) STARTDATE,
+                   ISNULL(T.[ENDDATE],NULL)  ENDDATE               
+            FROM   USR_UMHS_TEAM T
+                   LEFT JOIN USR_UMHS_DATA D ON T.UMHSID = D.ID
+                   LEFT JOIN CONSTITUENT C ON C.ID = D.CONSTITUENTID
+                   LEFT JOIN DBO.USR_UMHS_TEAMROLECODE R ON T.[TEAMROLECODEID] = R.ID
+            WHERE  T.[TEAMMEMBERID] = @FUNDRAISERID 
+          end
+        ELSE
+          begin
+             SELECT distinct T.[ID],
+                   C.ID                                CONSTITUENTID,
+                   CONCAT(D.FIRSTNAME, ' ', D.KEYNAME) TEAMMEMBER,
+                   ISNULL(T.[STARTDATE],NULL)  STARTDATE   ,
+                   ISNULL(T.[ENDDATE],NULL)       ENDDATE
+            FROM   USR_UMHS_TEAM T
+                   LEFT JOIN USR_UMHS_DATA D ON T.UMHSID = D.ID
+                   LEFT JOIN CONSTITUENT C ON C.ID = D.CONSTITUENTID
+                   LEFT JOIN DBO.USR_UMHS_TEAMROLECODE R ON T.[TEAMROLECODEID] = R.ID
+				   WHERE T.[TEAMMEMBERID] = @FUNDRAISERID  and T.[ENDDATE] is null
+          END
+       
+          
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+  <Context ContextRecordType="Constituent" RecordIDParameter="FUNDRAISERID" />
+	<!-- define the output fields in the list TODO: Make it work after GO live-->
+ <Parameters>
+    <c:FormMetaData xmlns="bb_appfx_commontypes">
+      <c:FormFields>
+        <c:FormField FieldID="INCLUDEHISTORICAL" DataType="Boolean" Caption="Show historical" DefaultValueText="1" CaptionResourceKey="$$show_historical" />
+      </c:FormFields>
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDPortfolioListUIModel" />
+            <c:WebUI>
+                <c:DefaultWebUI />
+            </c:WebUI>
+        </c:WebUIComponent>
+    </c:FormMetaData>
+  </Parameters>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="CONSTITUENTID" Caption="CONSTITUENTID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="TEAMMEMBER" Caption="MIMED Friend" DataType="String" />
+      <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date" />
+      <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

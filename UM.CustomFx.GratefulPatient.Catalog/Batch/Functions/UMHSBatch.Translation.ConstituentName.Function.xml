@@ -1,0 +1,32 @@
+﻿<TranslationFunctionSpec
+	xmlns="bb_appfx_translationfunction"
+	xmlns:c="bb_appfx_commontypes"
+	ID="e58d466f-1532-4dea-9b50-dd046094ed31"
+	Name="USR_UFN_TRANSLATIONFUNCTION_UMSH_BATCH_CONSTITUENTNAME"
+	Description="Get the Constituent's name"
+	Author="UM Dev"
+	RecordType="MIMED Data"
+	>
+
+	<SQLTranslationFunction FNName="USR_UFN_TRANSLATIONFUNCTION_UMSH_BATCH_CONSTITUENTNAME">
+		<c:CreateFunctionSQL>
+			<![CDATA[
+create function dbo.USR_UFN_TRANSLATIONFUNCTION_UMSH_BATCH_CONSTITUENTNAME(@ID uniqueidentifier)
+returns nvarchar(200) 
+as
+begin
+	declare @NAME nvarchar(200);
+  
+  select 
+    @NAME=c.NAME 
+  from dbo.CONSTITUENT c
+  where 
+    c.ID=@ID
+  
+	return @NAME;
+end	
+			]]>
+		</c:CreateFunctionSQL>
+	</SQLTranslationFunction>
+
+</TranslationFunctionSpec>

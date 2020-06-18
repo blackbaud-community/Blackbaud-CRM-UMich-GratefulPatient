@@ -1,0 +1,103 @@
+﻿<style type="text/css">
+    ##MAP#CALLBEFORE_value, ##MAP#CALLAFTER_value/*, ##MAP#SEASONALSTARTDATE_value, ##MAP#SEASONALENDDATE_value*/ {
+        width: 57px;
+    }
+
+    ##MAP#CALLAFTER_value {
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+
+    ##MAP#STARTDATE_value, ##MAP#ENDDATE_value {
+        width: 85px;
+    }
+</style> 
+<div id="#MAP#UMHSPhoneAddForm"> 
+    <h2 id="#MAP#FORMHEADER_value"> </h2> 
+    <table style="overflow: visible"> 
+        <tr> 
+            <td colspan="2"> 
+                <h3 id="#MAP#PHONEINFORMATION_value"> </h3> 
+                <table> 
+                    <tr> 
+                        <td style="vertical-align: top"> 
+                            <table> 
+                                <tr id="#MAP#PHONETYPECODEID_container"> 
+                                    <td> <label id="#MAP#PHONETYPECODEID_caption" for="#MAP#PHONETYPECODEID_value"> </label> </td> 
+                                    <td colspan="2"> <input id="#MAP#PHONETYPECODEID_value" type="text" /> </td> 
+                                </tr> 
+                                <tr id="#MAP#NUMBER_container"> 
+                                    <td> <label id="#MAP#NUMBER_caption" for="#MAP#NUMBER_value"> </label> </td> 
+                                    <td colspan="2"> <input id="#MAP#NUMBER_value" type="text" /> </td> 
+                                </tr> 
+                                <tr id="#MAP#COUNTRYID_container"> 
+                                    <td> <label id="#MAP#COUNTRYID_caption" for="#MAP#COUNTRYID_value"> </label> </td> 
+                                    <td colspan="2"> <input id="#MAP#COUNTRYID_value" type="text" /> </td> 
+                                </tr> 
+                                <tr id="#MAP#TIME_container">
+                                    <td> 
+                                        <span id="#MAP#CALLAFTER_caption"></span> </td>
+                                    <td colspan="2"> 
+                                        <input id="#MAP#CALLAFTER_value" type="text" /> 
+                                        <span id="#MAP#CALLBEFORE_caption"></span> 
+                                        <input id="#MAP#CALLBEFORE_value" type="text" />
+                                    </td>
+                                </tr>
+                                <tr id="#MAP#STARTDATE_container"> 
+                                    <td>
+                                        <label id="#MAP#STARTDATE_caption" for="#MAP#STARTDATE_value"> </label>
+                                    </td>
+                                    <td colspan="2">                                        
+                                        <input id="#MAP#STARTDATE_value" type="text" />
+                                    </td >
+                                </tr>
+                                <tr id="#MAP#ENDDATE_container">
+                                    <td><label id="#MAP#ENDDATE_caption" for="#MAP#ENDDATE_value"> </label></td>
+                                    <td colspan="2">                                            
+                                        <input id="#MAP#ENDDATE_value" type="text" />
+                                    </td>
+                                </tr> 
+                            </table> 
+                        </td> 
+                        <td style="vertical-align: top"> 
+                            <table> 
+                                <tr id="#MAP#ISPRIMARY_container"> 
+                                <td></td> 
+                                <td colspan="2"> 
+                                    <input id="#MAP#ISPRIMARY_value" type="checkbox" style="width: auto" /> 
+                                    <label for="#MAP#ISPRIMARY_value"> </label> 
+                                </td> 
+                        </tr> 
+                        <tr id="#MAP#DONOTCALL_container"> 
+                            <td> </td> <td colspan="2"> 
+                            <input id="#MAP#DONOTCALL_value" type="checkbox" style="width: auto" /> 
+                            <label for="#MAP#DONOTCALL_value"> </label> </td> 
+                        </tr> 
+                        <tr id="#MAP#DONOTCALLREASONCODEID_container"> 
+                            <td> </td> 
+                            <td><label for="#MAP#DONOTCALLREASONCODEID_value"> </label> </td> 
+                            <td><input id="#MAP#DONOTCALLREASONCODEID_value" type="text" /> </td> 
+                        </tr>                            
+                        <tr id="#MAP#ISCONFIDENTIAL_container"> 
+                            <td> </td> <td colspan="2"> 
+                            <input id="#MAP#ISCONFIDENTIAL_value" type="checkbox" style="width: auto" /> 
+                            <label for="#MAP#ISCONFIDENTIAL_value"> </label> </td> 
+                        </tr> 
+                        </table>
+                     </td> 
+                    </tr> 
+                </table> 
+            </td> 
+        </tr> 
+        <tr> 
+            <td style="vertical-align: top"> 
+                <table> 
+                <tr> 
+                    <td colspan="3"> <h3 id="#MAP#PHONESOURCE_value"> </h3> </td> 
+                </tr> 
+                <tr id="#MAP#INFOSOURCECODEID_container"> <td> <label id="#MAP#INFOSOURCECODEID_caption" for="#MAP#INFOSOURCECODEID_value"> </label> </td> 
+                    <td> <input id="#MAP#INFOSOURCECODEID_value" type="text" /> </td> </tr> 
+                <tr id="#MAP#INFOSOURCECOMMENTS_container"> <td> <label id="#MAP#INFOSOURCECOMMENTS_caption" for="#MAP#INFOSOURCECOMMENTS_value"> </label> </td> <td> <input id="#MAP#INFOSOURCECOMMENTS_value" type="text" /> </td> </tr> </table> </td> 
+        </tr> 
+    </table> 
+</div>

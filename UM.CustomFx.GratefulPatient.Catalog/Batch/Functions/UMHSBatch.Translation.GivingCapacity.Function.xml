@@ -1,0 +1,31 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="87b0b6b7-8e1c-4b2e-8a80-f4c9669fbcbd"
+	Name="USR_UFN_TRANSLATIONFUNCTION_UMHS_BATCH_ESTGIVINGCAPACITYID"
+	Description="Using the translation ID, get the associated ID for the Estimated "
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_TRANSLATIONFUNCTION_UMHS_BATCH_ESTGIVINGCAPACITYID"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_TRANSLATIONFUNCTION_UMHS_BATCH_ESTGIVINGCAPACITYID(@TID uniqueidentifier)
+returns uniqueidentifier
+with execute as caller
+as begin
+  declare @GIVINGCAPACITYID uniqueidentifier;
+  
+  select
+    @GIVINGCAPACITYID=w.ID
+  from USR_UMHS_BATCH_GIVINGCAPACITYTRANSLATION g
+  inner join WEESTGIVCAPACITYCODE w on w.ID=g.GIVINGCAPACITYID
+  where
+    g.ID=@TID;
+  
+	return @GIVINGCAPACITYID;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

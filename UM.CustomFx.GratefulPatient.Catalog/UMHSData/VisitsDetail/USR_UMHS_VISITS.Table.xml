@@ -1,0 +1,52 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="fd660f95-dc36-488a-b896-284d7ed280de"
+	Name="USR_UMHS_VISITS"
+	Description="Stores information about MIMED visits records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_VISITS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+	  <ForeignKeyField Name="UMHSID" Required="true" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" Cardinality="ManyToOne" />
+	  <ForeignKeyField Name="PROVIDERID" ForeignTable="USR_UMHS_PROVIDERS" Required="true" />
+	  <DateField Name="LASTPROCDATE" Required="true" Description="Last Proc Date" />
+	  <TextField Name="VISITTYPE" Length="1" Description="I for Inpatient and O for Outpatient"/>
+	  <ComputedColumnField Name="CSN" Description="Contact serial number." Expression="CAST(isnull(UMHSDATA_CSN, '') as nvarchar(50))" />
+	  <DateField Name="VISITSTARTDATE"  Description="Visit start date" />
+	  <DateField Name="VISITENDDATE"  Description="Visit end date" />
+	  <TextField Name="PROVIDERROLE" Description="Provider role" Length="50" Required="true" />
+	  <TextField Name="PATIENTHOSPITALROOM" Description="Patient Hospital Room" Length="150"/>
+	  <DateField Name="HOSPITALVISITDATE" Description="Hospital Visit Date" />
+	  <ForeignKeyField Name="DEPARTMENTID" ForeignTable="USR_UMHS_DEPARTMENT"/>
+	  <ForeignKeyField Name="SUBDEPARTMENTID" ForeignTable="USR_UMHS_SUBDEPARTMENT"/>
+	  <TextField Name="CATEGORYMEMBERDESCRIPTION" Description="Category of Member Description" Length="500"/>
+	  <NumberField Name="UMHSDATA_PROV_ID" Description="MIMED Provider's ID imported directly from the UMHSDATA datamart" Type="bigint" />
+	  <NumberField Name="UMHSDATA_CSN" Description="MIMED Contact Serial Number imported directly from the UMHSDATA datamart" Type="bigint" />
+  </Fields>
+
+
+	<!-- define any indexes on the table -->
+	<Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />        
+      </IndexFields>
+    </Index>
+    <!-- This index is the same key that is on the VISIT_TBL in the UMHSDATA GPF datamart
+         that is used by the GP Import to determine new visit records to import into 
+         DART's USR_UMHS_VISITS table.-->
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="UMHSDATA_CSN"/>
+        <IndexField Name="UMHSDATA_PROV_ID"/>
+        <IndexField Name="PROVIDERID"/>
+        <IndexField Name="PROVIDERROLE"/>
+      </IndexFields>
+    </Index>
+	</Indexes>
+
+</TableSpec>

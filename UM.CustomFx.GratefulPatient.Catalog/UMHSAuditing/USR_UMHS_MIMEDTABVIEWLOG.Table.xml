@@ -1,0 +1,23 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ca5614f8-7f43-4d42-906b-09d6515bc13b"
+	Name="MIMED Tab View Log"
+	Description="Stores information about mimed tab view log records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_MIMEDTABVIEWLOG"		   
+	IsBuiltIn="false"
+	>
+
+  <!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Name="APPUSERID" Required="true" ForeignTable="APPUSER" OnDelete="CascadeDelete" Description="FK to APPUSER" />
+    <ForeignKeyField Name="PAGEID" Required="true" ForeignTable="PAGEDEFINITIONCATALOG" OnDelete="CascadeDelete" Description="FK to PAGEDEFINITIONCATALOG"/>
+    <GuidField Name="TABID" Required="true" Description="Tab ID"/>
+    <GuidField Name="SUBTABID" Required="true" Description="Sub tab ID"/>
+    <GuidField Name="CONTEXTRECORDID" Required="false" Description="Context Record ID" />
+    <BooleanField Name="ISPATIENTVIEW" DefaultValue="0" Description="Bit Field to show if the view is a patient view"/>
+    <!--<BooleanField Name="PATIENTONLY" Description="Is this record a patient only" DefaultValue="0"/>-->
+  </Fields>
+
+</TableSpec>

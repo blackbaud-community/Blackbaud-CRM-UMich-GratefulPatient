@@ -1,0 +1,11 @@
+﻿<CodeTableSpec 
+	xmlns="bb_appfx_codetable" 
+	xmlns:c="bb_appfx_commontypes"
+	ID="5b6c9827-de93-4a8e-b09b-829c1b26839f" 
+	Name="MIMED Note Type code"
+	Description="Stores translations for usr MIMED notetypecode codes"
+	Author="UM Dev"
+	DBTablename="USR_UMHS_NOTETYPECODE"
+	Category="MIMED Data"
+	SortMethod="Alpha"
+/>

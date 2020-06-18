@@ -1,0 +1,29 @@
+﻿<TranslationFunctionSpec
+	xmlns="bb_appfx_translationfunction"
+	xmlns:c="bb_appfx_commontypes"
+	ID="6eb22cbc-8e57-494f-93a0-227af6cc41db"
+	Name="USR_UM_UFN_TRANSLATIONFUNCTION_DEPARTMENT_GETNAME"
+	Description="Returns the name of the given Department ID."
+	Author="UM Dev"
+	RecordType="MIMED Data"
+	>
+
+	<SQLTranslationFunction FNName="USR_UM_UFN_TRANSLATIONFUNCTION_DEPARTMENT_GETNAME">
+		<c:CreateFunctionSQL>
+			<![CDATA[
+      create function dbo.USR_UM_UFN_TRANSLATIONFUNCTION_DEPARTMENT_GETNAME
+      (
+	      @ID uniqueidentifier
+      ) 
+      returns nvarchar(50) 
+      as
+      begin
+	      declare @name nvarchar(50);
+	      select @name = name from dbo.USR_UMHS_DEPARTMENT where ID = @ID;
+	      return @name;
+      end	
+			]]>
+		</c:CreateFunctionSQL>
+	</SQLTranslationFunction>
+
+</TranslationFunctionSpec>

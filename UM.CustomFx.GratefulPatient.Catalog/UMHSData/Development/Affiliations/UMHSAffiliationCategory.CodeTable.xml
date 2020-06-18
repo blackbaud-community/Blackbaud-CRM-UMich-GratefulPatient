@@ -1,0 +1,11 @@
+﻿<CodeTableSpec 
+	xmlns="bb_appfx_codetable" 
+	xmlns:c="bb_appfx_commontypes"
+	ID="1f033af2-9436-4535-9923-549002e0510a" 
+	Name="MIMED Affiliation Category Type"
+	Description="Stores translations for MIMED affiliation category codes"
+	Author="UM Dev"
+	DBTablename="USR_UMHS_AFFILIATIONCATEGORYTYPECODE"
+	Category="MIMED Data"
+	SortMethod="Alpha"
+/>

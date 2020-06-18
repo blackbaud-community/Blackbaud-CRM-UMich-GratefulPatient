@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>UMHSRelationship.Edit.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>UMHSRelationshipEditFormUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>UMHSRelationshipEditForm.html</HtmlFile>
+    <HtmlFolder>htmlforms\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

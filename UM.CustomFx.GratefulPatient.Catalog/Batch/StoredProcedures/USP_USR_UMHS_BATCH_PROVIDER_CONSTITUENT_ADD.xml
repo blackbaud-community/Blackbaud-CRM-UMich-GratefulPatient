@@ -1,0 +1,86 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="18452d99-81a8-4755-8db3-8d2e872f0fe6"
+	Name="USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD"
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD
+(
+   @ID uniqueidentifier output
+  ,@CHANGEAGENTID uniqueidentifier = null
+  ,@UMEMPLID nvarchar(200)
+  ,@UMUNIQUENAME nvarchar(200)
+  ,@LASTNAME nvarchar(200)
+  ,@FIRSTNAME nvarchar(100) = ''
+)
+as
+	set nocount on;
+
+  if ((nullif(ltrim(rtrim(@UMEMPLID)), '') is null) and (nullif(ltrim(rtrim(@UMUNIQUENAME)), '') is null))
+  begin
+    RAISERROR('Unable to create Constituent record for new Provider. Both U-M ID and Uniquename are empty.', 13, 1)
+  end
+  else
+  begin
+  
+    if @ID is null
+        set @ID = newid()
+
+    if @CHANGEAGENTID is null  
+        exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+    
+    declare @CURRENTAPPUSERID uniqueidentifier=null;    
+    select @CURRENTAPPUSERID=ID from appuser where windowsusername=SUSER_NAME();    
+
+    begin try
+        -- Add new Constituent
+        exec dbo.USP_DATAFORMTEMPLATE_ADD_INDIVIDUALSPOUSEBUSINESS
+	         @ID=@ID
+	        ,@LASTNAME=@LASTNAME
+	        ,@FIRSTNAME=@FIRSTNAME
+	        ,@CURRENTAPPUSERID=@CURRENTAPPUSERID
+	        ,@CHANGEAGENTID=@CHANGEAGENTID
+      
+        -- Add alternate lookup IDs for the new Constituent
+        declare @ALTERNATELOOKUPID uniqueidentifier;
+
+        if (nullif(ltrim(rtrim(@UMEMPLID)), '') is not null)
+        begin
+          set @ALTERNATELOOKUPID=NEWID();
+
+          exec dbo.USP_DATAFORMTEMPLATE_ADD_ALTERNATELOOKUPID
+             @ID = @ALTERNATELOOKUPID output
+            ,@CHANGEAGENTID = @CHANGEAGENTID	
+            ,@CONSTITUENTID = @ID
+	          ,@ALTERNATELOOKUPIDTYPECODEID = '97CE11D1-6793-47D5-9FEE-B54B90DA16DA'		-- University of Michigan ID-UMID
+	          ,@ALTERNATELOOKUPID = @UMEMPLID;
+        end
+        
+        if (nullif(ltrim(rtrim(@UMUNIQUENAME)), '') is not null)
+        begin
+          set @ALTERNATELOOKUPID=NEWID();
+
+          exec dbo.USP_DATAFORMTEMPLATE_ADD_ALTERNATELOOKUPID
+             @ID = @ALTERNATELOOKUPID output
+            ,@CHANGEAGENTID = @CHANGEAGENTID	
+            ,@CONSTITUENTID = @ID
+            ,@ALTERNATELOOKUPIDTYPECODEID = '4073AA02-1416-4F6F-9238-9FCEFDEE6423'		-- U-M Uniqname
+            ,@ALTERNATELOOKUPID = @UMUNIQUENAME;      
+        end
+        
+    end try
+    begin catch
+        exec dbo.USP_RAISE_ERROR
+        return 1
+    end catch		
+  end
+]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

@@ -1,0 +1,45 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="e8830cb8-0be5-4185-b1ac-0be495962749" 
+	Name="UMHS Set Match Review Status To Deleted Record Operation" 
+	Description="Update that review status to Delete on the match set record"
+	Author="UM Dev"
+	OperationType="Update"
+	RecordType="Matched MIMED Friend Contacts to U-M affiliations"
+	c:SecurityUIFolder="UMHS Duplicate Search"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_UM_USP_RECORDOPERATION_UMHSSETMATCHREVIEWSTATUSTODELETED">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_RECORDOPERATION_UMHSSETMATCHREVIEWSTATUSTODELETED
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as begin
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate()
+
+  update USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS
+  set
+    REVIEWSTATUSCODE=1,
+    CHANGEDBYID=@CHANGEAGENTID,
+    DATECHANGED=@CURRENTDATE
+  where
+    ID=@ID
+    
+	return 0;
+	
+end
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+</RecordOperationSpec>

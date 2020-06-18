@@ -1,0 +1,120 @@
+﻿<BatchTypeSpec
+	xmlns="bb_appfx_batchtype"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c2b6609e-13a3-4938-8e60-1d1c8009e8c1" 
+	Name="MIMED Providers Data Batch"
+	Description="A batch type for adding MIMED Data Provider records" 
+	Author="UM Dev"
+	BaseTableName="USR_UMHS_BATCH_PROVIDERS" 
+	Category="MIMED Data" 
+	>
+  
+  <c:DependencyList>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.Providers.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Providers.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.Providers.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.Providers.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.Providers.RecordOperation.xml"/>
+  </c:DependencyList>
+
+  <!-- indicate the form used to add a row to the batch (note that this is the template ID, not the instance ID) -->
+	<AddRowDataFormTemplate CatalogItemID="0272ec61-5829-4b10-a132-1d764d5297fa" />
+
+	<!-- indicate the form used to edit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<EditRowDataFormTemplate CatalogItemID="c4e072a8-0f52-409c-8711-43c2bbac64dd" />
+
+	<!-- indicate the form used to commit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<CommitRowDataForms>
+    <CommitRowAddDataFormTemplate CatalogItemID="c84a6344-808e-4dbb-8428-3fd7beda0a39" />
+    <CommitRowEditDataFormTemplate CatalogItemID="5a794c8a-5ee1-45c8-9cb0-37177ad687d1" 
+                                   EditLoadField="PROVIDERID"/>
+  </CommitRowDataForms>
+	
+	<!-- Record operation to delete a row from the UMHS (Providers) batch -->
+	<BatchDeleteRowRecordOperation CatalogItemID="69001347-6564-46B8-85B0-818D6E2DD688" />
+
+  <!-- Record operation to delete a UMHS (Providers) Batch -->
+  <DeleteBatchRecordOperation CatalogItemID="35975872-5e8f-4100-8f5e-ae90783d60d4"/>
+  
+  <DefaultSelectedFields>
+    <Field>PROVIDERID</Field>
+    <Field>CONSTITUENTID</Field>
+    <Field>PROVIDERDRNUMBER</Field>
+    <Field>UMEMPLID</Field>
+    <Field>UMUNIQUENAME</Field>
+    <Field>LASTNAME</Field>
+    <Field>FIRSTNAME</Field>
+  </DefaultSelectedFields>
+
+  <FieldsRequiredByDesign>
+    <Field>PROVIDERID</Field>
+  </FieldsRequiredByDesign>
+
+  <DuplicateRecordCheck SearchListID="2787d0a0-59e9-47a3-9187-18d66cd71ed0"
+    DuplicateResolutionHeaderCaption="Resolve Duplicate"
+    IdentifiedDuplicateActionToPerform="Update"
+    LinkFieldID="PROVIDERID"
+    IdentifiedDuplicateActionCaption="Update Duplicate">
+
+    <NoMatchMsg MessageText="No duplicates found"
+                MessageTextResourceKey="$$no_matches_found" />
+    <SingleMatchMsg MessageText="Single duplicate found"
+                    MessageTextResourceKey="$$single_match_found" />
+    <MultipleMatchesMsg MessageText="Multiple duplicates found."/>
+
+    <AutoMatch
+      AutoMatchThresholdDataFormID="8cdcd98d-3cf0-4440-bfd3-1267678a3a51"
+      AutoMatchThresholdFormFieldID="AUTOMATCHTHRESHOLD"
+      OverallMatchThresholdFormFieldID="OVERALLMATCHTHRESHOLDBATCH"
+      SearchResultScoreColumn="MATCHPERCENTAGE"
+      SaveAutoMatchDataFormID="9b3d2c39-a4e6-4f69-8e2e-9697a7c032d2"
+      SaveAutoMatchDataFormMatchedFieldID="PROVIDERID"
+    >
+    </AutoMatch>
+  </DuplicateRecordCheck>  
+  
+  <!-- optionally, you can override the default 'batch delete' behavior by specifying the record operation to use deleting a batch of this type -->
+	<!--<DeleteBatchRecordOperation CatalogItemID="REPLACE_WITH_RECORDOPERATIONID" />-->
+
+	<!-- optionally, describe the batch row context window -->
+	<!--<RowContextWindow Caption="REPLACE_WITH_CAPTION" 
+				      ViewDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  EditDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  ImageKey="REPLACE_WITH_IMAGEKEY" 
+					  RecordType="REPLACE_WITH_RECORDTYPE" 
+					  ContextFieldID="REPLACE_WITH_CONTEXTFIELDID" 
+					  />-->
+
+	<!-- optionally, you can indicate a report to use as the validation report for the batch -->
+	<!--<ValidationReport CatalogItemID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe a control report for batches of this type -->
+	<!--<ControlReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				   QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+				   ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe an exception report for batches of this type -->
+	<!--<ExceptionReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				     QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+					 ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe the client-side summary panel for batches of this type.  This should refer to a class that inherits 
+	from Browser.Batch.BatchSummaryPanelHandler -->
+	<!--<SummaryPanelHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />-->
+
+	<!-- optionally, list any client-side event handlers that will be plugged into the event model for the batch data entry form.  Each handler
+	refers to a class that inherits from Browser.Batch.BatchEntryHandler -->
+	<!--<EventHandlers>
+		<BatchEventHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />
+	</EventHandlers>-->
+
+	<!-- optionally, indicate a list of fields from the Add/Edit form that should be included by default in the batch design.  This list
+	does not need to include required or hidden fields, as they are already included by default.	
+	-->
+	<!--<DefaultSelectedFields>
+		<Field>FIELD1</Field>
+		<Field>FIELD2</Field>
+		<Field>FIELD3</Field>
+	</DefaultSelectedFields>-->
+
+</BatchTypeSpec>

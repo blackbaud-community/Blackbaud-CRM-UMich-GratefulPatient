@@ -1,0 +1,301 @@
+﻿<style type="text/css">
+    ##MAP#ConstituentSearch {
+        width: 700px;
+    }
+
+    ##MAP#CONSTITUENCY_value {
+        width: 190px;
+    }
+
+    ##MAP#searchInTable {
+        border-collapse: collapse;
+        width: 600px;
+    }
+</style>
+<div id="#MAP#ConstituentSearch">
+    <table>
+        <tr>
+            <td>
+                <div class="bbui-forms-fieldset-column">
+                    <table>
+                        <tr id="#MAP#KEYNAME_container">
+                            <td>
+                                <label id="#MAP#KEYNAME_caption" for="#MAP#KEYNAME_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#KEYNAME_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#FIRSTNAME_container">
+                            <td>
+                                <label id="#MAP#FIRSTNAME_caption" for="#MAP#FIRSTNAME_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#FIRSTNAME_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#MIDDLENAME_container">
+                            <td>
+                                <label id="#MAP#MIDDLENAME_caption" for="#MAP#MIDDLENAME_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#MIDDLENAME_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#SUFFIXCODEID_container">
+                            <td>
+                                <label id="#MAP#SUFFIXCODEID_caption" for="#MAP#SUFFIXCODEID_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#SUFFIXCODEID_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#MRN_container">
+                            <td>
+                                <label id="#MAP#MRN_caption" for="#MAP#MRN_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#MRN_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#CPISEQUENCE_container">
+                            <td>
+                                <label id="#MAP#CPISEQUENCE_caption" for="#MAP#CPISEQUENCE_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#CPISEQUENCE_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#LOOKUPID_container">
+                            <td>
+                                <label id="#MAP#LOOKUPID_caption" for="#MAP#LOOKUPID_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#LOOKUPID_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#PRIMARYBUSINESS_container">
+                            <td>
+                                <label id="#MAP#PRIMARYBUSINESS_caption" for="#MAP#PRIMARYBUSINESS_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#PRIMARYBUSINESS_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#EMAILADDRESS_container">
+                            <td>
+                                <label id="#MAP#EMAILADDRESS_caption" for="#MAP#EMAILADDRESS_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#EMAILADDRESS_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#CONSTITUENCY_container">
+                            <td>
+                                <label id="#MAP#CONSTITUENCY_caption" for="#MAP#CONSTITUENCY_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#CONSTITUENCY_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#SCU_container">
+                            <td>
+                                <label id="#MAP#SCU_caption" for="#MAP#SCU_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#SCU_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#EXACTMATCHONLY_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#EXACTMATCHONLY_value" type="checkbox" style="width: auto" />
+                                <label for="#MAP#EXACTMATCHONLY_value"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td valign="top">
+                <div class="bbui-forms-fieldset-column">
+                    <table>
+                        <tr  id="#MAP#COUNTRYID_container">
+                            <td>
+                                <label id="#MAP#COUNTRYID_caption" for="#MAP#COUNTRYID_value"/>
+                            </td>
+                            <td>
+                                <input id="#MAP#COUNTRYID_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#ADDRESSBLOCK_container">
+                            <td>
+                                <label id="#MAP#ADDRESSBLOCK_caption" for="#MAP#ADDRESSBLOCK_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#ADDRESSBLOCK_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#CITY_container">
+                            <td>
+                                <label id="#MAP#CITY_caption" for="#MAP#CITY_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#CITY_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#STATEID_container">
+                            <td>
+                                <label id="#MAP#STATEID_caption" for="#MAP#STATEID_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#STATEID_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#POSTCODE_container">
+                            <td>
+                                <label id="#MAP#POSTCODE_caption" for="#MAP#POSTCODE_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#POSTCODE_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#CLASSOF_container">
+                            <td>
+                                <label id="#MAP#CLASSOF_caption" for="#MAP#CLASSOF_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#CLASSOF_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#PHONENUMBER_container">
+                            <td>
+                                <label id="#MAP#PHONENUMBER_caption" for="#MAP#PHONENUMBER_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#PHONENUMBER_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#PROSPECTMANAGERID_container">
+                            <td>
+                                <label id="#MAP#PROSPECTMANAGERID_caption" for="#MAP#PROSPECTMANAGERID_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#PROSPECTMANAGERID_value" type="text" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#GENDERCODE_container">
+                            <td>
+                                <label id="#MAP#GENDERCODE_caption" for="#MAP#GENDERCODE_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#GENDERCODE_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                        <tr id="#MAP#BIRTHDATE_container">
+                            <td>
+                                <label id="#MAP#BIRTHDATE_caption" for="#MAP#BIRTHDATE_value" />
+                            </td>
+                            <td>
+                                <input id="#MAP#BIRTHDATE_value" type="text" class="bbui-forms-xs" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="#MAP#HIDEADVANCEDOPTIONS_container" style="overflow: auto;">
+                    <table>
+                        <tr>
+                            <td colspan="3">
+                                <h3 id="#MAP#ADVANCEDSEARCHOPTIONSGROUP_value"></h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 100px;">
+                                <span id="#MAP#SEARCHIN_caption"></span>
+                            </td>
+                            <td colspan="2">
+                                <table id="#MAP#searchInTable" style="border-collapse:collapse">
+                                    <tr>
+                                        <td style="padding-left:0px">
+                                            <input type="checkbox" id="#MAP#INCLUDEINDIVIDUALS_value" />
+                                            <label for="#MAP#INCLUDEINDIVIDUALS_value">
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" id="#MAP#INCLUDEORGANIZATIONS_value" />
+                                            <label for="#MAP#INCLUDEORGANIZATIONS_value">
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" id="#MAP#INCLUDEGROUPS_value" />
+                                            <label for="#MAP#INCLUDEGROUPS_value">
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="checkbox" id="#MAP#CHECKNICKNAME_value" />
+                                <label for="#MAP#CHECKNICKNAME_value">
+                                </label>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="#MAP#ONLYPRIMARYADDRESS_value" />
+                                <label for="#MAP#ONLYPRIMARYADDRESS_value">
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="checkbox" id="#MAP#CHECKALIASES_value" />
+                                <label for="#MAP#CHECKALIASES_value">
+                                </label>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="#MAP#INCLUDEDECEASED_value" />
+                                <label for="#MAP#INCLUDEDECEASED_value">
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="checkbox" id="#MAP#CHECKALTERNATELOOKUPIDS_value" />
+                                <label for="#MAP#CHECKALTERNATELOOKUPIDS_value"></label>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="#MAP#INCLUDEINACTIVE_value" />
+                                <label for="#MAP#INCLUDEINACTIVE_value">
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <input type="checkbox" id="#MAP#FUZZYSEARCHONNAME_value" />
+                                <label for="#MAP#FUZZYSEARCHONNAME_value">
+                                </label>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="#MAP#PATIENTSONLY_value" />
+                                <label for="#MAP#PATIENTSONLY_value"></label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="padding: 5px;">
+                    <a id="#MAP#SHOWADVANCEDOPTIONS_action"></a>
+                    <a id="#MAP#HIDEADVANCEDOPTIONS_action"></a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<!--SCRIPT:/browser/htmlforms/constituent/individual/individualsearch.js-->

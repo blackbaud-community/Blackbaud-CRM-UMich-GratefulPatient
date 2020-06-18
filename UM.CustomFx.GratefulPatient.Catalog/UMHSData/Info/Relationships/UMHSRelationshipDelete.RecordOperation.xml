@@ -1,0 +1,54 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="1c2f993d-aaea-457e-95ca-50ee7a99cf4e"
+    Name="MIMED Relationship Delete"
+    Description="Used to delete the given USR_UMHS_RELATIONSHIP"
+    Author="UM Dev"
+    RecordType="MIMED Relationshp"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_USR_UMHS_RELATIONSHIP_DELETE">
+            <c:CreateProcedureSQL>
+<![CDATA[
+create procedure dbo.USR_USP_USR_UMHS_RELATIONSHIP_DELETE
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier = null
+)
+as begin
+  if @CHANGEAGENTID is null  
+    exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+
+	--check deletion rules, if any
+
+	-- use the system generated delete routine to allow proper recording of the deleting agent
+  
+  DECLARE @RECIPROCALUMHSID UNIQUEIDENTIFIER,
+          @RELATIONSHIPSETID UNIQUEIDENTIFIER
+          
+  SELECT  @RECIPROCALUMHSID = RECIPROCALUMHSID,
+          @RELATIONSHIPSETID = RELATIONSHIPSETID 
+  FROM USR_UMHS_RELATIONSHIP 
+  WHERE ID = @ID
+  
+  DELETE FROM DBO.USR_UMHS_RELATIONSHIP WHERE UMHSID = @RECIPROCALUMHSID
+  
+  DELETE FROM DBO.USR_UMHS_RELATIONSHIPSET WHERE ID = @RECIPROCALUMHSID
+    
+	exec USP_USR_UMHS_RELATIONSHIP_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+  
+  
+	return 0;
+	
+end
+]]>
+</c:CreateProcedureSQL>
+        </SPOperationImplementation>
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this relationship?" />
+    </Prompt>
+</RecordOperationSpec>

@@ -1,0 +1,103 @@
+﻿  <!--<table>
+    <tr id="#MAP#USERID_container">
+      <td>
+        <label id="#MAP#USERID_caption" for="#MAP#USERID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#USERID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#ACTIONTYPECODE_container">
+      <td>
+        <label id="#MAP#ACTIONTYPECODE_caption" for="#MAP#ACTIONTYPECODE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#ACTIONTYPECODE_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#DATETYPE_container">
+      <td>
+        <label id="#MAP#DATETYPE_caption" for="#MAP#DATETYPE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#DATETYPE_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#STARTDATE_container">
+      <td>
+        <label id="#MAP#STARTDATE_caption" for="#MAP#STARTDATE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#STARTDATE_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#ENDDATE_container">
+      <td>
+        <label id="#MAP#ENDDATE_caption" for="#MAP#ENDDATE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#ENDDATE_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#RECORDTYPECODE_container">
+      <td>
+        <label id="#MAP#RECORDTYPECODE_caption" for="#MAP#RECORDTYPECODE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#RECORDTYPECODE_value" type="text" />
+      </td>
+    </tr>
+  </table>
+   To define fields in multiple columns on the form, simply add/move the fields to this div
+        <div class="bbui-forms-fieldset-column">
+            <table>
+            </table>
+        </div>-->
+    <style type="text/css">
+        ##MAP#MIMEDHistoryReport .x-toolbar {
+            background-image: none;
+            background-color: Transparent;
+            border: none;
+        }
+
+        ##MAP#column2 {
+            vertical-align: top;
+        }
+
+        ##MAP#dateDropdowns {
+            margin: 0;
+            padding: 0;
+        }
+
+            ##MAP#dateDropdowns table {
+                border-collapse: collapse;
+            }
+    </style>
+
+    <div id="#MAP#MIMEDHistoryReport">
+    <table>
+        <tr>
+            <td>
+                <table>
+                        <tr id="#MAP#UMHSID_container">
+                        <td>
+                            <label id="#MAP#UMHSID_caption" for="#MAP#UMHSID_value"></label>
+                        </td>
+                        <td>
+                            <input id="#MAP#UMHSID_value" type="text" />
+                        </td>
+                        </tr>
+                    <tr id="#MAP#RECORDTYPECODE_container">
+                        <td>
+                            <label id="#MAP#RECORDTYPECODE_caption" for="#MAP#RECORDTYPECODE_value"> </label>
+                        </td>
+                        <td> <input id="#MAP#RECORDTYPECODE_value" type="text"/> </td>
+                    </tr>
+                    <tr> <td> <label id="#MAP#DATETYPE_caption" for="#MAP#DATETYPE_value"> </label> </td> <td> <input id="#MAP#DATETYPE_value" type="text"/> </td> </tr>
+                    <tr> <td> <label id="#MAP#STARTDATE_caption" for="#MAP#STARTDATE_value"> </label> </td> <td id="#MAP#dateDropdowns"> <table> <tr> <td> <input id="#MAP#STARTDATE_value" type="text" class="bbui-forms-xs"/> </td> <td></td> <td> <label id="#MAP#ENDDATE_caption" for="#MAP#ENDDATE_value"> </label> </td> <td> <input id="#MAP#ENDDATE_value" type="text" class="bbui-forms-xs"/> </td> </tr> </table> </td> </tr>
+                </table>
+            </td>
+            <td id="#MAP#column2"> <table> <tr id="#MAP#USERID_container"> <td> <label id="#MAP#USERID_caption" for="#MAP#USERID_value"> </label> </td> <td> <input id="#MAP#USERID_value" type="text" /> </td> </tr> <tr id="#MAP#ACTIONTYPECODE_container"> <td> <label id="#MAP#ACTIONTYPECODE_caption" for="#MAP#ACTIONTYPECODE_value"> </label> </td> <td> <input id="#MAP#ACTIONTYPECODE_value" type="text" /> </td> </tr> </table> </td>
+        </tr>
+    </table>
+</div>

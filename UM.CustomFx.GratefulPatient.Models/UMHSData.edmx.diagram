@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="62e933724f0a4f129311fa1e68a5f6e1" Name="Diagram1" ZoomLevel="99">
+        <EntityTypeShape EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATE" Width="2.75" PointX="2.5" PointY="0.75" />
+        <EntityTypeShape EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATEADDRESS" Width="1.5" PointX="5.625" PointY="9.5" />
+        <EntityTypeShape EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATEEMAILADDRESS" Width="3.125" PointX="5.375" PointY="0.75" />
+        <EntityTypeShape EntityType="UMHSDataModel.BATCHCONSTITUENTUPDATEPHONE" Width="1.5" PointX="5.625" PointY="19.75" />
+        <AssociationConnector Association="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEADDRESSES_BATCHCONSTITUENTUPDATEID" />
+        <AssociationConnector Association="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEEMAILADDRESSES_BATCHCONSTITUENTUPDATEID" />
+        <AssociationConnector Association="UMHSDataModel.FK_BATCHCONSTITUENTUPDATEPHONES_BATCHCONSTITUENTUPDATEID" />
+        <EntityTypeShape EntityType="UMHSDataModel.USR_UMHS_DATA" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="UMHSDataModel.BATCHREVENUECONSTITUENT" Width="3.25" PointX="8.625" PointY="0.75" />
+        <EntityTypeShape EntityType="UMHSDataModel.USR_UMHS_PROVIDERS" Width="3" PointX="12.375" PointY="0.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

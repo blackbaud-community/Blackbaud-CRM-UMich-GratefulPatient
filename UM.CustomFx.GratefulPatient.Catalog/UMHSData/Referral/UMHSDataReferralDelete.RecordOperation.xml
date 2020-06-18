@@ -1,0 +1,36 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="7b09d16c-0a04-4508-ac8a-e2b71f656ff9"
+    Name="MIMED Referral Delete"
+    Description="Used to delete the given MIMED Referral"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_UMHS_DATA_REFERRAL_DELETE">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            create procedure dbo.USR_USP_UMHS_DATA_REFERRAL_DELETE
+            (
+	            @ID uniqueidentifier,
+	            @CHANGEAGENTID uniqueidentifier
+            )
+            as begin
+	            --check deletion rules, if any
+
+	            -- use the system generated delete routine to allow proper recording of the deleting agent
+	            exec USP_USR_UMHS_REFERRAL_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	            return 0;
+	
+            end
+            ]]>
+            </c:CreateProcedureSQL>
+        </SPOperationImplementation>
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this MIMED Referral?" />
+    </Prompt>
+</RecordOperationSpec>

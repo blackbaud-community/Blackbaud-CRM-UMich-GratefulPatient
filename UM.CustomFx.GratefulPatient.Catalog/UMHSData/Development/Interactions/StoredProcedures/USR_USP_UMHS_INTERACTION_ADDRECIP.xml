@@ -1,0 +1,71 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9d7b90fa-309c-49f7-b5ba-bc28af0a7475"
+	Name="USR_USP_UMHS_INTERACTION_ADDRECIP"
+	Description="Adds MIMED reciprocal interaction"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_INTERACTION_ADDRECIP"
+	>
+	<CreateProcedureSQL>
+		<![CDATA[
+    CREATE PROCEDURE DBO.USR_USP_UMHS_INTERACTION_ADDRECIP(@INTERACTIONID UNIQUEIDENTIFIER,
+                                                           @CHANGEAGENTID UNIQUEIDENTIFIER=NULL,
+                                                           @CHANGEDATE    DATETIME =NULL)
+    AS
+        SET NOCOUNT ON;
+
+        --GET THE MAIN INTERACTION CONSTITUENT
+        DECLARE @CONSTITUENTID UNIQUEIDENTIFIER = (
+           SELECT D.CONSTITUENTID
+           FROM   USR_UMHS_INTERACTION I
+                  JOIN USR_UMHS_DATA D ON D.ID = I.UMHSID
+           WHERE  I.ID = @INTERACTIONID
+        )
+
+        IF @CHANGEAGENTID IS NULL
+          EXEC USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+            @CHANGEAGENTID OUTPUT;
+
+        IF @CHANGEDATE IS NULL
+          SET @CHANGEDATE=GETDATE();
+
+        --GET THE PARTICIPANTS AND BUILD THE RECIPROCAL RECORDS
+        DECLARE @RP TABLE(
+          RECIPID UNIQUEIDENTIFIER,
+          UMHSID  UNIQUEIDENTIFIER
+        )
+
+        INSERT INTO @RP
+        SELECT P.CONSTITUENTID,
+               RECIP.ID
+        FROM   DBO.USR_UMHS_INTERACTIONPARTICIPANT P
+               LEFT JOIN USR_UMHS_DATA RECIP ON RECIP.CONSTITUENTID = P.CONSTITUENTID
+        WHERE  P.INTERACTIONID = @INTERACTIONID
+
+        DECLARE @ID                       UNIQUEIDENTIFIER,
+                @RECIPID                  UNIQUEIDENTIFIER,
+                @UMHSID                   UNIQUEIDENTIFIER
+        
+        WHILE EXISTS(SELECT TOP 1 RECIPID FROM @RP)
+          BEGIN
+              SET @ID = NEWID() --CREATE NEW INTERACTIONID
+          
+              SELECT TOP 1 @RECIPID = RECIPID,
+                           @UMHSID = UMHSID
+              FROM @RP
+
+              IF @UMHSID IS NULL
+                --create MIMED Record
+                EXEC DBO.USR_USP_UMHS_CREATEFROMCONSTITUENT @UMHSID = @UMHSID OUTPUT, @CONSTITUENTID = @RECIPID
+
+              --clean up the temp table
+              DELETE FROM @RP WHERE  RECIPID = @RECIPID
+          END 
+
+
+
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

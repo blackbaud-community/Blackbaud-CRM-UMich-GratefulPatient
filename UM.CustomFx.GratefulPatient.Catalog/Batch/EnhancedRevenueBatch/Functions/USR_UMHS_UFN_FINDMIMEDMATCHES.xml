@@ -1,0 +1,426 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="B4F635D3-DCE6-4BAB-9798-5D8A23CD6904"
+	Name="USR_UMHS_UFN_FINDMIMEDMATCHES"
+	Description="Adds patient only search logic to the matching"
+	Author="UM Dev"
+	DBFunctionName="USR_UMHS_UFN_FINDMIMEDMATCHES"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+CREATE FUNCTION [DBO].[USR_UMHS_UFN_FINDMIMEDMATCHES] (
+  @TITLECODEID           UNIQUEIDENTIFIER,
+  @FIRSTNAME             NVARCHAR(50),
+  @MIDDLENAME            NVARCHAR(50),
+  @KEYNAME               NVARCHAR(100),
+  @SUFFIXCODEID          UNIQUEIDENTIFIER,
+  @ADDRESSBLOCK          NVARCHAR(150),
+  @POSTCODE              NVARCHAR(12),
+  @COUNTRYID             UNIQUEIDENTIFIER,
+  @ISORGANIZATION        BIT,
+  @ISGROUP               BIT,
+  @LOOKUPID              NVARCHAR(100),
+  @ALTERNATELOOKUPIDS    XML,
+  @EMAILADDRESS          NVARCHAR(100),
+  @PHONENUMBER           NVARCHAR(100),
+  @OVERALLMATCHTHRESHOLD TINYINT,
+  @AUTOMATCHTHRESHOLD    TINYINT
+)
+RETURNS @MATCHES TABLE (
+  CONSTITUENTID      UNIQUEIDENTIFIER,
+  ADDRESSID          UNIQUEIDENTIFIER,
+  EMAILADDRESSID     UNIQUEIDENTIFIER,
+  PHONEID            UNIQUEIDENTIFIER,
+  IDRESULT           TINYINT,
+  EMAILADDRESSRESULT TINYINT,
+  TITLERESULT        TINYINT,
+  FIRSTNAMERESULT    TINYINT,
+  MIDDLENAMERESULT   TINYINT,
+  KEYNAMERESULT      TINYINT,
+  SUFFIXRESULT       TINYINT,
+  STREETNUMBERRESULT TINYINT,
+  STREETNAMERESULT   TINYINT,
+  POSTCODERESULT     TINYINT,
+  PHONENUMBERRESULT  TINYINT,
+  -- scores are included for informational purposes, the results will be what is used to determine matches
+  FIRSTNAMESCORE     TINYINT,
+  MIDDLENAMESCORE    TINYINT,
+  KEYNAMESCORE       TINYINT,
+  STREETNUMBERSCORE  TINYINT,
+  STREETNAMESCORE    TINYINT,
+  POSTCODESCORE      TINYINT,
+  -- this constituent is not a match, but the two constituents may be a household
+  HOUSEHOLDMATCH     BIT,
+  COMPOSITESCORE     INT )
+  
+  BEGIN
+
+-- No matches found by lookup ID or alternate ID, proceed with the fuzzy matching.
+-- Clean incoming data
+DECLARE @CLEANFIRSTNAME   NVARCHAR(50),
+        @CLEANMIDDLENAME  NVARCHAR(50),
+        @CLEANKEYNAME     NVARCHAR(100),
+        @STREETNUMBER     NVARCHAR(12),
+        @STREETNAME       NVARCHAR(150),
+        @CLEANPOSTCODE    NVARCHAR(12),
+        @CLEANPHONENUMBER NVARCHAR(100)
+
+SELECT @CLEANFIRSTNAME = FIRSTNAME,
+       @CLEANMIDDLENAME = MIDDLENAME,
+       @CLEANKEYNAME = KEYNAME,
+       @STREETNUMBER = STREETNUMBER,
+       @STREETNAME = STREETNAME,
+       @CLEANPOSTCODE = POSTCODE
+FROM   DBO.UFN_CLEANCONSTITUENTSTRINGS_2(@FIRSTNAME, @MIDDLENAME, @KEYNAME, @ADDRESSBLOCK, @POSTCODE)
+
+DECLARE @LOGICALRESULTMAPPING DBO.UDT_GENERIC_NVARCHAR100_TINYINT;
+
+INSERT INTO @LOGICALRESULTMAPPING
+SELECT CASENAME,
+       RESULTCODE
+FROM   DBO.CONSTITUENTMATCHLOGICALRESULTMAPPING
+
+-- (2) Get candidates by email address.
+--     These candidates will be run through the main scoring algorithm.  Any email match will be considered at least a manual review match.
+--     If a single auto-match is found, we're done.
+--     If multiple auto-matches are found, or only manual matches are found, we will also examine name/address-based candidates.
+IF @EMAILADDRESS <> ''
+  BEGIN
+      INSERT INTO @MATCHES
+      SELECT DISTINCT C.CONSTITUENTID,
+                      -- only return addressid if the name/address is considered a match
+                      CASE WHEN S.BAILEDCOMPARISON = 1 THEN NULL
+                      ELSE C.ADDRESSID
+                      END,
+                      E.ID,
+                      NULL,
+                      1,
+                      0,
+                      S.TITLERESULT,
+                      S.FIRSTNAMERESULT,
+                      S.MIDDLENAMERESULT,
+                      S.KEYNAMERESULT,
+                      S.SUFFIXRESULT,
+                      S.STREETNUMBERRESULT,
+                      S.STREETNAMERESULT,
+                      S.POSTCODERESULT,
+                      NULL,
+                      S.FIRSTNAMESCORE,
+                      S.MIDDLENAMESCORE,
+                      S.KEYNAMESCORE,
+                      S.STREETNUMBERSCORE,
+                      S.STREETNAMESCORE,
+                      S.POSTCODESCORE,
+                      S.HOUSEHOLDMATCH,
+                      CASE WHEN S.BAILEDCOMPARISON = 1 THEN 70 --Email matches score at least 70
+                        WHEN S.COMPOSITESCORE < 98 THEN S.COMPOSITESCORE + 2 --Email matches add 2 to scores below 98
+                      ELSE S.COMPOSITESCORE
+                      END
+      FROM   DBO.USR_UMHS_EMAILADDRESS E
+             INNER JOIN DBO.USR_UMHS_SEARCHPATIENT C ON C.UMHSID = E.UMHSID
+             -- outer apply seems to resolve some performance problems with cross apply, since the UFN always returns a row, the results will be the same
+             OUTER APPLY DBO.UFN_COMPARECONSTITUENTS_4(@TITLECODEID, @CLEANFIRSTNAME, @CLEANMIDDLENAME, @CLEANKEYNAME, @SUFFIXCODEID, @STREETNUMBER, @STREETNAME, @CLEANPOSTCODE, C.TITLECODEID, C.FIRSTNAME, C.MIDDLENAME, C.KEYNAME, C.SUFFIXCODEID, C.STREETNUMBER, C.STREETNAME, C.POSTCODE, C.COUNTRYID, 0, @ISORGANIZATION, @LOGICALRESULTMAPPING, 69) S -- Email matches won't be scored below 70, so only scores of 71 or more are meaningful. Using 69 since match can provide a +2 bonus score to get to 71.
+      WHERE E.EMAILADDRESS   = @EMAILADDRESS
+
+      IF @@ROWCOUNT > 0
+         AND @AUTOMATCHTHRESHOLD > 0
+        BEGIN
+            IF ( (SELECT COUNT(DISTINCT CONSTITUENTID)
+                  FROM   @MATCHES
+                  WHERE
+                   COMPOSITESCORE >= @AUTOMATCHTHRESHOLD) = 1 )
+              RETURN
+        END
+  END
+
+DECLARE @NOEMAILRESULT TINYINT = CASE WHEN @EMAILADDRESS = '' THEN 4
+  ELSE 6
+  END
+DECLARE @NOPHONERESULT TINYINT = CASE WHEN @CLEANPHONENUMBER = '' THEN 4
+  ELSE 6
+  END
+
+-- (3) Find candidates by phone.
+IF @PHONENUMBER <> ''
+  BEGIN
+      SET @CLEANPHONENUMBER = DBO.UFN_PHONE_REMOVEFORMATTING(@PHONENUMBER);
+
+      DECLARE @NULLID UNIQUEIDENTIFIER = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+
+      INSERT INTO @MATCHES --SEARCH THE PATIENT DATA
+      SELECT DISTINCT C.CONSTITUENTID,
+                      -- only return addressid if the name/address is considered a match
+                      CASE WHEN S.BAILEDCOMPARISON = 1 THEN NULL
+                      ELSE C.ADDRESSID
+                      END,
+                      NULL,
+                      P.ID,
+                      1,
+                      @NOEMAILRESULT,
+                      S.TITLERESULT,
+                      S.FIRSTNAMERESULT,
+                      S.MIDDLENAMERESULT,
+                      S.KEYNAMERESULT,
+                      S.SUFFIXRESULT,
+                      S.STREETNUMBERRESULT,
+                      S.STREETNAMERESULT,
+                      S.POSTCODERESULT,
+                      0,
+                      S.FIRSTNAMESCORE,
+                      S.MIDDLENAMESCORE,
+                      S.KEYNAMESCORE,
+                      S.STREETNUMBERSCORE,
+                      S.STREETNAMESCORE,
+                      S.POSTCODESCORE,
+                      S.HOUSEHOLDMATCH,
+                      CASE WHEN S.BAILEDCOMPARISON = 1 THEN 70 --Phone matches score at least 70
+                        WHEN S.COMPOSITESCORE < 98 THEN S.COMPOSITESCORE + 2 --Phone matches add 2 to scores below 98
+                      ELSE S.COMPOSITESCORE
+                      END
+      FROM   DBO.USR_UMHS_PHONE P
+             INNER JOIN DBO.USR_UMHS_SEARCHPATIENT C ON C.UMHSID = P.UMHSID
+             OUTER APPLY DBO.UFN_COMPARECONSTITUENTS_4(@TITLECODEID, @CLEANFIRSTNAME, @CLEANMIDDLENAME, @CLEANKEYNAME, @SUFFIXCODEID, @STREETNUMBER, @STREETNAME, @CLEANPOSTCODE, C.TITLECODEID, C.FIRSTNAME, C.MIDDLENAME, C.KEYNAME, C.SUFFIXCODEID, C.STREETNUMBER, C.STREETNAME, C.POSTCODE, C.COUNTRYID, 0, @ISORGANIZATION, @LOGICALRESULTMAPPING, 69) S -- Phone matches won't be scored below 70, so only scores of 71 or more are meaningful. Using 69 since match can provide a +2 bonus score to get to 71.
+      WHERE
+            P.NUMBER                          = @CLEANPHONENUMBER
+        AND COALESCE(P.COUNTRYID, C.COUNTRYID, @NULLID) = COALESCE(@COUNTRYID, P.COUNTRYID, C.COUNTRYID, @NULLID)
+        -- constituent not already found by email address
+        AND NOT EXISTS(SELECT 1 FROM @MATCHES WHERE CONSTITUENTID = C.CONSTITUENTID);
+
+  END
+
+--Caching values for query checks below
+DECLARE @KEYNAME4 NVARCHAR(4) = LEFT(@CLEANKEYNAME, 4)
+DECLARE @FIRSTNAME3 NVARCHAR(3) = LEFT(@CLEANFIRSTNAME, 3)
+DECLARE @STREETNAME4 NVARCHAR(4) = LEFT(@STREETNAME, 4)
+DECLARE @POSTCODE3 NVARCHAR(3) = LEFT(@CLEANPOSTCODE, 3)
+DECLARE @CLEANFIRSTNAME3 NVARCHAR(3) = LEFT(@CLEANFIRSTNAME, 3)
+
+-- (4) Find candidates by name and address.
+IF @CLEANKEYNAME <> '' AND @CLEANPOSTCODE <> ''
+  BEGIN
+      -- Force checks that have to pass for constituent to have any chance at matching above overall match threshold
+      -- This is a help in automatch-only cases where the overall threshold is as high as @AUTOMATCHTHRESHOLD
+      DECLARE @FORCESTREETNUMBERCHECK BIT = 0
+      DECLARE @FORCEPOSTCODECHECK BIT = 0
+
+      IF @STREETNUMBER <> ''
+         AND @OVERALLMATCHTHRESHOLD > 100 - (SELECT DEDUCTION
+                                             FROM   DBO.UFN_CONSTITUENTMATCH_STREETNUMBERSCOREDEDUCTION_BYRESULT(1))
+        SET @FORCESTREETNUMBERCHECK = 1
+
+      IF @CLEANPOSTCODE <> ''
+         AND @OVERALLMATCHTHRESHOLD > 100 - (SELECT DEDUCTION
+                                             FROM   DBO.UFN_CONSTITUENTMATCH_POSTCODESCOREDEDUCTION_BYRESULT(1))
+        SET @FORCEPOSTCODECHECK = 1
+
+      --*********************************************************
+      -- THIS QUERY IS CAREFULLY WRITTEN TO MAKE USE OF THREE AVAILABLE INDEXES ON THE SEARCHCONSTITUENT TABLE, referred to as universes 1-3 below.
+      -- Do not make any changes to this query without verifying that the execution plan, and specifically the FULL use of the three indexes (all columns used in the lookup), remains intact.
+      -- *********************************************************
+      INSERT INTO @MATCHES
+      SELECT C.CONSTITUENTID,
+             A.ID ADDRESSID,
+             NULL,
+             NULL,
+             1,
+             @NOEMAILRESULT,
+             S.TITLERESULT,
+             S.FIRSTNAMERESULT,
+             S.MIDDLENAMERESULT,
+             S.KEYNAMERESULT,
+             S.SUFFIXRESULT,
+             S.STREETNUMBERRESULT,
+             S.STREETNAMERESULT,
+             S.POSTCODERESULT,
+             @NOPHONERESULT,
+             S.FIRSTNAMESCORE,
+             S.MIDDLENAMESCORE,
+             S.KEYNAMESCORE,
+             S.STREETNUMBERSCORE,
+             S.STREETNAMESCORE,
+             S.POSTCODESCORE,
+             S.HOUSEHOLDMATCH,
+             S.COMPOSITESCORE
+      FROM   DBO.USR_UMHS_DATA C
+             LEFT JOIN DBO.USR_UMHS_ADDRESS A ON A.UMHSID = C.ID
+             OUTER APPLY DBO.UFN_COMPARECONSTITUENTS_4(@TITLECODEID, @CLEANFIRSTNAME, @CLEANMIDDLENAME, @CLEANKEYNAME, @SUFFIXCODEID, @STREETNUMBER, @STREETNAME, @CLEANPOSTCODE, C.TITLECODEID, C.FIRSTNAME, C.MIDDLENAME, C.KEYNAME, C.SUFFIXCODEID, A.ADDRESSBLOCK, A.ADDRESSBLOCK, A.POSTCODE, A.COUNTRYID, 0, @ISORGANIZATION, @LOGICALRESULTMAPPING, @OVERALLMATCHTHRESHOLD) S
+		         cross apply (select ltrim(rtrim(upper(replace(replace(replace(replace(replace(replace(replace(replace(a.ADDRESSBLOCK,'.',''),'-',' '),',',' '), char(13)+char(10),' '),char(10)+char(13),' '),char(13),' '),char(10),' '),'  ',' ')))) CLEANADDRESSBLOCK) ab --pulled from the address trigger
+             outer apply (select left(CLEANADDRESSBLOCK,charindex(' ',CLEANADDRESSBLOCK)-1) STREETNUMBER,
+                                right(CLEANADDRESSBLOCK,len(CLEANADDRESSBLOCK)-charindex(' ',CLEANADDRESSBLOCK)) STREETNAME
+                          where dbo.UFN_REGULAREXPRESSIONMATCH('(?:^[A-Z]?[\d-]+[A-Z]? (?:.|\n)+$)',CLEANADDRESSBLOCK) = 1
+                          and charindex(' ',CLEANADDRESSBLOCK) <= 13) PARSEDADDRESS
+	    WHERE A.COUNTRYID = ISNULL(@COUNTRYID, A.COUNTRYID)
+               AND ( @FORCESTREETNUMBERCHECK = 0
+               OR A.ADDRESSBLOCK          = ''
+               OR A.ADDRESSBLOCK          = @STREETNUMBER
+               OR A.ADDRESSBLOCK LIKE @STREETNUMBER + '-%'
+               OR @STREETNUMBER LIKE A.ADDRESSBLOCK + '-%' )
+        -- universe 1 - postcode, keyname soundex
+        AND ( ( A.POSTCODE              = @CLEANPOSTCODE
+                AND left(C.KEYNAME,4)              = @KEYNAME4 )
+               OR
+              -- universe 2 - postcode, street name soundex, first name soundex
+              ( a.POSTCODE              = @CLEANPOSTCODE
+                AND SOUNDEX(PARSEDADDRESS.STREETNAME) = SOUNDEX(@STREETNAME)
+                AND left(c.FIRSTNAME,3)            = @FIRSTNAME3 )
+               OR
+              -- universe 3 - 1st 3 characters of postcode, 1st 4 characters of keyname,
+              --              1st 4 characters of street name, street number
+              ( ( @FORCEPOSTCODECHECK     = 0
+                   OR a.POSTCODE              = @CLEANPOSTCODE )
+                AND left(a.POSTCODE,3)             = @POSTCODE3
+                AND SOUNDEX(C.KEYNAME)        = SOUNDEX(@CLEANKEYNAME)
+                AND left(PARSEDADDRESS.STREETNAME,4)           = @STREETNAME4
+                AND PARSEDADDRESS.STREETNUMBER          = @STREETNUMBER 
+			 ) )
+        -- constituent not already found by email address or phone
+        AND NOT EXISTS(SELECT 1 FROM @MATCHES WHERE CONSTITUENTID = C.CONSTITUENTID);
+        
+  -- ******************************
+  -- END OF QUERY - see important note above regarding changes to this query
+  -- ******************************
+  END
+
+-- (5) Find candidates by name only (either no incoming address, or no existing records with a matching address).
+IF @CLEANKEYNAME <> '' AND NOT EXISTS(SELECT 1 FROM @MATCHES)
+  BEGIN
+      -- prevent long-running searches for names like "Friend of X" or "Anonymous"
+      IF NOT EXISTS(SELECT 'x'
+                    FROM   DBO.SEARCHCONSTITUENTEXCLUDE
+                    WHERE
+                         KEYNAME    = @CLEANKEYNAME
+                     AND FIRSTNAME3 = @CLEANFIRSTNAME3)
+        BEGIN
+            -- For performance reasons, search first for records with no address.
+            -- If we don't have an incoming address, these will score higher than any matches we might find with addresses.
+            -- If we have an incoming address, existing constituents with addresses would have been matched above so no reason to search those again.
+            INSERT INTO @MATCHES
+            SELECT DISTINCT C.CONSTITUENTID,
+                            NULL,
+                            NULL,
+                            NULL,
+                            1,
+                            @NOEMAILRESULT,
+                            S.TITLERESULT,
+                            S.FIRSTNAMERESULT,
+                            S.MIDDLENAMERESULT,
+                            S.KEYNAMERESULT,
+                            S.SUFFIXRESULT,
+                            S.STREETNUMBERRESULT,
+                            S.STREETNAMERESULT,
+                            S.POSTCODERESULT,
+                            @NOPHONERESULT,
+                            S.FIRSTNAMESCORE,
+                            S.MIDDLENAMESCORE,
+                            S.KEYNAMESCORE,
+                            S.STREETNUMBERSCORE,
+                            S.STREETNAMESCORE,
+                            S.POSTCODESCORE,
+                            S.HOUSEHOLDMATCH,
+                            S.COMPOSITESCORE
+            FROM   DBO.USR_UMHS_SEARCHPATIENT C
+                   OUTER APPLY DBO.UFN_COMPARECONSTITUENTS_4(@TITLECODEID, @CLEANFIRSTNAME, @CLEANMIDDLENAME, @CLEANKEYNAME, @SUFFIXCODEID, @STREETNUMBER, @STREETNAME, @CLEANPOSTCODE, C.TITLECODEID, C.FIRSTNAME, C.MIDDLENAME, C.KEYNAME, C.SUFFIXCODEID, C.STREETNUMBER, C.STREETNAME, C.POSTCODE, C.COUNTRYID, 0, @ISORGANIZATION, @LOGICALRESULTMAPPING, @OVERALLMATCHTHRESHOLD) S
+            WHERE
+                  C.KEYNAME    = @CLEANKEYNAME
+              AND C.FIRSTNAME3 = @CLEANFIRSTNAME3
+              AND C.POSTCODE   = ''
+
+            -- If we don't have an address and didn't find any records without an address, try existing constituents with an address.
+            IF @CLEANPOSTCODE = ''
+               AND NOT EXISTS(SELECT 1
+                              FROM   @MATCHES)
+              INSERT INTO @MATCHES
+              SELECT DISTINCT C.CONSTITUENTID,
+                              NULL,
+                              NULL,
+                              NULL,
+                              1,
+                              @NOEMAILRESULT,
+                              S.TITLERESULT,
+                              S.FIRSTNAMERESULT,
+                              S.MIDDLENAMERESULT,
+                              S.KEYNAMERESULT,
+                              S.SUFFIXRESULT,
+                              S.STREETNUMBERRESULT,
+                              S.STREETNAMERESULT,
+                              S.POSTCODERESULT,
+                              @NOPHONERESULT,
+                              S.FIRSTNAMESCORE,
+                              S.MIDDLENAMESCORE,
+                              S.KEYNAMESCORE,
+                              S.STREETNUMBERSCORE,
+                              S.STREETNAMESCORE,
+                              S.POSTCODESCORE,
+                              S.HOUSEHOLDMATCH,
+                              S.COMPOSITESCORE
+              FROM   DBO.USR_UMHS_SEARCHPATIENT C
+                     OUTER APPLY DBO.UFN_COMPARECONSTITUENTS_4(@TITLECODEID, @CLEANFIRSTNAME, @CLEANMIDDLENAME, @CLEANKEYNAME, @SUFFIXCODEID, @STREETNUMBER, @STREETNAME, @CLEANPOSTCODE, C.TITLECODEID, C.FIRSTNAME, C.MIDDLENAME, C.KEYNAME, C.SUFFIXCODEID, C.STREETNUMBER, C.STREETNAME, C.POSTCODE, C.COUNTRYID, 0, @ISORGANIZATION, @LOGICALRESULTMAPPING, @OVERALLMATCHTHRESHOLD) S
+              WHERE
+                    C.KEYNAME    = @CLEANKEYNAME
+                AND C.FIRSTNAME3 = @CLEANFIRSTNAME3
+                AND C.POSTCODE   <> ''
+        END
+  END
+
+-- If the email or phone are different, we want to subtract 1 so the score reflects the difference.
+-- However, in these situations, we want to ensure that we (a) don't auto match and (b) don't take a potential match out of manual review range. 
+-- Thus we ensure that the score is no more than 94 and we keep it at 70 if it was 70.
+IF @EMAILADDRESS <> ''
+  BEGIN
+      UPDATE M
+      SET    COMPOSITESCORE = CASE WHEN COMPOSITESCORE = 70 THEN COMPOSITESCORE
+                                WHEN COMPOSITESCORE > 95 THEN 94
+                              ELSE COMPOSITESCORE - 1
+                              END
+      FROM   @MATCHES M
+      WHERE M.EMAILADDRESSRESULT > 0
+        AND EXISTS (SELECT 'x'
+                    FROM   DBO.EMAILADDRESS E
+                    WHERE
+                     E.CONSTITUENTID = M.CONSTITUENTID)
+  END
+
+IF @PHONENUMBER <> ''
+  BEGIN
+      -- if phone wasn't processed (phone number result is null) try finding a match and increase the score     
+      UPDATE M
+      SET    COMPOSITESCORE = CASE WHEN COMPOSITESCORE < 98 THEN COMPOSITESCORE + 2
+                              ELSE COMPOSITESCORE
+                              END,
+             PHONEID = P.ID,
+             PHONENUMBERRESULT = 0
+      FROM   @MATCHES M
+             INNER JOIN DBO.PHONE P ON P.CONSTITUENTID = M.CONSTITUENTID
+      WHERE
+        M.PHONENUMBERRESULT IS NULL
+        AND ( P.COUNTRYID      = @COUNTRYID
+               OR P.COUNTRYID IS NULL
+               OR @COUNTRYID IS NULL )
+        AND P.NUMBERNOFORMAT = @CLEANPHONENUMBER
+
+      -- decrease the score if the incoming phone does not have a match
+      UPDATE M
+      SET    COMPOSITESCORE = CASE WHEN COMPOSITESCORE = 70 THEN COMPOSITESCORE
+                                WHEN COMPOSITESCORE > 95 THEN 94
+                              ELSE COMPOSITESCORE - 1
+                              END
+      FROM   @MATCHES M
+      WHERE
+            COALESCE(M.PHONENUMBERRESULT, 1) > 0
+        AND EXISTS (SELECT 'x'
+                    FROM   DBO.PHONE P
+                    WHERE
+                     P.CONSTITUENTID = M.CONSTITUENTID)
+  END
+
+
+
+      RETURN
+  END 
+
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

@@ -1,0 +1,38 @@
+﻿<PageDefinitionSpec 
+    xmlns="bb_appfx_pagedefinition" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="c0f23579-43e3-48a6-af9e-9cb73790e3bf"
+    Name="MIMED Logging Report Page"
+    Description="A page for displaying information about mimed logging report records"
+    Author="UM Dev"
+    ContextRecordType="MIMED Data"	
+    >
+
+	<!-- Note:  A page can optionally have a view form associated with it as the "Expression form".  While implemented as a view data form,
+	this form has no UI in this context, and is simply used as a way of loading additional information associated with the page.  The fields
+	returned by the expression form can be used as expressions in various properties throughout the page.  To specify an expression form for this
+	page, add the following attribute:		ExpressionDataFormID="<some guid>"-->
+
+	<!-- define how the page header should appear -->
+	<PageHeader Caption="MIMED Logging Report" ImageKey="" />
+
+	<!-- define the tabs for the page - note that if only one tab is present, then that tab's sections are promoted to the page level (ie., the tab
+	itself isn't shown -->
+	<Tabs>
+		<Tab ID="6387b553-b688-4766-bd4a-11dff768ff79" Caption="">
+
+			<!-- define the sections for this tab -->
+			<Sections>
+				<Section ID="e07fd6b2-9e81-43fd-aeb3-ff73b8aefbde" Caption="" Collapsible="true" Collapsed="true">
+          <Report ID="37522b76-f66d-4c94-9538-c13d2f2a0883" DisplayPromptArea="true">
+          </Report>
+				</Section>
+			</Sections>
+		</Tab>
+	</Tabs>
+
+
+	<!-- define page-level actions groups which appear in the explorer bar area of the shell -->
+	
+	
+</PageDefinitionSpec>

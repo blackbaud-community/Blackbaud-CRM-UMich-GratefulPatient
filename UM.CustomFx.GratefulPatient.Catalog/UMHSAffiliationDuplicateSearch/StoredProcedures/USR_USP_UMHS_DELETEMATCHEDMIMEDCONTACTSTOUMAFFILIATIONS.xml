@@ -1,0 +1,131 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="d39c1178-206e-43d5-b572-6f028247484c"
+	Name="USR_USP_UMHS_DELETEMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS"
+	Description="Delete MIMED Friend (shell) and Contact Data records that match to DART Constituents affiliated to U-M"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_DELETEMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USR_USP_UMHS_DELETEMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS 
+(
+  @MATCHSETID uniqueidentifier output -- Used as MATCHSETID on the USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS table
+)
+as
+set nocount on;
+begin
+  declare @UMHSID uniqueidentifier;
+  declare @MRN nvarchar(50);
+  declare @CONSTITUENTID uniqueidentifier;
+  declare @ISMIMEDFRIENDSHELLRECORD bit;
+  declare	@OVERALLMATCHTHRESHOLD TINYINT
+  declare @AUTOMATCHTHRESHOLD    TINYINT
+  declare @MIMEDFRIENDRECORDSDELETEDCOUNT int=0;
+  declare @MIMEDCONTACTDATADELETEDCOUNT int=0;
+  declare @CHANGEAGENTID uniqueidentifier=null;
+  declare @DATEADDED datetime=GETDATE();
+  declare @ErrorMessage NVARCHAR(4000)=null;
+  declare @ErrorSeverity int;
+  declare @ErrorState int;  
+  
+  begin try  
+      if @CHANGEAGENTID is null
+      begin
+	      exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @ID=@CHANGEAGENTID output;
+      end
+
+      /*
+       * Get thresholds for the MIMED Contact batch template
+       */
+      select 
+	      @AUTOMATCHTHRESHOLD=cast(AUTOMATCHTHRESHOLD as tinyint),
+	      @OVERALLMATCHTHRESHOLD=cast(OVERALLMATCHTHRESHOLD as tinyint)
+      from BATCHTEMPLATE
+      where 
+	      ID='DEDEA4B8-B29B-4102-AF44-155C8B7D5C8C'	-- 'MIMED Data - Contacts' batch template
+
+      if @MATCHSETID is NULL
+      begin
+        set @MATCHSETID=NEWID();
+        exec dbo.USR_USP_UMHS_GETMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS @MATCHSETID=@MATCHSETID OUTPUT
+      end
+  end try
+  begin catch
+      SELECT @ErrorMessage = ERROR_MESSAGE(), @ErrorSeverity = ERROR_SEVERITY(), @ErrorState = ERROR_STATE();
+  end catch
+
+  if @ErrorMessage is NULL
+  begin  
+      declare cursorMatchedMIMEDContactsToUMAffiliations CURSOR FAST_FORWARD 
+      FOR 
+          select distinct
+            d.ID UMHSID,
+            d.MRN,
+            d.CONSTITUENTID,
+            CASE 
+              WHEN 1 = CHARINDEX('MIMED FRIEND M', c.KEYNAME) 
+                THEN 1 
+              ELSE 0 
+            END
+          from dbo.USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS a
+          inner join USR_UMHS_DATA d on d.MRN=a.MRN
+          inner join CONSTITUENT c on c.ID=d.CONSTITUENTID
+          where
+              a.MATCHSETID=@MATCHSETID
+          and A.COMPOSITESCORE >= @AUTOMATCHTHRESHOLD   -- Deleting the records with the MIMED Contact batch template autothreshold of 95-100% 
+
+      open cursorMatchedMIMEDContactsToUMAffiliations;
+
+      begin try
+          fetch next from cursorMatchedMIMEDContactsToUMAffiliations into @UMHSID, @MRN, @CONSTITUENTID, @ISMIMEDFRIENDSHELLRECORD;
+
+          while (@@FETCH_STATUS = 0)
+          begin
+                if 1 = @ISMIMEDFRIENDSHELLRECORD
+                begin
+                    /*
+                     * Delete MIMED Friend (shell) record and associated MIMED Contact data
+                     */
+                    exec dbo.USP_CONSTITUENT_DELETE @ID=@CONSTITUENTID, @CHANGEAGENTID=@CHANGEAGENTID;
+                    set @MIMEDFRIENDRECORDSDELETEDCOUNT=@MIMEDFRIENDRECORDSDELETEDCOUNT+1;
+                end
+                else
+                begin
+                    /*
+                     * Delete MIMED Contact data linked to a DART individual constituent who is affiliated to U-M
+                     */
+                    exec dbo.USR_USP_UMHS_DATA_DELETE @ID=@UMHSID, @CHANGEAGENTID=@CHANGEAGENTID
+                    set @MIMEDCONTACTDATADELETEDCOUNT=@MIMEDCONTACTDATADELETEDCOUNT+1
+                end
+        
+                fetch next from cursorMatchedMIMEDContactsToUMAffiliations into @UMHSID, @MRN, @CONSTITUENTID, @ISMIMEDFRIENDSHELLRECORD;
+          end
+      end try
+      begin catch
+          SELECT @ErrorMessage = ERROR_MESSAGE(), @ErrorSeverity = ERROR_SEVERITY(), @ErrorState = ERROR_STATE();
+      end catch
+      
+      close cursorMatchedMIMEDContactsToUMAffiliations;
+      deallocate cursorMatchedMIMEDContactsToUMAffiliations;
+
+  end
+  
+  insert into USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS (ID, MATCHSETID, MIMEDFRIENDRECORDS, MIMEDUMHSDATARECORDS, MESSAGE, ADDEDBYID, CHANGEDBYID, DATEADDED, DATECHANGED)
+      VALUES(NEWID(), @MATCHSETID, @MIMEDFRIENDRECORDSDELETEDCOUNT, @MIMEDCONTACTDATADELETEDCOUNT, ISNULL(@ErrorMessage, N''), @CHANGEAGENTID, @CHANGEAGENTID, @DATEADDED, GETDATE());
+
+  if LEN(ISNULL(@ErrorMessage, N'')) > 0 
+  begin
+    RAISERROR (@ErrorMessage, -- Message text.
+               @ErrorSeverity, -- Severity.
+               @ErrorState -- State.
+               );
+  end
+  
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

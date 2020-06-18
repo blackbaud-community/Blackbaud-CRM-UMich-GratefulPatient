@@ -1,0 +1,152 @@
+﻿<GlobalChangeSpec
+    xmlns="bb_appfx_globalchange"
+    xmlns:c="bb_appfx_commontypes"
+    ID="38ba5eb4-885c-4445-be54-b5ff9888d677"
+    Name="Change MIMED Team Member Global Change (Custom)"
+    Description="Global Change to change a Team Member to multiple MIMED Records at once."
+    Author="UM Dev"
+    DisplayName="Change MIMED Team Member"
+    GlobalChangeFolder="MIMED Data"
+    SPName="USR_UM_USP_GLOBALCHANGE_CHANGE_MIMEDTEAMMEMBER"
+    >
+
+  <!-- describe the SP that performs the global change operation -->
+  <CreateProcedureSQL>
+    <![CDATA[
+create procedure dbo.USR_UM_USP_GLOBALCHANGE_CHANGE_MIMEDTEAMMEMBER
+(
+	@CHANGEAGENTID uniqueidentifier = null,
+	@ASOF as datetime = null,
+	@NUMBERADDED int = 0 output,
+	@NUMBEREDITED int = 0 output,
+	@NUMBERDELETED int = 0 output,
+	@SELECTIONID uniqueidentifier,
+	@CURRENTTEAMMEMBERID uniqueidentifier,
+  @CURRENTTEAMMEMBERSITEID uniqueidentifier,
+  @CURRENTTEAMROLECODEID uniqueidentifier,
+  @CURRENTSTARTDATE datetime,
+  @CURRENTENDDATE datetime,
+  @NEWTEAMMEMBERID uniqueidentifier,
+  @NEWTEAMMEMBERSITEID uniqueidentifier,
+  @NEWTEAMROLECODEID uniqueidentifier,
+  @NEWSTARTDATE datetime,
+  @NEWENDDATE datetime
+)
+as
+	set nocount off;
+
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate();
+	set @NUMBERADDED = 0;
+	set @NUMBEREDITED = 0;
+	set @NUMBERDELETED = 0; 
+
+	if @CHANGEAGENTID is null
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+
+  declare @SELECTION table (ID uniqueidentifier not null primary key);
+
+	begin try
+		insert into @SELECTION (ID) select ID from dbo.UFN_IDSETREADER_GETRESULTS_GUID(@SELECTIONID);
+
+    update t
+    set
+      t.TEAMMEMBERID = @NEWTEAMMEMBERID,
+      t.SITEID = @NEWTEAMMEMBERSITEID,
+      t.TEAMROLECODEID = @NEWTEAMROLECODEID,
+      t.STARTDATE = @NEWSTARTDATE,
+      t.ENDDATE = @NEWENDDATE
+    from dbo.USR_UMHS_TEAM t
+      inner join dbo.USR_UMHS_DATA d on t.UMHSID = d.ID
+      inner join @SELECTION s on d.CONSTITUENTID = s.ID
+    where t.TEAMMEMBERID = @CURRENTTEAMMEMBERID
+      and (@CURRENTTEAMMEMBERSITEID is null or @NEWTEAMMEMBERSITEID is null or isnull(t.SITEID,'00000000-0000-0000-0000-000000000000') = isnull(@CURRENTTEAMMEMBERSITEID,'00000000-0000-0000-0000-000000000000'))
+      and (@CURRENTTEAMROLECODEID is null or @NEWTEAMROLECODEID is null or isnull(t.TEAMROLECODEID,'00000000-0000-0000-0000-000000000000') = isnull(@CURRENTTEAMROLECODEID,'00000000-0000-0000-0000-000000000000'))
+      and (@CURRENTSTARTDATE is null or @NEWSTARTDATE is null or isnull(t.STARTDATE,'') = isnull(@CURRENTSTARTDATE,''))
+      and (@CURRENTENDDATE is null or @NEWENDDATE is null or isnull(t.ENDDATE,'') = isnull(@CURRENTENDDATE,''))
+
+    set @NUMBEREDITED = @@ROWCOUNT;
+	end try
+
+	begin catch
+		exec dbo.USP_RAISE_ERROR;
+		return 1;
+	end catch
+		]]>
+  </CreateProcedureSQL>
+
+  <ParametersFormMetaData>
+
+    <!-- describe fields on the parameter form, which correspond to parameters on the SP.  Note that system parameters 
+		like the context @CHANGEAGENTID, @ASOF, @NUMBERADDED, @NUMBEREDITED, and @NUMBERDELETED need not be listed. -->
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="SELECTIONID" Caption="Selection" DataType="Guid" Required="true">
+          <!--Constituent Search-->
+          <SearchList SearchListID="98d0070e-c4a7-495b-a438-2ac12da79068" EnableQuickFind="true">
+            <FormFieldOverrides>
+              <FormFieldOverride FieldID="RECORDTYPEID" DefaultValueText="64CC83C4-CEBF-426B-B72F-B96CEBA4818A" ReadOnly="true" />
+            </FormFieldOverrides>
+          </SearchList>
+        </FormField>
+        <FormField FieldID="CURRENTTEAMMEMBERID" Caption="Team Member" DataType="Guid" Required="true">
+          <!--Fundraiser Search-->
+          <SearchList SearchListID="35FA0186-B669-436F-913A-5E9FD5E59982" EnableQuickFind="true" />
+        </FormField>
+        <FormField FieldID="CURRENTTEAMMEMBERSITEID" Caption="Site" DataType="Guid">
+          <SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+            <SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" EnableQuickFind="true" />
+          </SimpleDataList>
+        </FormField>
+        <FormField FieldID="CURRENTTEAMROLECODEID" Caption="Team Role" DataType="Guid">
+          <CodeTable CodeTableName="USR_UMHS_TEAMROLECODE" />
+        </FormField>
+        <FormField FieldID="CURRENTSTARTDATE" Caption="Start Date" DataType="Date" />
+        <FormField FieldID="CURRENTENDDATE" Caption="End Date" DataType="Date" />
+        <FormField FieldID="NEWTEAMMEMBERID" Caption="Team Member" DataType="Guid" Required="true">
+          <!--Fundraiser Search-->
+          <SearchList SearchListID="35FA0186-B669-436F-913A-5E9FD5E59982" EnableQuickFind="true" />
+        </FormField>
+        <FormField FieldID="NEWTEAMMEMBERSITEID" Caption="Site" DataType="Guid">
+          <SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+            <SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" EnableQuickFind="true" />
+          </SimpleDataList>
+        </FormField>
+        <FormField FieldID="NEWTEAMROLECODEID" Caption="Team Role" DataType="Guid">
+          <CodeTable CodeTableName="USR_UMHS_TEAMROLECODE" />
+        </FormField>
+        <FormField FieldID="NEWSTARTDATE" Caption="Start Date" DataType="Date" />
+        <FormField FieldID="NEWENDDATE" Caption="End Date" DataType="Date" />
+      </FormFields>
+
+      <WebUIComponent>
+        <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDTeamMemberChangeGlobalChangeUIModel" />
+        <WebUI>
+          <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/MIMEDTeamMemberChangeGlobalChange.html" />
+        </WebUI>
+      </WebUIComponent>
+      
+      <FieldGroups>
+        <FieldGroup ID="CURRENT" Caption="Current">
+          <Fields>
+            <Field>CURRENTTEAMMEMBERID</Field>
+            <Field>CURRENTTEAMMEMBERSITEID</Field>
+            <Field>CURRENTTEAMROLECODEID</Field>
+            <Field>CURRENTSTARTDATE</Field>
+            <Field>CURRENTENDDATE</Field>
+          </Fields>
+        </FieldGroup>
+        <FieldGroup ID="NEW" Caption="New">
+          <Fields>
+            <Field>NEWTEAMMEMBERID</Field>
+            <Field>NEWTEAMMEMBERSITEID</Field>
+            <Field>NEWTEAMROLECODEID</Field>
+            <Field>NEWSTARTDATE</Field>
+            <Field>NEWENDDATE</Field>
+          </Fields>
+        </FieldGroup>
+      </FieldGroups>
+    </FormMetaData>
+  </ParametersFormMetaData>
+
+</GlobalChangeSpec>

@@ -1,0 +1,102 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="bc65fc78-af31-4ace-ab52-b09d0073ec16"
+	Name="MIMED Visit Outpatient Listbuilder Query"
+	Description="A view defined for querying on outpatient MIMED visit records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+  <TVFImplementation FunctionName="USR_UFN_UMHS_VISITOUTPATIENT">
+    <CreateFunctionSQL>
+      <![CDATA[
+        create function dbo.USR_UFN_UMHS_VISITOUTPATIENT
+          (
+            @UMHSID uniqueidentifier = null
+          )
+          returns table
+          as       
+          return  
+          select
+          DISTINCT v.ID,
+          v.LASTPROCDATE,
+		      --v.VISITTYPE,
+		      --d8a.MRN,
+		      --d8a.CPISEQUENCE,
+          v.CSN,         
+          v.VISITSTARTDATE,
+          v.VISITENDDATE,
+          c.ID as CONSTITUENTID,
+          p.PROVIDERDRNUMBER,
+          c.NAME as PROVIDERFULLNAME,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when s.ID is NOT null
+            then
+              s.NAME
+            else
+              N''
+          end as SUBDEPARTMENT,
+         v.PROVIDERROLE--,
+         --v.CATEGORYMEMBERDESCRIPTION
+	      from dbo.USR_UMHS_VISITS v
+        inner join dbo.USR_UMHS_DATA d8a on d8a.ID=v.UMHSID
+        inner join dbo.USR_UMHS_PROVIDERS p on p.ID=v.PROVIDERID
+        inner join dbo.CONSTITUENT c on c.ID=p.CONSTITUENTID
+        left outer join dbo.USR_UMHS_DEPARTMENT d on d.ID=p.DEPARTMENTID
+        left outer join dbo.USR_UMHS_SUBDEPARTMENT s on s.ID=p.SUBDEPARTMENTID
+        WHERE 
+          v.VISITTYPE= 'O'	 and UMHSID = @UMHSID
+      ]]>
+    </CreateFunctionSQL>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  </TVFImplementation>
+	
+
+	<!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Name="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="LASTPROCDATE" Caption="Last processed date" DataType="Date" />
+      <!--<OutputField Name="VISITTYPE" Caption="Visit type" DataType="String" />-->
+      <OutputField Name="CSN" Caption="CSN" DataType="String" />      
+      <OutputField Name="VISITSTARTDATE" Caption="Visit start date" DataType="Date" />
+      <OutputField Name="VISITENDDATE" Caption="Visit end date" DataType="Date" />
+      <OutputField Name="CONSTITUENTID" Caption="Constituent ID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" />
+      <OutputField Name="PROVIDERFULLNAME" Caption="Provider full name" DataType="String" />
+      <OutputField Name="DEPARTMENT" Caption="Provider department" DataType="String" />
+      <OutputField Name="SUBDEPARTMENT" Caption="Provider subdepartment" DataType="String" />
+      <OutputField Name="PROVIDERROLE" Caption="Provider role" DataType="String" />
+    </OutputFields>
+  </Output>
+
+  
+  <ListBuilder>
+    <Columns>
+      <Column IsDefaultColumn="true" Name="LASTPROCDATE" />
+      <Column IsDefaultColumn="true" Name="CSN"/>  
+      <Column IsDefaultColumn="true" Name="VISITSTARTDATE"/>
+      <Column IsDefaultColumn="true" Name="VISITENDDATE"/>
+      <Column IsDefaultColumn="true" Name="CONSTITUENTID"/>
+      <Column IsDefaultColumn="true" Name="PROVIDERDRNUMBER"/>
+      <Column IsDefaultColumn="true" Name="PROVIDERFULLNAME"/>
+      <Column IsDefaultColumn="true" Name="DEPARTMENT"/>
+      <Column IsDefaultColumn="true" Name="SUBDEPARTMENT"/>
+      <Column IsDefaultColumn="true" Name="PROVIDERROLE" />
+    </Columns>
+  </ListBuilder>
+
+</QueryViewSpec>
+

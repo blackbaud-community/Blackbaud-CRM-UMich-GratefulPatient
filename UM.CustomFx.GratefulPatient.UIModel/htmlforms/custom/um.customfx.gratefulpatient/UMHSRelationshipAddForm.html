@@ -1,0 +1,142 @@
+﻿<style type="text/css">
+    ##MAP#RECIPROCALUMHSID_value {
+        width: 300px;
+    }
+
+    ##MAP#HOUSEHOLDRECOGNITIONLABEL_value, ##MAP#HOUSEHOLDADDLABEL_value {
+        width: 250px;
+    }
+
+    ##MAP#RECIPROCALRECOGNITIONTYPECODEID_value, ##MAP#PRIMARYRECOGNITIONTYPECODEID_value {
+        width: 120px;
+    }
+
+    ##MAP#RECIPROCALSOFTCREDITMATCHFACTOR_value, ##MAP#PRIMARYSOFTCREDITMATCHFACTOR_value {
+        width: 40px;
+    }
+
+    ##MAP#UMHSRelationshipAddForm .relation_label {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 300px;
+    }
+
+    ##MAP#UMHSRelationshipAddForm .recognition_label {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 440px;
+    }
+</style> 
+<div id="#MAP#UMHSRelationshipAddForm" style="overflow:hidden"> 
+    <h2 id="#MAP#FORMHEADER_value"> </h2> 
+    <div class="bbui-forms-tabs-main"> 
+        <div id="#MAP#PRIMARYRELATIONSHIPTAB_caption" style="height: 400px"> 
+            <div class="bbui-forms-fieldset-column" style="width: 330px"> 
+                <table> 
+                    <tr id="#MAP#RECIPROCALUMHSIDLABEL_container"> 
+                        <td> <label id="#MAP#RECIPROCALUMHSID_caption" for="#MAP#RECIPROCALUMHSID_value"> </label> </td> </tr> 
+                    <tr id="#MAP#RECIPROCALUMHSID_container"> 
+                        <td> <input id="#MAP#RECIPROCALUMHSID_value" type="text" /> </td> </tr> 
+                    <tr> 
+                        <td> <h3 id="#MAP#RELATIONSHIPGROUP_value"> </h3> </td> </tr> 
+                    <tr id="#MAP#RELATIONSHIPTYPECODELABEL_container"> 
+                        <td> <label id="#MAP#RELATIONSHIPTYPECODEID_caption" for="#MAP#RELATIONSHIPTYPECODEID_value" class="relation_label"> </label> </td> </tr> 
+                    <tr id="#MAP#RELATIONSHIPTYPECODEID_container"> 
+                        <td> <input id="#MAP#RELATIONSHIPTYPECODEID_value" type="text" /> </td> </tr> 
+                    <tr id="#MAP#RECIPROCALTYPECODELABEL_container"> 
+                        <td> <label id="#MAP#RECIPROCALTYPECODEID_caption" for="#MAP#RECIPROCALTYPECODEID_value" class="relation_label"> </label> </td> </tr> 
+                    <tr id="#MAP#RECIPROCALTYPECODEID_container"> 
+                        <td> <input id="#MAP#RECIPROCALTYPECODEID_value" type="text" /> </td> </tr> 
+                    <tr> 
+                        <td style="padding: 0px;"> 
+                         <table style="border-collapse: collapse;"> 
+                            <tr id="#MAP#STARTDATE_container"> 
+                                <td> <label id="#MAP#STARTDATE_caption" for="#MAP#STARTDATE_value"> </label> </td> 
+                                <td> <input id="#MAP#STARTDATE_value" type="text" class="bbui-forms-xs" /> </td> </tr> 
+                            <tr id="#MAP#ENDDATE_container"> 
+                                <td> <label id="#MAP#ENDDATE_caption" for="#MAP#ENDDATE_value"> </label> </td> 
+                                <td> <input id="#MAP#ENDDATE_value" type="text" class="bbui-forms-xs" /> </td> </tr> 
+                         </table> </td> </tr> 
+                    
+                </table> 
+            </div> 
+            <div class="bbui-forms-fieldset-column" style="width: 330px"> 
+                <table> 
+                    <tr>
+                        <td colspan="2"> 
+                            <h3 id="#MAP#COMMENTSGROUP_value"></h3> 
+                        </td> 
+                    </tr> 
+                    <tr id="#MAP#COMMENTS_container"> 
+                        <td colspan="2"> <textarea id="#MAP#COMMENTS_value" rows="5" cols="1" class="bbui-forms-l"></textarea></td> 
+                    </tr> 
+                    <tr id="#MAP#ISGUARANTOR_container">
+                        <td></td>
+                        <td>
+                            <input id="#MAP#ISGUARANTOR_value" type="checkbox" style="width: auto;" />
+                            <label for="#MAP#ISGUARANTOR_value"></label>
+                        </td>
+                    </tr>
+                  </table>
+                    <!--<table>
+                        <tr id="#MAP#ISPRIMARYBUSINESS_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#ISPRIMARYBUSINESS_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#ISPRIMARYBUSINESS_value"></label>
+                            </td>
+                        </tr>
+                        <tr id="#MAP#ISCONTACT_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#ISCONTACT_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#ISCONTACT_value"></label>
+                            </td>
+                        </tr>
+                        <tr id="#MAP#ISPRIMARYCONTACT_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#ISPRIMARYCONTACT_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#ISPRIMARYCONTACT_value"></label>
+                            </td>
+                        </tr>
+                        <tr id="#MAP#ISMATCHINGGIFTRELATIONSHIP_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#ISMATCHINGGIFTRELATIONSHIP_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#ISMATCHINGGIFTRELATIONSHIP_value"></label>
+                            </td>
+                        </tr>
+                        <tr id="#MAP#ISEMERGENCYCONTACT_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#ISEMERGENCYCONTACT_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#ISEMERGENCYCONTACT_value"></label>
+                            </td>
+                        </tr>
+                        <tr id="#MAP#RECEIVESREPORTCARD_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#RECEIVESREPORTCARD_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#RECEIVESREPORTCARD_value"></label>
+                            </td>
+                        </tr>
+                        <tr id="#MAP#ISGUARANTOR_container">
+                            <td></td>
+                            <td>
+                                <input id="#MAP#ISGUARANTOR_value" type="checkbox" style="width: auto;" />
+                                <label for="#MAP#ISGUARANTOR_value"></label>
+                            </td>
+                        </tr>
+                    </table>-->
+            </div> 
+        </div> 
+            <!--<div id="#MAP#ADDITIONALRELATIONSHIPSTAB_caption" style="width: 850px;"> <table style="border-collapse: collapse;"> 
+                    <tr id="#MAP#RELATIONSHIPS_container"> 
+                    <td> <div id="#MAP#RELATIONSHIPS_value" style="height: 400px; width: 845px;" class="bbui-grid-lookenabled"> </div> </td> </tr> 
+                    </table> 
+            </div>--> 
+    </div> 
+</div>

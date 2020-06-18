@@ -1,0 +1,27 @@
+﻿<SQLFunctionSpec 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="bb_appfx_sqlfunction" 
+  ID="0E9C14D0-DCD4-4443-85F8-ADCD830010ED" 
+  Name="USR_UFN_UMHS_INTERACTIONBATCHPARTICIPANTS" 
+  Description="Returns participants for an MIMED batch interaction." 
+  Author="UM Dev" 
+  DBFunctionName="USR_UFN_UMHS_INTERACTIONBATCHPARTICIPANTS">
+  <CreateFunctionSQL>
+    <![CDATA[
+    CREATE FUNCTION DBO.USR_UFN_UMHS_INTERACTIONBATCHPARTICIPANTS(@BATCHINTERACTIONID UNIQUEIDENTIFIER)
+    RETURNS TABLE
+    AS
+        RETURN
+          SELECT IP.ID,
+                 IP.CONSTITUENTID,
+                 C.KEYNAME,
+                 C.FIRSTNAME
+          FROM   DBO.USR_UMHS_INTERACTIONBATCHPARTICIPANT IP
+                 INNER JOIN DBO.CONSTITUENT C
+                         ON IP.CONSTITUENTID = C.ID
+          WHERE  BATCHINTERACTIONID = @BATCHINTERACTIONID; 
+  ]]>
+  </CreateFunctionSQL>
+  <CreateChildCollectionFunction RootElementName="PARTICIPANTS" BaseTableName="USR_UMHS_INTERACTIONBATCHPARTICIPANT" ParentIDColumn="BATCHINTERACTIONID" OrderBy="KEYNAME,FIRSTNAME" />
+</SQLFunctionSpec>

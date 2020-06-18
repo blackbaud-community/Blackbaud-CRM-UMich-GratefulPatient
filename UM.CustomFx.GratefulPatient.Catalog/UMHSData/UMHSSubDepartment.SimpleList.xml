@@ -1,0 +1,48 @@
+﻿<SimpleDataListSpec
+	xmlns="bb_appfx_simpledatalist"
+	xmlns:c="bb_appfx_commontypes"
+	ID="879b4e21-6a71-4c60-9b41-771fa39ef9cf"
+	Name="MIMED Sub Department Simple Data List"
+	Description="A simple data list that returns MIMED sub department records"
+	Author="UM Dev"
+	TranslationFunctionID="6e96fae7-4b99-46fc-8a3d-e22100adf379"
+	>
+
+	<SPSimpleList SPName="USR_UM_USP_SIMPLEDATALIST_UMHSSUBDEPARTMENT">
+		<c:CreateProcedureSQL >
+			<![CDATA[
+      create procedure dbo.USR_UM_USP_SIMPLEDATALIST_UMHSSUBDEPARTMENT (
+	      @INCLUDEINACTIVE bit = 0, 
+        @DEPARTMENTID uniqueidentifier = null
+      ) as
+      set nocount on;
+      select 
+					SD.ID as VALUE,
+					SD.NAME as LABEL
+				from
+					dbo.USR_UMHS_SUBDEPARTMENT as SD
+					inner join dbo.USR_UMHS_DEPARTMENT as D on SD.DEPARTMENTID = D.ID
+				where (SD.DEPARTMENTID = @DEPARTMENTID or @DEPARTMENTID is null)
+						and ((SD.ISINACTIVE = 0 and D.ISINACTIVE = 0) or @INCLUDEINACTIVE=1)
+				order by
+					case D.SORTMETHODCODE when 1 then SD.SEQUENCE else 0 end,
+					SD.NAME;
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSimpleList>
+  <LookupView ViewName="V_SIMPLEDATALIST_USR_UMHS_SUBDEPARTMENT">
+    <ViewSQL>
+      <![CDATA[      select SD.NAME as LABEL
+            from dbo.USR_UMHS_SUBDEPARTMENT as SD
+      ]]>
+    </ViewSQL>
+  </LookupView>
+  <Parameters>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="INCLUDEINACTIVE" DataType="Boolean" Caption="Include inactive" DefaultValueText="0" />
+        <FormField FieldID="DEPARTMENTID" DataType="Guid" Caption="DEPARTMENTID" />
+      </FormFields>
+    </FormMetaData>
+  </Parameters>
+</SimpleDataListSpec>

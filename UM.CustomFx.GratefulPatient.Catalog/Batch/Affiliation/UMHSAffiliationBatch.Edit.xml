@@ -1,0 +1,177 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="61b399cd-5159-4850-a000-33eb2fd5b880" 
+	Name="MIMED Affiliation Batch Edit Data Form"
+	Description="A data form for editing umhs affiliation batch records" 
+	Author="UM Dev"
+	DataFormInstanceID="da98f6fd-e3fd-4e04-a384-23625e8193ed" 
+	RecordType="MIMED Affiliation Batch"
+	c:SecurityUIFolder="MIMED Affiliation Batch"
+	FormHeader="Edit an MIMED affiliation batch"
+	>
+
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSAFFILIATIONBATCH">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSAFFILIATIONBATCH
+        (
+            @ID                        UNIQUEIDENTIFIER,
+            @UMHSID                    UNIQUEIDENTIFIER = NULL OUTPUT, 
+            @AFFILIATIONID             UNIQUEIDENTIFIER = NULL OUTPUT, 
+            @SEQUENCE                  INT = NULL  OUTPUT,
+            @DATALOADED                BIT = 0 OUTPUT,
+            @TSLONG                    BIGINT = 0 OUTPUT,
+            @AFFILIATIONCATEGORYCODEID UNIQUEIDENTIFIER = NULL OUTPUT,
+            @AFFILIATIONBASENAMECODEID UNIQUEIDENTIFIER = NULL OUTPUT,
+            @STARTDATE                 DATETIME = NULL OUTPUT,
+            @ENDDATE                   DATETIME = NULL OUTPUT,
+            @SITEID                    UNIQUEIDENTIFIER = NULL OUTPUT,
+            @DEPARTMENTID              UNIQUEIDENTIFIER = NULL OUTPUT,
+            @SUBDEPARTMENTID           UNIQUEIDENTIFIER = NULL OUTPUT,                                                                                     
+            @COMMENTS                  NVARCHAR(MAX) = NULL OUTPUT
+        )
+        AS
+            SET NOCOUNT ON;
+            -- be sure to set these, in case the select returns no rows
+            SET @DATALOADED = 0
+            SET @TSLONG = 0
+
+            SELECT @DATALOADED = 1,
+                    @UMHSID = UA.UMHSID,
+                    @AFFILIATIONID = AFFILIATIONID,
+                    @SEQUENCE = UA.SEQUENCE,
+                    @TSLONG = UA.TSLONG,
+                    @AFFILIATIONCATEGORYCODEID = UAC.ID,
+                    @AFFILIATIONBASENAMECODEID = UA.AFFILIATIONBASENAMECODEID,
+                    @STARTDATE = UA.STARTDATE,
+                    @ENDDATE = UA.ENDDATE,
+                    @SITEID = UA.SITEID,
+                    @DEPARTMENTID = UA.DEPARTMENTID,
+                    @SUBDEPARTMENTID = UA.SUBDEPARTMENTID,                               
+                    @COMMENTS = UA.COMMENTS
+            FROM   DBO.USR_UMHS_AFFILIATIONBATCH UA
+            join dbo.USR_UMHS_AFFILIATIONBASE UAB
+                  on UA.AFFILIATIONBASENAMECODEID = UAB.ID     
+                  join dbo.USR_UMHS_AFFILIATIONCATEGORYTYPECODE UAC
+                  on UAB.UMHSAFFILIATIONCATEGORYCODEID = UAC.ID
+            WHERE  UA.ID = @ID
+
+            RETURN 0; 
+
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHSAFFILIATIONBATCH">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHSAFFILIATIONBATCH 
+        (
+	        @ID                        UNIQUEIDENTIFIER,
+          @UMHSID                    UNIQUEIDENTIFIER,
+          @AFFILIATIONID             UNIQUEIDENTIFIER,
+          @SEQUENCE                  INT,
+          @AFFILIATIONCATEGORYCODEID UNIQUEIDENTIFIER,
+          @AFFILIATIONBASENAMECODEID UNIQUEIDENTIFIER,
+          @STARTDATE                 DATETIME,
+          @ENDDATE                   DATETIME,
+          @SITEID                    UNIQUEIDENTIFIER,
+          @DEPARTMENTID              UNIQUEIDENTIFIER,
+          @SUBDEPARTMENTID           UNIQUEIDENTIFIER,                                                                                 
+          @COMMENTS                  NVARCHAR(MAX),
+          @CHANGEAGENTID             UNIQUEIDENTIFIER = NULL
+        )
+        AS
+            SET NOCOUNT ON;
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+          BEGIN TRY
+              -- handle updating the data
+              UPDATE DBO.USR_UMHS_AFFILIATIONBATCH
+              SET     AFFILIATIONBASENAMECODEID = @AFFILIATIONBASENAMECODEID,
+                      AFFILIATIONID = @AFFILIATIONID,                  
+                      STARTDATE = @STARTDATE,
+                      ENDDATE = @ENDDATE,
+                      SITEID = @SITEID,
+                      DEPARTMENTID = @DEPARTMENTID,
+                      SUBDEPARTMENTID = @SUBDEPARTMENTID, 
+                      COMMENTS = @COMMENTS,
+                      CHANGEDBYID = @CHANGEAGENTID,
+                      DATECHANGED = GETDATE()
+              WHERE  ID = @ID
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+
+            RETURN 0; 
+
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="UMHSID" DataType="Guid" Caption="MIMED Constituent" Hidden="false" Required="true">
+        <SearchList SearchListID="875b6cfb-b52f-45a0-bf30-9f1992ab28ae" EnableQuickFind="true">
+          <FormFieldOverrides>
+            <FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true"/>
+            <FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="true"/>
+          </FormFieldOverrides>
+        </SearchList>
+      </FormField>
+      <FormField FieldID="AFFILIATIONID" DataType="Guid" Hidden="true"/>
+      <FormField FieldID="SEQUENCE" Caption="Sequence" DataType="Integer"  Required="true" Hidden="true" />
+      <FormField FieldID="AFFILIATIONCATEGORYCODEID" DataType="Guid" Required="true" Caption="Category">
+        <CodeTable CodeTableName="USR_UMHS_AFFILIATIONCATEGORYTYPECODE" />
+      </FormField>
+      <FormField FieldID="AFFILIATIONBASENAMECODEID" DataType="Guid" Required="true" Caption="Name">
+        <SimpleDataList SimpleDataListID="4c646cee-0f5b-4197-b4d3-0869693cfc2d">
+          <Params>
+            <Param ID="AFFILIATIONCATEGORYCODEID">
+              <Value>Fields!AFFILIATIONCATEGORYCODEID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Required="true" />
+      <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+      <c:FormField FieldID="SITEID" DataType="Guid" Caption="Site">
+        <c:SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+          <c:SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+        </c:SimpleDataList>
+      </c:FormField>
+      <FormField FieldID="DEPARTMENTID" DataType="Guid" Caption="Department" Required="true">
+        <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" DataType="Guid" Caption="Sub department">
+        <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          <Params>
+            <Param ID="DEPARTMENTID">
+              <Value>Fields!DEPARTMENTID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="COMMENTS" Caption="Comments" />
+    </FormFields>
+    <FormUIComponent />
+  </FormMetaData>
+</EditDataFormTemplateSpec>

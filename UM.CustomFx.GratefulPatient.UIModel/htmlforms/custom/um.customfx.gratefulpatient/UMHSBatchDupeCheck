@@ -1,0 +1,206 @@
+﻿<div id="#MAP#USR_USP_SEARCHLIST_UMHS_BATCH_DUPCHECK">
+  <table>
+    <tr id="#MAP#MRN_container">
+      <td>
+        <label id="#MAP#MRN_caption" for="#MAP#MRN_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#MRN_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#CONSTITUENTLOOKUPID_container">
+      <td>
+        <label id="#MAP#CONSTITUENTLOOKUPID_caption" for="#MAP#CONSTITUENTLOOKUPID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#CONSTITUENTLOOKUPID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#TITLECODEID_container">
+      <td>
+        <label id="#MAP#TITLECODEID_caption" for="#MAP#TITLECODEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#TITLECODEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#FIRSTNAME_container">
+      <td>
+        <label id="#MAP#FIRSTNAME_caption" for="#MAP#FIRSTNAME_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#FIRSTNAME_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#MIDDLENAME_container">
+      <td>
+        <label id="#MAP#MIDDLENAME_caption" for="#MAP#MIDDLENAME_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#MIDDLENAME_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#LASTNAME_container">
+      <td>
+        <label id="#MAP#LASTNAME_caption" for="#MAP#LASTNAME_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#LASTNAME_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#SUFFIXCODEID_container">
+      <td>
+        <label id="#MAP#SUFFIXCODEID_caption" for="#MAP#SUFFIXCODEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#SUFFIXCODEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#BIRTHDATE_container">
+      <td>
+        <label id="#MAP#BIRTHDATE_caption" for="#MAP#BIRTHDATE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#BIRTHDATE_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#ADDRESSTYPECODEID_container">
+      <td>
+        <label id="#MAP#ADDRESSTYPECODEID_caption" for="#MAP#ADDRESSTYPECODEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#ADDRESSTYPECODEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#ADDRESSBLOCK_container">
+      <td valign="top">
+        <label id="#MAP#ADDRESSBLOCK_caption" for="#MAP#ADDRESSBLOCK_value"></label>
+      </td>
+      <td>
+        <textarea id="#MAP#ADDRESSBLOCK_value" rows="3" cols="1"></textarea>
+      </td>
+    </tr>
+    <tr id="#MAP#CITY_container">
+      <td>
+        <label id="#MAP#CITY_caption" for="#MAP#CITY_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#CITY_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#STATEID_container">
+      <td>
+        <label id="#MAP#STATEID_caption" for="#MAP#STATEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#STATEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#POSTCODE_container">
+      <td>
+        <label id="#MAP#POSTCODE_caption" for="#MAP#POSTCODE_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#POSTCODE_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#COUNTRYID_container">
+      <td>
+        <label id="#MAP#COUNTRYID_caption" for="#MAP#COUNTRYID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#COUNTRYID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#PHONENUMBER_container">
+      <td>
+        <label id="#MAP#PHONENUMBER_caption" for="#MAP#PHONENUMBER_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#PHONENUMBER_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#PHONETYPECODEID_container">
+      <td>
+        <label id="#MAP#PHONETYPECODEID_caption" for="#MAP#PHONETYPECODEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#PHONETYPECODEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#PHONE_COUNTRYID_container">
+      <td>
+        <label id="#MAP#PHONE_COUNTRYID_caption" for="#MAP#PHONE_COUNTRYID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#PHONE_COUNTRYID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#PHONE_OTHER_container">
+      <td>
+        <label id="#MAP#PHONE_OTHER_caption" for="#MAP#PHONE_OTHER_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#PHONE_OTHER_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#PHONE_OTHERTYPECODEID_container">
+      <td>
+        <label id="#MAP#PHONE_OTHERTYPECODEID_caption" for="#MAP#PHONE_OTHERTYPECODEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#PHONE_OTHERTYPECODEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#PHONE_OTHER_COUNTRYID_container">
+      <td>
+        <label id="#MAP#PHONE_OTHER_COUNTRYID_caption" for="#MAP#PHONE_OTHER_COUNTRYID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#PHONE_OTHER_COUNTRYID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#EMAILADDRESS_container">
+      <td>
+        <label id="#MAP#EMAILADDRESS_caption" for="#MAP#EMAILADDRESS_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#EMAILADDRESS_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#EMAILADDRESSTYPECODEID_container">
+      <td>
+        <label id="#MAP#EMAILADDRESSTYPECODEID_caption" for="#MAP#EMAILADDRESSTYPECODEID_value"></label>
+      </td>
+      <td>
+        <input id="#MAP#EMAILADDRESSTYPECODEID_value" type="text" />
+      </td>
+    </tr>
+    <tr id="#MAP#GOTONEXTRECORD_container">
+      <td>
+        <label id="#MAP#GOTONEXTRECORD_caption" for="#MAP#GOTONEXTRECORD_value"></label>
+      </td>
+      <td>
+        <span id="#MAP#GOTONEXTRECORD_value"></span>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <button id="#MAP#SAVE_action"></button>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <button id="#MAP#CANCEL_action"></button>
+      </td>
+    </tr>
+  </table>
+  <!-- To define fields in multiple columns on the form, simply add/move the fields to this div
+       <div class="bbui-forms-fieldset-column">
+           <table>
+           </table>
+       </div>
+       -->
+</div>

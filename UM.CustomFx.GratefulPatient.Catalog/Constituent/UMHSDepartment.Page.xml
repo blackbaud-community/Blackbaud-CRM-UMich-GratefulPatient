@@ -1,0 +1,93 @@
+﻿<PageDefinitionSpec 
+    xmlns="bb_appfx_pagedefinition" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="1e35d32d-3e70-4585-90e3-493b89031db7"
+    Name="MIMED departments Page"
+    Description="A page for displaying information about MIMED department subdepartment records."
+    Author="UM Dev"
+    ContextRecordType="MIMED Department"	
+    >
+
+	<!-- Note:  A page can optionally have a view form associated with it as the "Expression form".  While implemented as a view data form,
+	this form has no UI in this context, and is simply used as a way of loading additional information associated with the page.  The fields
+	returned by the expression form can be used as expressions in various properties throughout the page.  To specify an expression form for this
+	page, add the following attribute:		ExpressionDataFormID="<some guid>"-->
+
+	<!-- define how the page header should appear -->
+	<PageHeader Caption="MIMED departments and Subdepartments" ImageKey="RES:fa_Configuration"  />
+
+	<!-- define the tabs for the page - note that if only one tab is present, then that tab's sections are promoted to the page level (ie., the tab
+	itself isn't shown -->
+	<Tabs>
+		<Tab ID="86a34a3c-145c-484f-98ac-1e3130011baf" Caption="MIMED departments and Subdepartments">
+			<!-- define the sections for this tab -->
+			<Sections>
+				<Section ID="6512a9d2-a16f-439b-b805-81bf5e5b6dd1" Caption="MIMED departments">
+					<DataList ID="ea34ef97-53a5-4fc0-b53d-8d3b71d27cbf" HideFilters="false">
+						<RenderStyle>
+							<StandardView/>
+						</RenderStyle>
+					</DataList>
+					<!-- define the section-level actions -->
+					<Actions>
+            <Action ID="3895c489-5b4f-4489-87bf-28b162f3e5b3" Caption="Go to subdepartments" ImageKey="RES:goto_round" DefaultAction="true" LinkFieldID="NAME" >
+              <ShowPage PageID="a764147d-1b60-412f-b187-9bf683ca2bd8" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+						<Action ID="f35e7cf4-0318-4188-bc34-33a457d3208c" Caption="Add" ImageKey="RES:NewItem">
+              <c:ShowAddDataForm DataFormID="a35813a0-3a69-4dc8-9e38-996d4104e808">
+                <c:PostActionEvent>
+                  <c:RefreshSection />
+                </c:PostActionEvent>
+              </c:ShowAddDataForm>              
+						</Action>
+            <Action ID="3413F41A-5B59-4731-9AED-56A8193670C2" Caption="Edit" ImageKey="RES:Edit">
+              <c:ShowDataForm DataFormID="f825705b-48ec-4853-b0bc-04fb15b1f38d" >
+                <c:ActionContext>
+                  <c:SectionField>ID</c:SectionField>
+                </c:ActionContext>
+                <c:PostActionEvent>
+                  <c:RefreshSection />
+                </c:PostActionEvent>
+              </c:ShowDataForm>              
+            </Action>        
+            <Action ID="3874ce0e-7874-4a42-ab42-b265640b7f30" Caption="Mark inactive" ImageKey="RES:RecordOperationSpec" Visible="= CBOOL(Fields!ISACTIVE)" >
+              <ExecuteRecordOperation RecordOperationID="3efaaa0a-af59-4b08-b25d-1cd5e1b95c0a" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ExecuteRecordOperation>              
+            </Action>
+            <Action ID="03b75128-5d85-4d05-8c9c-467bb9a5fd10" Caption="Mark active" ImageKey="RES:RecordOperationSpec" Visible="= Not CBOOL(Fields!ISACTIVE)" >
+              <ExecuteRecordOperation RecordOperationID="ddad4fb2-9be4-4066-8364-6d5d9bae689a" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ExecuteRecordOperation>             
+            </Action>            
+            <Action ID="4145E8CF-8BB3-4D88-8945-3C4753F15367" Caption="Delete" ImageKey="RES:Delete">
+              <c:ExecuteRecordOperation RecordOperationID="e8301786-b0b1-486f-a88a-387e13fe9ccf" ShowPrompt="true">
+                <c:ActionContext>
+                  <c:SectionField>ID</c:SectionField>
+                </c:ActionContext>
+                <c:PostActionEvent>
+                  <c:RefreshSection />
+                </c:PostActionEvent>
+              </c:ExecuteRecordOperation>
+            </Action>
+					</Actions>
+					
+				</Section>
+			</Sections>
+		</Tab>
+	</Tabs>	
+</PageDefinitionSpec>

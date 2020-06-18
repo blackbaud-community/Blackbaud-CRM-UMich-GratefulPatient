@@ -1,0 +1,12 @@
+﻿<ConfigurationDataSpec
+	xmlns="bb_appfx_configurationdata"
+	ID="8cb0daf0-b799-4d7b-ba9c-7e0a891f1895"
+	Name="UMHSSubdepartments"
+	Description="Defines the process used to import and export MIMED subdepartments records"
+	Author="UM Dev"
+	ConfigurationDataFolder="UM Configurations"
+	DisplayName="MIMED Subdepartments"
+	IncludeChildTables="false"
+	ParentTableName="USR_UMHS_SUBDEPARTMENT"
+	>
+</ConfigurationDataSpec>

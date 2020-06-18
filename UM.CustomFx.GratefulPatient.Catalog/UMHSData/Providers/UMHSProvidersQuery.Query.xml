@@ -1,0 +1,110 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="35311ae1-6c42-4917-b76c-638b3291c40b"
+	Name="MIMED Providers Query"
+	Description="A view defined for querying on MIMED provider records"
+	Author="UM Dev"
+	IsRoot="true"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_UM_V_QUERY_UMHSPROVIDERS">
+		<ViewSQL>
+			<![CDATA[
+        select
+	        p.ID,
+          v.UMHSID,
+          c.ID as CONSTITUENTID,
+          c.NAME as PROVIDERNAME,
+          p.PROVIDERDRNUMBER,
+          d.ID as DEPARTMENTID,
+          sd.ID as SUBDEPARTMENTID,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when sd.ID is NOT null
+            then
+              sd.NAME
+            else
+              N''
+          end as SUBDEPARTMENT,
+          p.ADMITDOCTORIND,
+          p.ATTENDDOCTORIND,
+          p.RESIDENTDOCTORIND,
+          p.CONSULTDOCTORIND,
+          --p.ADDRESSBLOCK,
+          --p.CITY,
+          --isnull(s.[DESCRIPTION], '') as [STATE],
+          --p.POSTCODE,
+          p.PHONE,
+          --p.CATEGORYMEMBERDESCRIPTION,
+          --p.EFFDATE,
+          -- p.TERMDATE,
+          [ADDEDBY].APPLICATIONNAME   AS [ADDEDBY_APPLICATION],
+          [ADDEDBY].USERNAME          AS [ADDEDBY_USERNAME],
+          [CHANGEDBY].APPLICATIONNAME AS [CHANGEDBY_APPLICATION],
+          [CHANGEDBY].USERNAME        AS [CHANGEDBY_USERNAME],
+          p.DATEADDED,
+          p.DATECHANGED
+        from dbo.USR_UMHS_PROVIDERS p
+        inner join USR_UMHS_VISITS v on v.providerid = p.ID
+        inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+        left join USR_UMHS_DATA u on u.ID = v.UMHSID
+        --left outer join [STATE] s on s.ID=p.STATEID
+        left outer join USR_UMHS_DEPARTMENT d on d.ID = p.DEPARTMENTID
+        left outer join USR_UMHS_SUBDEPARTMENT sd on sd.ID = p.SUBDEPARTMENTID
+        LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON ADDEDBY.ID = p.ADDEDBYID
+        LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON CHANGEDBY.ID = p.CHANGEDBYID 	
+      ]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+      <OutputField Name="ID" Caption="ID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="MIMED ID" Category="System Fields" Name="UMHSID" />
+      <OutputField Name="CONSTITUENTID" Caption="Constituent" DataType="Guid" IsHidden="true"/>
+      <OutputField Name="PROVIDERNAME" Caption="Provider name" DataType="String" />
+      <OutputField Name="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" />
+      <OutputField Caption="DEPARTMENTID" Name="DEPARTMENTID" IsHidden="true" DataType="Guid"></OutputField>
+      <OutputField Caption="SUBDEPARTMENTID" Name="SUBDEPARTMENTID" IsHidden="true" DataType="Guid"></OutputField>
+      <OutputField Caption="MIMED department" Name="DEPARTMENT">
+        <LookupInfo IDField="DEPARTMENTID">
+          <SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="MIMED subdepartment" Name="SUBDEPARTMENT">
+        <LookupInfo IDField="SUBDEPARTMENTID">
+          <SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADMITDOCTORIND" Caption="Admitting provider" DataType="Boolean" />
+      <OutputField Name="ATTENDDOCTORIND" Caption="Attending provider" DataType="Boolean" />
+      <OutputField Name="RESIDENTDOCTORIND" Caption="Resident provider" DataType="Boolean" />
+      <OutputField Name="CONSULTDOCTORIND" Caption="Consulting provider" DataType="Boolean" />
+      <OutputField Name="PHONE" Caption="Provider phone" DataType="String" />
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+		</OutputFields>
+	</Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Providers"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

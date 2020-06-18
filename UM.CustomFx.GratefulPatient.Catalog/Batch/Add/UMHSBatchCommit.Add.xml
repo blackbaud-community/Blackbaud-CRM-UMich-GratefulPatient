@@ -1,0 +1,329 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ada59d70-2505-4751-a07e-8fdedaefef00" 
+	Name="MIMED Batch Commit Add Data Form"
+	Description="A data form for adding MIMED batch commit records" 
+	Author="UM Dev"
+	DataFormInstanceID="71a0008d-ce2e-4fa7-bb3d-c50687690cb6" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Add an MIMED batch commit"
+	>
+
+	<SPDataForm>
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCHCOMMIT">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCHCOMMIT
+(
+   @ID uniqueidentifier = null output
+  ,@BATCHCONSTITUENTID UNIQUEIDENTIFIER = NULL
+  ,@CHANGEAGENTID uniqueidentifier
+  ,@VALIDATEONLY bit = 0
+  -- Batch fields
+  ,@MRN           nvarchar(50)                -- required
+  ,@CPISEQUENCE   nvarchar(50)                -- required
+  ,@CONSTITUENTLOOKUPID nvarchar(200) = ''    
+  ,@FIRSTNAME     nvarchar(50) = ''
+  ,@MIDDLENAME    nvarchar(50) = ''
+  ,@LASTNAME      nvarchar(100) = ''
+  ,@SUFFIXCODEID  uniqueidentifier = null
+  ,@BIRTHDATE     udt_fuzzydate = '00000000'       -- required
+  ,@ADDRESSBLOCK       nvarchar(500) = ''
+  ,@CITY          nvarchar(100) = ''
+  ,@STATEID   uniqueidentifier = null
+  ,@POSTCODE       nvarchar(24) = ''
+  ,@COUNTRYID uniqueidentifier = null
+  ,@ADDRESSTYPECODEID uniqueidentifier = null
+  ,@INFOSOURCECODEID uniqueidentifier = null
+  ,@HISTORICALSTARTDATE date = null
+  ,@PHONENUMBER nvarchar(200) = ''
+  ,@PHONETYPECODEID uniqueidentifier = null
+  ,@PHONE_COUNTRYID uniqueidentifier = null
+  ,@PHONE_OTHER nvarchar(200) = ''
+  ,@PHONE_OTHERTYPECODEID uniqueidentifier = null
+  ,@PHONE_OTHER_COUNTRYID uniqueidentifier = null
+  ,@PHONESTARTDATE date = null
+  ,@EMAILADDRESS  nvarchar(100) = ''  
+  ,@EMAILADDRESSTYPECODEID uniqueidentifier = null
+  ,@EMAILADDRESSSTARTDATE date = null
+  ,@GENDERCODE tinyint = 0
+  ,@ISDMINELIGIBLE  bit = 0
+  ,@DMINELIGIBLEREASONCODEID uniqueidentifier = null  
+  ,@WEDMSCORECODEID        uniqueidentifier = null
+  ,@WEDMSCORESTARTDATE date = null
+  ,@WEESTGIVCAPACITYCODEID uniqueidentifier = null
+  ,@WEESTGIVCAPACITYCOMMENT nvarchar(510) = ''
+  ,@WEESTGIVCAPACITYSTARTDATE date = null  
+  ,@UMHSDATA_LASTPROCDATE datetime = null
+  ,@HASUMAFFILIATION bit = null
+  ,@WEALTHSCORES_TOTALESTIMATEDASSETS nvarchar(50) = ''
+  ,@WEALTHSCORES_RATINGID uniqueidentifier = null
+)
+as
+
+set nocount on;
+
+/*
+ * Creating  a new patient and shell constituent record.
+ */
+
+declare @CURRENTDATE datetime;
+declare @CURRENTAPPUSERID uniqueidentifier=null;
+declare @CONSTITUENTID uniqueidentifier;
+declare @UMHSFRIENDKEYNAME nvarchar(50);
+
+begin try
+  
+  declare @STARTDATE datetime;
+  
+  set @STARTDATE=case when @UMHSDATA_LASTPROCDATE is NULL then GETDATE() else @UMHSDATA_LASTPROCDATE end;
+  
+  set @CURRENTDATE = getdate();
+
+  if @CHANGEAGENTID is null  
+  exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+		
+  select @CURRENTAPPUSERID=ID from appuser where windowsusername=SUSER_NAME();
+
+  if @ID is null 
+    set @ID = newid()
+  
+  /* Get KEYNAME value for constituent shell record */
+  exec dbo.USR_USP_UMHS_GETUMHSFRIENDKEYNAME @CONSTITUENTID=@CONSTITUENTID output, @UMHSFRIENDKEYNAME=@UMHSFRIENDKEYNAME output;
+
+  /* Add new Constituent Shell record */
+  exec dbo.USP_DATAFORMTEMPLATE_ADD_INDIVIDUAL @ID=@CONSTITUENTID OUTPUT, @LASTNAME=@UMHSFRIENDKEYNAME,  @CURRENTAPPUSERID=@CURRENTAPPUSERID;
+  
+  /*
+   * Set the shell record as inactive if individual is ineligible for Direct Mail and deceased
+   */
+  if (1 = @ISDMINELIGIBLE) and (@DMINELIGIBLEREASONCODEID is NOT null)
+  begin
+    update CONSTITUENT set ISINACTIVE=1 where ID=@CONSTITUENTID;
+  end
+  
+  /*
+   * Set Non-Alum constituency on the MIMED Shell record
+   */
+  declare @CONSTITUENCYID uniqueidentifier;
+  declare @CONSTITUENCYCODEID_NONALUM uniqueidentifier='BA102635-D715-4B17-B902-E96501F375D9';   
+  if not exists(select 1 from CONSTITUENCY where CONSTITUENTID=@CONSTITUENTID and CONSTITUENCYCODEID=@CONSTITUENCYCODEID_NONALUM)
+  begin
+
+	  exec dbo.USP_DATAFORMTEMPLATE_ADD_CONSTITUENCY
+			  @ID = @CONSTITUENCYID output,
+			  @CONSTITUENTID = @CONSTITUENTID,
+			  @CONSTITUENCYCODEID = @CONSTITUENCYCODEID_NONALUM,
+			  @DATEFROM = @STARTDATE;
+  end
+
+  /*
+   * Validate the email address.
+   */
+  if (0 < LEN(@EMAILADDRESS))
+  begin
+    if 0 = [dbo].[UFN_VALIDEMAILADDRESS](@EMAILADDRESS)
+    begin
+      RAISERROR('Invalid email address format.', 13, 1);
+    end
+  end
+
+  exec dbo.USP_USR_UMHS_BATCH_ADD_INDIVIDUAL
+     @CHANGEAGENTID = @CHANGEAGENTID
+    ,@CONSTITUENTID = @CONSTITUENTID        -- Primary record ID
+    ,@MRN = @MRN                            -- required
+    ,@CPISEQUENCE = @CPISEQUENCE            -- required
+    ,@FIRSTNAME = @FIRSTNAME
+    ,@MIDDLENAME = @MIDDLENAME
+    ,@LASTNAME = @LASTNAME                  -- required
+    ,@SUFFIXCODEID = @SUFFIXCODEID
+    ,@BIRTHDATE = @BIRTHDATE                -- required
+    ,@ADDRESSBLOCK = @ADDRESSBLOCK
+    ,@CITY = @CITY
+    ,@STATEID = @STATEID
+    ,@POSTCODE = @POSTCODE
+    ,@ADDRESSCOUNTRYID = @COUNTRYID                         -- United States
+    ,@ADDRESSTYPECODEID = @ADDRESSTYPECODEID                -- Home
+    ,@INFOSOURCECODEID = @INFOSOURCECODEID                  -- Med/Hospital Batch
+    ,@HISTORICALSTARTDATE = @HISTORICALSTARTDATE
+    ,@PHONE = @PHONENUMBER
+    ,@PHONETYPECODEID = @PHONETYPECODEID                    -- Home
+    ,@PHONE_COUNTRYID = @PHONE_COUNTRYID                    -- United States
+    ,@PHONE_OTHER = @PHONE_OTHER
+    ,@PHONE_OTHERTYPECODEID = @PHONE_OTHERTYPECODEID        -- Other
+    ,@PHONE_OTHER_COUNTRYID = @PHONE_OTHER_COUNTRYID        -- United States
+    ,@PHONESTARTDATE = @PHONESTARTDATE
+    ,@EMAILADDRESS = @EMAILADDRESS
+    ,@EMAILADDRESSTYPECODEID = @EMAILADDRESSTYPECODEID      -- Home E-mail Address
+    ,@EMAILADDRESSSTARTDATE = @EMAILADDRESSSTARTDATE
+    ,@ISDMINELIGIBLE = @ISDMINELIGIBLE
+    ,@DMINELIGIBLEREASONCODEID = @DMINELIGIBLEREASONCODEID
+    ,@GENDERCODE = @GENDERCODE
+    ,@UMHSDATA_LASTPROCDATE = @UMHSDATA_LASTPROCDATE
+    
+    declare @WEALTHSCORESATTRIBUTEID uniqueidentifier;
+    
+    if @WEALTHSCORES_RATINGID is NOT NULL
+    begin
+        /*
+         * Add 'Blackbaud Wealth Point Rating'
+         */
+        set @WEALTHSCORESATTRIBUTEID = newid();
+    
+        if @WEALTHSCORES_RATINGID is NOT NULL
+        begin    
+          exec dbo.[USP_ATTRIBUTEC35DC7056236482E810402B9C71B3318_ADD] 
+                  @ID=@WEALTHSCORESATTRIBUTEID,
+                  @PARENTID=@CONSTITUENTID,
+                  @VALUE=@WEALTHSCORES_RATINGID,
+                  @CHANGEAGENTID=@CHANGEAGENTID,
+                  @STARTDATE=@STARTDATE,
+                  @ENDDATE=default
+        end 
+        
+        /*
+         * Default the Total Estimated Assets value when empty
+         */
+        if nullif(isnull(@WEALTHSCORES_TOTALESTIMATEDASSETS, ''), '') IS NULL
+        begin
+            set @WEALTHSCORES_TOTALESTIMATEDASSETS = N'Not available'
+        end        
+        
+        /*
+         * Add 'Blackbaud Wealth Total Estimated Assets'
+         */
+        set @WEALTHSCORESATTRIBUTEID = newid();
+
+        if nullif(isnull(@WEALTHSCORES_TOTALESTIMATEDASSETS, ''), '') IS NOT NULL
+        begin
+            exec dbo.USP_ATTRIBUTE7EAF9B3B191F4A29A9BD7A7F63EE3F76_ADD
+	            @ID = @WEALTHSCORESATTRIBUTEID,
+	            @PARENTID = @CONSTITUENTID,
+	            @VALUE = @WEALTHSCORES_TOTALESTIMATEDASSETS,
+              @CHANGEAGENTID=@CHANGEAGENTID,
+	            @STARTDATE = @STARTDATE,
+              @ENDDATE=default
+        end
+    end
+    
+end try
+begin catch
+    exec dbo.USP_RAISE_ERROR
+    return 1
+end catch
+
+return 0				
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="VALIDATEONLY" Caption="Validate only" Hidden="true" />
+      <!--Batch fields-->
+      <FormField FieldID="BATCHCONSTITUENTID" DataType="Guid" Hidden="true" Caption="BATCHCONSTITUENTID"/>
+      <FormField FieldID="MRN" Caption="Medical Record Number (MRN)"  DataType="String" MaxLength="50" Required="true"/>
+      <FormField FieldID="CPISEQUENCE" Caption="CPI sequence" DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="CONSTITUENTLOOKUPID" Caption="Constituent Lookup ID" Description="Constituent's Lookup ID" DataType="String" MaxLength="200" />
+      <FormField FieldID="FIRSTNAME" Caption="First name" DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" MaxLength="50" />
+      <FormField FieldID="LASTNAME" Caption="Last name" DataType="String" MaxLength="100" Required="true"/>
+      <FormField FieldID="ISUMAFFILATION" Description="Is the Constituent have an affilation with U-M?" Caption="Is U-M affiliated" DataType="Boolean" ReadOnly="true">
+        <Link IDColumn="HASUMAFFILIATION"/>
+      </FormField>      
+      <FormField FieldID="SUFFIXCODEID" Caption="Suffix" DataType="Guid">
+        <CodeTable CodeTableName="SUFFIXCODE"/>
+      </FormField>
+      <FormField FieldID="BIRTHDATE" Caption="Birth date" DataType="FuzzyDate" Required="true" />
+      <FormField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" MaxLength="500" Category="Address"/>
+      <FormField FieldID="CITY" Caption="City" DataType="String" MaxLength="100"  Category="Address"/>
+      <FormField FieldID="STATEID" Caption="State" DataType="Guid"  Category="Address">
+        <SimpleDataList SimpleDataListID="cae6185d-898e-474f-84d1-dadaa4b63ad3" />
+      </FormField>
+      <FormField FieldID="POSTCODE" Caption="Post code" DataType="String" MaxLength="24"  Category="Address"/>
+      <!-- Default Country: United States -->
+      <FormField FieldID="COUNTRYID" Caption="Address country" DataType="Guid"  Category="Address" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <!-- Default code type for Address: "Home" -->
+      <FormField FieldID="ADDRESSTYPECODEID" Caption="Address type code" DataType="Guid" Category="Address" >
+        <CodeTable CodeTableName="ADDRESSTYPECODE"/>
+      </FormField>
+      <!-- Default Infosource code: "Med/Hospital"-->
+      <FormField FieldID="INFOSOURCECODEID" Caption="Information source code" DataType="Guid" Category="Address" >
+        <CodeTable CodeTableName="INFOSOURCECODE"/>
+      </FormField>
+      <FormField FieldID="HISTORICALSTARTDATE" Description="Start date for Address" Caption="Historical start date" DataType="Date" Category="Address"/>
+      <FormField FieldID="PHONENUMBER" Caption="Phone" DataType="String" MaxLength="200" Category="Phone" />
+      <!-- Default code type for Phone Other: "Home" -->
+      <FormField FieldID="PHONETYPECODEID" Caption="Phone type code" DataType="Guid" Category="Phone" >
+        <CodeTable CodeTableName="PHONETYPECODE"/>
+      </FormField>
+      <!-- Default Country: United States -->
+      <FormField FieldID="PHONE_COUNTRYID" Caption="Phone country" DataType="Guid"  Category="Phone" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONE_OTHER" Caption="Phone (other)" DataType="String" MaxLength="200" Category="Phone" />
+      <!-- Default code type for Phone Other: "Other" -->
+      <FormField FieldID="PHONE_OTHERTYPECODEID" Caption="Phone (other) type code" DataType="Guid" Category="Phone" >
+        <CodeTable CodeTableName="PHONETYPECODE"/>
+      </FormField>
+      <!-- Default Country: United States -->
+      <FormField FieldID="PHONE_OTHER_COUNTRYID" Caption="Phone (other) country" DataType="Guid"  Category="Phone" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONESTARTDATE" Caption="Phone start date" DataType="Date" Category="Phone" />
+      <FormField FieldID="EMAILADDRESS" Caption="Email address" DataType="String" MaxLength="100" Category="Email" />
+      <!-- Default code type for Email Address: "Home E-mail Address" -->
+      <FormField FieldID="EMAILADDRESSTYPECODEID" Caption="Email address type code" DataType="Guid" Category="Email" >
+        <CodeTable CodeTableName="EMAILADDRESSTYPECODE"/>
+      </FormField>
+      <FormField FieldID="EMAILADDRESSSTARTDATE" Caption="Email start date" DataType="Date" Category="Email" />
+      <FormField FieldID="GENDERCODE" Caption="Gender" DataType="TinyInt" DefaultValueText="0" Required="true">
+        <ValueList>
+          <Items>
+            <Item>
+              <Value>0</Value>
+              <Label>Unknown</Label>
+            </Item>
+            <Item>
+              <Value>1</Value>
+              <Label>Male</Label>
+            </Item>
+            <Item>
+              <Value>2</Value>
+              <Label>Female</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="ISDMINELIGIBLE" Caption="Direct Mail Ineligible" DataType="Boolean"  DefaultValueText="0" AllowNullValue="false" />
+      <FormField FieldID="DMINELIGIBLEREASONCODEID" Caption="Direct Mail Ineligible Reason" DataType="Guid" >
+        <CodeTable CodeTableName="USR_UMHS_DMINELIGIBLEREASONCODE"/>
+      </FormField>
+      <FormField FieldID="WEDMSCORECODEID" Caption="Wealth Engine Data Mining Score (Med)" DataType="Guid" Category="Wealth Engine" Hidden="true" >
+          <CodeTable CodeTableName="WEDMSCORECODE" />
+      </FormField>
+      <FormField FieldID="WEDMSCORESTARTDATE" Caption="Wealth Engine Data Mining Score (Med) start date" DataType="Date" Category="Wealth Engine" Hidden="true" />
+      <FormField FieldID="WEESTGIVCAPACITYCODEID" Caption="Wealth Engine Est Giv Capacity (Med)" DataType="Guid"  Category="Wealth Engine" Hidden="true" >
+          <CodeTable CodeTableName="WEESTGIVCAPACITYCODE"/>
+      </FormField>
+      <FormField FieldID="WEESTGIVCAPACITYCOMMENT" Caption="Wealth Engine Est Giv Capacity (Med) comment" DataType="String" MaxLength="510" Category="Wealth Engine" DefaultValueText="" Hidden="true" />
+      <FormField FieldID="WEESTGIVCAPACITYSTARTDATE" Caption="Wealth Engine Est Giv Capacity (Med) start date" DataType="Date" Category="Wealth Engine" Hidden="true" />
+      <FormField FieldID="UMHSDATA_LASTPROCDATE" Description="MIMED Imported last process date" Caption="MIMED Imported last process date" DataType="Date" IncludeTimeOnDate="true" Category="MIMED Import (only)" Hidden="true" />
+      <FormField FieldID="ISGPIMPORTEDRECORD" Description="Is record imported from the Grateful Patient import process" Caption="Is Grateful Patient imported record" DataType="TinyInt" MinValue="0" MaxValue="1" Hidden="true" ReadOnly="true" />
+      <FormField FieldID="HASUMAFFILIATION" Description="Does the constiuent have an affilation and/or constiteuncy of Faculty, Staff, or Board Member with U-M" DataType="TinyInt" MinValue="0" MaxValue="1" Hidden="true" ReadOnly="false" />
+      <FormField FieldID="WEALTHSCORES_TOTALESTIMATEDASSETS" Description="Wealth Scores Total Estimated Assets" Caption="Wealth Scores Total Estimated Assets" DataType="String" MaxLength="50" Category="Blackbaud Wealth Scores Ratings" />
+      <FormField FieldID="WEALTHSCORES_RATINGID" Description="Wealth Scores Rating" Caption="Wealth Scores Rating" DataType="Guid" Category="Blackbaud Wealth Scores Ratings" >
+          <CodeTable CodeTableName="WEALTHPOINTRATINGCATEGORYCODE" />
+      </FormField>
+    </FormFields>
+	</FormMetaData>
+
+</AddDataFormTemplateSpec>

@@ -1,0 +1,195 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="1ebe205d-89fd-4ef1-b25b-a7e44f136a92" 
+	Name="MIMED Portfolio Prospects Data Form"
+	Description="A data form for editing MIMED portfolio prospects records" 
+	Author="UM Dev"
+	DataFormInstanceID="fde9ceda-d74a-4a5b-a0e0-aee6f733422a" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Add an MIMED portfolio prospects"
+	>
+  <c:DependencyList>
+    <c:Dependency CatalogAssembly="Blackbaud.AppFx.MajorGiving.Catalog.dll" CatalogItem="Blackbaud.AppFx.MajorGiving.Catalog.Prospect.Search.xml" />
+    <c:Dependency CatalogAssembly="Blackbaud.AppFx.MajorGiving.Catalog.dll" CatalogItem="Blackbaud.AppFx.MajorGiving.Catalog.USP_PROSPECTASSIGNEDALERT_SEND.xml" />
+  </c:DependencyList>
+  <c:InstalledProductList>
+    <c:InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <c:InstalledProduct ID="a84df439-5a75-4a3b-b3f5-b47035ddd3ff" />
+    <c:InstalledProduct ID="ab25cd89-7288-4605-b0ea-48961960ec06" />
+  </c:InstalledProductList>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.MajorGiving.Catalog.dll" ClassName="Blackbaud.AppFx.MajorGiving.Catalog.FundraiserAssignToProspect.Edit" />
+  <SPDataForm>
+    <LoadImplementation SPName="USR_USP_UMHS_DATAFORMTEMPLATE_FUNDRAISERASSIGNTOPROSPECT_EDITLOAD">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        create procedure dbo.USR_USP_UMHS_DATAFORMTEMPLATE_FUNDRAISERASSIGNTOPROSPECT_EDITLOAD (
+        @ID uniqueidentifier,
+        @TSLONG bigint = 0 output,
+        @DATALOADED bit = 0 output,
+        @PROSPECTID uniqueidentifier = null output,
+        @FUNDRAISERSTARTDATE datetime = null output
+        ) as begin
+        set nocount on;
+
+        set @DATALOADED = 0;
+        set @TSLONG = 0;
+
+        select
+        @DATALOADED = 1,
+        @TSLONG = TSLONG
+        from
+        dbo.CONSTITUENT
+        where
+        ID = @ID;
+        return 0;
+        end
+        ]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_UMHS_DATAFORMTEMPLATE_FUNDRAISERASSIGNTOPROSPECT_EDIT">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        create procedure dbo.USR_USP_UMHS_DATAFORMTEMPLATE_FUNDRAISERASSIGNTOPROSPECT_EDIT (
+        @ID uniqueidentifier,
+        @CHANGEAGENTID uniqueidentifier = null,
+        @PROSPECTID uniqueidentifier,
+        @FUNDRAISERSTARTDATE datetime,
+        @CURRENTAPPUSERID uniqueidentifier
+        ) as begin
+        set nocount on;
+
+        if @CHANGEAGENTID is null
+        exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+
+        declare @CURRENTDATE datetime = getdate();
+        
+        begin try
+        declare @PREVIOUSMANAGERID uniqueidentifier;
+        declare @PREVIOUSMANAGERSTARTDATE date;
+        declare @PREVIOUSMANAGERENDDATE date;
+        declare @MAKEHISTORICAL bit = 1;
+        select
+        @PREVIOUSMANAGERID = PROSPECTMANAGERFUNDRAISERID,
+        @PREVIOUSMANAGERSTARTDATE = PROSPECTMANAGERSTARTDATE,
+        @PREVIOUSMANAGERENDDATE = PROSPECTMANAGERENDDATE
+        from
+        dbo.PROSPECT
+        where
+        ID = @PROSPECTID;
+
+        if @PREVIOUSMANAGERID is not null
+        begin
+        if exists(select 1 from dbo.PROSPECT where ID = @PROSPECTID and PROSPECTMANAGERFUNDRAISERID = @ID)
+        raiserror('FUNDRAISERASSIGNTOPROSPECT_ERR_ALREADYASSIGNED', 13, 1);
+
+        if @FUNDRAISERSTARTDATE is null
+        set @FUNDRAISERSTARTDATE = getdate();
+
+        if @FUNDRAISERSTARTDATE <= @PREVIOUSMANAGERSTARTDATE
+        if dbo.UFN_DATE_GETEARLIESTTIME(@PREVIOUSMANAGERSTARTDATE) < dbo.UFN_DATE_GETEARLIESTTIME(getdate())
+        raiserror('FUNDRAISERASSIGNTOPROSPECT_ERR_INVALIDSTARTDATE', 13, 1);
+        else
+        set @MAKEHISTORICAL = 0;
+
+        if @MAKEHISTORICAL = 1
+        begin
+        if @PREVIOUSMANAGERENDDATE is null or @PREVIOUSMANAGERENDDATE >= @FUNDRAISERSTARTDATE
+        set @PREVIOUSMANAGERENDDATE = dateadd(d, -1, @FUNDRAISERSTARTDATE);
+
+        update
+        dbo.PROSPECT
+        set
+        PROSPECTMANAGERFUNDRAISERID = null,
+        PROSPECTMANAGERSTARTDATE = null,
+        PROSPECTMANAGERENDDATE = null,
+        DATECHANGED  = @CURRENTDATE,
+        CHANGEDBYID = @CHANGEAGENTID
+        where
+        ID = @PROSPECTID
+
+        insert into dbo.PROSPECTMANAGERHISTORY(ID, PROSPECTID, FUNDRAISERID, DATEFROM, DATETO, DATEADDED, DATECHANGED, ADDEDBYID, CHANGEDBYID)
+        values(newid(), @PROSPECTID, @PREVIOUSMANAGERID, @PREVIOUSMANAGERSTARTDATE, @PREVIOUSMANAGERENDDATE, @CURRENTDATE, @CURRENTDATE, @CHANGEAGENTID, @CHANGEAGENTID)
+        end
+        end
+
+        update
+        dbo.PROSPECT
+        set
+        PROSPECTMANAGERFUNDRAISERID = @ID,
+        PROSPECTMANAGERSTARTDATE = @FUNDRAISERSTARTDATE,
+        PROSPECTMANAGERENDDATE = null,
+        DATECHANGED  = @CURRENTDATE,
+        CHANGEDBYID = @CHANGEAGENTID
+        where
+        ID = @PROSPECTID
+
+        exec dbo.USP_PROSPECTASSIGNEDALERT_SEND @PREVIOUSMANAGERID, @PROSPECTID;
+
+        update dbo.USR_UMHS_INTERACTION set
+        FUNDRAISERID = @PREVIOUSMANAGERID,
+        CHANGEDBYID = @CHANGEAGENTID,
+        DATECHANGED = @CURRENTDATE
+        from
+        dbo.USR_UMHS_INTERACTION I
+        inner join dbo.PROSPECTPLAN PP on PP.ID = I.PROSPECTPLANID
+        left outer join dbo.PLANOUTLINESTEP SI on SI.ID=I.PLANOUTLINESTEPID
+        where
+        I.FUNDRAISERID is null
+        and SI.FUNDRAISERROLECODE = 0
+        and PP.PROSPECTID = @PROSPECTID;
+
+        end try
+        begin catch
+        exec dbo.USP_RAISE_ERROR;
+        return 1;
+        end catch;
+
+        return 0;
+        end
+        ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="SECONDARYFUNDRAISER.PROSPECTPLANID" Field="PROSPECTID" Type="Required" />
+          <c:Constraint Name="FK_PROSPECT_PROSPECTMANAGERFUNDRAISERID" Field="PROSPECTID" Type="ForeignKey" />
+          <c:Constraint Name="CK_PROSPECT_VALIDMANAGERSTARTDATE" Field="FUNDRAISERSTARTDATE" Type="Format" CustomErrorMsgResourceKey="$$the_new_prospect_manager's_start_date_must_be_on_or_after_the_end_date_of_the_current_prospect_manager">
+            <c:CustomErrorMsg>The new prospect manager's start date must be on or after the end date of the current prospect manager.</c:CustomErrorMsg>
+          </c:Constraint>
+          <c:Constraint Name="CK_PROSPECTMANAGERHISTORY_VALIDDATERANGE" Field="FUNDRAISERSTARTDATE" Type="Format" CustomErrorMsgResourceKey="$$the_new_prospect_manager's_start_date_must_be_on_or_after_the_end_date_of_the_current_prospect_manager">
+            <c:CustomErrorMsg>The new prospect manager's start date must be on or after the end date of the current prospect manager.</c:CustomErrorMsg>
+          </c:Constraint>
+          <c:Constraint Name="CK_PROSPECTMANAGERHISTORY_VALIDCONSTITUENT" Field="FUNDRAISERSTARTDATE" Type="Format" CustomErrorMsgResourceKey="$$the_new_prospect_manager's_start_date_must_be_on_or_after_the_end_date_of_the_current_prospect_manager">
+            <c:CustomErrorMsg>The new prospect manager's start date must be on or after the end date of the current prospect manager.</c:CustomErrorMsg>
+          </c:Constraint>
+        </c:Constraints>
+        <c:CustomExceptions>
+          <c:Exception Field="PROSPECTID" SearchText="FUNDRAISERASSIGNTOPROSPECT_ERR_ALREADYASSIGNED" CustomErrorMsgResourceKey="$$the_fundraiser_has_already_been_assigned_to_that_prospect_as_the_prospect_manager">
+            <c:CustomErrorMsg>The fundraiser has already been assigned to that prospect as the prospect manager.</c:CustomErrorMsg>
+          </c:Exception>
+          <c:Exception Field="FUNDRAISERSTARTDATE" SearchText="FUNDRAISERASSIGNTOPROSPECT_ERR_INVALIDSTARTDATE" CustomErrorMsgResourceKey="$$the_new_prospect_manager's_start_date_must_be_after_the_current_prospect_manager's_start_date">
+            <c:CustomErrorMsg>The new prospect manager's start date must be after the current prospect manager's start date.</c:CustomErrorMsg>
+          </c:Exception>
+          <c:Exception Field="PROSPECTID" SearchText="FUNDRAISERASSIGNTOPROSPECT_ERR_ACCESSDENIEDFORPROSPECT" CustomErrorMsgResourceKey="$$the_current_user_does_not_have_rights_to_the_selected_prospect_from_this_form">
+            <c:CustomErrorMsg>The current user does not have rights to the selected prospect from this form.</c:CustomErrorMsg>
+          </c:Exception>
+        </c:CustomExceptions>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="PROSPECTID" DataType="Guid" Required="true" Caption="Prospect" CaptionResourceKey="$$prospect">
+        <c:SearchList SearchListID="df763cbc-6f79-4e50-8849-e34e71bd5250" EnableQuickFind="true" />
+      </c:FormField>
+      <c:FormField FieldID="FUNDRAISERSTARTDATE" DataType="Date" Caption="Start date" CaptionResourceKey="$$start_date" />
+    </c:FormFields>
+    <c:WebUIComponent>
+      <c:UIModel AssemblyName="Blackbaud.AppFx.MajorGiving.UIModel.dll" ClassName="Blackbaud.AppFx.MajorGiving.UIModel.Prospect.FundraiserAssignToProspectEditFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser\htmlforms\majorgiving\prospect\FundraiserAssignToProspectEditForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>
+  </c:FormMetaData>
+</EditDataFormTemplateSpec>

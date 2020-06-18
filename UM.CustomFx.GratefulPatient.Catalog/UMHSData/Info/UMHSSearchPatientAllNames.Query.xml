@@ -1,0 +1,31 @@
+﻿<QueryViewSpec 
+  xmlns="bb_appfx_queryview" 
+  xmlns:common="bb_appfx_commontypes" 
+  Author="UM Dev" 
+  Description="Provides the ability to query all versions of patient names for populating the USR_UMHS_SEARCHPATIENT table." 
+  ID="2F58E2F1-9DF7-4DD8-9082-2FE815F23A7E" 
+  IsBuiltIn="false" 
+  Name="Search Patient All Names" 
+  SecurityUIDisplayFeature="false"
+>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.ConstituentAllNames.Query" />
+  <ViewImplementation ViewName="USR_UMHS_V_PATIENTALLNAMES">
+    <ViewSQL>
+    <![CDATA[
+    SELECT D.ID UMHSID,
+           CONSTITUENT.ID CONSTITUENTID,
+           UPPER(LTRIM(RTRIM(REPLACE(D.FIRSTNAME, '.', ''))))                   FIRSTNAME,
+           UPPER(LTRIM(RTRIM(REPLACE(REPLACE(D.KEYNAME, '.', ''), '''', ''))))  KEYNAME,
+           UPPER(LTRIM(RTRIM(REPLACE(REPLACE(D.NICKNAME, '.', ''), '''', '')))) NICKNAME,
+           ISORGANIZATION,
+           ISGROUP,
+           UPPER(LTRIM(RTRIM(REPLACE(D.MIDDLENAME, '.', ''))))                  MIDDLENAME,
+           D.TITLECODEID,
+           D.SUFFIXCODEID
+    FROM   DBO.CONSTITUENT
+           JOIN USR_UMHS_DATA D ON D.CONSTITUENTID = CONSTITUENT.ID
+
+    ]]>
+    </ViewSQL>
+  </ViewImplementation>
+</QueryViewSpec>

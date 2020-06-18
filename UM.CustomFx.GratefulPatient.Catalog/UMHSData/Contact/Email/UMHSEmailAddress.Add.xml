@@ -1,0 +1,199 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="95c3f69c-9adf-4b45-9b4c-4861329a53d8"
+    Name="MIMED Email Address Add Form"
+    Description="Used for adding a new USR UM MIMED EMAILADDRESS"
+    Author="UM Dev"
+    RecordType="MIMED Email Address"
+    DataFormInstanceID="3e721531-9f45-4351-bcc3-9f7226551251"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    FormHeader="Add MIMED Email Address"
+    >
+  <SPDataForm>
+    <LoadImplementation SPName="USP_UMHS_DATAFORMTEMPLATE_ADD_EMAILADDRESS_PRELOAD">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+					create procedure dbo.USP_UMHS_DATAFORMTEMPLATE_ADD_EMAILADDRESS_PRELOAD(
+						@UMHSID uniqueidentifier,
+						@ISPRIMARY bit = null output,						
+						@FORCEDPRIMARY bit = null output,			-- used by constituent data review
+						@CANEDITPRIMARY bit = null output,			-- used by constituent data review
+						@INVALIDFIELDS nvarchar(256) = null output	-- used by constituent data review
+					)
+					as
+						set nocount on;
+						
+						select
+								@ISPRIMARY = case when count(EMAILADDRESS.ID) = 0 then 1 else 0 end
+							from
+								dbo.USR_UMHS_EMAILADDRESS EMAILADDRESS
+							where
+								EMAILADDRESS.UMHSID = @UMHSID;
+								
+						declare @CURRENTDATE date;
+						set @CURRENTDATE = getdate();
+            
+						
+						return 0;
+            
+			        
+        ]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_USR_UMHS_EMAILADDRESS">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_USR_UMHS_EMAILADDRESS (  @ID                       UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                                       @CHANGEAGENTID          UNIQUEIDENTIFIER = NULL,
+                                                                                       @UMHSID                 UNIQUEIDENTIFIER,
+                                                                                       @EMAILADDRESSTYPECODEID UNIQUEIDENTIFIER = NULL,
+                                                                                       @EMAILADDRESS           DBO.UDT_EMAILADDRESS = NULL,
+                                                                                       @ISPRIMARY              BIT = 0,
+                                                                                       @DONOTEMAIL             BIT = 0,
+                                                                                       @INFOSOURCECODEID       UNIQUEIDENTIFIER = NULL,
+                                                                                       @INFOSOURCECOMMENTS     NVARCHAR(256) = '',
+                                                                                       @STARTDATE              DATETIME = NULL,
+                                                                                       @ENDDATE                DATETIME = NULL,
+                                                                                       @ISCONFIDENTIAL        BIT = 0)
+            AS
+                SET NOCOUNT ON;
+
+                IF @ID IS NULL
+                  SET @ID = NEWID()
+
+                IF @CHANGEAGENTID IS NULL
+                  EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                    @CHANGEAGENTID OUTPUT
+
+                DECLARE @CURRENTDATE DATETIME
+
+                SET @CURRENTDATE = GETDATE()
+
+
+              BEGIN TRY
+                      if @ISPRIMARY = 1
+						        update
+							        dbo.USR_UMHS_EMAILADDRESS
+						        set
+							        ISPRIMARY = 0,
+							        CHANGEDBYID = @CHANGEAGENTID,
+							        DATECHANGED = @CURRENTDATE
+						        where
+							        UMHSID = @UMHSID and
+							        ISPRIMARY = 1;
+                  -- handle inserting the data
+                  INSERT INTO DBO.USR_UMHS_EMAILADDRESS
+                              (ID,
+                               UMHSID,
+                               EMAILADDRESSTYPECODEID,
+                               EMAILADDRESS,
+                               ISPRIMARY,
+                               DONOTEMAIL,
+                               INFOSOURCECODEID,
+                               INFOSOURCECOMMENTS,
+                               STARTDATE,
+                               ENDDATE,
+                               ISCONFIDENTIAL,
+                               ADDEDBYID,
+                               CHANGEDBYID,
+                               DATEADDED,
+                               DATECHANGED)
+                  VALUES      (@ID,
+                               @UMHSID,
+                               @EMAILADDRESSTYPECODEID,
+                               @EMAILADDRESS,
+                               @ISPRIMARY,
+                               @DONOTEMAIL,
+                               @INFOSOURCECODEID,
+                               @INFOSOURCECOMMENTS,
+                               @STARTDATE,
+                               @ENDDATE,
+                               @ISCONFIDENTIAL,
+                               @CHANGEAGENTID,
+                               @CHANGEAGENTID,
+                               @CURRENTDATE,
+                               @CURRENTDATE
+                               )
+              END TRY
+
+              BEGIN CATCH
+                  EXEC DBO.USP_RAISE_ERROR
+
+                  RETURN 1
+              END CATCH
+
+                RETURN 0 		
+
+            ]]>
+      </c:CreateProcedureSQL>
+      <ExpectedDBExceptions xmlns="bb_appfx_commontypes">
+        <Constraints>
+          <Constraint Name="FK_USR_UMHS_EMAILADDRESS_EMAILADDRESSTYPECODEID" Field="EMAILADDRESSTYPECODEID" Type="ForeignKey" />
+          <Constraint Name="USR_UMHS_EMAILADDRESS.EMAILADDRESS" Field="EMAILADDRESS" Type="Required" />
+          <Constraint Name="CK_USR_UMHS_EMAILADDRESS_EMAILADDRESS" Field="EMAILADDRESS" Type="Format" />
+          <Constraint Name="FK_USR_UMHS_EMAILADDRESS_INFOSOURCECODEID" Field="INFOSOURCECODEID" Type="ForeignKey" />
+          
+          <Constraint Name="CK_USR_UMHS_EMAILADDRESS_PRIMARYCOUNT" Field="ISPRIMARY" Type="Format">
+            <CustomErrorMsg>There is already a primary email address for this contact.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_EMAILADDRESS_VALIDDATERANGE" Field="ENDDATE" Type="Format">
+            <CustomErrorMsg>The start date must be on or before the end date.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_EMAILADDRESS_ENDDATEINVALIDIFPRIMARY" Field="ENDDATE" Type="Format">
+            <CustomErrorMsg>Primary email address cannot have an end date.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_EMAILADDRESS_UNIQUEEMAILADDRESSANDTYPE" Field="EMAILADDRESS" Type="Format">
+            <CustomErrorMsg>The email address you entered already exists for this contact.</CustomErrorMsg>
+          </Constraint>
+        </Constraints>
+      </ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="EMAILADDRESSTYPECODEID" DataType="Guid" Caption="Email address type">
+        <c:CodeTable CodeTableName="EMAILADDRESSTYPECODE" />
+      </c:FormField>
+      <c:FormField FieldID="EMAILADDRESS" DataType="EmailAddress" Caption="Email address" Required="true" />
+      <c:FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Set as primary email address" />
+      <c:FormField FieldID="DONOTEMAIL" DataType="Boolean" Caption="Do not send email to this address" />
+      <c:FormField FieldID="INFOSOURCECODEID" DataType="Guid" Caption="Information source">
+        <c:CodeTable CodeTableName="INFOSOURCECODE" />
+      </c:FormField>
+      <c:FormField FieldID="FORCEDPRIMARY" DataType="Boolean" ReadOnly="true" Hidden="true" />
+      <c:FormField FieldID="CANEDITPRIMARY" DataType="Boolean" ReadOnly="true" Hidden="true" />
+      <c:FormField FieldID="INVALIDFIELDS" ReadOnly="true" Hidden="true" MaxLength="256" />
+      <c:FormField FieldID="INFOSOURCECOMMENTS" MaxLength="256" Caption="Comments" Multiline="true" />
+      <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" />
+      <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+      <c:FormField FieldID="ISCONFIDENTIAL" DataType="Boolean" Caption="Is confidential" />
+    </c:FormFields>
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSEmailAddressFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSEmailAddressForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+    
+    <c:FieldGroups>
+      <c:FieldGroup ID="SOURCEINFORMATION" Caption="Email source" CaptionResourceKey="$$email_source">
+        <c:Fields>
+          <c:Field>INFOSOURCECODEID</c:Field>
+          <c:Field>INFOSOURCECOMMENTS</c:Field>
+        </c:Fields>
+      </c:FieldGroup>
+    </c:FieldGroups>
+    <c:UIFields>
+      <c:FormField FieldID="INVALIDACCOUNT" />
+      <c:FormField FieldID="HISTORICALSTARTDATEMESSAGE" Caption="" />
+      <c:FormField FieldID="SHOWINVALID" DataType="Boolean" Hidden="true" />
+      <c:FormField FieldID="INVALIDFIELD1" Hidden="true" />
+      <c:FormField FieldID="INVALIDFIELD2" Hidden="true" />
+      <c:FormField FieldID="ORIGINCODETRANSLATION" Caption="Information source" CaptionResourceKey="$$information_source" />
+    </c:UIFields>
+  </c:FormMetaData>
+
+</AddDataFormTemplateSpec>

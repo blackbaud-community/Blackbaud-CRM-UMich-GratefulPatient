@@ -1,0 +1,103 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="2e589ff4-c1c3-428a-b552-26408423295d" 
+	Name="MIMED Documentation Data List"
+	Description="A data list showing MIMED documentation records." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.ConstituentDocumentation.DataList" />
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSDOCUMENTATION">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+            create procedure dbo.USR_UM_USP_DATALIST_UMHSDOCUMENTATION
+            (
+	            @UMHSID uniqueidentifier,
+              @MSG  NVARCHAR(100) = NULL OUTPUT,
+              @CURRENTAPPUSERID  uniqueidentifier
+            )
+            as
+	            set nocount on;
+              select  
+                    un.ID,
+                    'Note' as [DOCUMENTATIONTYPE],
+                    un.DATEENTERED,
+                    unc.DESCRIPTION as [TYPE],
+                    un.TITLE as [TITLE], 
+					          --un.AUTHORID,
+					          c.name as [AUTHOR]
+                from
+                    dbo.USR_UMHS_NOTE un
+					          inner join dbo.USR_UMHS_NOTETYPECODE unc  on  unc.ID = un.UMHSNOTETYPECODEID
+					          left join dbo.constituent c on c.ID = un.Authorid					          
+                Where un.UMHSID = @UMHSID
+                order by un.DATEENTERED desc
+                /* --Audit code start */
+	DECLARE @USERNAME VARCHAR(100)
+	DECLARE @DISPLAYNAME VARCHAR(100)
+	DECLARE @NAME VARCHAR(200)
+	DECLARE @EVENTMESSAGE VARCHAR(1000)
+	DECLARE @PID VARCHAR(100)
+	DECLARE @PATIENTONLY BIT
+	DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	SELECT @USERNAME = USERNAME
+	             ,@DISPLAYNAME = DISPLAYNAME
+		FROM APPUSER 
+	WHERE ID = @CURRENTAPPUSERID
+  	SELECT @NAME = NAME
+	             ,@PID = LOOKUPID
+	              FROM CONSTITUENT
+	inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		 WHERE gp.ID = @UMHSID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='2605d220-0622-4020-9fad-98aa7ba742bd' --MIMED Documentation subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @UMHSID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+
+
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+   <Parameters>
+     <FormMetaData xmlns="bb_appfx_commontypes">
+       <FormFields>
+         <FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100"  Hidden="true" />
+       </FormFields>
+     </FormMetaData>
+  </Parameters>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$id" />
+      <OutputField FieldID="DOCUMENTATIONTYPE" Caption="Documentation type" DataType="String" CaptionResourceKey="$$documentation_type" />
+      <OutputField FieldID="DATEENTERED" Caption="Date" DataType="Date" CaptionResourceKey="$$date" />
+      <OutputField FieldID="TYPE" Caption="Type" DataType="String" CaptionResourceKey="$$type" />
+      <OutputField FieldID="TITLE" Caption="Title" DataType="String" CaptionResourceKey="$$title" />
+      <OutputField FieldID="AUTHOR" Caption="Author" DataType="String" CaptionResourceKey="$$author" />
+    </OutputFields>
+  </Output>
+
+</DataListSpec>

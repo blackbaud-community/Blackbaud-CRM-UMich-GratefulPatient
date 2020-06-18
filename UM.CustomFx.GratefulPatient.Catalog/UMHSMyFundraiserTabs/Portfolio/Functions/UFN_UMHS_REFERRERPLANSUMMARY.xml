@@ -1,0 +1,61 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="1b9c205c-9760-4769-a864-26a9fdb3525f"
+	Name="UFN_UMHS_REFERRERPLANSUMMARY"
+	Description="UFN_UMHS_REFERRERPLANSUMMARY"
+	Author="UM Dev"
+	DBFunctionName="UFN_UMHS_REFERRERPLANSUMMARY"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+          CREATE function dbo.UFN_UMHS_REFERRERPLANSUMMARY()
+          returns table
+          as
+            return (
+            select
+	          U.ID,
+	          U.CONSTITUENTID,
+	          (
+		          select max(ACTUALDATE) from	dbo.PROSPECTPLAN PP
+			          inner join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID=PP.ID
+		          where PP.PROSPECTID=C.ID
+	          ) LASTSTEP,
+	          case when PP.ISACTIVE = 1 and datediff(day,(
+		          select max(ACTUALDATE) from dbo.PROSPECTPLAN PP
+			          inner join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID=PP.ID
+		          where PP.PROSPECTID=C.ID
+	          ),getdate())>=90 then 'RES:warning' else '' end NORECENT,
+	          (
+		          select min(I.EXPECTEDDATE)
+		          from PROSPECTPLAN PP
+			          inner join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID=PP.ID
+		          where
+			          PP.PROSPECTID=C.ID and
+			          I.ID = dbo.UFN_PROSPECTPLAN_GETNEXTSTEP(PP.ID) and
+			          I.COMPLETED=0
+	          ) NEXTSTEP,
+	          NF.NAME,
+	          U.KEYNAME,
+	          C.NAME REFERRER,
+              UCR.DESCRIPTION REFERRERROLE,
+	        --  UR.[UMHSDEVSTAFFASSIGNMENTDATE] ASSIGNMENTDATE,
+	         DBO.USR_UFN_UMHS_INTERACTION_GETSITELIST(I.ID) AS SITES
+	
+	          from 
+		          dbo.USR_UMHS_DATA U		        
+              --INNER JOIN dbo.USR_UMHS_CONNECTION UC on UC.UMHSID = U.ID
+		          LEFT JOIN dbo.USR_UMHS_REFERRAL UR on UR.UMHSID = U.ID
+		          LEFT JOIN CONSTITUENT C ON C.ID = UR.REFERRERID	
+		          LEFT JOIN DBO.USR_UMHS_REFERRERROLECODE UCR ON UR.[REFERRERROLECODEID] = UCR.ID	
+		          left join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID = C.ID
+		          left outer join dbo.PROSPECTPLAN PP on PP.PROSPECTID=C.ID
+	              outer apply dbo.USR_UFN_UMHS_DISPLAYNAME(U.ID) NF
+	          where
+	            dbo.UFN_CONSTITUENT_ISPROSPECT(C.ID) = 1
+	          )
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

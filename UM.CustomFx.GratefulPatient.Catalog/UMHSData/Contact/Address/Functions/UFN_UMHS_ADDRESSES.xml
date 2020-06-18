@@ -1,0 +1,137 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="4d023d3b-61ea-4257-9f12-d64acf0ab958"
+	Name="USR_UFN_UMHS_ADDRESSES"
+	Description="USR_UFN_UMHS_ADDRESSES"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_ADDRESSES"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_ADDRESSES(
+  @UMHSID UNIQUEIDENTIFIER,
+  @INCLUDEFORMER BIT = 0
+)
+
+RETURNS @OUTPUT TABLE (
+  ID                  UNIQUEIDENTIFIER,
+  DESCRIPTION         NVARCHAR(300),
+  ADDRESSTYPE         NVARCHAR(100),
+  ISPRIMARY           BIT,
+  DONOTMAIL           BIT,
+  ISCONFIDENTIAL      BIT,
+  ISFORMER            BIT,
+  HISTORICALSTARTDATE DATETIME,
+  HISTORICALENDDATE   DATETIME,
+  ISGEOCODED          BIT,
+  PENDINGGEOCODE      BIT,
+  INVALIDGEOCODE      BIT,
+  MAPCONTEXTID        NVARCHAR(108),
+  IMAGEKEY            NVARCHAR(15),
+  STARTDATE_SORT      DATE,
+  ENDDATE_SORT        DATE,
+  DATEADDED           DATETIME )
+AS
+  BEGIN
+      DECLARE @CURRENTDATE DATETIME = DBO.UFN_DATE_GETEARLIESTTIME(GETDATE());
+      DECLARE @MAPENTITYID UNIQUEIDENTIFIER = N'645E6BE7-459C-402b-A03C-67587CA72B94';
+
+      IF ( DBO.UFN_INSTALLEDPRODUCTS_PRODUCTIS('6f77d512-d0d1-444f-9b46-b8603a6fe5f1') = 1 )
+        SET @MAPENTITYID = N'78102CE5-F217-4429-9175-D99A6B55A4EE';
+
+      WITH [CONTACTINFO_CTE]
+           AS (
+              --Addresses
+              SELECT ADDRESS.ID,
+                     ADDRESS.DESCRIPTION                                                            AS CONTACTINFO,
+                     DBO.UFN_ADDRESSTYPECODE_GETDESCRIPTION(ADDRESS.ADDRESSTYPECODEID)              AS TYPE,
+                     ADDRESS.ISPRIMARY,
+                     ADDRESS.DONOTMAIL,
+                     ADDRESS.ISCONFIDENTIAL,
+                     ADDRESS.HISTORICALSTARTDATE,
+                     ADDRESS.HISTORICALENDDATE,
+                     CASE
+                       WHEN ADDRESS.HISTORICALSTARTDATE IS NULL THEN '0001-01-01'
+                       ELSE ADDRESS.HISTORICALSTARTDATE
+                     END                                                                            AS [STARTDATE_SORT],
+                     CASE
+                       WHEN ADDRESS.HISTORICALENDDATE IS NULL THEN '0001-01-01'
+                       ELSE ADDRESS.HISTORICALENDDATE
+                     END                                                                            AS [ENDDATE_SORT],
+                     ADDRESS.DATEADDED,
+                     ADDRESSCOORDINATES.ID                                                          AS ADDRESSCOORDINATESID,
+                     ADDRESSCOORDINATES.PENDINGGEOCODE,
+                     ADDRESSCOORDINATES.INVALIDGEOCODE
+                     --DBO.UFN_MAPPING_BUILDCONTEXTRECORDID(@MAPENTITYID, @CONSTITUENTID, ADDRESS.ID) AS [MAPCONTEXTID],
+               FROM   USR_UMHS_ADDRESS ADDRESS
+                      LEFT JOIN DBO.ADDRESSCOORDINATES
+                             ON ADDRESSCOORDINATES.ADDRESSID = ADDRESS.ID
+               WHERE  ADDRESS.UMHSID = @UMHSID)
+               
+      INSERT INTO @OUTPUT
+                  (ID,
+                   DESCRIPTION,
+                   ADDRESSTYPE,
+                   ISPRIMARY,
+                   DONOTMAIL,
+                   ISCONFIDENTIAL,
+                   ISFORMER,
+                   HISTORICALSTARTDATE,
+                   HISTORICALENDDATE,
+                   ISGEOCODED,
+                   PENDINGGEOCODE,
+                   INVALIDGEOCODE,
+                   --MAPCONTEXTID,
+                   IMAGEKEY,
+                   STARTDATE_SORT,
+                   ENDDATE_SORT,
+                   DATEADDED)
+      SELECT CONTACTINFO.ID,
+             CONTACTINFO.CONTACTINFO,
+             CONTACTINFO.TYPE,
+             CONTACTINFO.ISPRIMARY,
+             CONTACTINFO.DONOTMAIL,
+             CONTACTINFO.ISCONFIDENTIAL,
+             CASE
+               WHEN ( ( CONTACTINFO.HISTORICALENDDATE IS NULL )
+                       OR ( CONTACTINFO.HISTORICALENDDATE > @CURRENTDATE ) ) THEN 0
+               ELSE 1
+             END AS ISFORMER,
+             CONTACTINFO.HISTORICALSTARTDATE,
+             CONTACTINFO.HISTORICALENDDATE,
+             CASE
+               WHEN CONTACTINFO.ADDRESSCOORDINATESID IS NULL
+                     OR CONTACTINFO.PENDINGGEOCODE = 1
+                     OR CONTACTINFO.INVALIDGEOCODE = 1 THEN 0
+               ELSE 1
+             END AS ISGEOCODED,
+             CASE
+               WHEN CONTACTINFO.ADDRESSCOORDINATESID IS NULL THEN 0
+               ELSE CONTACTINFO.PENDINGGEOCODE
+             END AS PENDINGGEOCODE,
+             CASE
+               WHEN CONTACTINFO.ADDRESSCOORDINATESID IS NULL THEN 0
+               ELSE CONTACTINFO.INVALIDGEOCODE
+             END AS INVALIDGEOCODE,
+             --CONTACTINFO.MAPCONTEXTID,
+             CASE
+               WHEN CONTACTINFO.ISCONFIDENTIAL = 1 THEN 'RES:padlock'
+               WHEN CONTACTINFO.DONOTMAIL = 1 THEN 'RES:warning'
+               ELSE 'RES:lv_spacer'
+             END AS IMAGEKEY,
+             CONTACTINFO.STARTDATE_SORT,
+             CONTACTINFO.ENDDATE_SORT,
+             CONTACTINFO.DATEADDED
+      FROM   [CONTACTINFO_CTE] CONTACTINFO
+      WHERE  @INCLUDEFORMER = 1
+              OR ( ( CONTACTINFO.HISTORICALENDDATE IS NULL )
+                    OR ( CONTACTINFO.HISTORICALENDDATE > @CURRENTDATE ) )
+
+      RETURN;
+  END 
+		]]>
+	</CreateFunctionSQL>
+  <GenerateToFromXMLFunction RootElementName="ADDRESSES" OrderBy="ISPRIMARY desc, ISFORMER asc, ENDDATE_SORT desc, STARTDATE_SORT desc, DATEADDED desc" />
+</SQLFunctionSpec>

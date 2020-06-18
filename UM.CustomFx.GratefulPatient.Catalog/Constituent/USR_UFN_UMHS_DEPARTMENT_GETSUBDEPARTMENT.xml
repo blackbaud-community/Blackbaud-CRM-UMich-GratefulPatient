@@ -1,0 +1,35 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="1aaa3953-bf4a-4e16-bc84-8de9d85e17ba"
+	Name="USR_UFN_UMHS_DEPARTMENT_GETSUBDEPARTMENT"
+	Description="Create the xml for editing the subdepartments."
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_DEPARTMENT_GETSUBDEPARTMENT"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+      create function dbo.USR_UFN_UMHS_DEPARTMENT_GETSUBDEPARTMENT(@DEPARTMENTID uniqueidentifier)
+      returns table
+			as
+			return
+			(
+				select
+					ID,
+					NAME,
+          ISINACTIVE,
+					SEQUENCE
+				from
+					dbo.USR_UMHS_SUBDEPARTMENT
+				where
+					DEPARTMENTID = @DEPARTMENTID
+			);
+		]]>
+	</CreateFunctionSQL>
+  <CreateChildCollectionFunction BaseTableName="USR_UMHS_SUBDEPARTMENT" 
+                                 RootElementName="UMHSSUBDEPARTMENTS" 
+                                 ParentIDColumn="DEPARTMENTID" 
+                                 OrderBy="SEQUENCE"></CreateChildCollectionFunction>
+
+</SQLFunctionSpec>

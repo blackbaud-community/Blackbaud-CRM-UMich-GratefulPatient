@@ -1,0 +1,35 @@
+﻿<SimpleDataListSpec
+	xmlns="bb_appfx_simpledatalist"
+	xmlns:c="bb_appfx_commontypes"
+	ID="728fb163-43fd-44de-9d4e-125d44fdb5f7"
+	Name="UMHS Duplicate Search Match Set Simple Data List"
+	Description="A simple data list that returns MIMED duplicate search match set records"
+	Author="UM Dev"
+	>
+
+	<SPSimpleList SPName="USR_USP_SIMPLEDATALIST_UMHSDUPSEARCHMATCHSET">
+		<c:CreateProcedureSQL >
+			<![CDATA[
+      create procedure dbo.USR_USP_SIMPLEDATALIST_UMHSDUPSEARCHMATCHSET 
+      as
+      set nocount on;
+      select top 20
+          d.MATCHSETID as VALUE,
+          CONVERT(VARCHAR(20), d.DATEADDED, 100) as LABEL
+      from USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS d
+      inner join 
+      (
+          select
+              ROW_NUMBER() over(PARTITION BY MATCHSETID ORDER BY DATEADDED) ROWNUM,
+              MATCHSETID,
+              DATEADDED
+          from USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS
+      ) m on m.MATCHSETID=d.MATCHSETID
+      where
+          m.ROWNUM=1  
+      order by d.DATEADDED desc
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSimpleList>
+
+</SimpleDataListSpec>

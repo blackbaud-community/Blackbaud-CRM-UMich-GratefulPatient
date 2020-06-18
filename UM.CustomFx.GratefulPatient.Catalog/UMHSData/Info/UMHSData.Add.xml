@@ -1,0 +1,261 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="c7976657-1974-4225-b724-f143b7651998"
+    Name="MIMED Data Add Form"
+    Description="Used for adding a new MIMED Data"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    DataFormInstanceID="a3e4ea4a-1328-467f-99cd-d352c409eee8"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    >
+  <SPDataForm>
+    <LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA_PRELOAD">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA_PRELOAD (@CONSTITUENTID UNIQUEIDENTIFIER,
+                                                                             @LOOKUPID      NVARCHAR(100) = NULL OUTPUT,
+                                                                             @FIRSTNAME     NVARCHAR(50) = NULL OUTPUT,
+                                                                             @MIDDLENAME    NVARCHAR(50) = NULL OUTPUT,
+                                                                             @KEYNAME       NVARCHAR(100) = NULL OUTPUT,
+                                                                             @AGE           INT = NULL OUTPUT,
+                                                                             @BIRTHDATE     DBO.UDT_FUZZYDATE = NULL OUTPUT)
+        AS
+          BEGIN
+              SET NOCOUNT ON;
+              
+              --make sure they have revenue before we copy
+              SELECT @LOOKUPID = LOOKUPID,
+                      @FIRSTNAME = FIRSTNAME,
+                      @KEYNAME = KEYNAME,
+                      @MIDDLENAME = MIDDLENAME
+              FROM   DBO.CONSTITUENT
+              WHERE  ID = @CONSTITUENTID
+
+              RETURN 0;
+          END 
+				]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA (@ID                          UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                    @CHANGEAGENTID               UNIQUEIDENTIFIER = NULL,
+                                                                    @CONSTITUENTID               UNIQUEIDENTIFIER,                                                                    
+                                                                    @MRN                         NVARCHAR(50) = NULL,
+                                                                    @CPISEQUENCE                 NVARCHAR(50) = NULL,
+                                                                    @FIRSTNAME                   NVARCHAR(50) = '',
+                                                                    @MIDDLENAME                  NVARCHAR(50) = '',
+                                                                    @NICKNAME                    NVARCHAR(50) = '',
+                                                                    @KEYNAME                     NVARCHAR(100),
+                                                                    @BIRTHDATE                   DBO.UDT_FUZZYDATE = NULL,
+                                                                    @TITLECODEID                 UNIQUEIDENTIFIER = NULL,
+                                                                    @TITLE2CODEID                UNIQUEIDENTIFIER = NULL,
+                                                                    @SUFFIXCODEID                UNIQUEIDENTIFIER = NULL,
+                                                                    @SUFFIX2CODEID               UNIQUEIDENTIFIER = NULL,
+                                                                    @INFOSOURCECODEID            UNIQUEIDENTIFIER = '3B2167B6-EEF1-499C-9347-F9168B8BC49B',
+                                                                    @ISDMINELIGIBLE              BIT = 0,
+                                                                    @DMINELIGIBLEREASONCODEID    UNIQUEIDENTIFIER = NULL,                                                                    
+                                                                    @GENDERCODE                  TINYINT = 0,
+                                                                    @DATEADDED                   DATETIME = NULL,      
+                                                                    @PREPOPULATEMIMED            BIT = 1
+                                                                   )
+        AS
+            SET NOCOUNT ON;
+
+            IF @ID IS NULL
+              SET @ID = NEWID()
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+            DECLARE @CURRENTDATE DATETIME
+
+            SET @CURRENTDATE = GETDATE()
+
+          if @DATEADDED is NULL set @DATEADDED=@CURRENTDATE;
+          
+          BEGIN TRY
+              -- handle inserting the data
+              INSERT INTO DBO.USR_UMHS_DATA
+                          (ID,
+                           CONSTITUENTID,
+                           MRN,
+                           CPISEQUENCE,
+                           FIRSTNAME,
+                           MIDDLENAME,
+                           NICKNAME,
+                           KEYNAME,
+                           BIRTHDATE,
+                           TITLECODEID,
+                           TITLE2CODEID,
+                           SUFFIXCODEID,
+                           SUFFIX2CODEID, 
+                           INFOSOURCECODEID,
+                           ISDMINELIGIBLE,
+                           DMINELIGIBLEREASONCODEID,
+                           GENDERCODE,                          
+                           ADDEDBYID,
+                           CHANGEDBYID,
+                           DATEADDED,
+                           DATECHANGED)
+              VALUES      (@ID,
+                           @CONSTITUENTID,
+                           ltrim(rtrim(@MRN)),
+                           @CPISEQUENCE,
+                           @FIRSTNAME,
+                           @MIDDLENAME,
+                           @NICKNAME,
+                           @KEYNAME,
+                           @BIRTHDATE,
+                           @TITLECODEID,
+                           @TITLE2CODEID,
+                           @SUFFIXCODEID,
+                           @SUFFIX2CODEID,
+                           @INFOSOURCECODEID,
+                           @ISDMINELIGIBLE,
+                           @DMINELIGIBLEREASONCODEID,
+                           @GENDERCODE,                      
+                           @CHANGEAGENTID,
+                           @CHANGEAGENTID,
+                           @DATEADDED,
+                           @CURRENTDATE)                     
+          
+          IF @PREPOPULATEMIMED = 1
+            exec dbo.USR_USP_UMHS_CREATEFROMCONSTITUENT @UMHSID = @ID, @CONSTITUENTID = @CONSTITUENTID 
+            
+          /*    
+              DECLARE @RELATIONSHIPCODEID UNIQUEIDENTIFIER =  (SELECT ID FROM USR_UMHS_RELATIONSHIPCODE WHERE DESCRIPTION = 'SELF')
+
+              --add the MIMED Dataconnection for self
+              EXEC DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA_CONNECTION
+                @UMHSID=@ID,
+                @MRN=@MRN,
+                @CPISEQUENCE=@CPISEQUENCE,
+                @FIRSTNAME=@FIRSTNAME,
+                @KEYNAME=@KEYNAME,
+                @RELATIONSHIPCODEID=@RELATIONSHIPCODEID,
+                @BIRTHDATE=@BIRTHDATE,
+                @GENDERCODE=@GENDERCODE 
+          */
+                           
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+
+            RETURN 0 
+			
+
+        ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <!--<c:Constraint Name="FK_USR_UMHS_DATA_CONSTITUENTID" Field="CONSTITUENTID" Type="ForeignKey" />-->
+          <c:Constraint Name="CK_USR_UMHS_DATA_BIRTHDATE" Field="BIRTHDATE" Type="Format" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_TITLECODEID" Field="TITLECODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_TITLE2CODEID" Field="TITLE2CODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_SUFFIXCODEID" Field="SUFFIXCODEID" Type="ForeignKey" />
+          <c:Constraint Name="UIX_V_USR_UMHS_DATA_UNIQUE_MRN" Field="MRN" Type="Unique" >
+            <c:CustomErrorMsg>This MRN already exists in the system. Enter another MRN.</c:CustomErrorMsg>
+          </c:Constraint>
+          <c:Constraint Name="UIX_V_USR_UMHS_DATA_UNIQUE_CPISEQUENCE" Field="CPISEQUENCE" Type="Unique" >
+            <c:CustomErrorMsg>This CPI Sequence already exists in the system. Enter another CPI Sequence.</c:CustomErrorMsg>
+          </c:Constraint>
+          <!--<c:Constraint Name="FK_USR_UMHS_DATA_PATIENTORIGINATIONCODEID" Field="PATIENTORIGINATIONCODEID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_DATA_PROSPECTORIGINATIONCODEID" Field="PROSPECTORIGINATIONCODEID" Type="ForeignKey" />-->
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="Constituent" RecordIDParameter="CONSTITUENTID" />
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="MRN" MaxLength="50" Caption="MRN"  />
+      <c:FormField FieldID="CPISEQUENCE" MaxLength="50" Caption="CPI seq"  />
+      <c:FormField FieldID="FIRSTNAME" MaxLength="50" Caption="First name" Required="true" />
+      <c:FormField FieldID="MIDDLENAME" MaxLength="50" Caption="Middle name" />
+      <c:FormField FieldID="NICKNAME" MaxLength="50" Caption="Nickname" />
+      <c:FormField FieldID="KEYNAME" MaxLength="100" Caption="Last name" Required="true" />
+      <c:FormField FieldID="BIRTHDATE" DataType="FuzzyDate" Caption="Birth date"  />
+      <c:FormField FieldID="AGE" ReadOnly="true" Caption="Age" />
+      <c:FormField FieldID="TITLECODEID" DataType="Guid" Caption="Title">
+        <c:CodeTable CodeTableName="TITLECODE" />
+      </c:FormField>
+      <c:FormField FieldID="TITLE2CODEID" DataType="Guid" Caption="Title 2">
+        <c:CodeTable CodeTableName="TITLECODE" />
+      </c:FormField>
+      <c:FormField FieldID="SUFFIXCODEID" DataType="Guid" Caption="Suffix">
+        <c:CodeTable CodeTableName="SUFFIXCODE" />
+      </c:FormField>
+      <c:FormField FieldID="SUFFIX2CODEID" DataType="Guid" Caption="Suffix 2">
+        <c:CodeTable CodeTableName="SUFFIXCODE" />
+      </c:FormField>
+      <c:FormField FieldID="LOOKUPID" DataType="String" Caption="Lookup ID" ReadOnly="true" ></c:FormField>
+      <c:FormField FieldID="INFOSOURCECODEID" DataType="Guid" Caption="Information source">
+        <c:CodeTable CodeTableName="INFOSOURCECODE" />
+      </c:FormField>
+      <c:FormField FieldID="ISDMINELIGIBLE" DataType="Boolean" Caption="Direct Mail Ineligible" />
+      <c:FormField FieldID="DMINELIGIBLEREASONCODEID" DataType="Guid" Caption="Reason">
+        <c:CodeTable CodeTableName="USR_UMHS_DMINELIGIBLEREASONCODE" />
+      </c:FormField>
+      <c:FormField FieldID="GENDERCODE" DataType="TinyInt" Caption="Gender" DefaultValueText="0">
+        <c:ValueList>
+          <c:Items>
+            <c:Item>
+              <c:Value>0</c:Value>
+              <c:Label>Unknown</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>1</c:Value>
+              <c:Label>Male</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>2</c:Value>
+              <c:Label>Female</c:Label>
+            </c:Item>
+          </c:Items>
+        </c:ValueList>
+      </c:FormField>
+      <c:FormField FieldID="DATEADDED" DataType="Date" Caption="Date Added" Hidden="true" />
+      <c:FormField FieldID="PREPOPULATEMIMED" DataType="Boolean" Caption="PREPOPULATEMIMED" Hidden="true" />
+    </c:FormFields>
+    <c:WebUIComponent>
+        <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDataFormUIModel" />
+        <c:WebUI>
+            <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSDataForm.html" />
+        </c:WebUI>
+    </c:WebUIComponent>
+    <c:FieldGroups>
+      <c:FieldGroup ID="UMHSINFORMATION" Caption="MIMED Information" CaptionResourceKey="$$UMHS_information">
+        <c:Fields>
+          <c:Field>MRN</c:Field>
+          <c:Field>CPISEQUENCE</c:Field>
+          <c:Field>LOOKUPID</c:Field>
+          <c:Field>KEYNAME</c:Field>
+          <c:Field>FIRSTNAME</c:Field>
+          <c:Field>MIDDLENAME</c:Field>
+          <c:Field>TITLECODEID</c:Field>
+          <c:Field>TITLE2CODEID</c:Field>
+          <c:Field>SUFFIXCODEID</c:Field>
+          <c:Field>SUFFIX2CODEID</c:Field>
+          <c:Field>NICKNAME</c:Field>
+          <c:Field>BIRTHDATE</c:Field>
+          <c:Field>GENDERCODE</c:Field>
+          <c:Field>ISDMINELIGIBLE</c:Field>
+        </c:Fields>
+      </c:FieldGroup>
+      <c:FieldGroup ID="SOURCEINFORMATION" Caption="MIMED source" CaptionResourceKey="$$UMHS_source">
+        <c:Fields>
+          <c:Field>INFOSOURCECODEID</c:Field>          
+        </c:Fields>
+      </c:FieldGroup>
+    </c:FieldGroups>    
+  </c:FormMetaData>
+</AddDataFormTemplateSpec>

@@ -1,0 +1,91 @@
+﻿<TableSpec
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes"
+	ID="33bb831c-447d-4018-b29b-d51c53b4a335"
+	Name="MIMED Relationship"
+	Description="This table stores the set id for MIMED Data relationships"
+	Author="UM Dev"
+	Tablename="USR_UMHS_RELATIONSHIP"
+	IsBuiltIn="false"
+	>
+
+  <Fields>
+    <ForeignKeyField Description="Stores the ID of the relationship constituent" Name="UMHSID" Required="true" ForeignTable="USR_UMHS_DATA" />
+    <ForeignKeyField Description="Stores the ID of the reciprocal relationship constituent" Name="RECIPROCALUMHSID" Required="true" ForeignTable="USR_UMHS_DATA" />
+    <GuidField Description="Stores the relationship type for the relationship record" Name="RELATIONSHIPTYPECODEID" Required="true" />
+    <GuidField Description="Stores the relationship type for the reciprocal relationship record" Name="RECIPROCALTYPECODEID" Required="true" />
+    <DateField Description="Date that the relationship was established or became effective" Name="STARTDATE" />
+    <DateField Description="Date that the relationship was dissolved or ceased to be effective" Name="ENDDATE" />
+    <BooleanField Description="Designates the relationship as a spouse record" Name="ISSPOUSE" />
+    <BooleanField Description="Designates the relationship as a primary business record" Name="ISPRIMARYBUSINESS" />
+    <BooleanField Description="Designates the relationship as a contact record" Name="ISCONTACT" />
+    <CodeTableField Description="Stores the contact type for records marked as contacts" Name="CONTACTTYPECODEID" CodeTable="CONTACTTYPECODE" />
+    <BooleanField Description="Indicates whether the contact is a primary contact" Name="ISPRIMARYCONTACT" />
+    <BooleanField Description="The organization in the relationship will match the individual's gifts." Name="ISMATCHINGGIFTRELATIONSHIP" />
+    <ComputedColumnField Description="Provides a translation field for the relationship record" Name="DESCRIPTION" Expression="dbo.USR_UFN_UMHS_RELATIONSHIP_DESCRIPTION(ID, N'UFN_NAMEFORMAT_01')" />
+    <ForeignKeyField Description="Stores the category of the job for this relationship" Name="RELATIONSHIPSETID" ForeignTable="USR_UMHS_RELATIONSHIPSET" />
+    <MemoField Name="COMMENTS" />
+    <BooleanField Description="Indicates this relation is an emergency contact." Name="ISEMERGENCYCONTACT" />
+    <BooleanField Description="Indicates this relation receives report cards for the MIMED record." Name="RECEIVESREPORTCARD" />
+    <BooleanField Description="Indicates this person guarantees." Name="ISGUARANTOR" />
+  </Fields>
+  <!--  The Check Constraints and Triggers still need to be ported over to UMHS -->
+  <!--
+  <CheckConstraints>
+    <CheckConstraint Name="CK_RELATIONSHIP_CONSTIT_NOTEQUAL" CheckExpression="RELATIONSHIPUMHSID &lt;&gt; RECIPROCALUMHSID" />
+    <CheckConstraint Name="CK_RELATIONSHIP_VALIDENDDATE" CheckExpression="STARTDATE &lt;= ENDDATE" />
+    <CheckConstraint Name="CK_RELATIONSHIP_VALIDSPOUSE" CheckExpression="dbo.UFN_RELATIONSHIP_VALIDSPOUSE(ISSPOUSE,RECIPROCALCONSTITUENTID) = 1" />
+    <CheckConstraint Name="CK_RELATIONSHIP_OWNER_VALIDSPOUSE" CheckExpression="dbo.UFN_RELATIONSHIP_VALIDSPOUSE(ISSPOUSE,RELATIONSHIPCONSTITUENTID) = 1" />
+    <CheckConstraint Name="CK_RELATIONSHIP_VALIDPRIMARYBUSINESS" CheckExpression="dbo.UFN_RELATIONSHIP_VALIDPRIMARYBUSINESS(ISPRIMARYBUSINESS, RELATIONSHIPCONSTITUENTID, RECIPROCALCONSTITUENTID) = 1" />
+    <CheckConstraint Name="CK_RELATIONSHIP_VALIDCONTACT" CheckExpression="dbo.UFN_RELATIONSHIP_VALIDCONTACT(ISCONTACT, RELATIONSHIPCONSTITUENTID, RECIPROCALCONSTITUENTID) = 1" />
+    <CheckConstraint Name="CK_RELATIONSHIP_MATCHINGGIFTRELATIONSHIPCOUNT" CheckExpression="ISMATCHINGGIFTRELATIONSHIP=0 or dbo.UFN_RELATIONSHIP_MATCHINGGIFTRELATIONSHIPCOUNT(RELATIONSHIPCONSTITUENTID, RECIPROCALCONSTITUENTID) &lt;= 1" />
+    <CheckConstraint Name="CK_RELATIONSHIP_VALIDEMERGENCYCONTACT" CheckExpression="ISEMERGENCYCONTACT=0 or dbo.UFN_RELATIONSHIP_VALIDEMERGENCYCONTACT(RELATIONSHIPCONSTITUENTID, RECIPROCALCONSTITUENTID) = 1" />
+    <CheckConstraint Name="CK_RELATIONSHIP_VALIDRECEIVESREPORTCARD" CheckExpression="RECEIVESREPORTCARD=0 or dbo.UFN_RELATIONSHIP_VALIDRECEIVESREPORTCARD(RELATIONSHIPCONSTITUENTID, RECIPROCALCONSTITUENTID) = 1" />
+  </CheckConstraints>
+  <Indexes>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="RELATIONSHIPCONSTITUENTID" />
+        <IndexField Name="RECIPROCALCONSTITUENTID" />
+        <IndexField Name="RELATIONSHIPTYPECODEID" />
+        <IndexField Name="RECIPROCALTYPECODEID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="RELATIONSHIPCONSTITUENTID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ID" />
+        <IncludeField Name="ISSPOUSE" />
+        <IncludeField Name="ISPRIMARYBUSINESS" />
+        <IncludeField Name="ISPRIMARYCONTACT" />
+        <IncludeField Name="ISCONTACT" />
+        <IncludeField Name="RECIPROCALCONSTITUENTID" />
+        <IncludeField Name="CONTACTTYPECODEID" />
+        <IncludeField Name="POSITION" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="RECIPROCALCONSTITUENTID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="ISSPOUSE" />
+        <IncludeField Name="ISPRIMARYBUSINESS" />
+        <IncludeField Name="ISPRIMARYCONTACT" />
+        <IncludeField Name="RELATIONSHIPCONSTITUENTID" />
+      </IncludeFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="RELATIONSHIPTYPECODEID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="RECIPROCALTYPECODEID" />
+      </IncludeFields>
+    </Index>
+  </Indexes>
+  -->
+
+</TableSpec>

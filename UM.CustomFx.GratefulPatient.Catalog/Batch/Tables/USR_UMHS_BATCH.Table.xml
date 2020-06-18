@@ -1,0 +1,81 @@
+﻿<TableSpec
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes"
+	ID="247d5ae3-90d7-4e73-b3f0-76747ac23015"
+	Name="MIMED Batch"
+	Description="Stores information about usr MIMED patient batch records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_BATCH"
+	IsBuiltIn="false"
+	>
+
+  <!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Name="BATCHID" Required="true" ForeignTable="BATCH" OnDelete="CascadeDelete"/>
+    <GuidField Name="BATCHCONSTITUENTID"/>
+    <SequenceField Name="SEQUENCE" />
+    <ForeignKeyField Name="CONSTITUENTID" Description="Constituent" ForeignTable="CONSTITUENT" OnDelete="SetToNull" />
+    <TextField Description="For individuals, medical record number." Name="MRN" Length="50" Required="true" />
+    <TextField Description="For individuals, CPI sequence." Name="CPISEQUENCE" Length="50" Required="true" />
+    <TextField Description="For individuals, Lookup ID" Name="CONSTITUENTLOOKUPID" Length="200" />
+    <TextField Description="For individuals, stores the first name." Name="FIRSTNAME" Length="50" Required="true" />
+    <TextField Description="For individuals, stores the middle name." Name="MIDDLENAME" Length="50" />
+    <TextField Description="For individuals, stores the last name." Name="LASTNAME" Length="100" Required="true" />
+    <GuidField Description="For individuals, suffix code ID" Name="SUFFIXCODEID" />
+    <FuzzyDateField Description="Patient date of birth." Name="BIRTHDATE" Required="true"/>
+    <TextField Description="For individuals, stores address." Name="ADDRESSBLOCK" Length="500"/>
+    <TextField Description="For individuals, stores city." Name="CITY" Length="100"/>
+    <ForeignKeyField Description="For individuals, stores state." Name="STATEID" ForeignTable="STATE"/>
+    <TextField Description="For individuals, stores postal code." Name="POSTCODE" Length="24"/>
+    <GuidField Description="For individuals, stores country for the address." Name="ADDRESSCOUNTRYID" />
+    <CodeTableField  Description="For individuals, address type code" Name="ADDRESSTYPECODEID" CodeTable="ADDRESSTYPECODE" />
+    <CodeTableField Description="Information source" Name="INFOSOURCECODEID" CodeTable="INFOSOURCECODE"/>
+    <DateField Description="For individuals, address historical start date" Name="HISTORICALSTARTDATE" IncludeTime="false" />
+    <TextField Description="For individuals, stores phone number." Name="PHONE" Length="200"/>
+    <CodeTableField  Description="For individuals, address type code" Name="PHONETYPECODEID" CodeTable="PHONETYPECODE" />
+    <GuidField Description="For individuals, stores country for the phone number." Name="PHONE_COUNTRYID" />
+    <TextField Description="For individuals, stores (other) phone number." Name="PHONE_OTHER" Length="200"/>
+    <CodeTableField  Description="For individuals, address type code" Name="PHONE_OTHERTYPECODEID" CodeTable="PHONETYPECODE" />
+    <GuidField Description="For individuals, stores country for the (other) phone number." Name="PHONE_OTHER_COUNTRYID" />
+    <DateField Description="For individuals, phone start date" Name="PHONESTARTDATE" IncludeTime="false" />
+    <TextField Description="For individuals, stores email address." Name="EMAILADDRESS" Length="100" />
+    <CodeTableField  Description="For individuals, address type code" Name="EMAILADDRESSTYPECODEID" CodeTable="EMAILADDRESSTYPECODE" />
+    <DateField Description="For individuals, email start date" Name="EMAILADDRESSSTARTDATE" IncludeTime="false" />
+    <EnumField Name="GENDERCODE" DefaultValue="0">
+      <EnumValues>
+        <EnumValue ID="0" Translation="Unknown"/>
+        <EnumValue ID="1" Translation="Male"/>
+        <EnumValue ID="2" Translation="Female"/>
+      </EnumValues>
+    </EnumField>
+    <BooleanField Description="For individuals, Is DM Ineligible" Name="ISDMINELIGIBLE" DefaultValue="0"/>
+    <GuidField Description="For individual, DM Ineligible Reason Code" Name="DMINELIGIBLEREASONCODEID"/>
+    <GuidField Description="For individuals, Wealth Engine Data Mining Score (Med)" Name="WEDMSCORECODEID"/>
+    <DateField Description="For individuals, Wealth Engine Data Mining Score (Med) start date" Name="WEDMSCORESTARTDATE" IncludeTime="false" />
+    <GuidField Description="For individuals, Wealth Engine Est Giv Capacity (Med)" Name="WEESTGIVCAPACITYCODEID"/>
+    <TextField Description="For individuals, Wealth Engine Est Giv Capacity (Med) comment" Name="WEESTGIVCAPACITYCOMMENT" Length="510"/>
+    <DateField Description="For individuals, Wealth Engine Est Giv Capacity (Med) start date" Name="WEESTGIVCAPACITYSTARTDATE" IncludeTime="false" />
+    <DateField Description="Date on the records imported from the UMHSDATA datamart." Name="UMHSDATA_LASTPROCDATE"  />
+    <BooleanField Description="Is record imported from the Grateful Patient import process" Name="ISGPIMPORTEDRECORD" DefaultValue="true"/>
+    <BooleanField Description="Does the constiuent have an affilation and/or constiteuncy of Faculty, Staff, or Board Member with U-M" Name="HASUMAFFILIATION" DefaultValue="false"/>
+    <TextField Description="For individuals, Blackbaud Wealth Scores for Total Estimated Assets" Name="WEALTHSCORES_TOTALESTIMATEDASSETS" Length="50"/>
+    <GuidField Description="For individuals, Blackbaud Wealth Scores for Rating" Name="WEALTHSCORES_RATINGID"/>
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="BATCHID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField  Name="BATCHCONSTITUENTID" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

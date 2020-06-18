@@ -1,0 +1,63 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="857375de-51af-4f25-9e39-afe21db7b5ee"
+	Name="USR_USP_UMHS_GETUMHSFRIENDNUMBER"
+	Description="Get new MIMED Friend Number"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_GETUMHSFRIENDNUMBER"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USR_USP_UMHS_GETUMHSFRIENDNUMBER
+(
+  @CONSTITUENTID uniqueidentifier OUTPUT,
+  @UMHSFRIENDNUMBER bigint OUTPUT
+)
+as
+begin
+  declare @ErrorMessage NVARCHAR(4000)=null;
+  declare @ErrorSeverity INT;
+  declare @ErrorState INT;
+  declare @CURRENTDATE datetime;
+  declare @CHANGEAGENTID uniqueidentifier;
+  declare @ID uniqueidentifier;
+
+  set @CURRENTDATE = getdate();
+  exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  set @ID = newid()
+  
+  if @CONSTITUENTID is NULL 
+    set @CONSTITUENTID = newid();
+
+  begin tran T_UMHS_FRIEND_NUM
+
+  begin try
+  
+    if exists (select top 1 ID from dbo.USR_UMHS_FRIENDNUMBERS)
+    begin
+        select @UMHSFRIENDNUMBER=max(UMHSFRIENDNUMBER) + 1 from dbo.USR_UMHS_FRIENDNUMBERS
+        
+        insert into dbo.USR_UMHS_FRIENDNUMBERS with (TABLOCKX) (ID, CONSTITUENTID, UMHSFRIENDNUMBER, ADDEDBYID, CHANGEDBYID, DATEADDED, DATECHANGED) values(@ID, @CONSTITUENTID, @UMHSFRIENDNUMBER, @CHANGEAGENTID, @CHANGEAGENTID, @CURRENTDATE, @CURRENTDATE);
+    end
+    else
+    begin
+      /* First UMHS Friend record */
+      set @UMHSFRIENDNUMBER = 1;
+      insert into dbo.USR_UMHS_FRIENDNUMBERS with (TABLOCKX) (ID, CONSTITUENTID, UMHSFRIENDNUMBER, ADDEDBYID, CHANGEDBYID, DATEADDED, DATECHANGED) values(@ID, @CONSTITUENTID, @UMHSFRIENDNUMBER, @CHANGEAGENTID, @CHANGEAGENTID, @CURRENTDATE, @CURRENTDATE);
+    end
+
+    commit tran T_UMHS_FRIEND_NUM
+
+  end try
+  begin catch
+    rollback tran T_UMHS_FRIEND_NUM
+     RAISERROR('Error getting new MIMED Friend Number.', 13, 1);
+  end catch
+  
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

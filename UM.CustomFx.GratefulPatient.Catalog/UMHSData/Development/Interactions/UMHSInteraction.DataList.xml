@@ -1,0 +1,340 @@
+<DataListSpec
+    xmlns:c="bb_appfx_commontypes"
+    ID="139b6c5f-c676-4f41-9cfb-7edd09a0c53f"
+    Name="MIMED Interaction List"
+    Description="Returns all MIMED Interaction records"
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Interactions2.DataList" />
+  <SPDataList SPName="USR_USP_DATALIST_UMHS_INTERACTION">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+CREATE procedure dbo.USR_USP_DATALIST_UMHS_INTERACTION
+		(
+		@UMHSID uniqueidentifier,
+		@DATEFILTER tinyint = 0,
+		@STARTDATE datetime = null,
+		@ENDDATE datetime = null,
+		@TYPEFILTER uniqueidentifier = null,
+		@CURRENTAPPUSERID uniqueidentifier = null,
+		@SITEFILTERMODE tinyint = 0,
+		@SITESSELECTED xml = null,
+		@SECURITYFEATUREID uniqueidentifier = null,
+		@SECURITYFEATURETYPE tinyint = null,
+		@STATUS uniqueidentifier = null
+		)
+		as 
+		begin
+
+		set nocount on;
+
+		exec USR_USP_USR_UPDATE_CUSTOM_STATUS
+
+		declare @DATE datetime = getdate();
+
+		declare @CONSTITUENTID uniqueidentifier 
+		set @CONSTITUENTID = (SELECT top 1 ConstituentID from USR_UMHS_DATA U where U.ID = @UMHSID)
+
+		if @DATEFILTER = 0		-- all
+		begin
+		set @STARTDATE = null;
+		set @ENDDATE = null;
+		end
+
+		if @DATEFILTER = 1		-- this year
+		begin
+		set @STARTDATE = dbo.UFN_DATE_THISCALENDARYEAR_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_THISCALENDARYEAR_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 2		-- this quarter
+		begin
+		set @STARTDATE = dbo.UFN_DATE_THISQUARTER_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_THISQUARTER_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 3		-- this month
+		begin
+		set @STARTDATE = dbo.UFN_DATE_THISMONTH_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_THISMONTH_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 4		-- this week
+		begin
+		set @STARTDATE = dbo.UFN_DATE_THISWEEK_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_THISWEEK_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 5		-- next week
+		begin
+		set @STARTDATE = dbo.UFN_DATE_NEXTWEEK_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_NEXTWEEK_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 6		-- next month
+		begin
+		set @STARTDATE = dbo.UFN_DATE_NEXTMONTH_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_NEXTMONTH_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 7		-- next quarter
+		begin
+		set @STARTDATE = dbo.UFN_DATE_NEXTQUARTER_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_NEXTQUARTER_LASTDAY(@DATE, 0);
+		end
+
+		if @DATEFILTER = 8		-- next year
+		begin
+		set @STARTDATE = dbo.UFN_DATE_NEXTCALENDARYEAR_FIRSTDAY(@DATE, 0);
+		set @ENDDATE = dbo.UFN_DATE_NEXTCALENDARYEAR_LASTDAY(@DATE, 0);
+		end;
+			
+		END
+
+SELECT distinct USR_UMHS_INTERACTION.ID,--invisible
+       USR_UMHS_INTERACTION.DATE,
+       OWNERNAME.NAME                                                    AS OWNER,
+       USR_UMHS_INTERACTION.FUNDRAISERID                                 AS OWNERID,--invisible
+       USR_UMHS_INTERACTION.EXPECTEDSTARTTIME                            AS STARTTIME,
+       USR_UMHS_INTERACTION.EXPECTEDENDTIME                              AS ENDTIME,
+       TIMEZONEENTRY.DISPLAYNAME                                         TIMEZONE,
+       UIS.DESCRIPTION                                                   AS STATUS,
+       USR_UMHS_INTERACTION.SUMMARY,--summary
+       INTERACTIONTYPECODE.DESCRIPTION                                   AS TYPE,--contactmethod		
+       EVENT.NAME                                                        EVENT,
+       DBO.USR_UFN_UMHS_INTERACTION_GETSITELIST(USR_UMHS_INTERACTION.ID) AS SITES
+FROM   DBO.USR_UMHS_INTERACTION
+       LEFT JOIN USR_INTERACTION_STATUSCODE UIS ON USR_UMHS_INTERACTION.STATUSCODEID = UIS.ID
+       LEFT JOIN DBO.INTERACTIONSUBCATEGORY ON INTERACTIONSUBCATEGORY.ID = USR_UMHS_INTERACTION.INTERACTIONSUBCATEGORYID
+       LEFT JOIN DBO.INTERACTIONCATEGORY ON INTERACTIONCATEGORY.ID = INTERACTIONSUBCATEGORY.INTERACTIONCATEGORYID
+       LEFT JOIN DBO.INTERACTIONTYPECODE ON USR_UMHS_INTERACTION.CONTACTMETHODCODEID = INTERACTIONTYPECODE.ID
+       LEFT JOIN DBO.TIMEZONEENTRY ON USR_UMHS_INTERACTION.TIMEZONEENTRYID = TIMEZONEENTRY.ID
+       LEFT JOIN DBO.EVENT ON EVENT.ID = USR_UMHS_INTERACTION.EVENTID
+       LEFT JOIN DBO.USR_UMHS_DATA U ON U.ID = USR_UMHS_INTERACTION.UMHSID
+       LEFT JOIN DBO.CONSTITUENT ON CONSTITUENT.ID = U.CONSTITUENTID
+       OUTER APPLY DBO.UFN_CONSTITUENT_DISPLAYNAME(USR_UMHS_INTERACTION.FUNDRAISERID) OWNERNAME
+       LEFT JOIN PROSPECTPLAN PPL ON USR_UMHS_INTERACTION.PROSPECTPLANID = PPL.ID
+WHERE  USR_UMHS_INTERACTION.UMHSID = @UMHSID
+       AND ( @STATUS IS NULL
+              OR USR_UMHS_INTERACTION.STATUSCODEID = @STATUS )
+       AND ( ( USR_UMHS_INTERACTION.DATE BETWEEN @STARTDATE AND @ENDDATE )
+              OR ( @STARTDATE IS NULL
+                   AND @ENDDATE IS NULL )
+              OR ( USR_UMHS_INTERACTION.DATE >= @STARTDATE
+                   AND @ENDDATE IS NULL )
+              OR ( @STARTDATE IS NULL
+                   AND USR_UMHS_INTERACTION.DATE <= @ENDDATE ) )
+       AND ( @TYPEFILTER IS NULL OR USR_UMHS_INTERACTION.CONTACTMETHODCODEID = @TYPEFILTER )
+       AND ( @SITEFILTERMODE = 0
+              OR ( USR_UMHS_INTERACTION.PROSPECTPLANID IS NOT NULL
+                   AND USR_UMHS_INTERACTION.ID IN (SELECT USR_UMHS_INTERACTIONSITE.INTERACTIONID
+                                                   FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                                          INNER JOIN DBO.USR_UMHS_INTERACTIONSITE ON USR_UMHS_INTERACTIONSITE.SITEID = SITEFILTER.SITEID) )
+              OR ( USR_UMHS_INTERACTION.PROSPECTPLANID IS NULL
+                   AND USR_UMHS_INTERACTION.ID IN (SELECT USR_UMHS_INTERACTIONSITE.INTERACTIONID
+                                                   FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                                          INNER JOIN DBO.USR_UMHS_INTERACTIONSITE ON USR_UMHS_INTERACTIONSITE.SITEID = SITEFILTER.SITEID) )
+              OR ( USR_UMHS_INTERACTION.PROSPECTPLANID IS NULL
+                   AND USR_UMHS_INTERACTION.PROSPECTPLANID IN (SELECT PROSPECTPLANSITE.PROSPECTPLANID
+                                                               FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                                                      INNER JOIN DBO.PROSPECTPLANSITE ON PROSPECTPLANSITE.SITEID = SITEFILTER.SITEID) )
+              OR ( USR_UMHS_INTERACTION.PROSPECTPLANID IS NOT NULL
+                   AND USR_UMHS_INTERACTION.PROSPECTPLANID IN (SELECT PROSPECTPLANSITE.PROSPECTPLANID
+                                                               FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                                                      INNER JOIN DBO.PROSPECTPLANSITE ON PROSPECTPLANSITE.SITEID = SITEFILTER.SITEID) ) )
+UNION ALL
+-- Interactions where the constituent is a participant
+SELECT distinct I.ID,
+       I.DATE,
+       OWNERNAME.NAME                                 AS OWNER,
+       I.FUNDRAISERID                                 AS OWNERID,
+       I.EXPECTEDSTARTTIME                            AS STARTTIME,
+       I.EXPECTEDENDTIME                              AS ENDTIME,
+       TIMEZONEENTRY.DISPLAYNAME                      TIMEZONE,
+       UIS.DESCRIPTION                                AS STATUS,
+       I.SUMMARY                                      AS SUMMARY,
+       INTERACTIONTYPECODE.DESCRIPTION                AS TYPE,
+       EVENT.NAME                                     EVENT,
+       DBO.USR_UFN_UMHS_INTERACTION_GETSITELIST(I.ID) AS SITES
+FROM   USR_UMHS_DATA D
+       JOIN DBO.USR_UMHS_INTERACTIONPARTICIPANT IP ON IP.CONSTITUENTID = D.CONSTITUENTID
+       JOIN USR_UMHS_INTERACTION I ON I.ID = IP.INTERACTIONID
+	     LEFT JOIN dbo.USR_INTERACTION_EXTENSION_29442 IEX ON I.ID = IEX.ID
+       LEFT JOIN USR_INTERACTION_STATUSCODE UIS ON I.STATUSCODEID = UIS.ID
+       LEFT JOIN DBO.INTERACTIONSUBCATEGORY ON INTERACTIONSUBCATEGORY.ID = I.INTERACTIONSUBCATEGORYID
+       LEFT JOIN DBO.INTERACTIONCATEGORY ON INTERACTIONCATEGORY.ID = INTERACTIONSUBCATEGORY.INTERACTIONCATEGORYID
+       LEFT JOIN DBO.INTERACTIONTYPECODE  ON I.CONTACTMETHODCODEID = INTERACTIONTYPECODE.ID
+       LEFT JOIN DBO.TIMEZONEENTRY ON I.TIMEZONEENTRYID = TIMEZONEENTRY.ID
+       LEFT JOIN DBO.EVENT ON EVENT.ID = I.EVENTID
+       LEFT JOIN DBO.USR_UMHS_DATA U ON U.ID = I.UMHSID
+       LEFT JOIN DBO.CONSTITUENT ON CONSTITUENT.ID = U.CONSTITUENTID
+       OUTER APPLY DBO.UFN_CONSTITUENT_DISPLAYNAME(I.FUNDRAISERID) OWNERNAME
+       LEFT JOIN DBO.USR_UMHS_INTERACTIONPARTICIPANT ON USR_UMHS_INTERACTIONPARTICIPANT.INTERACTIONID = I.ID
+       LEFT JOIN PROSPECTPLAN PPL ON I.PROSPECTPLANID = PPL.ID
+WHERE  
+      USR_UMHS_INTERACTIONPARTICIPANT.CONSTITUENTID =  (SELECT CONSTITUENTID FROM USR_UMHS_DATA WHERE ID = @UMHSID)
+      --AND D.CONSTITUENTID = (SELECT CONSTITUENTID FROM USR_UMHS_DATA WHERE ID = @UMHSID)
+      --AND I.ISINTERACTION = 1
+      AND (
+        @STATUS IS NULL 
+          OR
+          IEX.INTERACTION_STATUSCODE_CODEID = @STATUS
+          )
+          and(
+              (I.DATE between @STARTDATE and @ENDDATE) or
+            (@STARTDATE is null and @ENDDATE is null) or
+            (I.DATE >= @STARTDATE and @ENDDATE is null) or
+            (@STARTDATE is null and I.DATE <= @ENDDATE)
+        ) 
+        and (@TYPEFILTER is null or I.CONTACTMETHODCODEID = @TYPEFILTER) 
+              
+        --and exists(
+            --select top 1 INTERACTIONSITE.SITEID from dbo.UFN_SITEID_MAPFROM_INTERACTIONID(I.ID) INTERACTIONSITE
+            --where (dbo.UFN_APPUSER_ISSYSADMIN(@CURRENTAPPUSERID) = 1 or exists (select 1 from dbo.UFN_SITESFORUSERONFEATURE(@CURRENTAPPUSERID,@SECURITYFEATUREID,@SECURITYFEATURETYPE) where SITEID=[INTERACTIONSITE].[SITEID] or (SITEID is null and [INTERACTIONSITE].[SITEID] is null)))
+        --) 
+		
+      --D.ID = @UMHSID
+       AND ( @SITEFILTERMODE = 0
+              OR ( I.PROSPECTPLANID IS NOT NULL
+                   AND I.ID IN (SELECT USR_UMHS_INTERACTIONSITE.INTERACTIONID
+                                FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                       INNER JOIN DBO.USR_UMHS_INTERACTIONSITE ON USR_UMHS_INTERACTIONSITE.SITEID = SITEFILTER.SITEID) )
+              OR ( I.PROSPECTPLANID IS NULL
+                   AND I.ID IN (SELECT USR_UMHS_INTERACTIONSITE.INTERACTIONID
+                                FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                       INNER JOIN DBO.USR_UMHS_INTERACTIONSITE ON USR_UMHS_INTERACTIONSITE.SITEID = SITEFILTER.SITEID) )
+              OR ( I.PROSPECTPLANID IS NULL
+                   AND I.PROSPECTPLANID IN (SELECT PROSPECTPLANSITE.PROSPECTPLANID
+                                            FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                                   INNER JOIN DBO.PROSPECTPLANSITE ON PROSPECTPLANSITE.SITEID = SITEFILTER.SITEID) )
+              OR ( I.PROSPECTPLANID IS NOT NULL
+                   AND I.PROSPECTPLANID IN (SELECT PROSPECTPLANSITE.PROSPECTPLANID
+                                            FROM   DBO.UFN_SITE_BUILDDATALISTSITEFILTER (@CURRENTAPPUSERID, @SITEFILTERMODE, @SITESSELECTED) SITEFILTER
+                                                   INNER JOIN DBO.PROSPECTPLANSITE ON PROSPECTPLANSITE.SITEID = SITEFILTER.SITEID) ) ) 
+                                                          
+        ]]>
+    </c:CreateProcedureSQL>
+  </SPDataList>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID"/>
+  <SiteSecurity TableName="USR_UMHS_INTERACTIONSITE" ColumnName="SITEID" />
+  <Parameters>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="SITEFILTERMODE" DataType="TinyInt" Required="true" Caption="Sites" DefaultValueText="0" CaptionResourceKey="$$sites">
+          <ValueList>
+            <Items>
+              <Item>
+                <Value>0</Value>
+                <Label>All sites</Label>
+              </Item>
+              <Item>
+                <Value>1</Value>
+                <Label>My site</Label>
+              </Item>
+              <Item>
+                <Value>2</Value>
+                <Label>My site's branch</Label>
+              </Item>
+              <Item>
+                <Value>3</Value>
+                <Label>Selected sites</Label>
+              </Item>
+            </Items>
+          </ValueList>
+          <InstalledProductList>
+            <InstalledProduct ID="133f9bca-00f1-4007-9792-586b931340c6" />
+          </InstalledProductList>
+        </FormField>
+        <FormField FieldID="SITESSELECTED" DataType="XML" Hidden="true" AvailableToClient="false">
+          <Collection>
+            <Fields>
+              <FormField FieldID="SITEID" DataType="Guid" Caption="Site ID" CaptionResourceKey="$$site_id" />
+            </Fields>
+          </Collection>
+        </FormField>
+        <FormField FieldID="TYPEFILTER" DataType="Guid" Caption="Contact method" CaptionResourceKey="$$contact_method">
+          <CodeTable CodeTableName="INTERACTIONTYPECODE" />
+        </FormField>
+        <FormField FieldID="DATEFILTER" DataType="TinyInt" Caption="Date" DefaultValueText="0" CaptionResourceKey="$$date">
+          <ValueList>
+            <Items>
+              <Item LabelResourceKey="$$all">
+                <Value>0</Value>
+                <Label>All</Label>
+              </Item>
+              <Item LabelResourceKey="$$this_year">
+                <Value>1</Value>
+                <Label>This year</Label>
+              </Item>
+              <Item LabelResourceKey="$$this_quarter">
+                <Value>2</Value>
+                <Label>This quarter</Label>
+              </Item>
+              <Item LabelResourceKey="$$this_month">
+                <Value>3</Value>
+                <Label>This month</Label>
+              </Item>
+              <Item LabelResourceKey="$$this_week">
+                <Value>4</Value>
+                <Label>This week</Label>
+              </Item>
+              <Item LabelResourceKey="$$next_week">
+                <Value>5</Value>
+                <Label>Next week</Label>
+              </Item>
+              <Item LabelResourceKey="$$next_month">
+                <Value>6</Value>
+                <Label>Next month</Label>
+              </Item>
+              <Item LabelResourceKey="$$next_quarter">
+                <Value>7</Value>
+                <Label>Next quarter</Label>
+              </Item>
+              <Item LabelResourceKey="$$next_year">
+                <Value>8</Value>
+                <Label>Next year</Label>
+              </Item>
+              <Item LabelResourceKey="$$&lt;specific_date_range&gt;">
+                <Value>9</Value>
+                <Label>&lt;Specific date range&gt;</Label>
+              </Item>
+            </Items>
+          </ValueList>
+        </FormField>
+        <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" CaptionResourceKey="$$start_date" />
+        <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" CaptionResourceKey="$$end_date" />        
+        <FormField FieldID="STATUS" DataType="Guid" Caption="Status" CaptionResourceKey="$$status">
+          <CodeTable CodeTableName="USR_INTERACTION_STATUSCODE" />
+        </FormField>        
+      </FormFields>
+      <FormUIComponent FormUIComponentType="CustomComponent">
+        <CustomComponentID AssemblyName="Blackbaud.AppFx.Constituent.ClientComponents.V1_1.dll" ClassName="Blackbaud.AppFx.Constituent.ClientComponents.V1_1.InteractionFilter_1_1" />
+      </FormUIComponent>
+      <WebUIComponent>
+        <UIModel AssemblyName="Blackbaud.CustomFx.Constituent.UIModel.dll" ClassName="Blackbaud.CustomFx.Constituent.UIModel.InteractionsByFundraiserDataListUIModel" />
+        <WebUI>
+          <ExternalResource Url="browser/htmlforms/custom/constituent/InteractionsByFundraiserDataList.html" />
+        </WebUI>
+      </WebUIComponent>
+    </FormMetaData>
+  </Parameters>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" IDColumn="true" CaptionResourceKey="$$id" DisplaySequence="1" />
+      <OutputField FieldID="DATE" Caption="Date" DataType="Date" CaptionResourceKey="$$date" DisplaySequence="2" />      
+      <OutputField FieldID="OWNER" Caption="Owner" DataType="String" CaptionResourceKey="$$owner" DisplaySequence="3" />
+      <OutputField FieldID="OWNERID" Caption="Owner ID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$owner_id" DisplaySequence="4" />
+      <OutputField FieldID="STARTTIME" Caption="Start time" DataType="HourMinute" CaptionResourceKey="$$start_time" DisplaySequence="5" />
+      <OutputField FieldID="ENDTIME" Caption="End time" DataType="HourMinute" CaptionResourceKey="$$end_time" DisplaySequence="6" />
+      <OutputField FieldID="TIMEZONE" Caption="Time zone" DataType="String" CaptionResourceKey="$$time_zone" DisplaySequence="7" />
+      <OutputField FieldID="STATUS" Caption="Status" DataType="String" CaptionResourceKey="$$status" DisplaySequence="8" />
+      <OutputField FieldID="SUMMARY" Caption="Summary" DataType="String" CaptionResourceKey="$$summary" DisplaySequence="9" />
+      <OutputField FieldID="TYPE" Caption="Contact Method" DataType="String" CaptionResourceKey="$$contact_method" DisplaySequence="10" />
+      <OutputField FieldID="EVENT" Caption="Event" DataType="String" CaptionResourceKey="$$event" DisplaySequence="13" />
+      <OutputField FieldID="SITES" Caption="Sites" DataType="String" CaptionResourceKey="$$Sites"  DisplaySequence="14">        
+      </OutputField>
+    </OutputFields>
+  </Output>
+</DataListSpec>

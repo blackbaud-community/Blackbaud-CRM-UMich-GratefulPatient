@@ -1,0 +1,159 @@
+﻿<PageDefinitionSpec
+    xmlns="bb_appfx_pagedefinition"
+    xmlns:c="bb_appfx_commontypes"
+    ID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0"
+    Name="MIMED Interaction Page"
+    Description="A page for displaying information about MIMED interaction records"
+    Author="UM Dev"
+    ExpressionDataFormID="4bd04331-1e6e-42fe-9a07-4d962cebc094"
+    ContextRecordType="MIMED Interaction"
+    >
+
+  <!--<InstalledProductList xmlns="bb_appfx_commontypes">
+    <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+  </InstalledProductList>-->
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.ConstituentInteraction.Page" />
+
+  <!-- define how the page header should appear -->
+  <PageHeader Caption="=String.Format(Me.Globals.GetResourceString(&quot;Description-Interaction&quot;), Fields!TYPE, Fields!DATE.ToShortDateString)"  >
+    <ContextLinks>
+      <ContextLink ID="00000000-0000-0000-0000-000000000000" PageID="88159265-2B7E-4c7b-82A2-119D01ECD40F" TabID="d797ffd4-d395-4574-8028-448cced5c31b" ContextID="=Fields!CONSTITUENTID">
+        <Caption>="MIMED Data for " + Fields!CONSTITUENT</Caption>
+      </ContextLink>
+    </ContextLinks>
+  </PageHeader>
+
+  <SummarySection ID="d035a08d-908e-416f-a93c-7e0728c0c8c7" HideCaption="true">
+    <DataForm ID="1f4fea31-5779-44db-bcce-ec5afa36d82b" />
+    <SectionContext>
+      <PageExpressionField xmlns="bb_appfx_commontypes">CONSTITUENTID</PageExpressionField>
+    </SectionContext>
+    <HelpKey />
+  </SummarySection>
+  <Tabs>
+    <Tab Caption="Details" ID="f924cf1b-3c85-49fb-9097-c9b869336db2" CaptionResourceKey="$$details">
+      <Sections>
+        <Section ID="bb11a47e-e135-404f-a1e7-46cd0a3789d5" Caption="Details" Visible="True" CaptionResourceKey="$$details">
+          <DataForm ID="a20b702c-9466-42aa-9cc0-5060a9036f28"/>
+          <Actions>
+            <Action ID="D60C1F43-9091-4532-B550-E1493157E68E" Caption="Edit" ImageKey="RES:Edit" Visible="=Not CBool(Page.Fields!ISMOVE)" CaptionResourceKey="$$edit">
+              <ShowDataForm DataFormID="689e3a9a-f16b-4dfe-bed7-afb7c77854f2" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <PageContextID />
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ShowDataForm>
+              <HelpKey>CRMEditConstInteractions.html</HelpKey>
+            </Action>
+          </Actions>
+          <!--  <Action ID="30dcc413-e75d-45d1-bfad-8b6e9efc3113" Caption="Edit" ImageKey="RES:Edit" Visible="=CBool(Page.Fields!ISMOVE)" CaptionResourceKey="$$edit">
+              <ShowDataForm DataFormID="94bd73fa-61e1-4275-aa44-111ca5bb334c" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <PageContextID />
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ShowDataForm>
+              <HelpKey>CRMEditConstInteractions.html</HelpKey>
+            </Action>
+          </Actions>
+          <HelpKey>CRMInteractionDetailsTab.html</HelpKey>-->
+        </Section>
+      </Sections>
+    </Tab>
+  </Tabs>
+  <!--Uncomment this if you need to add my fundraiser tabs to your local dev
+  <AlterExistingPages>
+    <AlterPages>
+      <AlterPage PageID="baee8762-6727-43a7-9645-5dd776f6289a">
+        <AddPageExpressionForms>
+          <PageExpressionForm DataFormInstanceID="dc6ae57a-bc95-44de-9ac3-2da1d1e42cbd"/>
+        </AddPageExpressionForms>
+      </AlterPage>
+      <AlterPage PageID="baee8762-6727-43a7-9645-5dd776f6289a">
+        <AlterTabs>
+          <AddTab Sequence="1">
+            <Tab Caption="My MIMED" ID="12732c9a-d98d-46e7-95e1-3658467020d0">
+              <Tabs>
+                <Tab Caption="Planned and Pending Interactions" ID="c0e00bc8-8aad-480a-bf45-8aa1f79b42ab">
+                  <Sections>
+                    <Section ID="9958077a-7257-4577-b532-2a8a5b64f38f" Caption="Planned and Pending Interactions">
+                      <DataList ID="5d630dd0-b1b8-4b37-8450-6fb80b797016">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="4A1DDB8E-8691-4637-ADCF-70192E86B3DE" Caption="Go to interaction" LinkFieldID="OBJECTIVE">
+                          <c:ShowPage PageID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0">
+                            <c:ActionContext>
+                              <c:SectionField>ID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>
+                      </Actions>
+
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Completed Interactions" ID="578e5bb8-fc17-45fd-9ec7-a62ce8cbd94a">
+                  <Sections>
+                    <Section ID="f09f9a4c-9702-4e58-a1a0-67e1a2de1ec6" Caption="Completed Interactions">
+                      <DataList ID="35dc1be3-c7a5-4c1c-8731-9b1265e2edad">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="5C8FF1CB-5E97-4868-B231-D5403502953A" Caption="Go to interaction" LinkFieldID="OBJECTIVE">
+                          <c:ShowPage PageID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0">
+                            <c:ActionContext>
+                              <c:SectionField>ID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Portfolio" ID="c3fac4f7-c422-4bed-8241-a8cc30c4e02a">
+                  <Sections>
+                    <Section ID="4e1afffc-15c3-45e1-aab5-83ff027d95a0" Caption="Referrals">
+                      <DataList ID="1071c8eb-4c82-4fd1-9e35-6aace93a01ec">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                    </Section>
+                    <Section ID="42b0fda1-686a-4c5d-8562-a80346d80fb7" Caption="Team Assignments">
+                      <DataList ID="4cceb8ef-f245-4643-ad11-daa63ee7e277">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                    </Section>
+                  </Sections>
+                </Tab>
+              </Tabs>
+            </Tab>
+          </AddTab>
+        </AlterTabs>
+      </AlterPage>
+    </AlterPages>
+  </AlterExistingPages>
+  -->
+</PageDefinitionSpec>
+

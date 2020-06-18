@@ -1,0 +1,141 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes"
+	ID="889a66dd-dc75-41d6-a2b2-a0a818fa8d3f"
+	Name="MIMED Data Query"
+	Description="A view defined for querying on MIMED data records"
+	Author="UM Dev"
+	IsRoot="true"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Constituent.Query" />
+
+  <!-- define the view used to return data for the query -->
+  <ViewImplementation ViewName="USR_V_QUERY_UMHS_DATA">
+    <ViewSQL>
+      <![CDATA[
+      SELECT D.ID,
+             D.CONSTITUENTID,
+             C.LOOKUPID,
+             D.MRN,
+             D.CPISEQUENCE,
+             D.FIRSTNAME,
+             D.MIDDLENAME,
+             D.KEYNAME,            
+             D.BIRTHDATE,
+             D.AGE,
+             TC.DESCRIPTION              TITLE,
+             TC2.DESCRIPTION             TITLE2,
+             SC.DESCRIPTION              SUFFIX,
+             SC2.DESCRIPTION             SUFFIX2,
+             D.INFOSOURCECODEID,
+             D.ISDMINELIGIBLE,
+             D.DMINELIGIBLEREASONCODEID,
+             DR.DESCRIPTION as DMINELIGIBLEREASON,
+             D.GENDER,             
+             [ADDEDBY].APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             [ADDEDBY].USERNAME          AS ADDEDBY_USERNAME,
+             [CHANGEDBY].APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             [CHANGEDBY].USERNAME        AS CHANGEDBY_USERNAME,
+             D.DATEADDED,
+             D.DATECHANGED,
+             D.TITLECODEID,
+             D.SUFFIXCODEID,
+             D.TITLE2CODEID,
+             D.SUFFIX2CODEID 
+      FROM   DBO.USR_UMHS_DATA D
+             INNER JOIN CONSTITUENT C 
+                    ON C.ID=D.CONSTITUENTID
+             LEFT JOIN TITLECODE TC
+                    ON TC.ID = D.TITLECODEID
+             LEFT JOIN TITLECODE TC2
+                    ON TC2.ID = D.TITLE2CODEID
+             LEFT JOIN SUFFIXCODE SC
+                    ON SC.ID = D.SUFFIXCODEID
+             LEFT JOIN SUFFIXCODE SC2
+                    ON SC2.ID = D.SUFFIX2CODEID   
+             LEFT JOIN DBO.USR_UMHS_DMINELIGIBLEREASONCODE DR 
+                    ON DR.ID = D.DMINELIGIBLEREASONCODEID
+             LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY]
+                    ON [ADDEDBY].ID = D.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY]
+                    ON [CHANGEDBY].ID = D.CHANGEDBYID 
+
+			]]>
+    </ViewSQL>
+  </ViewImplementation>
+
+  <!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="Constituent record ID" Category="System Fields" Name="CONSTITUENTID" />
+      <OutputField Caption="Lookup ID" Name="LOOKUPID" />
+      <OutputField Name="MRN" Caption="MRN" DataType="String"/>
+      <OutputField Name="CPISEQUENCE" Caption="CPI Sequence" DataType="String"/>
+      <OutputField Name="FIRSTNAME" Caption="First name" DataType="String" IsDefaultOutput="true"/>
+      <OutputField Name="MIDDLENAME" Caption="Middle name" DataType="String"/>
+      <OutputField Name="KEYNAME" Caption="Last name" DataType="String" IsDefaultOutput="true"/>
+      <!--<OutputField Name="BIRTHDATE" Caption="Birth date" DataType="Date" AllowMonthDayOnFuzzyDate="true"/>-->
+      <OutputField Caption="Birth date" Name="BIRTHDATE" AllowMonthDayOnFuzzyDate="true" CaptionResourceKey="$$birth_date" />
+      <OutputField Name="AGE" Caption="Age" DataType="Integer"/>
+      <OutputField Name="TITLE" Caption="Title" DataType="String">
+        <LookupInfo IDField="TITLECODEID">
+          <CodeTable IncludeInactive="true" CodeTableName="TITLECODE" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="TITLE2" Caption="Title 2" DataType="String">
+        <LookupInfo IDField="TITLECODEID">
+          <CodeTable IncludeInactive="true" CodeTableName="TITLECODE" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="SUFFIX" Caption="Suffix" DataType="String">
+        <LookupInfo IDField="SUFFIXCODEID">
+          <CodeTable IncludeInactive="true" CodeTableName="SUFFIXCODE" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="SUFFIX2" Caption="Suffix 2" DataType="String">
+        <LookupInfo IDField="SUFFIXCODEID">
+          <CodeTable IncludeInactive="true" CodeTableName="SUFFIXCODE" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="GENDER" Caption="Gender" DataType="String">
+        <LookupInfo>
+          <TranslationList>
+            <c:Options>
+              <c:TranslationListOption Value="Unknown" />
+              <c:TranslationListOption Value="Male" />
+              <c:TranslationListOption Value="Female" />
+            </c:Options>
+          </TranslationList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="INFOSOURCECODEID" Name="INFOSOURCECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Name="ISDMINELIGIBLE" DataType="Boolean" Caption="Direct Mail Ineligible" />
+      <OutputField Name="DMINELIGIBLEREASONCODEID" DataType="Guid" IsHidden="true"/>
+
+      <OutputField Name="DMINELIGIBLEREASON" DataType="String" Caption="Direct Mail Ineligible Reason" >
+        <LookupInfo>
+          <CodeTable CodeTableName="USR_UMHS_DMINELIGIBLEREASONCODE"/>
+        </LookupInfo>
+      </OutputField>
+      
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+      <OutputField Caption="Title code ID" Name="TITLECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="Suffix code ID" Name="SUFFIXCODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="Title 2 code ID" Name="TITLE2CODEID" DataType="Guid" IsHidden="true"  />
+      <OutputField Caption="Suffix 2 code ID" Name="SUFFIX2CODEID" DataType="Guid" IsHidden="true" />
+    </OutputFields>
+  </Output>
+  <RelationshipOperations>
+    <AddToParentView Field="CONSTITUENTID" ParentViewRelatedField="ID" ParentView="V_QUERY_CONSTITUENT" PathAlias="MIMED Data"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

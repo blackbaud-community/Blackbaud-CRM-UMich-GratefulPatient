@@ -1,0 +1,57 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="1b4a6a24-e19c-47e9-b9c4-88d204bfa331"
+	Name="MIMED Referral Batch"
+	Description="Stores information about MIMED referral batch records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_REFERRALBATCH"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Name="BATCHID" ForeignTable="BATCH" />
+    <ForeignKeyField Name="REFERRERID" ForeignTable ="CONSTITUENT" Description ="Foreign key to the referrer's constituent record."/>
+    <GuidField Name="REFERRALID" ></GuidField>
+    <GuidField Name="UMHSID" Required="true"></GuidField>
+    <SequenceField Name="SEQUENCE"/>
+    <CodeTableField CodeTable="USR_UMHS_REFERRERROLECODE" Name="REFERRERROLECODEID"/>
+    <ForeignKeyField ForeignTable="USR_UMHS_DEPARTMENT" Name="DEPARTMENTID"/>
+    <ForeignKeyField ForeignTable="USR_UMHS_SUBDEPARTMENT" Name="SUBDEPARTMENTID"/>
+    <DateField Name ="REFERRALDATE" IncludeTime ="false" Description ="Date of referral."/>
+    <ForeignKeyField Name="UMHSDEVSTAFFID" ForeignTable="CONSTITUENT"  />
+    <BooleanField Name="FOLLOWUPCOMPLETED" Description="Follow-up Completed represents the completion of the follow-up with this the referral" DefaultValue="0"></BooleanField>
+    <EnumField Name="FOLLOWUPSTATUSCODE" Description="Follow-up Status represents the success or failure status of the follow-up" DefaultValue="0"  >
+      <EnumValues>
+        <EnumValue ID="0" Translation=" "/>
+        <EnumValue ID="1" Translation="Unsuccessful"/>
+        <EnumValue ID="2" Translation="Successful"/>
+      </EnumValues>
+    </EnumField>
+    <MemoField Name ="COMMENTS" Description ="Comments."/>
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name ="REFERRALID"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name ="REFERRERID"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name ="UMHSDEVSTAFFID"/>
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name ="UMHSID"/>
+      </IndexFields>
+    </Index>
+  </Indexes>
+
+</TableSpec>

@@ -1,0 +1,48 @@
+<DataListSpec
+    xmlns:c="bb_appfx_commontypes"
+    ID="f20767fc-abb4-424d-9537-8f3c05d74fa2"
+    Name="MIMED Team List"
+    Description="Returns all MIMED Team records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+  <SPDataList SPName="USR_USP_DATALIST_UMHS_TEAM">
+    <c:CreateProcedureSQL>
+      <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATALIST_UMHS_TEAM(@UMHSID uniqueidentifier)
+        AS
+            SET NOCOUNT ON;
+
+            SELECT T.[ID],
+                   C.NAME TEAMMEMBER,
+                   T.SITEID,
+                   SITE.[NAME],
+                   R.DESCRIPTION TEAMROLE,
+                   T.[STARTDATE],
+                   T.[ENDDATE]
+            FROM   DBO.USR_UMHS_TEAM T
+                   LEFT JOIN CONSTITUENT C
+                          ON C.ID = T.[TEAMMEMBERID]
+                   LEFT JOIN DBO.USR_UMHS_TEAMROLECODE R
+                          ON T.[TEAMROLECODEID] = R.ID
+                    LEFT join SITE 
+                          on SITE.[ID] = T.[SITEID]
+            WHERE  UMHSID = @UMHSID 
+
+        ]]>
+    </c:CreateProcedureSQL>
+  </SPDataList>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID"/>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="TEAMMEMBER" Caption="Team member" DataType="String" />
+      <OutputField FieldID="SITEID" Caption="Site ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="SITENAME" Caption="Site" DataType="String" />
+      <OutputField FieldID="TEAMROLE" Caption="Team role" DataType="String" />
+      <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date" />
+      <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

@@ -1,0 +1,20 @@
+﻿<TaskSpec
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="44520C35-8B27-4E68-9538-7F6475A6209A"
+	Name="MIMED Friend Constituent Duplicate Review"
+	Description="Show list of the MIMED Contact Duplicates Search and Cleanup history"
+	Author="UM Dev"
+	FunctionalAreaID="00050ce8-8abb-4a86-b9af-70a035ce0582"
+  Folder="Duplicates" 
+  FolderTaskGroup="Maintenance" 
+  FolderImageKey="CATALOG:Blackbaud.AppFx.Constituent.Catalog.dll,Blackbaud.AppFx.Constituent.Catalog.duplicateconstituentsfolder.png"
+	ImageKey="catalog:Blackbaud.AppFx.Constituent.Catalog.dll,Blackbaud.AppFx.Constituent.Catalog.mergedconstituentsearch.png"
+  TaskGroup="Duplicate constituent search process"
+	Sequence="552"  
+	>
+
+	<!-- indicate what this task should do (navigate to a page, show a form, etc. -->
+  <c:ShowPage PageID="a119b42e-a24c-4373-a183-ff279880229c"/>
+  
+</TaskSpec>

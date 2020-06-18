@@ -1,0 +1,28 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9a91f982-665c-417e-9a6a-ff57cc6784a6"
+	Name="MIMED Team"
+	Description="Stores information about MIMED team records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_TEAM"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Name="UMHSID" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" Required="true"/>
+	  <GuidField Description="The UM Organizational Site ID" Name="SITEID" />
+    <ForeignKeyField Name="TEAMMEMBERID" ForeignTable="CONSTITUENT"/>
+    <CodeTableField CodeTable="USR_UMHS_TEAMROLECODE" Name="TEAMROLECODEID"/>
+    <DateField Name="STARTDATE"/>
+    <DateField Name="ENDDATE"/>
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="TEAMMEMBERID"/>
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

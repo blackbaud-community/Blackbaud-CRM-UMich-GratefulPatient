@@ -1,0 +1,78 @@
+﻿<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="2787d0a0-59e9-47a3-9187-18d66cd71ed0"
+    Name="MIMED Batch Search"
+    Description="A search list for locating MIMED Batch records"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="09755eab-3180-42d1-bf8a-1df7c5bc43f4"
+	>
+
+	<!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be 
+	used to limit the number of rows returned to a reasonable number. -->
+	<SPSearchList SPName="USR_USP_SEARCHLIST_UMHS_BATCH_PROVIDERS_DUPCHECK">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_USP_SEARCHLIST_UMHS_BATCH_PROVIDERS_DUPCHECK
+(
+   @ID uniqueidentifier = null -- Provider ID
+  ,@PROVIDERDRNUMBER nvarchar(50) = null
+  ,@UMEMPLID nvarchar(200) = null
+  ,@UMUNIQUENAME nvarchar(200) = null
+	,@MAXROWS smallint = 500
+)
+as
+  select top(@MAXROWS)
+	   p.ID
+	  ,p.CONSTITUENTID
+	  ,p.PROVIDERDRNUMBER
+	  ,a1.ALTERNATELOOKUPID as UMEMPLID
+	  ,a2.ALTERNATELOOKUPID as UMUNIQUENAME
+	  ,c.KEYNAME as LASTNAME
+	  ,c.FIRSTNAME
+    ,p.DATECHANGED
+	  ,100.0 as MATCHPERCENTAGE
+	  ,N'PROVIDERDRNUMBER' as MATCHEDON
+  from dbo.USR_UMHS_PROVIDERS p
+  inner join dbo.CONSTITUENT c on c.ID=p.CONSTITUENTID
+  inner join dbo.ALTERNATELOOKUPID a1 on a1.CONSTITUENTID=c.ID
+  inner join dbo.ALTERNATELOOKUPIDTYPECODE atc1 on atc1.ID=a1.ALTERNATELOOKUPIDTYPECODEID
+  inner join dbo.ALTERNATELOOKUPID a2 on a2.CONSTITUENTID=c.ID
+  inner join dbo.ALTERNATELOOKUPIDTYPECODE atc2 on atc2.ID=a2.ALTERNATELOOKUPIDTYPECODEID
+  where
+	    p.PROVIDERDRNUMBER=@PROVIDERDRNUMBER
+  and atc1.ID = '97CE11D1-6793-47D5-9FEE-B54B90DA16DA'  -- University of Michigan ID-UMID	
+  and atc2.ID = '4073AA02-1416-4F6F-9238-9FCEFDEE6423'  -- U-M Uniqname
+    
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+			<FormField FieldID="PROVIDERDRNUMBER" Caption="Name" DataType="String" MaxLength="50" />
+      <FormField FieldID="UMEMPLID" Caption="U-M Employment ID" DataType="String" MaxLength="200" />
+      <FormField FieldID="UMUNIQUENAME" Caption="U-M Unique Name" DataType="String" MaxLength="200" />
+		</FormFields>
+	</FormMetaData>
+
+	<!-- also describe the output fields for the search screen -->
+	<Output>
+		<OutputFields>
+			<OutputField FieldID="ID" Caption="Provider" DataType="Guid" IsHidden="true" />
+      <OutputField FieldID="CONSTITUENTID" Caption="Constituent" DataType="Guid" />
+      <OutputField FieldID="PROVIDERDRNUMBER" Caption="Provider doctor number" DataType="String"/>
+      <OutputField FieldID="UMEMPLID" Caption="U-M Employee ID" DataType="String" />
+      <OutputField FieldID="UMUNIQUENAME" Caption="U-M Unique Name" DataType="String" />
+      <OutputField FieldID="LASTNAME" Caption="Provider's last name" DataType="String" />
+      <OutputField FieldID="FIRSTNAME" Caption="Provider's first name" DataType="String" />
+      <OutputField FieldID="DATECHANGED" Caption="Date changed" IsHidden="true" DataType="Date" DisplayDateAsDateTime="true" />
+      <OutputField FieldID="MATCHPERCENTAGE" Caption="% Match" DataType="Decimal"/>
+      <OutputField FieldID="MATCHEDON" Caption="Matched On" DataType="String" />
+		</OutputFields>
+	</Output>
+
+</SearchListSpec>
+

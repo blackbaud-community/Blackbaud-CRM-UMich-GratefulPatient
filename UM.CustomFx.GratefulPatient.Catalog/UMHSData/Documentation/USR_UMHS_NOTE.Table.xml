@@ -1,0 +1,184 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="78c35e45-9b1d-4afc-b00a-445615f7cb17"
+	Name="USR_UMHS_NOTE"
+	Description="Stores information about usr MIMED note records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_NOTE"		   
+	IsBuiltIn="false"
+	>
+  <Fields>
+    <DateField Description="The date the note was entered." Name="DATEENTERED" Required="true" />
+    <TextField Description="The title of the note." Name="TITLE" Length="50" DefaultValue="" />
+    <ForeignKeyField Description="The author of the note" Name="AUTHORID" ForeignTable="CONSTITUENT" />
+    <MemoField Description="The plain text that comprises this note." Name="TEXTNOTE" />
+    <CodeTableField Description="Indicates the user-defined type of this note." Name="UMHSNOTETYPECODEID" CodeTable="USR_UMHS_NOTETYPECODE" Required="true" />
+    <ForeignKeyField Description="The MIMED record to which this note belongs." Name="UMHSID" Required="true" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" />
+    <MemoField Description="The HTML that comprises this note." Name="HTMLNOTE" />
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="AUTHORID" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+  <Triggers>
+    <Trigger Name="TR_UMHSNOTE_INSERT_HTMLPOPULATE" Description="Used to fill the HTMLNOTE field when the value is not supplied.">
+      <CreateTriggerSQL>
+      <![CDATA[
+              create trigger TR_UMHSNOTE_INSERT_HTMLPOPULATE on dbo.USR_UMHS_NOTE after insert not for replication
+              as begin
+              update dbo.USR_UMHS_NOTE
+              set HTMLNOTE = dbo.UFN_BUILDHTMLNOTE(TEXTNOTE)
+              where ID in(select ID from inserted)
+              and HTMLNOTE = ''
+              and TEXTNOTE <> ''
+              end
+      ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHSNOTE_TASYNC_I" Enabled="false">
+      <CreateTriggerSQL>
+      <![CDATA[
+              create trigger TR_UMHSNOTE_TASYNC_I on dbo.USR_UMHS_NOTE after insert not for replication
+              as begin
+              if dbo.UFN_B2T_CONTEXTISSYNC() = 0
+              begin
+              insert into dbo.TA_USR_UMHS_NOTE (ID, SYNCID, ACTIONCODE)
+              select INSERTED.ID, newid(), 1
+              from INSERTED
+              -- only insert notes using codes mapped from interactions
+              inner join dbo.B2TROWS as jcontact_type on jcontact_type.TATABLE = 'CONTACT_TYPE' and jcontact_type.BBECTABLE = 'USR_UMHS_NOTETYPECODE' and jcontact_type.BBECID = INSERTED.UMHSNOTETYPECODEID
+              -- don't sync records for groups
+              where not exists(select 'x'
+              from dbo.GROUPDATA d
+              where d.ID = INSERTED.UMHSID
+              and d.GROUPTYPECODE = 1);
+
+              -- note that the above insert could fail if row is deleted and then reinserted w/ same ID before sync is run
+              -- since we would not know anything about whether the row is really the same or not, we need to throw an exception
+              -- to resolve, run the sync, then retry the insert
+
+              update dbo.TA_USR_UMHS_DATA
+              set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+              where ID in(select INSERTED.UMHSID
+              from INSERTED
+              inner join dbo.USR_UMHS_NOTETYPECODE c on c.ID = INSERTED.USR_UMHS_NOTETYPECODEID
+              where c.DESCRIPTION = 'Patient Comments');
+
+              if @@ROWCOUNT > 0
+              update dbo.TA_ACCOUNTS
+              set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+              where ID in(select INSERTED.UMHSID
+              from INSERTED
+              inner join dbo.USR_UMHS_NOTEYPECODE c on c.ID = INSERTED.UMHSNOTETYPECODEID
+              where c.DESCRIPTION = 'Patient Comments');
+              end
+              end
+      ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHSNOTE_TASYNC_U" Enabled="false">
+      <CreateTriggerSQL>
+        <![CDATA[
+                create trigger TR_UMHSNOTE_TASYNC_U on dbo.USR_UMHS_NOTE after update not for replication
+                as begin
+                if dbo.UFN_B2T_CONTEXTISSYNC() = 0
+                begin
+                -- normally this is triggering an update of interactions
+                -- if notetypecode changed from one not mapped to interactions to one that is, this triggers an insert instead
+                merge dbo.TA_USR_UMHS_NOTE t
+                using (select i.ID
+                from INSERTED i
+                -- only keep notes using codes mapped from interactions
+                inner join dbo.B2TROWS as jcontact_type on jcontact_type.TATABLE = 'CONTACT_TYPE' and jcontact_type.BBECTABLE = 'USR_UMHS_NOTETYPECODE' and jcontact_type.BBECID = i.UMHSNOTETYPECODEID
+                where not exists(select 'x'
+                from dbo.GROUPDATA d
+                where d.ID = i.UMHSID
+                and d.GROUPTYPECODE = 1)) u
+                on (t.ID = u.ID)
+                when matched then
+                update set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+                when not matched then
+                insert (ID, SYNCID, ACTIONCODE) values (u.ID, newid(), 1);
+
+                -- if notetypecode changed to one not mapped to interactions, delete the interaction from TA
+                merge dbo.TA_USR_UMHS_NOTE t
+                using (select i.ID
+                from INSERTED i
+                where not exists(select 'x'
+                from dbo.B2TROWS jcontact_type
+                where jcontact_type.TATABLE = 'CONTACT_TYPE'
+                and jcontact_type.BBECTABLE = 'USR_UMHS_NOTETYPECODE'
+                and jcontact_type.BBECID = i.UMHSNOTETYPECODEID)) u
+                on (t.ID = u.ID)
+                when matched and t.ACTIONCODE = 1 then
+                delete
+                when matched then
+                update set ACTIONCODE = 3;
+
+                update dbo.TA_USR_UMHS_DATA
+                set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+                where ID in(select INSERTED.UMHSID
+                from INSERTED
+                inner join dbo.USR_UMHS_NOTETYPECODE c on c.ID = INSERTED.UMHSNOTETYPECODEID
+                where c.DESCRIPTION = 'Patient Comments');
+
+                if @@ROWCOUNT > 0
+                update dbo.TA_ACCOUNTS
+                set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+                where ID in(select INSERTED.UMHSID
+                from INSERTED
+                inner join dbo.USR_UMHS_NOTETYPECODE c on c.ID = INSERTED.UMHSNOTETYPECODEID
+                where c.DESCRIPTION = 'Patient Comments');
+                end
+                end
+        ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+    <Trigger Name="TR_UMHSNOTE_TASYNC_D" Enabled="false">
+      <CreateTriggerSQL>
+        <![CDATA[
+                create trigger TR_UMHSNOTE_TASYNC_D on dbo.USR_UMHS_NOTE after delete not for replication
+                as begin
+                if dbo.UFN_B2T_CONTEXTISSYNC() = 1
+                delete from dbo.TA_USR_UMHS_NOTE
+                where ID in(select ID from DELETED)
+                else
+                begin
+                merge dbo.TA_USR_UMHS_NOTE t
+                using (select ID from DELETED) d
+                on (d.ID = t.ID)
+                when matched and t.ACTIONCODE = 1 then
+                delete
+                when matched then
+                update set ACTIONCODE = 3;
+
+                update dbo.TA_USR_UMHS_DATA
+                set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+                where ID in(select DELETED.UMHSID
+                from DELETED
+                inner join dbo.USR_UMHS_NOTETYPECODE c on c.ID = DELETED.UMHSNOTETYPECODEID
+                where c.DESCRIPTION = 'Patient Comments');
+
+                if @@ROWCOUNT > 0
+                update dbo.TA_ACCOUNTS
+                set ACTIONCODE = case when ACTIONCODE=1 then 1 else 2 end
+                where ID in(select DELETED.UMHSID
+                from DELETED
+                inner join dbo.USR_UMHS_NOTETYPECODE c on c.ID = DELETED.UMHSNOTETYPECODEID
+                where c.DESCRIPTION = 'Patient Comments');
+                end
+                end
+        ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+  </Triggers>
+</TableSpec>

@@ -1,0 +1,61 @@
+<DataListSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="3c124409-8ce0-41af-8111-156b7fd98b5b"
+    Name="MIMED Interest List"
+    Description="Returns all MIMED Interest records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Interactions2.DataList" />
+
+  <SPDataList SPName="USR_USP_DATALIST_UMHS_INTEREST">
+        <c:CreateProcedureSQL>
+        <![CDATA[
+        create procedure dbo.USR_USP_DATALIST_UMHS_INTEREST( @UMHSID UNIQUEIDENTIFIER)
+        as
+	        set nocount on;
+
+          SELECT I.[ID],
+                  ITC.DESCRIPTION,
+                  I.[INTERESTLEVEL],
+                  dbo.USR_UFN_UMHS_INTEREST_GETDEPTLIST(I.ID)  as DEPARTMENTS,
+                  dbo.USR_UFN_UMHS_INTEREST_GETSUBDEPTLIST(I.ID) as SUBDEPARTMENTS,
+                  I.[COMMENT],
+                  C.NAME,                  
+                  I.[STARTDATE],
+                  I.[ENDDATE]
+          FROM   DBO.USR_UMHS_INTEREST I
+                  JOIN DBO.USR_UMHS_INTERESTTYPECODE ITC
+                    ON I.[INTERESTTYPECODEID] = ITC.ID
+                  LEFT JOIN CONSTITUENT C
+                        ON C.ID = I.DISCOVEREDBYID 
+
+          where UMHSID = @UMHSID
+
+        ]]>
+        </c:CreateProcedureSQL>
+    </SPDataList>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID"/>
+    <Output>
+        <OutputFields>
+            <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+            <OutputField FieldID="INTERESTTYPECODEID" Caption="Interest type" DataType="Guid" />
+            <OutputField FieldID="INTERESTLEVELCODE" Caption="Interest level" DataType="String" />
+          <OutputField FieldID="DEPARTMENTS" Caption="MIMED department" DataType="String"  >
+            <InstalledProductList xmlns="bb_appfx_commontypes">
+              <InstalledProduct ID="133f9bca-00f1-4007-9792-586b931340c6" />
+            </InstalledProductList>
+          </OutputField>
+          <OutputField FieldID="SUBDEPARTMENTS" Caption="MIMED subdepartment" DataType="String" >
+            <InstalledProductList xmlns="bb_appfx_commontypes">
+              <InstalledProduct ID="133f9bca-00f1-4007-9792-586b931340c6" />
+            </InstalledProductList>
+          </OutputField>
+          <OutputField FieldID="COMMENT" Caption="Comment" DataType="String" />
+            <OutputField FieldID="DISCOVEREDBYID" Caption="Discovered by" DataType="String" />
+            <OutputField FieldID="STARTDATE" Caption="Start date" DataType="Date" />
+            <OutputField FieldID="ENDDATE" Caption="End date" DataType="Date" />
+        </OutputFields>
+    </Output>
+</DataListSpec>

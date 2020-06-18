@@ -1,0 +1,66 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="fa2af202-53d3-4096-ac32-167c5e44bf55"
+	Name="UFN_UMHS_PROSPECTPLANSUMMARY"
+	Description="UFN_UMHS_PROSPECTPLANSUMMARY"
+	Author="UM Dev"
+	DBFunctionName="UFN_UMHS_PROSPECTPLANSUMMARY"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+CREATE function dbo.UFN_UMHS_PROSPECTPLANSUMMARY()
+returns table
+as
+  return (
+  select
+	U.ID,
+	U.CONSTITUENTID,
+	--C.ID as ConstituentID,
+	(
+		select
+			max(ACTUALDATE)
+		from
+			dbo.PROSPECTPLAN PP
+			inner join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID=PP.ID
+		where
+			PP.PROSPECTID=C.ID
+	) LASTSTEP,
+	case when PP.ISACTIVE = 1 and datediff(day,(
+		select
+			max(ACTUALDATE)
+		from
+			dbo.PROSPECTPLAN PP
+			inner join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID=PP.ID
+		where
+			PP.PROSPECTID=C.ID
+	),getdate())>=90 then 'RES:warning' else '' end NORECENT,
+	(
+		select min(I.EXPECTEDDATE)
+		from PROSPECTPLAN PP
+			inner join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID=PP.ID
+		where
+			PP.PROSPECTID=C.ID and
+			I.ID = dbo.UFN_PROSPECTPLAN_GETNEXTSTEP(PP.ID) and
+			I.COMPLETED=0
+	) NEXTSTEP,
+	NF.NAME,
+	U.KEYNAME,	
+	DBO.USR_UFN_UMHS_INTERACTION_GETSITELIST(I.ID) AS SITES
+	from 
+		dbo.USR_UMHS_DATA U 
+		left join dbo.CONSTITUENT C on C.ID = U.CONSTITUENTID 
+		left join dbo.USR_UMHS_INTERACTION I on I.PROSPECTPLANID = C.ID
+		left outer join dbo.PROSPECTPLAN PP on PP.PROSPECTID=C.ID
+	    outer apply dbo.USR_UFN_UMHS_DISPLAYNAME(U.ID) NF
+	  --outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(C.ID) NF
+	where
+	  dbo.UFN_CONSTITUENT_ISPROSPECT(C.ID) = 1
+	)
+		
+	
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

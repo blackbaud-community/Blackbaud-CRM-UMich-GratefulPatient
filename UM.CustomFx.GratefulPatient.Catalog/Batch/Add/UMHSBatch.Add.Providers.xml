@@ -1,0 +1,248 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0272ec61-5829-4b10-a132-1d764d5297fa" 
+	Name="MIMED Batch Add Provider Data Form"
+	Description="MIMED Batch Add Provider Data Form" 
+	Author="UM Dev"
+	DataFormInstanceID="b6c7c897-8a33-49f0-a598-7e5ab1d216c1" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Add MIMED batch Provider data"
+	>
+
+	<SPDataForm>
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCH_PROVIDER">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCH_PROVIDER
+(
+   @ID uniqueidentifier = null output
+  ,@CHANGEAGENTID uniqueidentifier = null
+  ,@BATCHID uniqueidentifier
+  ,@SEQUENCE int = NULL
+  -- Batch fields
+  ,@PROVIDERID uniqueidentifier = null    -- Primary Record ID
+  ,@CONSTITUENTID uniqueidentifier = null
+  ,@PROVIDERDRNUMBER nvarchar(50) = ''
+  ,@UMEMPLID nvarchar(200) = ''
+  ,@UMUNIQUENAME nvarchar(200) = ''
+  ,@LASTNAME nvarchar(200) = ''
+  ,@FIRSTNAME nvarchar(100) = ''
+  ,@PHONE nvarchar(100) = ''
+  ,@ADMITDOCTORIND bit  = 0
+  ,@ATTENDDOCTORIND bit  = 0
+  ,@RESIDENTDOCTORIND bit  = 0
+  ,@CONSULTDOCTORIND bit  = 0
+  ,@DEPARTMENTID uniqueidentifier = null
+  ,@SUBDEPARTMENTID uniqueidentifier = null
+  ,@UMHSDATA_LASTPROCDATE datetime = null
+)
+as
+
+set nocount on;
+
+if @ID is null
+    set @ID = newid()
+
+if @CHANGEAGENTID is null  
+    exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+
+declare @CURRENTDATE datetime
+
+set @CURRENTDATE = getdate()
+
+begin try
+
+  /*
+   * Get constituent record for this Provider
+   */    
+  if @PROVIDERID is NOT NULL
+  begin
+    select @CONSTITUENTID=CONSTITUENTID from USR_UMHS_PROVIDERS where ID=@PROVIDERID
+  end
+  
+  /*
+   * There isn't a matching/existing Provider, so see if there is an existing Constituent
+   * record for the new Provider based on either the UMEMPLID and/or the UMUNIQUENAME. 
+   * If there isn't, then this could be a newly hired Provider that hasn't been brought into
+   * DART via the HRMS import process. If this is the case, then the Commit will create a 
+   * shell Constituent record with the UMEMPLID and/or the UMUNIQUENAME assigned to the new
+   * Constituent record. This allows the HRMS Import to find the new Constituent shell record
+   * and update it with the imported HRMS data.
+   */
+  if @CONSTITUENTID is NULL
+  begin
+    select
+        @CONSTITUENTID = c.ID
+    from constituent c
+    inner join alternatelookupid a on a.CONSTITUENTID=c.ID
+    inner join ALTERNATELOOKUPIDTYPECODE atc on atc.ID=a.ALTERNATELOOKUPIDTYPECODEID
+    where
+	      a.ALTERNATELOOKUPID=@UMEMPLID
+    and atc.ID='97CE11D1-6793-47D5-9FEE-B54B90DA16DA' -- University of Michigan ID-UMID
+  end
+      
+  if @CONSTITUENTID is NULL
+  begin
+    select
+      @CONSTITUENTID = c.ID
+    from constituent c
+    inner join alternatelookupid a on a.CONSTITUENTID=c.ID
+    inner join ALTERNATELOOKUPIDTYPECODE atc on atc.ID=a.ALTERNATELOOKUPIDTYPECODEID
+    where
+	  a.ALTERNATELOOKUPID=@UMUNIQUENAME
+    and atc.ID='4073AA02-1416-4F6F-9238-9FCEFDEE6423' -- U-M Uniqname
+  end
+
+
+	-- handle inserting the data
+	insert into dbo.USR_UMHS_BATCH_PROVIDERS
+		( ID
+      ,BATCHID
+      ,SEQUENCE
+      ,PROVIDERID
+      ,CONSTITUENTID
+      ,PROVIDERDRNUMBER
+      ,UMEMPLID
+      ,UMUNIQUENAME
+      ,LASTNAME
+      ,FIRSTNAME
+      ,PHONE
+      ,ADMITDOCTORIND
+      ,ATTENDDOCTORIND
+      ,RESIDENTDOCTORIND
+      ,CONSULTDOCTORIND
+      ,DEPARTMENTID
+      ,SUBDEPARTMENTID
+      ,UMHSDATA_LASTPROCDATE
+      ,ADDEDBYID
+      ,CHANGEDBYID
+      ,DATEADDED
+      ,DATECHANGED)
+    values
+		( @ID
+      ,@BATCHID
+      ,@SEQUENCE
+      ,@PROVIDERID
+      ,@CONSTITUENTID
+      ,@PROVIDERDRNUMBER
+      ,@UMEMPLID
+      ,@UMUNIQUENAME
+      ,@LASTNAME
+      ,@FIRSTNAME
+      ,@PHONE
+      ,@ADMITDOCTORIND
+      ,@ATTENDDOCTORIND
+      ,@RESIDENTDOCTORIND
+      ,@CONSULTDOCTORIND
+      ,@DEPARTMENTID
+      ,@SUBDEPARTMENTID
+      ,@UMHSDATA_LASTPROCDATE
+      ,@CHANGEAGENTID
+      ,@CHANGEAGENTID
+      ,@CURRENTDATE
+      ,@CURRENTDATE)
+
+	
+end try
+
+begin catch
+    exec dbo.USP_RAISE_ERROR
+    return 1
+end catch
+
+return 0				
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe the context ID for this form (if applicable), which corresponds to a parameter in the SP. -->
+	<Context ContextRecordType="Batch" RecordIDParameter="BATCHID"/>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="PROVIDERID" DataType="Guid" Caption="Provider" Hidden="false">
+        <SearchList SearchListID="861770a7-f57c-42dc-b2ad-07c16f9f8aa1"  EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Constituent" Hidden="false">
+        <SearchList SearchListID="27dffa05-1147-4ceb-a0da-36158da56b98"  EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="SEQUENCE" Caption="Sequence" DataType="Integer"  Required="true" Hidden="true" />
+      <FormField FieldID="PROVIDERDRNUMBER" Caption="Provider DR Number" Description="Provider DR Number" DataType="String" MaxLength="50" Required="true"/>
+      <FormField FieldID="UMEMPLID" Caption="U-M Employment ID" Description="U-M Employment ID" DataType="String" MaxLength="200" />
+      <FormField FieldID="UMUNIQUENAME" Caption="U-M Unique Name" Description="U-M Unique Name" DataType="String" MaxLength="200" />
+      <FormField FieldID="LASTNAME" Caption="Last Name" Description="Provider's last name" DataType="String" MaxLength="200" />
+      <FormField FieldID="FIRSTNAME" Caption="First Name" Description="Provider's first name" DataType="String" MaxLength="100" />
+      <FormField FieldID="PHONE" Caption="Phone" Description="Provider's Phone" MaxLength="100"  Category="Phone" DataType="String" ApplyPhoneFormatting="true"/>
+      <FormField FieldID="ADMITDOCTORIND" Caption="Admitting Provider" Description="Admitting Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="ATTENDDOCTORIND" Caption="Attending Provider" Description="Attending Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="RESIDENTDOCTORIND" Caption="Resident Provider" Description="Resident Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="CONSULTDOCTORIND" Caption="Consulting Provider" Description="Consulting Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="DEPARTMENTID" Caption="Department" Description="MIMED department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="df5aac7a-1861-4c47-8649-85f405d95ce7"/>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" Caption="Subdepartment" Description="MIMED Sub-Department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="287fe463-4ca5-40e7-8064-3df34dd15864" />
+      </FormField>
+      <FormField FieldID="UMHSDATA_LASTPROCDATE" Description="UMHSDATA Import of the Process Date." Caption="UMHSDATA Import process date" DataType="Date" IncludeTimeOnDate="true" Category="UMHSDATA Import (only)" />
+    </FormFields>
+	</FormMetaData>
+
+</AddDataFormTemplateSpec>

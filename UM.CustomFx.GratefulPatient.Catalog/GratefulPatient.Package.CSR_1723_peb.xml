@@ -1,0 +1,21 @@
+﻿<PackageSpec 
+	xmlns="bb_appfx_package"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0228e275-10df-4f1d-ab03-40727a73e8c4" 
+	Name="Grateful Patient Package - Fix for MIMED Provider import always requiring both a UM ID and Unique Name (1723_peb)"
+	Description="Fix for MIMED Provider import always requiring both a UM ID and Unique Name (1723_peb)" 
+	Author="UM Dev"
+	>
+
+	
+	<DependencyList xmlns="bb_appfx_commontypes">
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH_PROVIDERS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.Provider.ConstituentID.Search.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD.xml" />
+  </DependencyList>
+
+</PackageSpec>

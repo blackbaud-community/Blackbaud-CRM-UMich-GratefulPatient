@@ -1,0 +1,11 @@
+﻿<CodeTableSpec 
+	xmlns="bb_appfx_codetable" 
+	xmlns:c="bb_appfx_commontypes"
+	ID="74695dab-405d-4e6d-8fc5-d6faa1250612" 
+	Name="MIMED Team Role"
+	Description="Stores translations for MIMED team role codes"
+	Author="UM Dev"
+	DBTablename="USR_UMHS_TEAMROLECODE"
+	Category="MIMED Data"
+	SortMethod="Alpha"
+/>

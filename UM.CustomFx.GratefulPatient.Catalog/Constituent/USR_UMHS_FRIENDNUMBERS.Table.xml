@@ -1,0 +1,31 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="dfb0d191-01e3-4980-9f95-ec6153a2d9f8"
+	Name="MIMED FRIENDNUMBERS"
+	Description="Stores information about usr MIMED friendnumbers records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_FRIENDNUMBERS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <GuidField Name="CONSTITUENTID" Description="Constituent Id" IsUnique="true" Required="true"/>
+    <NumberField Name="UMHSFRIENDNUMBER" Description="MIMED Friend Number for Keyname field on Constituent" Type="bigint" />
+	</Fields>
+  
+	<!-- define any indexes on the table -->
+	<Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID"/>
+      </IndexFields>
+    </Index>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="UMHSFRIENDNUMBER"/>
+      </IndexFields>
+    </Index>
+	</Indexes>
+</TableSpec>

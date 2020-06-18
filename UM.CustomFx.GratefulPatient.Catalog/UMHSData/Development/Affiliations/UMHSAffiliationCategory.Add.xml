@@ -1,0 +1,93 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="a31a1cde-732e-441f-853a-92c6834c9a7d" 
+	Name="MIMED Affiliation Category Add Data Form"
+	Description="A data form for adding MIMED affiliation category records." 
+	Author="UM Dev"
+	DataFormInstanceID="6d088c8f-faac-42f7-82af-fbc96081a41e" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+  HelpKey="ConstituentAffiliations.html"  
+	FormHeader="Add MIMED Affiliation Category"
+	>
+
+	<SPDataForm>
+		<!-- describe the preload SP (if applicable), which should be used to fetch field default values from the database.  If no
+		preload is needed, then this section can be removed -->
+    <SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSAFFILIATIONCATEGORY">
+      <c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSAFFILIATIONCATEGORY
+(
+               @ID uniqueidentifier = null output,
+               @CHANGEAGENTID uniqueidentifier = null,
+               @UMHSAFFILIATIONBASENAME varchar(100) = null,
+               @UMHSAFFILIATIONBASEDESCRIPTION varchar(500) = null,
+               @UMHSAFFILIATIONCATEGORYCODEID uniqueidentifier = null
+              )
+              as
+ 
+              set nocount on;
+ 
+              if @ID is null
+                set @ID = newid()
+ 
+              if @CHANGEAGENTID is null  
+                exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+ 
+              declare @CURRENTDATE datetime
+              set @CURRENTDATE = getdate()
+ 
+              BEGIN TRY
+                  -- handle inserting the data
+                  INSERT INTO dbo.USR_UMHS_AFFILIATIONBASE
+                  (
+                  ID,
+                  UMHSAFFILIATIONBASENAME,
+                  UMHSAFFILIATIONBASEDESCRIPTION,
+                  UMHSAFFILIATIONCATEGORYCODEID,
+                  ADDEDBYID,
+                  CHANGEDBYID,
+                  DATEADDED,
+                  DATECHANGED
+                  )
+                  VALUES
+                  (
+                  @ID,
+                  @UMHSAFFILIATIONBASENAME,
+                  @UMHSAFFILIATIONBASEDESCRIPTION,
+                  @UMHSAFFILIATIONCATEGORYCODEID,
+                  @CHANGEAGENTID,
+                  @CHANGEAGENTID,
+                  @CURRENTDATE,
+                  @CURRENTDATE
+                  )
+                   
+              END TRY
+ 
+              BEGIN CATCH
+                exec dbo.USP_RAISE_ERROR
+                return 1
+              END CATCH
+ 
+              return 0          	
+				]]>
+			</c:CreateProcedureSQL>
+    </SaveImplementation>
+  </SPDataForm>
+
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="UMHSAFFILIATIONCATEGORYCODEID" DataType="Guid" Required="true" Caption="MIMED Category">
+        <CodeTable CodeTableName="USR_UMHS_AFFILIATIONCATEGORYTYPECODE" />
+      </FormField>
+      <FormField FieldID="UMHSAFFILIATIONBASENAME" Required="true" MaxLength="100" Caption="MIMED Affiliation name" />
+      <FormField FieldID="UMHSAFFILIATIONBASEDESCRIPTION" MaxLength="500" Caption="MIMED Affiliation description" />
+    </FormFields>
+  </FormMetaData>
+
+</AddDataFormTemplateSpec>

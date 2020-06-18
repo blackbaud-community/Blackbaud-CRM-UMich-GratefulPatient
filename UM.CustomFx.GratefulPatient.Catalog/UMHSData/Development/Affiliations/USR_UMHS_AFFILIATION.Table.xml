@@ -1,0 +1,49 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="1ca27562-7062-4650-adea-5f36bfc78d69"
+	Name="MIMED Affiliation"
+	Description="Stores information about MIMED affiliation records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_AFFILIATION"		   
+	IsBuiltIn="false"
+	>
+	<!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Description="MIMED ID" Name="UMHSID" ForeignTable="USR_UMHS_DATA" OnDelete="CascadeDelete" Required="true" />
+    <GuidField Description="Affiliation base name" Name="AFFILIATIONBASENAMECODEID" />
+    <DateField Description="Start Date of the Affiliation" Name="STARTDATE" />
+    <DateField Description="End Date of the Affiliation" Name="ENDDATE" />
+    <!--<ForeignKeyField Name="SITEID" ForeignTable="SITE" OnDelete="CascadeDelete" Required="true"/>-->
+    <GuidField Description="The UM Organizational SITE ID" Name="SITEID"/>
+    <GuidField Description="The MIMED department ID" Name="DEPARTMENTID"/>
+    <GuidField Description="The MIMED Sub-Department ID" Name="SUBDEPARTMENTID"/>
+    <!--<BooleanField Description="Opt out of the Affiliation" Name="OPTOUT" />-->
+    <TextField Description="Comments" Name="COMMENTS" Length="500" />
+    <!--<CodeTableField Name="INFOSOURCECODEID" CodeTable="INFOSOURCECODE" />-->
+  </Fields>
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+      </IndexFields>
+      <IncludeFields>
+        <IncludeField Name="AFFILIATIONBASENAMECODEID" />
+        <IncludeField Name="SITEID"/>
+        <IncludeField Name="DEPARTMENTID"/>
+        <IncludeField Name="SUBDEPARTMENTID"/>
+        <IncludeField Name="STARTDATE" />
+      </IncludeFields>
+    </Index>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="UMHSID" />
+        <IndexField Name="AFFILIATIONBASENAMECODEID" />
+        <IndexField Name="SITEID"/>
+        <IndexField Name="DEPARTMENTID"/>
+        <IndexField Name="SUBDEPARTMENTID"/>
+        <IndexField Name="STARTDATE" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

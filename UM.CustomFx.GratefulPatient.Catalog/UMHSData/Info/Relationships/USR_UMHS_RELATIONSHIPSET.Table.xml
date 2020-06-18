@@ -1,0 +1,9 @@
+﻿<TableSpec
+	  xmlns="bb_appfx_table"
+	  xmlns:c="bb_appfx_commontypes" 
+    ID="7645f947-dae8-438d-813e-ff92b1689d1f"
+    Name="USR_UMHS_RELATIONSHIPSET"
+    Description="This table stores the set id for sets of MIMED Data relationships."
+    Author="UM Dev"
+    Tablename="USR_UMHS_RELATIONSHIPSET" 
+    IsBuiltIn="false" />

@@ -1,0 +1,26 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c84f45d7-bdba-464b-bf1e-c8f1ff5b1f8f"
+	Name="USR_UMHS_AFFILIATIONBASE"
+	Description="Stores information about usr MIMED affiliationbase records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_AFFILIATIONBASE"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+  <Fields>
+    <TextField Description="MIMED Affiliation Base Name" Name="UMHSAFFILIATIONBASENAME" Length="100" Required="true" />
+    <TextField Description="MIMED Affiliation Base Description" Name="UMHSAFFILIATIONBASEDESCRIPTION" Length="500" />
+    <CodeTableField Description="Category for the MIMED affiliation base" Name="UMHSAFFILIATIONCATEGORYCODEID" CodeTable="USR_UMHS_AFFILIATIONCATEGORYTYPECODE" Required="true" />
+  </Fields>
+  <Indexes>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="UMHSAFFILIATIONBASENAME" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+
+</TableSpec>

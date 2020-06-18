@@ -1,0 +1,69 @@
+﻿<PageDefinitionSpec 
+    xmlns="bb_appfx_pagedefinition" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="75919bcc-5e6b-4e89-acae-2e75bd1fdbef"
+    Name="MIMED Affiliation Configuration Page"
+    Description="A page for displaying information about MIMED affiliation configuration records"
+    Author="UM Dev"
+    ExpressionDataFormID="00000000-0000-0000-0000-000000000000"
+    ContextRecordType="MIMED Data"	
+    >
+
+	<!-- Note:  A page can optionally have a view form associated with it as the "Expression form".  While implemented as a view data form,
+	this form has no UI in this context, and is simply used as a way of loading additional information associated with the page.  The fields
+	returned by the expression form can be used as expressions in various properties throughout the page.  To specify an expression form for this
+	page, add the following attribute:		ExpressionDataFormID="<some guid>"-->
+
+	<!-- define how the page header should appear -->
+	<PageHeader Caption="MIMED Affiliation Configuration" />
+
+	<!-- define the tabs for the page - note that if only one tab is present, then that tab's sections are promoted to the page level (ie., the tab
+	itself isn't shown -->
+	<Tabs>
+		<Tab ID="fabef31d-681f-4527-a509-02b5bd92dcb2" Caption="MIMED Affiliation">
+
+			<!-- define the sections for this tab -->
+			<Sections>
+				<Section ID="33bdc726-e8ae-4445-b76a-a927b4c75b76" Caption="MIMED Affiliation">
+					<DataList ID="cf9e44ce-c397-43b9-8157-3f20d14efb0f" ShowBorder="true">
+						<RenderStyle>
+							<StandardView/>
+						</RenderStyle>
+					</DataList>
+
+					<!-- define the section-level actions -->
+					<Actions>
+            <Action ID="8fe9324f-1bd0-4237-847b-b7fcd0465f4a" Caption="Add" ImageKey="res:newitem">
+              <ShowAddDataForm DataFormID="6d088c8f-faac-42f7-82af-fbc96081a41e" xmlns="bb_appfx_commontypes">
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ShowAddDataForm>
+            </Action>
+            <Action ID="80f4b34c-e1fd-46a9-8234-ce15147f50dd" Caption="Edit" ImageKey="RES:Edit">
+              <ShowDataForm DataFormID="e1dbfdfd-f8c3-4760-b290-2738186ad0b2" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ShowDataForm>
+            </Action>
+            <Action ID="3698c446-553f-4adc-a147-6110abeb7162" Caption="Delete" ImageKey="RES:Delete">
+              <ExecuteRecordOperation RecordOperationID="09eee87b-5776-4de1-bee2-a442f8bb3a2c" xmlns="bb_appfx_commontypes">
+                <ActionContext>
+                  <SectionField>ID</SectionField>
+                </ActionContext>
+                <PostActionEvent>
+                  <RefreshPage />
+                </PostActionEvent>
+              </ExecuteRecordOperation>
+            </Action>
+          </Actions>					
+				</Section>
+			</Sections>
+		</Tab>
+	</Tabs>
+	
+</PageDefinitionSpec>

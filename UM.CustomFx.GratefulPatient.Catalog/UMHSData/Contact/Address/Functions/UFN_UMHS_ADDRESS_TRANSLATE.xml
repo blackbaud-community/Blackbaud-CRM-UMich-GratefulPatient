@@ -1,0 +1,26 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="4f40b088-26bc-4e81-9137-40fd869bd5e7"
+	Name="USR_UFN_UMHS_ADDRESS_TRANSLATE"
+	Description="Builds the address for the MIMED contact address"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_ADDRESS_TRANSLATE"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+    CREATE FUNCTION dbo.USR_UFN_UMHS_ADDRESS_TRANSLATE(@ID AS UNIQUEIDENTIFIER)
+    RETURNS NVARCHAR(300)
+    AS
+      BEGIN
+          RETURN
+            (SELECT DBO.UFN_BUILDFULLADDRESS(ADDRESS.ID, ADDRESS.ADDRESSBLOCK, ADDRESS.CITY, ADDRESS.STATEID, ADDRESS.POSTCODE, ADDRESS.COUNTRYID)
+             FROM   DBO.USR_UMHS_ADDRESS ADDRESS
+             WHERE  ADDRESS.ID = @ID);
+      END 
+
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

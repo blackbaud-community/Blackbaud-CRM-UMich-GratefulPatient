@@ -1,0 +1,172 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ff6f707f-f707-412b-85b3-95789aeaf9a0"
+	Name="USP_USR_UMHS_BATCH_ADD_INDIVIDUAL"
+	Description="Add MIMED Data Individual"
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_BATCH_ADD_INDIVIDUAL"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_BATCH_ADD_INDIVIDUAL
+(
+   @CHANGEAGENTID uniqueidentifier
+  ,@CONSTITUENTID uniqueidentifier    -- Primary record ID
+  ,@MRN           nvarchar(50)        -- required
+  ,@CPISEQUENCE   nvarchar(50)        -- required
+  ,@FIRSTNAME     nvarchar(50) = ''
+  ,@MIDDLENAME    nvarchar(50) = ''
+  ,@LASTNAME      nvarchar(100)       -- required
+  ,@SUFFIXCODEID  uniqueidentifier
+  ,@BIRTHDATE     udt_fuzzydate = null
+  ,@ADDRESSBLOCK       nvarchar(500) = ''
+  ,@CITY          nvarchar(100) = ''
+  ,@STATEID   uniqueidentifier = null
+  ,@POSTCODE       nvarchar(24) = ''
+  ,@ADDRESSCOUNTRYID uniqueidentifier = '27CF0F7D-CDAF-448F-80DE-E9196BF28D36'            -- United States
+  ,@ADDRESSTYPECODEID uniqueidentifier = '68F9E4F9-0F55-4EDC-8369-8773B6E95245'           -- Home
+  ,@INFOSOURCECODEID uniqueidentifier = '3c3c7fa4-d8c3-444c-96a8-34a773493137'            -- Med/Hospital Batch
+  ,@HISTORICALSTARTDATE date = null
+  ,@PHONE nvarchar(200) = ''
+  ,@PHONETYPECODEID uniqueidentifier = '7F1CF5D0-468C-4FD8-933A-7496BB6003FA'             -- Home
+  ,@PHONE_COUNTRYID uniqueidentifier = '27CF0F7D-CDAF-448F-80DE-E9196BF28D36'             -- United States
+  ,@PHONE_OTHER nvarchar(200) = ''
+  ,@PHONE_OTHERTYPECODEID uniqueidentifier = '7F1CF5D0-468C-4FD8-933A-7496BB6003FA'       -- Other
+  ,@PHONE_OTHER_COUNTRYID uniqueidentifier = '27CF0F7D-CDAF-448F-80DE-E9196BF28D36'       -- United States
+  ,@PHONESTARTDATE date = null
+  ,@EMAILADDRESS  udt_emailaddress = ''  
+  ,@EMAILADDRESSTYPECODEID uniqueidentifier = 'C4ED26B5-36FE-4E24-AB95-10AA71AC7968'      -- Home E-mail Address
+  ,@EMAILADDRESSSTARTDATE date = null
+  ,@ISDMINELIGIBLE  bit = 0
+  ,@DMINELIGIBLEREASONCODEID  uniqueidentifier = null
+  ,@GENDERCODE    tinyint = 0
+  ,@UMHSDATA_LASTPROCDATE datetime = null
+  
+)
+as
+set nocount on;
+
+begin
+  declare @CURRENTDATE datetime;
+  declare @CURRENTAPPUSERID uniqueidentifier=null;
+  declare @UMHSID uniqueidentifier;
+  
+  set @CURRENTDATE = getdate();
+
+  if @CHANGEAGENTID is null  
+    exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+		
+  select @CURRENTAPPUSERID=ID from appuser where windowsusername=SUSER_NAME();
+  
+  /* Add UMHS (Patient) Data record */
+  exec dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA 
+         @ID=@UMHSID OUTPUT
+        ,@CHANGEAGENTID=@CHANGEAGENTID
+        ,@CONSTITUENTID=@CONSTITUENTID
+        ,@MRN=@MRN
+        ,@CPISEQUENCE=@CPISEQUENCE
+        ,@FIRSTNAME=@FIRSTNAME
+        ,@MIDDLENAME=@MIDDLENAME
+        ,@KEYNAME=@LASTNAME
+        ,@SUFFIXCODEID=@SUFFIXCODEID
+        ,@INFOSOURCECODEID=@INFOSOURCECODEID
+        ,@BIRTHDATE=@BIRTHDATE
+        ,@ISDMINELIGIBLE=@ISDMINELIGIBLE
+        ,@DMINELIGIBLEREASONCODEID=@DMINELIGIBLEREASONCODEID
+        ,@GENDERCODE=@GENDERCODE
+        ,@PREPOPULATEMIMED = 0
+  
+  /* Set the imported UMHSDATA_LASTPROCDATE field */
+  if @UMHSDATA_LASTPROCDATE is not null
+  begin
+    update dbo.USR_UMHS_DATA set UMHSDATA_LASTPROCDATE=@UMHSDATA_LASTPROCDATE where ID=@UMHSID
+  end
+  
+  declare @ADDRESSID uniqueidentifier = newid();
+  declare @ISPRIMARY bit=1;
+  
+  /* 
+   * Add UMHS Address 
+   */
+  if nullif(isnull(@ADDRESSBLOCK, ''), '') is not null
+  begin
+    exec dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_ADDRESS
+         @ID=@ADDRESSID OUTPUT
+        ,@CHANGEAGENTID=@CHANGEAGENTID
+        ,@UMHSID=@UMHSID
+        ,@ISPRIMARY=@ISPRIMARY
+        ,@COUNTRYID=@ADDRESSCOUNTRYID
+        ,@STATEID=@STATEID
+        ,@ADDRESSBLOCK=@ADDRESSBLOCK
+        ,@CITY=@CITY
+        ,@POSTCODE=@POSTCODE
+        ,@ADDRESSTYPECODEID=@ADDRESSTYPECODEID
+        ,@INFOSOURCECODEID=@INFOSOURCECODEID
+        ,@HISTORICALSTARTDATE=@HISTORICALSTARTDATE
+  end
+  
+  /* 
+   * Add UMHS Email Address 
+   */
+  declare @EMAILADDRESSID uniqueidentifier
+  set @ISPRIMARY = 1;
+  
+  if nullif(isnull(@EMAILADDRESS, ''), '') is not null
+  begin
+    exec dbo.USR_USP_DATAFORMTEMPLATE_ADD_USR_UMHS_EMAILADDRESS
+         @ID=@EMAILADDRESSID OUTPUT
+        ,@CHANGEAGENTID=@CHANGEAGENTID
+        ,@UMHSID=@UMHSID
+        ,@EMAILADDRESSTYPECODEID=@EMAILADDRESSTYPECODEID
+        ,@EMAILADDRESS=@EMAILADDRESS
+        ,@ISPRIMARY=@ISPRIMARY
+        ,@STARTDATE=@EMAILADDRESSSTARTDATE
+        ,@INFOSOURCECODEID=@INFOSOURCECODEID
+  end
+  
+  /* 
+   * Add UMHS Phone Numbers 
+   */
+  declare @PHONEID uniqueidentifier
+  set @ISPRIMARY = 1; -- First phone number added is the Primary
+  
+  if nullif(isnull(@PHONE, ''), '') is not null
+  begin
+  
+    set @PHONEID=newid();
+    exec dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_PHONE
+         @ID=@PHONEID OUTPUT
+        ,@CHANGEAGENTID=@CHANGEAGENTID
+        ,@UMHSID=@UMHSID
+        ,@PHONETYPECODEID=@PHONETYPECODEID
+        ,@NUMBER=@PHONE
+        ,@ISPRIMARY=@ISPRIMARY
+        ,@STARTDATE=@PHONESTARTDATE
+        ,@COUNTRYID=@PHONE_COUNTRYID
+        ,@INFOSOURCECODEID=@INFOSOURCECODEID
+        
+    set @ISPRIMARY=0; -- No more primaries allowed
+  end
+  
+  if nullif(isnull(@PHONE_OTHER, ''), '') is not null
+  begin
+    
+    set @PHONEID=newid();
+    exec dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_PHONE
+         @ID=@PHONEID OUTPUT
+        ,@CHANGEAGENTID=@CHANGEAGENTID
+        ,@UMHSID=@UMHSID
+        ,@PHONETYPECODEID=@PHONE_OTHERTYPECODEID
+        ,@NUMBER=@PHONE_OTHER
+        ,@ISPRIMARY=@ISPRIMARY
+        ,@STARTDATE=@PHONESTARTDATE
+        ,@COUNTRYID=@PHONE_OTHER_COUNTRYID
+        ,@INFOSOURCECODEID=@INFOSOURCECODEID        
+  end
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

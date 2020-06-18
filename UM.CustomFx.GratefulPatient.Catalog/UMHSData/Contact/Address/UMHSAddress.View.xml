@@ -1,0 +1,139 @@
+﻿<ViewDataFormTemplateSpec 
+    xmlns="bb_appfx_viewdataformtemplate"
+    xmlns:c="bb_appfx_commontypes"
+    ID="f1f35dc0-946f-4170-ad74-9fc7b9fedc83"
+    Name="MIMED Address View Data Form"
+    Description="A data form for viewing MIMED address records"
+    Author="UM Dev"
+    DataFormInstanceID="75f282f7-9e30-41fb-84ca-321bc8c9eb98"
+    RecordType="MIMED Data"
+    c:SecurityUIFolder="MIMED Data"
+    >
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Address.View.2" />
+
+  <!-- define the SP that returns the data used by the form -->
+	<SPDataForm SPName="USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSADDRESS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSADDRESS 
+				(
+					@ID uniqueidentifier,
+					@DATALOADED bit = 0 output,
+					@ADDRESS nvarchar(300) = null output,
+					@PRIMARY bit = null output,
+					@DONOTMAIL bit = null output,
+					@COUNTRY nvarchar(100) = null output,
+					@DONOTMAILREASONCODE nvarchar(100) = null output,
+					@ISFORMER bit = null output,
+					@DATEADDED date = null output,
+					@HISTORICALSTARTDATE date = null output,
+					@HISTORICALENDDATE date = null output,
+					@INFOSOURCECODE nvarchar(100) = null output,
+					@INFOSOURCECOMMENTS nvarchar(256) = null output,
+					@ISCONFIDENTIAL bit = null output--,
+				) as
+				set nocount on;
+
+				set @DATALOADED = 0;
+			
+
+				select
+					@DATALOADED = 1,
+					@ADDRESS = dbo.UFN_BUILDFULLADDRESS(USR_UMHS_ADDRESS.ID, USR_UMHS_ADDRESS.ADDRESSBLOCK, USR_UMHS_ADDRESS.CITY, USR_UMHS_ADDRESS.STATEID, USR_UMHS_ADDRESS.POSTCODE, USR_UMHS_ADDRESS.COUNTRYID),
+					@PRIMARY = dbo.USR_UMHS_ADDRESS.ISPRIMARY,
+					@DONOTMAIL = dbo.USR_UMHS_ADDRESS.DONOTMAIL,
+					@COUNTRY = (select case when charindex('[country]', COUNTRYADDRESSFORMAT.FORMATSTRING) > 0 then
+																	''
+																else
+																	COUNTRY.DESCRIPTION
+																end
+															from
+																dbo.COUNTRY
+																inner join dbo.COUNTRYADDRESSFORMAT on COUNTRY.COUNTRYADDRESSFORMATID = COUNTRYADDRESSFORMAT.ID
+															where
+																COUNTRY.ID = USR_UMHS_ADDRESS.COUNTRYID),
+					@DONOTMAILREASONCODE = '(' + (select DESCRIPTION from DONOTMAILREASONCODE where ID=dbo.USR_UMHS_ADDRESS.DONOTMAILREASONCODEID) + ')',
+					@ISFORMER = case when HISTORICALENDDATE is null then 0 else 1 end,
+					@DATEADDED = USR_UMHS_ADDRESS.DATEADDED,
+					@HISTORICALSTARTDATE = HISTORICALSTARTDATE,
+					@HISTORICALENDDATE = HISTORICALENDDATE,
+					@INFOSOURCECODE = (select DESCRIPTION from dbo.INFOSOURCECODE where ID = USR_UMHS_ADDRESS.INFOSOURCECODEID),--dbo.UFN_INFOSOURCECODE_GETDESCRIPTION(ADDRESSVALIDATIONUPDATE.INFOSOURCECODEID),
+					@INFOSOURCECOMMENTS = USR_UMHS_ADDRESS.INFOSOURCECOMMENTS,--ADDRESSVALIDATIONUPDATE.INFOSOURCECOMMENTS,
+					@ISCONFIDENTIAL = USR_UMHS_ADDRESS.ISCONFIDENTIAL--,
+					--@ORIGINCODE = ADDRESSVALIDATIONUPDATE.ORIGINCODE
+					from 
+						dbo.USR_UMHS_ADDRESS 
+					left join
+						dbo.ADDRESSVALIDATIONUPDATE on USR_UMHS_ADDRESS.ID = ADDRESSVALIDATIONUPDATE.ID
+					where 
+						USR_UMHS_ADDRESS.ID = @ID;
+						
+			/*	if @ORIGINCODE is null
+					set @ORIGINCODE = 0
+									
+				if @RELATIONSHIPID is not null
+				begin
+					select 
+						@ISCONTACT = r.ISCONTACT,
+						@ORGNAME = org.NAME,
+						@JOBPOSITION = job.JOBTITLE,
+						@JOBDEPARTMENT = job.JOBDEPARTMENT,
+						@JOBDIVISION = job.JOBDIVISION
+					from CONSTITUENT org
+					inner join RELATIONSHIP r 
+						on r.RELATIONSHIPCONSTITUENTID = org.ID
+					left outer join dbo.RELATIONSHIPJOBINFO job
+						on r.RELATIONSHIPSETID = job.RELATIONSHIPSETID
+					where
+						r.ID=@RELATIONSHIPID and
+						r.ISCONTACT=1 and
+						org.ISORGANIZATION=1; 
+				end*/
+				
+				return 0;
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the context @ID, @DATALOADED, and @CURRENTAPPUSERID need not be listed. -->
+  
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="ADDRESS" MaxLength="300" Caption="Address" CaptionResourceKey="$$address" />
+      <c:FormField FieldID="COUNTRY" MaxLength="100" Caption="Country" CaptionResourceKey="$$country" />
+      <c:FormField FieldID="PRIMARY" DataType="Boolean" Caption="Primary" CaptionResourceKey="$$primary" />
+      <c:FormField FieldID="DONOTMAIL" DataType="Boolean" Caption="Do not mail" CaptionResourceKey="$$do_not_mail" />      
+      <c:FormField FieldID="DONOTMAILREASONCODE" MaxLength="100" Caption="Reason" CaptionResourceKey="$$reason" />
+      <c:FormField FieldID="ISFORMER" DataType="Boolean" Caption="Is former" CaptionResourceKey="$$is_former" />
+      <c:FormField FieldID="DATEADDED" DataType="Date" Caption="Date added" CaptionResourceKey="$$date_added" />
+      <c:FormField FieldID="HISTORICALSTARTDATE" DataType="Date" Caption="Historical start date" CaptionResourceKey="$$historical_start_date" />
+      <c:FormField FieldID="HISTORICALENDDATE" DataType="Date" Caption="Historical end date" CaptionResourceKey="$$historical_end_date" />
+      <c:FormField FieldID="INFOSOURCECODE" MaxLength="100" Caption="Information source" CaptionResourceKey="$$information_source" />
+      <c:FormField FieldID="INFOSOURCECOMMENTS" MaxLength="256" Caption="Comments" CaptionResourceKey="$$comments" />
+      <c:FormField FieldID="ISCONFIDENTIAL" DataType="Boolean" Caption="Confidential" CaptionResourceKey="$$confidential" />
+    </c:FormFields>
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSAddressViewDataFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSAddressViewDataForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+    
+    <c:UIFields>
+      <c:FormField FieldID="CONFIDENTIALIMAGE" />
+      <c:FormField FieldID="CONFIDENTIALDESCRIPTION" />
+      <c:FormField FieldID="PRIMARYIMAGE" />
+      <c:FormField FieldID="HISTORICALENDDATEDESCRIPTION" />
+      <c:FormField FieldID="DONOTMAILIMAGE" />
+      <c:FormField FieldID="DONOTMAILDESCRIPTION" />
+      <c:FormField FieldID="SEASONALRANGEDESCRIPTION" />
+      <c:FormField FieldID="HYPHEN" />
+      <c:FormField FieldID="CONTACTIMAGE" />
+      <c:FormField FieldID="CONTACTDESCRIPTION" />
+      <c:FormField FieldID="ORIGINCODETRANSLATION" Caption="Information source" CaptionResourceKey="$$information_source" />
+    </c:UIFields>
+  </c:FormMetaData>
+
+</ViewDataFormTemplateSpec>

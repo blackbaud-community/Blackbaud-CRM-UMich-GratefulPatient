@@ -1,0 +1,211 @@
+<PackageSpec
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="e7219705-c8e8-4cb1-87df-26cf969f0cb4"
+    Name="Grateful Patient Package (CSR_1509_sas)"
+    Description="A package defining specs related to package spec records"
+    Author="UM Dev"
+    >
+
+  <!-- Note:  the order of the items listed here is important.  For example, you won't be able to load a data form that references 
+	a table that hasn't been loaded, etc.  In general, the following order is recommended:
+	
+		(functions and procedures first)
+		SQLFunctionSpec
+		SQLStoredProcedureSpec
+		TranslationFunctionSpec
+
+		(tables next)
+		CodeTableSpec
+		TableSpec
+		SQLViewSpec
+
+		(features next)
+		SimpleDataListSpec		
+		SearchListSpec
+		RecordOperationSpec
+		DataListSpec
+		
+		(forms next)
+		AddDataFormTemplateSpec
+		EditDataFormTemplateSpec
+		ViewDataFormTemplateSpec		
+
+		(more feature types)
+		BatchTypeSpec
+		BusinessProcessSpec
+		CalendarSpec
+		FlashDashSpec
+		GlobalChangeSpec
+		IDMapperSpec
+		KpiSpec
+		MapEntitySpec
+		MergeConfiguration
+		MergeTaskSpec
+		QueryViewSpec
+		ReportSpec
+		RelationshipMapSpec
+		SmartFieldSpec
+		SmartQuerySpec
+		WorkflowInboxSpec
+		WorkflowSpec
+		
+		(functional areas, pages, and tasks last)
+		PageDefinitionSpec
+		FunctionalAreaSpec
+		TaskSpec	
+	-->
+
+  <c:DependencyList>
+
+    <!--For Compare Merge Issues.-->
+    <!--<c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog..Info.UMHSData.Add.xml" />-->
+    <!--JIRA DAR599: Referral area modifications - New code table plus the specs from CSR 1514 below-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSFollowUpStatus.CodeTable.xml" />
+
+    <!--JIRA DAR100: Referral Batch-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.USR_UMHS_REFERRALBATCH.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatch.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatch.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatch.Commit.xml" />
+
+    <!--JIRA DAR589 and JIRA DAR509 fix to Delete interaction from MIMED area after copying over to DART proper.-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Copy.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Delete.MIMEDInteraction.GlobalChange.xml" />
+
+    <!--CSR 1514 - Referral caption changes-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.View.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.UMHSPortfolioReferrals.DataList.xml" />    
+    <!--CSR 1509-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisitsDetailView.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummary.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.UMHSPortfolioProspects.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.UMHSPortfolioReferrals.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisitInpatient.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisitOutPatient.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisits.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummary.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummaryQuery.Query.xml" />
+  </c:DependencyList>
+
+  <AlterExistingPages xmlns="bb_appfx_pagedefinition">
+    <AlterPages>
+      <AlterPage PageID="baee8762-6727-43a7-9645-5dd776f6289a">
+        <AlterTabs>
+          <AddTab Sequence="1">
+            <Tab Caption="My MIMED" ID="12732c9a-d98d-46e7-95e1-3658467020d0">
+              <Tabs>
+                <Tab Caption="Planned and Pending Interactions" ID="c0e00bc8-8aad-480a-bf45-8aa1f79b42ab">
+                  <Sections>
+                    <Section ID="9958077a-7257-4577-b532-2a8a5b64f38f" Caption="Planned and Pending Interactions">
+                      <DataList ID="5d630dd0-b1b8-4b37-8450-6fb80b797016">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="4A1DDB8E-8691-4637-ADCF-70192E86B3DE" Caption="Go to interaction" LinkFieldID="OBJECTIVE">
+                          <c:ShowPage PageID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0">
+                            <c:ActionContext>
+                              <c:SectionField>ID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>
+                        <Action ID="c743c8b8-ba7c-423d-9a14-ef42f6d687a0" Caption="Go to Constituent" LinkFieldID="NAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Completed Interactions" ID="578e5bb8-fc17-45fd-9ec7-a62ce8cbd94a">
+                  <Sections>
+                    <Section ID="f09f9a4c-9702-4e58-a1a0-67e1a2de1ec6" Caption="Completed Interactions">
+                      <DataList ID="35dc1be3-c7a5-4c1c-8731-9b1265e2edad">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="5C8FF1CB-5E97-4868-B231-D5403502953A" Caption="Go to interaction" LinkFieldID="OBJECTIVE">
+                          <c:ShowPage PageID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0">
+                            <c:ActionContext>
+                              <c:SectionField>ID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>
+                        <Action ID="1bdeae3a-7452-4ba2-909d-26e94d3a0dd4" Caption="Go to Constituent" LinkFieldID="NAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Referrals and Team Assignments" ID="c3fac4f7-c422-4bed-8241-a8cc30c4e02a">
+                  <Sections>
+                    <Section ID="4e1afffc-15c3-45e1-aab5-83ff027d95a0" Caption="Referrals">
+                      <DataList ID="1071c8eb-4c82-4fd1-9e35-6aace93a01ec" AutoDisplayFilters="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <Actions>
+                        <Action ID="8075be6a-6d81-42e0-af80-8354a66ad771" Caption="Go to prospect" LinkFieldID="PROSPECT">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="42b0fda1-686a-4c5d-8562-a80346d80fb7" Caption="Team Assignments">
+                      <DataList ID="4cceb8ef-f245-4643-ad11-daa63ee7e277" AutoDisplayFilters="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="c68172c3-5221-4920-b48f-5760f6689bdd" Caption="Go to team member" LinkFieldID="TEAMMEMBER">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+              </Tabs>
+            </Tab>
+          </AddTab>
+        </AlterTabs>
+      </AlterPage>
+    </AlterPages>
+  </AlterExistingPages>
+
+</PackageSpec>

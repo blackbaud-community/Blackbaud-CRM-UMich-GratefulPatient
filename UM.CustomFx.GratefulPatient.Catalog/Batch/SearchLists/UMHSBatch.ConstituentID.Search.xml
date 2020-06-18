@@ -1,0 +1,57 @@
+﻿<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="dc67a7e3-41a9-4b07-97a3-f5e4e07412f2"
+    Name="Search list for looking up the MIMED Data Constituent ID"
+    Description="Search list for looking up the MIMED Data Constituent ID"
+    Author="UM Dev"
+    RecordType="UMHS"
+    TranslationFunctionID="e58d466f-1532-4dea-9b50-dd046094ed31"
+	>
+
+	<!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be 
+	used to limit the number of rows returned to a reasonable number. -->
+	<SPSearchList SPName="USR_USP_SEARCHLIST_UMHS_BATCH_CONSTITUENTID">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_USP_SEARCHLIST_UMHS_BATCH_CONSTITUENTID
+(
+	@MRN nvarchar(50) = null,
+	@MAXROWS smallint = 500
+)
+as
+  select top(@MAXROWS)
+     CONSTITUENTID as ID
+    ,MRN
+    ,FIRSTNAME
+    ,KEYNAME LASTNAME
+    ,BIRTHDATE
+  from 
+  dbo.USR_UMHS_DATA 
+  where
+    MRN=@MRN
+      
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+			<FormField FieldID="MRN" Caption="MRN" DataType="String" MaxLength="50" />
+		</FormFields>
+	</FormMetaData>
+
+	<!-- also describe the output fields for the search screen -->          
+	<Output>
+		<OutputFields>
+      <OutputField FieldID="ID" Caption="Constituent" DataType="Guid" IsHidden="true" />
+			<OutputField FieldID="MRN" Caption="MRN" DataType="String" />
+			<OutputField FieldID="FIRSTNAME" Caption="First name" DataType="String" />
+			<OutputField FieldID="LASTNAME" Caption="Last name" DataType="String" />
+      <OutputField FieldID="BIRTHDATE" Caption="Birthdate" DataType="FuzzyDate" />
+		</OutputFields>
+	</Output>
+
+</SearchListSpec>
+

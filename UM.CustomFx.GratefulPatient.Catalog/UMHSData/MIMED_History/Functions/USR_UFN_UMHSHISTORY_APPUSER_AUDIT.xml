@@ -1,0 +1,88 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9d1fc732-0278-46aa-ad3b-4a4efc7d8dee"
+	Name="USR_UFN_UMHSHISTORY_APPUSER_AUDIT"
+	Description="USR_UFN_UMHSHISTORY_APPUSER_AUDIT"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHSHISTORY_APPUSER_AUDIT"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+	
+			create function dbo.USR_UFN_UMHSHISTORY_APPUSER_AUDIT
+			(
+				--declare 
+				@UMHSID uniqueidentifier ,--= 'D13308AC-355A-44C4-BAB0-E1CEC43BD33C' ,
+				@CONSTITUENTID uniqueidentifier,
+				@UMHSDATEADDED datetime,
+				@ACTIONTYPECODE tinyint
+			)
+
+			returns 
+			--declare 
+			@RESULTS table
+			(
+				RECORDID uniqueidentifier,
+				AUDITDATE datetime,
+				CHANGEDBYUSER nvarchar(128),
+				PROCESS nvarchar(255),
+				FIELD nvarchar(128),
+				OLD nvarchar(4000),
+				NEW nvarchar(4000),
+				ACTION nvarchar(8),
+				CHANGEDBYAPP nvarchar(200)
+			) 
+			as 
+			begin			
+			--SET @CONSTITUENTID = (SELECT CONSTITUENTID from USR_UMHS_DATA WHERE ID = @UMHSID);
+				with CHANGES as
+					(select
+						'Update' as CHANGETYPE,
+						AFTERUPDATE.AUDITRECORDID,
+						AFTERUPDATE.AUDITKEY,
+						AFTERUPDATE.CHANGEDBYID AUDITCHANGEAGENTID,
+						CHANGEAGENT.APPLICATIONNAME CHANGEDBYAPP,
+						CHANGEAGENT.USERNAME CHANGEDBYUSER,
+						AFTERUPDATE.DATEADDED,
+						AFTERUPDATE.DATECHANGED,
+						'APPUSER' TABLENAME
+					from
+						dbo.APPUSERAUDIT as BEFOREUPDATE
+					inner join
+						dbo.APPUSERAUDIT as AFTERUPDATE
+					on
+						AFTERUPDATE.AUDITKEY = BEFOREUPDATE.AUDITKEY
+						and BEFOREUPDATE.AUDITTYPECODE = 0 and AFTERUPDATE.AUDITTYPECODE = 1
+					left join
+						dbo.CHANGEAGENT
+					on
+						CHANGEAGENT.ID = AFTERUPDATE.CHANGEDBYID
+					where
+						(BEFOREUPDATE.CONSTITUENTID = @CONSTITUENTID and (AFTERUPDATE.CONSTITUENTID <> @CONSTITUENTID or AFTERUPDATE.CONSTITUENTID is null)) or
+						((BEFOREUPDATE.CONSTITUENTID <> @CONSTITUENTID or BEFOREUPDATE.CONSTITUENTID is null) and AFTERUPDATE.CONSTITUENTID = @CONSTITUENTID))
+				insert into @RESULTS
+				select
+					CHANGES.AUDITRECORDID,
+					CHANGES.DATECHANGED as AUDITDATE,
+					CHANGES.CHANGEDBYUSER,
+					(select PROCESSDISPLAYNAME from dbo.CHANGEAGENT where ID = CHANGES.AUDITCHANGEAGENTID) as PROCESS,
+					'Link to ' + (select coalesce(USERNAME,'App User') from dbo.APPUSER where ID = CHANGES.AUDITRECORDID) + ':' + [DETAIL].FIELD, 
+					DETAIL.OLD,
+					case when CHANGES.CHANGETYPE = 'Delete' then 'n/a' else DETAIL.NEW end,
+					case when CHANGES.CHANGETYPE = 'Delete' then 'Delete' else 'Update' end,
+					CHANGES.CHANGEDBYAPP
+				from
+					CHANGES
+				cross apply
+					dbo.UFN_AUDIT_GETDETAIL_BYFIELDLIST('APPUSERAUDIT',CHANGES.AUDITKEY,CHANGES.AUDITRECORDID,'CONSTITUENTID') as DETAIL
+				where
+					(CHANGES.CHANGETYPE = 'Update' and (@ACTIONTYPECODE = 0 or @ACTIONTYPECODE = 2));
+					
+				return;
+			end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

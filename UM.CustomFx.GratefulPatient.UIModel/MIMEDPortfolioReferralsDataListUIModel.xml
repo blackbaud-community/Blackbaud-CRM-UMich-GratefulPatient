@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>UMHSPortfolioReferrals.DataList.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>MIMEDPortfolioReferralsDataListUIModel</ClassName>
+  <HtmlInfo GenerateHtml="false">
+    <HtmlFile />
+    <HtmlFolder>htmlforms\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

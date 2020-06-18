@@ -1,0 +1,509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2820B209-12AF-4993-8255-EA995F4C851F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UM.CustomFx.GratefulPatient.UIModel</RootNamespace>
+    <AssemblyName>UM.CustomFx.GratefulPatient.UIModel</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>UIModel.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>C:\BBEC\Instances\BB40\bbappfx\vroot\bin\custom</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>UIModel.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Blackbaud.AppFx, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.BatchUI, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.BatchUI.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Constituent.UIModel, Version=4.0.180.1604, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.Constituent.UIModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Fundraising.UIModel, Version=4.0.180.1604, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.Fundraising.UIModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Platform.Catalog, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.Platform.Catalog.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Platform.UIModel, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.Server, Version=4.0.177.64, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.Server.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.UIModeling.Core, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.UIModeling.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.XmlTypes, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.XmlTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.AppFx.XmlTypes.XmlSerializers, Version=4.0.177.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\SDK\Blackbaud.AppFx.XmlTypes.XmlSerializers.dll</HintPath>
+    </Reference>
+    <Reference Include="Blackbaud.CustomFx.Revenue.UIModel">
+      <HintPath>..\..\..\..\Blackbaud_UM_Shared\Blackbaud.CustomFx.Revenue.UIModel\obj\Debug\Blackbaud.CustomFx.Revenue.UIModel.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddDataFormTemplateSpecAddDataFormUIModel.CodeGen.cs">
+      <DependentUpon>AddDataFormTemplateSpecAddDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddDataFormTemplateSpecAddDataFormUIModel.cs" />
+    <Compile Include="Helpers\Common.cs" />
+    <Compile Include="MIMEDAffiliationDeleteGlobalChangeUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDAffiliationDeleteGlobalChangeUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDAffiliationDeleteGlobalChangeUIModel.cs" />
+    <Compile Include="MIMEDHistoryReportUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDHistoryReportUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDHistoryReportUIModel.cs" />
+    <Compile Include="MIMEDInteractionsDeleteGlobalChangeUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDInteractionsDeleteGlobalChangeUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDInteractionsDeleteGlobalChangeUIModel.cs" />
+    <Compile Include="MIMEDLoggingReportReportUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDLoggingReportReportUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDLoggingReportReportUIModel.cs" />
+    <Compile Include="MIMEDPortfolioListUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDPortfolioListUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDPortfolioListUIModel.cs" />
+    <Compile Include="MIMEDPortfolioReferralsDataListUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDPortfolioReferralsDataListUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDPortfolioReferralsDataListUIModel.cs" />
+    <Compile Include="MIMEDTeamAddFormUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDTeamAddFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDTeamAddFormUIModel.cs" />
+    <Compile Include="MIMEDTeamMemberChangeGlobalChangeUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDTeamMemberChangeGlobalChangeUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDTeamMemberChangeGlobalChangeUIModel.cs" />
+    <Compile Include="MIMEDTeamMemberGlobalChangeUIModel.CodeGen.cs">
+      <DependentUpon>MIMEDTeamMemberGlobalChangeUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIMEDTeamMemberGlobalChangeUIModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UMHDataConstituentSearchHelper.cs" />
+    <Compile Include="UMHSAddressFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSAddressFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSAddressFormUIModel.cs" />
+    <Compile Include="UMHSAddressViewDataFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSAddressViewDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSAddressViewDataFormUIModel.cs" />
+    <Compile Include="UMHSAffiliationEditFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSAffiliationDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSAffiliationDataFormUIModel.cs" />
+    <Compile Include="UMHSBatchDupeCheckUIModel.CodeGen.cs">
+      <DependentUpon>UMHSBatchDupeCheckUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSBatchDupeCheckUIModel.cs" />
+    <Compile Include="UMHSConnectionFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSConnectionFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSConnectionFormUIModel.cs" />
+    <Compile Include="UMHSConstituent.AddIn.cs" />
+    <Compile Include="UMHSDataConstituentSearchUIModel.CodeGen.cs">
+      <DependentUpon>UMHSDataConstituentSearchUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSDataConstituentSearchUIModel.cs" />
+    <Compile Include="UMHSDataERB.AddIn.cs" />
+    <Compile Include="UMHSDataFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSDataFormUIModel.cs" />
+    <Compile Include="UMHSDataViewFormUIModel.CodeGen.cs" />
+    <Compile Include="UMHSDataViewFormUIModel.cs" />
+    <Compile Include="UMHSDocumentationFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSDocumentationFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSDocumentationFormUIModel.cs" />
+    <Compile Include="UMHSDuplicateConstituentSearchNEWCONSTITUENTUIModel.CodeGen.cs">
+      <DependentUpon>UMHSDuplicateConstituentSearchUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSDuplicateConstituentSearchUIModel.CodeGen.cs">
+      <DependentUpon>UMHSDuplicateConstituentSearchUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSDuplicateConstituentSearchUIModel.cs" />
+    <Compile Include="UMHSEmailAddressFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSEmailAddressFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSEmailAddressFormUIModel.cs" />
+    <Compile Include="UMHSEmailAddressViewDataFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSEmailAddressViewDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSEmailAddressViewDataFormUIModel.cs" />
+    <Compile Include="UMHSInteractionCopyINTERACTIONSUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInteractionCopyUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInteractionCopyUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInteractionCopyUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInteractionCopyUIModel.cs" />
+    <Compile Include="UMHSInteractionFormPARTICIPANTSUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInteractionFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInteractionFormSITESUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInteractionFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInteractionFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInteractionFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInteractionFormUIModel.cs" />
+    <Compile Include="UMHSInteractionViewDataFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInteractionViewDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInteractionViewDataFormUIModel.cs" />
+    <Compile Include="UMHSInterestFormDEPARTMENTSUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInterestFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInterestFormSITESUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInterestFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInterestFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSInterestFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSInterestFormUIModel.cs" />
+    <Compile Include="UMHSPhoneFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSPhoneFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSPhoneFormUIModel.cs" />
+    <Compile Include="UMHSPhoneViewDataFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSPhoneViewDataFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSPhoneViewDataFormUIModel.cs" />
+    <Compile Include="UMHSReferralFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSReferralFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSReferralFormUIModel.cs" />
+    <Compile Include="UMHSRelationshipAddFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSRelationshipAddFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSRelationshipAddFormUIModel.cs" />
+    <Compile Include="UMHSRelationshipEditFormUIModel.CodeGen.cs">
+      <DependentUpon>UMHSRelationshipEditFormUIModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UMHSRelationshipEditFormUIModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\GlobalChange\Add.MIMEDTeamMember.GlobalChange.xml">
+      <Link>LinkedSpecs\Add.MIMEDTeamMember.GlobalChange.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\GlobalChange\Change.MIMEDTeamMember.GlobalChange.xml">
+      <Link>LinkedSpecs\Change.MIMEDTeamMember.GlobalChange.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\LoggingReport\MIMEDLoggingReport.Report.xml">
+      <Link>LinkedSpecs\MIMEDLoggingReport.Report.xml</Link>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\MIMEDLoggingReportReport.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\MIMEDTeamMemberGlobalChange.html" />
+    <Content Include="MIMEDLoggingReportReportUIModel.xml">
+      <DependentUpon>MIMEDLoggingReportReportUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDTeamMemberChangeGlobalChangeUIModel.xml">
+      <DependentUpon>MIMEDTeamMemberChangeGlobalChangeUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDTeamMemberGlobalChangeUIModel.xml">
+      <DependentUpon>MIMEDTeamMemberGlobalChangeUIModel.cs</DependentUpon>
+    </Content>
+    <None Include="App.config" />
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\Constituent\Search\UMHSData.ConstituentPatient.Search.xml">
+      <Link>LinkedSpecs\UMHSData.ConstituentPatient.Search.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\Constituent\Search\UMHSDataConstituentSearch.xml">
+      <Link>LinkedSpecs\UMHSDataConstituentSearch.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\Constituent\Search\UMHSDataConstituentDuplicateSearch.xml">
+      <Link>LinkedSpecs\UMHSDataConstituentDuplicateSearch.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Development\Interactions\UMHSInteraction.Copy.xml">
+      <Link>LinkedSpecs\UMHSInteraction.Copy.xml</Link>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\MIMEDHistory\MIMEDHistory.Report.xml">
+      <Link>LinkedSpecs\MIMEDHistory.Report.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\MIMEDAddDataFormTemplateSpec.Add.xml">
+      <Link>LinkedSpecs\MIMEDAddDataFormTemplateSpec.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\GlobalChange\Delete.MIMEDAffiliations.GlobalChange.xml">
+      <Link>LinkedSpecs\Delete.MIMEDAffiliations.GlobalChange.xml</Link>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Development\Team\UMHSTeam.Add.xml">
+      <Link>LinkedSpecs\UMHSTeam.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSMyFundraiserTabs\Portfolio\UMHSPortfolioProspects.DataList.xml">
+      <Link>LinkedSpecs\UMHSPortfolioProspects.DataList.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\GlobalChange\Delete.MIMEDInteraction.GlobalChange.xml">
+      <Link>LinkedSpecs\Delete.MIMEDInteraction.GlobalChange.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSMyFundraiserTabs\Portfolio\UMHSPortfolioReferrals.DataList.xml">
+      <Link>LinkedSpecs\UMHSPortfolioReferrals.DataList.xml</Link>
+    </None>
+    <Content Include="AddDataFormTemplateSpecAddDataFormUIModel.xml">
+      <DependentUpon>AddDataFormTemplateSpecAddDataFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\AddDataFormTemplateSpecAddDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\individualsearch.js" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\MIMEDAffiliationDeleteGlobalChange.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\MIMEDHistoryReport.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\MIMEDTeamAddForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSBatchDupeCheck" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\MIMEDTeamMemberChangeGlobalChange.html" />
+    <None Include="packages.config" />
+    <None Include="UIModel.ruleset" />
+    <None Include="postbuild.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UM.CustomFx.GratefulPatient.Models\UM.CustomFx.GratefulPatient.Models.csproj">
+      <Project>{fbb0250a-90ff-446d-90b6-ad73e6e66e3b}</Project>
+      <Name>UM.CustomFx.GratefulPatient.Models</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Info\Relationships\UMHSRelationship.Edit.xml">
+      <Link>LinkedSpecs\UMHSRelationship.Edit.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\Constituent\UMHSDataConstituent.Search.xml">
+      <Link>LinkedSpecs\UMHSDataConstituent.Search.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\Batch\SearchLists\UMHSBatch.DupCheck.Search.xml">
+      <Link>LinkedSpecs\UMHSBatch.DupCheck.Search.xml</Link>
+    </None>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSBatchDupeCheck.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSDataConstituentSearch.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSDuplicateConstituentSearch.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSInteractionCopy.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSInteractionForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSRelationshipEditForm.html" />
+    <Content Include="MIMEDAffiliationDeleteGlobalChangeUIModel.xml">
+      <DependentUpon>MIMEDAffiliationDeleteGlobalChangeUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDHistoryReportUIModel.xml">
+      <DependentUpon>MIMEDHistoryReportUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDPortfolioListUIModel.xml">
+      <DependentUpon>MIMEDPortfolioListUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDInteractionsDeleteGlobalChangeUIModel.xml">
+      <DependentUpon>MIMEDInteractionsDeleteGlobalChangeUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDPortfolioReferralsDataListUIModel.xml">
+      <DependentUpon>MIMEDPortfolioReferralsDataListUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="MIMEDTeamAddFormUIModel.xml">
+      <DependentUpon>MIMEDTeamAddFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSBatchDupeCheckUIModel.xml">
+      <DependentUpon>UMHSBatchDupeCheckUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSDataConstituentSearchUIModel.xml">
+      <DependentUpon>UMHSDataConstituentSearchUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSDuplicateConstituentSearchUIModel.xml">
+      <DependentUpon>UMHSDuplicateConstituentSearchUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSInteractionCopyUIModel.xml">
+      <DependentUpon>UMHSInteractionCopyUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSInteractionFormUIModel.xml">
+      <DependentUpon>UMHSInteractionFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSInteractionViewDataFormUIModel.xml">
+      <DependentUpon>UMHSInteractionViewDataFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSRelationshipEditFormUIModel.xml">
+      <DependentUpon>UMHSRelationshipEditFormUIModel.cs</DependentUpon>
+    </Content>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Info\Relationships\UMHSRelationship.Add.xml">
+      <Link>LinkedSpecs\UMHSRelationship.Add.xml</Link>
+    </None>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSRelationshipAddForm.html" />
+    <Content Include="UMHSRelationshipAddFormUIModel.xml">
+      <DependentUpon>UMHSRelationshipAddFormUIModel.cs</DependentUpon>
+    </Content>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Referral\UMHSDataReferral.Add.xml">
+      <Link>LinkedSpecs\UMHSDataReferral.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Info\Connections\UMHSConnection.Add.xml">
+      <Link>LinkedSpecs\UMHSConnection.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Contact\Address\UMHSAddress.Add.xml">
+      <Link>LinkedSpecs\UMHSAddress.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Contact\Address\UMHSAddress.View.xml">
+      <Link>LinkedSpecs\UMHSAddress.View.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Contact\Phone\UMHSPhone.Add.xml">
+      <Link>LinkedSpecs\UMHSPhone.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Contact\Phone\UMHSPhone.View.xml">
+      <Link>LinkedSpecs\UMHSPhone.View.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Contact\Email\UMHSEmailAddress.Add.xml">
+      <Link>LinkedSpecs\UMHSEmailAddress.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Contact\Email\UMHSEmailAddress.View.xml">
+      <Link>LinkedSpecs\UMHSEmailAddress.View.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Development\Interests\UMHSInterest.Add.xml">
+      <Link>LinkedSpecs\UMHSInterest.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Documentation\UMHSDocumentation.Add.xml">
+      <Link>LinkedSpecs\UMHSDocumentation.Add.xml</Link>
+    </None>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSAddressForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSAddressViewDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSConnectionForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSConstituentSearch.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSDocumentationForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSEmailAddressForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSEmailAddressViewDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSInterestForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSPhoneForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSPhoneViewDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSReferralForm.html" />
+    <Content Include="UMHSAddressFormUIModel.xml">
+      <DependentUpon>UMHSAddressFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSAddressViewDataFormUIModel.xml">
+      <DependentUpon>UMHSAddressViewDataFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSConnectionFormUIModel.xml">
+      <DependentUpon>UMHSConnectionFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSDocumentationFormUIModel.xml">
+      <DependentUpon>UMHSDocumentationFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSEmailAddressFormUIModel.xml">
+      <DependentUpon>UMHSEmailAddressFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSEmailAddressViewDataFormUIModel.xml">
+      <DependentUpon>UMHSEmailAddressViewDataFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSInterestFormUIModel.xml">
+      <DependentUpon>UMHSInterestFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSPhoneFormUIModel.xml">
+      <DependentUpon>UMHSPhoneFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSPhoneViewDataFormUIModel.xml">
+      <DependentUpon>UMHSPhoneViewDataFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSReferralFormUIModel.xml">
+      <DependentUpon>UMHSReferralFormUIModel.cs</DependentUpon>
+    </Content>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Info\NameFormats\UMHSNameFormat.Add.xml">
+      <Link>LinkedSpecs\UMHSNameFormat.Add.xml</Link>
+    </None>
+    <Content Include="UMHSDataViewFormUIModel.xml" />
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Development\Interactions\UMHSInteraction.View.xml">
+      <Link>LinkedSpecs\UMHSInteraction.View.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Development\Interactions\UMHSInteraction.Add.xml">
+      <Link>LinkedSpecs\UMHSInteraction.Add.xml</Link>
+    </None>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSInteractionDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSInteractionsViewForm.html" />
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Info\UMHSData.View.xml">
+      <Link>LinkedSpecs\UMHSData.View.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Info\UMHSData.Add.xml">
+      <Link>LinkedSpecs\UMHSData.Add.xml</Link>
+    </None>
+    <None Include="..\UM.CustomFx.GratefulPatient.Catalog\UMHSData\Development\Affiliations\UMHSAffiliation.Edit.xml">
+      <Link>LinkedSpecs\UMHSAffiliation.Edit.xml</Link>
+    </None>
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSAffiliationDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSDataForm.html" />
+    <Content Include="htmlforms\custom\um.customfx.gratefulpatient\UMHSDataViewForm.html" />
+    <Content Include="UMHSAffiliationEditFormUIModel.xml">
+      <DependentUpon>UMHSAffiliationDataFormUIModel.cs</DependentUpon>
+    </Content>
+    <Content Include="UMHSDataFormUIModel.xml">
+      <DependentUpon>UMHSDataFormUIModel.cs</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>"$(ProjectDir)postbuild.bat"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

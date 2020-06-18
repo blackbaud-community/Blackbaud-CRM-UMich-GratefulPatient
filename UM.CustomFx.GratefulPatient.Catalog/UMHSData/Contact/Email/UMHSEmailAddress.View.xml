@@ -1,0 +1,125 @@
+<ViewDataFormTemplateSpec 
+    xmlns="bb_appfx_viewdataformtemplate"
+    xmlns:c="bb_appfx_commontypes"
+    ID="9696e562-cc4c-46c1-8bea-bd44ee7c329e"
+    Name="MIMED Email Address View Data Form"
+    Description="A data form for viewing MIMED email address records"
+    Author="UM Dev"
+    DataFormInstanceID="67f2d064-dd1c-4512-b2d5-1df37026ab9e"
+    RecordType="MIMED Email Address"
+    c:SecurityUIFolder="MIMED Data"
+    >
+  <c:InstalledProductList>
+    <c:InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <c:InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+    <c:InstalledProduct ID="6f77d512-d0d1-444f-9b46-b8603a6fe5f1" />
+    <c:InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+    <c:InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+  </c:InstalledProductList>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.EmailAddress.View" />
+	<!-- define the SP that returns the data used by the form -->
+	<SPDataForm SPName="USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSEMAILADDRESS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_VIEW_UMHSEMAILADDRESS
+(
+    @ID uniqueidentifier,
+    @DATALOADED bit = 0 output,
+    @EMAILADDRESSTYPECODE nvarchar(100) = null output,
+    @EMAILADDRESS nvarchar(100) = null output,
+    @PRIMARY bit = null output,
+    @DONOTEMAIL bit = null output,
+    @INFOSOURCECODE nvarchar(100) = null output,
+    @INFOSOURCECOMMENTS nvarchar(256) = null output,    
+    @STARTDATE date = null output,
+    @ENDDATE date = null output,
+    @DATEADDED date = null output,
+    @ISCONFIDENTIAL bit = null output
+    --,
+    --@BOUNCEDEMAIL bit = null output
+)
+as
+    set nocount on;
+    
+    set @DATALOADED = 0;
+    --set @ISCONTACT = 0;
+    
+    declare @RELATIONSHIPID uniqueidentifier;
+    
+    select 
+        @DATALOADED = 1,
+        @EMAILADDRESSTYPECODE = (select DESCRIPTION from dbo.EMAILADDRESSTYPECODE where ID = EMAILADDRESSTYPECODEID),
+        @EMAILADDRESS = EMAILADDRESS,
+        @PRIMARY = ISPRIMARY,
+        @DONOTEMAIL = DONOTEMAIL,
+        @INFOSOURCECODE = (select DESCRIPTION from dbo.INFOSOURCECODE where ID = INFOSOURCECODEID),
+        @INFOSOURCECOMMENTS = INFOSOURCECOMMENTS,
+        @STARTDATE = STARTDATE,
+        @ENDDATE = ENDDATE,
+        @ISCONFIDENTIAL = ISCONFIDENTIAL,
+        @DATEADDED = DATEADDED
+    from dbo.USR_UMHS_EMAILADDRESS
+    where ID = @ID;
+    
+ /*   if @RELATIONSHIPID is not null
+    begin
+        select 
+            @ISCONTACT = r.ISCONTACT,
+            @ORGNAME = org.NAME,
+            @JOBPOSITION = job.JOBTITLE,
+            @JOBDEPARTMENT = job.JOBDEPARTMENT,
+            @JOBDIVISION = job.JOBDIVISION
+        from CONSTITUENT org
+        inner join RELATIONSHIP r 
+            on r.RELATIONSHIPCONSTITUENTID = org.ID
+        left outer join dbo.RELATIONSHIPJOBINFO job
+            on r.RELATIONSHIPSETID = job.RELATIONSHIPSETID
+        where
+            r.ID=@RELATIONSHIPID and
+            r.ISCONTACT=1 and
+            org.ISORGANIZATION=1;
+    end */
+    
+    return 0;
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the context @ID, @DATALOADED, and @CURRENTAPPUSERID need not be listed. -->
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="EMAILADDRESSTYPECODE" MaxLength="100" Caption="Type" CaptionResourceKey="$$type" />
+      <c:FormField FieldID="EMAILADDRESS" MaxLength="100" Caption="Email address" CaptionResourceKey="$$email_address" />
+      <c:FormField FieldID="PRIMARY" DataType="Boolean" Caption="Primary"  CaptionResourceKey="$$primary" />
+      <c:FormField FieldID="DONOTEMAIL" DataType="Boolean" Caption="Do not email" CaptionResourceKey="$$do_not_email" />
+      <c:FormField FieldID="INFOSOURCECODE" MaxLength="100" Caption="Information source" CaptionResourceKey="$$information_source" />
+      <c:FormField FieldID="INFOSOURCECOMMENTS" MaxLength="256" Caption="Comments" CaptionResourceKey="$$comments" />
+      <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" CaptionResourceKey="$$start_date" />
+      <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" CaptionResourceKey="$$end_date" />
+      <c:FormField FieldID="ISCONFIDENTIAL" DataType="Boolean" Caption="Is confidential" CaptionResourceKey="$$isconfidential" />
+      <c:FormField FieldID="DATEADDED" DataType="Date" Caption="Date added" CaptionResourceKey="$$date_added" />
+    </c:FormFields>
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSEmailAddressViewDataFormUIModel" />
+            <c:WebUI>
+              <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSEmailAddressViewDataForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+        
+    <c:UIFields>
+      <c:FormField FieldID="INVALIDACCOUNT" />
+      <c:FormField FieldID="PRIMARYIMAGE" CaptionResourceKey="$$primary_image" />
+      <c:FormField FieldID="DONOTEMAILIMAGE" />
+      <c:FormField FieldID="DONOTEMAILDESCRIPTION" />
+      <c:FormField FieldID="CONTACTIMAGE" />
+      <c:FormField FieldID="CONTACTDESCRIPTION" />
+      <c:FormField FieldID="SHOWINVALID" DataType="Boolean" Hidden="true" />     
+      <c:FormField FieldID="ORIGINCODETRANSLATION" Caption="Information source" CaptionResourceKey="$$information_source" />
+      <c:FormField FieldID="ENDDATEDESCRIPTION" />
+      <c:FormField FieldID="HYPHEN" />
+    </c:UIFields>
+  </c:FormMetaData>
+
+</ViewDataFormTemplateSpec>

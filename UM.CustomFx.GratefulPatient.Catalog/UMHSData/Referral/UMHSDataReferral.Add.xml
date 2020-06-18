@@ -1,0 +1,156 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="a7d483b7-2c7f-4295-bfe0-e1a9b9e2d097"
+    Name="MIMED Referral Add Form"
+    Description="Used for adding a new MIMED Referral"
+    Author="UM Dev"
+    RecordType="MIMED Referral"
+    DataFormInstanceID="77fc6de5-1849-4d84-aa6e-56dd5300f20b"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    >
+  <SPDataForm>
+   
+    
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA_REFERRAL">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+        CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_DATA_REFERRAL (@ID                         UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @UMHSID                     UNIQUEIDENTIFIER,
+                                                                              @CHANGEAGENTID              UNIQUEIDENTIFIER = NULL,                                                                                                                                                        
+                                                                              @REFERRERID                 UNIQUEIDENTIFIER = NULL,
+                                                                              @REFERRERROLECODEID         UNIQUEIDENTIFIER = NULL,
+                                                                              @DEPARTMENTID               UNIQUEIDENTIFIER = NULL,
+                                                                              @SUBDEPARTMENTID            UNIQUEIDENTIFIER = NULL,
+                                                                              @FOLLOWUPCOMPLETED          bit = null,
+                                                                              @FOLLOWUPSTATUSCODEID       UNIQUEIDENTIFIER = NULL,
+                                                                              @FOLLOWUPSTATUSCODE         tinyint = 0,
+                                                                              @REFERRALDATE               DATETIME = NULL,
+                                                                              @UMHSDEVSTAFFID             UNIQUEIDENTIFIER = NULL,                                                                            
+                                                                              @COMMENTS                   NVARCHAR(MAX) = '')
+        AS
+            SET NOCOUNT ON;
+
+            IF @ID IS NULL
+              SET @ID = NEWID()
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+            DECLARE @CURRENTDATE DATETIME = GETDATE();           
+
+
+          BEGIN TRY
+              -- handle inserting the data
+              INSERT INTO DBO.USR_UMHS_REFERRAL
+                          (ID,
+                            UMHSID,
+                            REFERRERID,
+                            REFERRERROLECODEID,
+                            DEPARTMENTID,
+                            SUBDEPARTMENTID,
+                            FOLLOWUPCOMPLETED,
+                            FOLLOWUPSTATUSCODE,
+                            REFERRALDATE,
+                            UMHSDEVSTAFFID,                          
+                            COMMENTS,
+                            ADDEDBYID,
+                            CHANGEDBYID,
+                            DATEADDED,
+                            DATECHANGED)
+              VALUES      (@ID,
+                            @UMHSID,
+                            @REFERRERID,
+                            @REFERRERROLECODEID,
+                            @DEPARTMENTID,
+                            @SUBDEPARTMENTID,
+                            @FOLLOWUPCOMPLETED,
+                            @FOLLOWUPSTATUSCODE,
+                            @REFERRALDATE,
+                            @UMHSDEVSTAFFID,
+                            @COMMENTS,
+                            @CHANGEAGENTID,
+                            @CHANGEAGENTID,
+                            @CURRENTDATE,
+                            @CURRENTDATE)
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+
+            RETURN 0 
+        ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="UIX_USR_UMHS_REFERRAL_UMHSID_REFERRERID" Type="Unique" Field="REFERRERID">
+            <c:CustomErrorMsg>This individual (referrer) has already made a referral on behalf of this constituent.  The system does not allow duplicates.</c:CustomErrorMsg>
+          </c:Constraint>
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="REFERRERID" DataType="Guid" Caption="Referrer" Required="true" >
+        <c:SearchList SearchListID="76d8c79c-b8d4-4349-beb5-283b4bad4285" EnableQuickFind="true" EnableAutoSearch="true"  />
+      </c:FormField>
+      <c:FormField FieldID="DEPARTMENTID" DataType="Guid" Caption="Referrer department" Required="true">
+        <c:SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+        </c:SimpleDataList>
+      </c:FormField>
+      <c:FormField FieldID="SUBDEPARTMENTID" DataType="Guid" Caption="Referrer subdepartment">
+        <c:SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          <c:Params>
+            <c:Param ID="DEPARTMENTID">
+              <c:Value>Fields!DEPARTMENTID</c:Value>
+            </c:Param>
+          </c:Params>
+        </c:SimpleDataList>
+      </c:FormField>
+      <c:FormField FieldID="REFERRERROLECODEID" DataType="Guid" Caption="Referrer role" Required="true">
+        <c:CodeTable CodeTableName="USR_UMHS_REFERRERROLECODE" />
+      </c:FormField>
+      <c:FormField FieldID="FOLLOWUPCOMPLETED" DataType="Boolean" Caption="Follow-up completed"  >
+      </c:FormField>
+      <c:FormField FieldID="FOLLOWUPSTATUSCODEID" DataType="TinyInt" Caption="Follow-up status" >
+        <c:CodeTable CodeTableName="USR_UMHS_MIMEDFOLLOWUPSTATUSCODE"  />
+      </c:FormField>
+      <c:FormField FieldID="FOLLOWUPSTATUSCODE" DataType="TinyInt" Caption="Follow-up status" DefaultValueText="0" AvailableToClient="false" Hidden="true" >
+        <c:ValueList>
+          <c:Items>
+            <c:Item>
+              <c:Value>0</c:Value>
+              <c:Label> </c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>1</c:Value>
+              <c:Label>Unsuccessful</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>2</c:Value>
+              <c:Label>Successful</c:Label>
+            </c:Item>
+          </c:Items>
+        </c:ValueList>
+      </c:FormField>
+      <c:FormField FieldID="REFERRALDATE" DataType="Date" Caption="Referral date" Required="true" />
+      <c:FormField FieldID="UMHSDEVSTAFFID" DataType="Guid" Caption="MIMED Development staff" Required="true">
+        <c:SearchList SearchListID="35fa0186-b669-436f-913a-5e9fd5e59982" EnableQuickFind="true" />
+      </c:FormField>
+      <c:FormField FieldID="COMMENTS" Caption="Comments" />
+    </c:FormFields>
+    <c:FormUIComponent />
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSReferralFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSReferralForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+  </c:FormMetaData>
+</AddDataFormTemplateSpec>

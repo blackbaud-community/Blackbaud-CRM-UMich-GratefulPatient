@@ -1,0 +1,22 @@
+﻿<TaskSpec
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="bb_appfx_task"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="89c81079-fe22-4f97-917b-7eebd5242957"
+	Name="MIMED Logging Report"
+	Description="View the MIMED Logging Report."
+	Author="UM Dev"
+	FunctionalAreaID="00050ce8-8abb-4a86-b9af-70a035ce0582"
+  TaskGroup="Reports"
+	Sequence="102"
+	ImageKey="RES:Reports"
+	>
+
+	<!-- indicate what this task should do (navigate to a page, show a form, etc. -->
+  <ShowPage PageID="c0f23579-43e3-48a6-af9e-9cb73790e3bf" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes" />
+   
+
+
+
+</TaskSpec>

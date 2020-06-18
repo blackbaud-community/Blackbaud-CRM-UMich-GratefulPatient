@@ -1,0 +1,14 @@
+<PackageSpec 
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="06DF558A-DF1A-4C7D-9803-3F05ACF95EF3"
+    Name="Package for CSR-DRT-1685_jiac (Custom)"
+    Description="CSR-DRT-1685_jiac: Modify MIMED Search to allow adding Individual, Organization, Group and Household."
+    Author="UM Dev"
+    >
+
+	<c:DependencyList>
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDataAdd.Task.xml" />
+  </c:DependencyList>
+
+</PackageSpec>

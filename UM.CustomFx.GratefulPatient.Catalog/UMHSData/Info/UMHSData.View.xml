@@ -1,0 +1,205 @@
+<ViewDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="09205855-aabd-4266-9b21-b9bf09ca2488"
+    Name="MIMED Data View Form"
+    Description="Used for viewing a given MIMED Data"
+    Author="UM Dev"
+    DataFormInstanceID="97d591d1-75b1-417f-94da-a03fca7357e4"
+    RecordType="MIMED Data"
+    c:SecurityUIFolder="MIMED Data"
+    OwnerIDMapperID="00000000-0000-0000-0000-000000000000"
+    xmlns="bb_appfx_viewdataformtemplate"
+    >
+    <SPDataForm SPName="USR_USP_DATAFORMTEMPLATE_VIEW_UMHS_DATA">
+        <c:CreateProcedureSQL>
+        <![CDATA[
+       CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_VIEW_UMHS_DATA (@ID                      UNIQUEIDENTIFIER,
+                                                                      @DATALOADED              BIT = 0 OUTPUT,
+                                                                      @MRN                     NVARCHAR(50) = NULL OUTPUT,
+                                                                      @CPISEQUENCE             NVARCHAR(50) = NULL OUTPUT,
+                                                                      @FIRSTNAME               NVARCHAR(50) = NULL OUTPUT,
+                                                                      @MIDDLENAME              NVARCHAR(50) = NULL OUTPUT,
+                                                                      @KEYNAME                 NVARCHAR(100) = NULL OUTPUT,
+                                                                      @BIRTHDATE               DBO.UDT_FUZZYDATE = NULL OUTPUT,
+                                                                      @AGE                     INT = NULL OUTPUT,
+                                                                      @TITLECODE               NVARCHAR(100) = NULL OUTPUT,
+                                                                      @TITLE2CODE              NVARCHAR(100) = NULL OUTPUT,
+                                                                      @SUFFIXCODE              NVARCHAR(100) = NULL OUTPUT,
+                                                                      @SUFFIX2CODE             NVARCHAR(100) = NULL OUTPUT,
+                                                                      @NICKNAME                NVARCHAR(100) = NULL OUTPUT,
+                                                                      @LOOKUPID                NVARCHAR(100) = NULL OUTPUT,
+                                                                      @INFOSOURCECODE          NVARCHAR(100) = NULL OUTPUT,
+                                                                      --@INFOSOURCECODEID        UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                      @ISDMINELIGIBLE            BIT = NULL OUTPUT,
+                                                                      @DMINELIGIBLEREASONCODEID  NVARCHAR(100) = NULL OUTPUT,
+                                                                      @GENDERCODE              TINYINT = NULL OUTPUT,
+                                                                      @DATECREATED             DATETIME = NULL OUTPUT,
+                                                                      @DATEUPDATED             DATETIME = NULL OUTPUT,
+                                                                      @MSG                     NVARCHAR(100) = NULL OUTPUT,
+                                                                      @CURRENTAPPUSERID        uniqueidentifier 
+        )
+        AS
+            SET NOCOUNT ON;
+            -- be sure to set this, in case the select returns no rows
+            SET @DATALOADED = 0;
+
+            -- populate the output parameters, which correspond to fields on the form.  Note that
+            -- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+            -- will display a "no data loaded" message.
+            SELECT @DATALOADED = 1,
+                   @MRN = D.MRN,
+                   @CPISEQUENCE = D.CPISEQUENCE,
+                   @FIRSTNAME = D.FIRSTNAME,
+                   @MIDDLENAME = D.MIDDLENAME,
+                   @KEYNAME = D.KEYNAME,
+                   @BIRTHDATE = D.BIRTHDATE,
+                   @AGE = D.AGE,
+                   @TITLECODE = T1.[DESCRIPTION],
+                   @TITLE2CODE = T2.[DESCRIPTION],
+                   @SUFFIXCODE = S1.[DESCRIPTION],
+                   @SUFFIX2CODE = S2.[DESCRIPTION],
+                   @NICKNAME = D.NICKNAME,
+                   @GENDERCODE = D.GENDERCODE,  
+                   @LOOKUPID = C.LOOKUPID,
+                   @INFOSOURCECODE = I.[DESCRIPTION],
+                   @ISDMINELIGIBLE = D.ISDMINELIGIBLE,
+                   @DMINELIGIBLEREASONCODEID = DMC.[DESCRIPTION],
+                   @DATECREATED = D.DATEADDED,
+                   @DATEUPDATED = D.DATECHANGED
+            FROM   DBO.USR_UMHS_DATA D
+            INNER JOIN DBO.CONSTITUENT C on C.ID=D.CONSTITUENTID
+            LEFT OUTER JOIN DBO.INFOSOURCECODE I on I.ID=D.INFOSOURCECODEID
+            LEFT OUTER JOIN DBO.TITLECODE T1 on T1.ID=D.TITLECODEID
+            LEFT OUTER JOIN DBO.TITLECODE T2 on T2.ID=D.TITLE2CODEID
+            LEFT OUTER JOIN DBO.SUFFIXCODE S1 on S1.ID=D.SUFFIXCODEID
+            LEFT OUTER JOIN DBO.SUFFIXCODE S2 on S2.ID=D.SUFFIX2CODEID
+            LEFT OUTER JOIN DBO.USR_UMHS_DMINELIGIBLEREASONCODE DMC on D.DMINELIGIBLEREASONCODEID = DMC.ID
+            WHERE  
+              D.CONSTITUENTID = @ID
+
+           /* --Audit code start */
+			          DECLARE @USERNAME VARCHAR(100)
+			          DECLARE @DISPLAYNAME VARCHAR(100)
+			          DECLARE @NAME VARCHAR(200)
+			          DECLARE @EVENTMESSAGE VARCHAR(1000)
+			          DECLARE @PID VARCHAR(100)
+			          DECLARE @PATIENTONLY BIT
+			          DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+			          SELECT @USERNAME = USERNAME
+					        ,@DISPLAYNAME = DISPLAYNAME
+			          FROM APPUSER 
+			          WHERE ID = @CURRENTAPPUSERID
+  
+			          SELECT @NAME = NAME
+					        ,@PID = LOOKUPID
+			          FROM CONSTITUENT
+				        inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+			          WHERE CONSTITUENT.ID = @ID
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+
+				        Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='9bd55710-e3fe-4210-aff2-279ac0570f37' --MIMED Info subtab
+                Declare @CONTEXTRECORDID uniqueidentifier = null
+                SET @CONTEXTRECORDID = (SELECT ID from dbo.USR_UMHS_DATA WHERE CONSTITUENTID = @ID)
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @CONTEXTRECORDID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+              
+            /* --Audit code end */
+            
+            RETURN 0; 
+            
+            
+            
+        ]]>
+</c:CreateProcedureSQL>
+    </SPDataForm>
+    <c:FormMetaData FixedDialog="true">
+        <c:FormFields>
+            <c:FormField FieldID="MRN" MaxLength="50" Caption="MRN" />
+            <c:FormField FieldID="CPISEQUENCE" MaxLength="50" Caption="CPI seq" />
+            <c:FormField FieldID="FIRSTNAME" MaxLength="50" Caption="First name" />
+            <c:FormField FieldID="MIDDLENAME" MaxLength="50" Caption="Middle name" />
+            <c:FormField FieldID="KEYNAME" MaxLength="100" Caption="Last name" />
+            <c:FormField FieldID="BIRTHDATE" DataType="FuzzyDate" Caption="Birth date" />
+            <c:FormField FieldID="AGE" DataType="Integer" ReadOnly="true" Caption="Age" />
+            <c:FormField FieldID="TITLECODE" MaxLength="100" Caption="Title" />
+            <c:FormField FieldID="TITLE2CODE" MaxLength="100" Caption="Title 2" />
+            <c:FormField FieldID="SUFFIXCODE" MaxLength="100" Caption="Suffix" />
+            <c:FormField FieldID="SUFFIX2CODE" MaxLength="100" Caption="Suffix 2" />
+            <c:FormField FieldID="NICKNAME" MaxLength="100" Caption="Nickname" />
+           <c:FormField FieldID="LOOKUPID" DataType="String" Caption="Lookup ID" ReadOnly="true" ></c:FormField>
+          <c:FormField FieldID="INFOSOURCECODE" MaxLength="100" Caption="Information source" CaptionResourceKey="$$information_source" />
+            <c:FormField FieldID="ISDMINELIGIBLE" DataType="Boolean" Caption="Direct Mail Ineligible" />
+          <c:FormField FieldID="DMINELIGIBLEREASONCODEID" MaxLength="100" Caption="Reason"/>
+            <c:FormField FieldID="GENDERCODE" DataType="TinyInt" Caption="Gender" DefaultValueText="0">
+                <c:ValueList>
+                    <c:Items>
+                        <c:Item>
+                            <c:Value>0</c:Value>
+                            <c:Label>Unknown</c:Label>
+                        </c:Item>
+                        <c:Item>
+                            <c:Value>1</c:Value>
+                            <c:Label>Male</c:Label>
+                        </c:Item>
+                        <c:Item>
+                            <c:Value>2</c:Value>
+                            <c:Label>Female</c:Label>
+                        </c:Item>
+                    </c:Items>
+                </c:ValueList>
+            </c:FormField>
+           
+            <c:FormField FieldID="DATECREATED" Caption="Date created" DataType="Date" ReadOnly="true" IncludeTimeOnDate="false" />
+            <c:FormField FieldID="DATEUPDATED" Caption="Date last updated" DataType="Date" ReadOnly="true" IncludeTimeOnDate="false" />
+          <c:FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100"  Hidden="true" />
+        </c:FormFields>
+        <c:FormUIComponent />
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDataViewFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSDataViewForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+      <c:FieldGroups>
+        <c:FieldGroup ID="UMHSINFORMATION" Caption="MIMED Information" CaptionResourceKey="$$UMHS_information">
+          <c:Fields>
+            <c:Field>MRN</c:Field>
+            <c:Field>CPISEQUENCE</c:Field>
+            <c:Field>LOOKUPID</c:Field>
+            <c:Field>KEYNAME</c:Field>
+            <c:Field>FIRSTNAME</c:Field>
+            <c:Field>MIDDLENAME</c:Field>
+            <c:Field>TITLECODE</c:Field>
+            <c:Field>TITLE2CODE</c:Field>
+            <c:Field>SUFFIXCODE</c:Field>
+            <c:Field>SUFFIX2CODE</c:Field>
+            <c:Field>NICKNAME</c:Field>
+            <c:Field>BIRTHDATE</c:Field>
+            <c:Field>GENDERCODE</c:Field>
+            <c:Field>ISDMINELIGIBLE</c:Field>
+            <c:Field>DMINELIGIBLEREASONCODEID</c:Field>
+          </c:Fields>
+        </c:FieldGroup>
+        <c:FieldGroup ID="SOURCEINFORMATION" Caption="MIMED source" CaptionResourceKey="$$UMHS_source">
+          <c:Fields>
+            <c:Field>INFOSOURCECODE</c:Field>
+          </c:Fields>
+        </c:FieldGroup>
+      </c:FieldGroups>
+
+      <c:UIFields>        
+        <c:FormField FieldID="PRIMARYIMAGE" CaptionResourceKey="$$primary_image" />
+      </c:UIFields>
+      
+    </c:FormMetaData>
+</ViewDataFormTemplateSpec>

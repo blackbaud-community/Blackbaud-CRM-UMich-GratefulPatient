@@ -1,0 +1,79 @@
+﻿<BatchTypeSpec
+	xmlns="bb_appfx_batchtype"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="b32ddea3-f332-4c73-88f1-94a2c5c35845" 
+	Name="MIMED Referral Batch"
+	Description="A batch type for adding MIMED referral batch records" 
+	Author="UM Dev"
+	BaseTableName="USR_UMHS_REFERRALBATCH" 
+	Category="MIMED Data" 
+	>
+
+	<!-- indicate the form used to add a row to the batch (note that this is the template ID, not the instance ID) -->
+	<AddRowDataFormTemplate CatalogItemID="0eba95c8-22a7-451c-9fab-55d27024b8d0" />
+
+	<!-- indicate the form used to edit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<EditRowDataFormTemplate CatalogItemID="e7c26d36-7787-461d-ab70-a1a005e35106" />
+
+	<!-- indicate the form used to commit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<CommitRowDataForms>
+    <CommitRowAddDataFormTemplate CatalogItemID="82aa0fe8-40f6-40c3-8c5b-54951b709a6b"  />
+    
+	</CommitRowDataForms>
+	
+	<!-- indicate the record operation used to delete a row from the batch -->
+	<BatchDeleteRowRecordOperation CatalogItemID="3b796579-08d9-45f3-812f-1b4a33566908" />
+
+	<!-- optionally, you can override the default 'batch delete' behavior by specifying the record operation to use deleting a batch of this type -->
+	<!--<DeleteBatchRecordOperation CatalogItemID="REPLACE_WITH_RECORDOPERATIONID" />-->
+
+	<!-- optionally, describe the batch row context window -->
+	<!--<RowContextWindow Caption="REPLACE_WITH_CAPTION" 
+				      ViewDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  EditDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  ImageKey="REPLACE_WITH_IMAGEKEY" 
+					  RecordType="REPLACE_WITH_RECORDTYPE" 
+					  ContextFieldID="REPLACE_WITH_CONTEXTFIELDID" 
+					  />-->
+
+	<!-- optionally, you can indicate a report to use as the validation report for the batch -->
+	<!--<ValidationReport CatalogItemID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe a control report for batches of this type -->
+	<!--<ControlReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				   QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+				   ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe an exception report for batches of this type -->
+	<!--<ExceptionReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				     QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+					 ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe the client-side summary panel for batches of this type.  This should refer to a class that inherits 
+	from Browser.Batch.BatchSummaryPanelHandler -->
+	<!--<SummaryPanelHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />-->
+
+	<!-- optionally, list any client-side event handlers that will be plugged into the event model for the batch data entry form.  Each handler
+	refers to a class that inherits from Browser.Batch.BatchEntryHandler -->
+	<!--<EventHandlers>
+		<BatchEventHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />
+	</EventHandlers>-->
+
+	<!-- optionally, indicate a list of fields from the Add/Edit form that should be included by default in the batch design.  This list
+	does not need to include required or hidden fields, as they are already included by default.	
+	-->
+  <DefaultSelectedFields>
+    <Field>UMHSID</Field>
+    <Field>REFERRERID</Field>
+    <Field>REFERRERROLECODEID</Field>
+    <Field>AFFILIATIONBASENAMECODEID</Field>
+    <Field>DEPARTMENTID</Field>
+    <Field>SUBDEPARTMENTID</Field>
+    <Field>REFERRALDATE</Field>
+    <Field>UMHSDEVSTAFFID</Field>
+    <Field>FOLLOWUPCOMPLETED</Field>
+    <Field>FOLLOWUPSTATUSCODE</Field>
+    <Field>COMMENTS</Field>
+  </DefaultSelectedFields>
+
+</BatchTypeSpec>

@@ -1,0 +1,38 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="dee5f77f-548d-46e6-8347-7ceb29b62b6a"
+	Name="MIMED Providers"
+	Description="Stores information about MIMED providers records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_PROVIDERS"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField Name="CONSTITUENTID" ForeignTable="CONSTITUENT" Required="true" Cardinality="OneToOne" OnDelete="RaiseError"/>
+    <ForeignKeyField Name="DEPARTMENTID" ForeignTable="USR_UMHS_DEPARTMENT"/>
+    <ForeignKeyField Name="SUBDEPARTMENTID" ForeignTable="USR_UMHS_SUBDEPARTMENT"/>
+    <TextField Name="PROVIDERDRNUMBER" Description="Provider doctor number" Length="50" IsUnique="true"/>
+    <BooleanField Name="ADMITDOCTORIND" Description="Admitting Provider Y/N"/>
+    <BooleanField Name="ATTENDDOCTORIND" Description="Attending Provider Y/N"/>
+    <BooleanField Name="RESIDENTDOCTORIND" Description="Resident Provider Y/N"/>
+    <BooleanField Name="CONSULTDOCTORIND" Description="Consulting Provider Y/N"/>    
+    <TextField Name="PHONE" Description="Provider Phone" Length="100"/>
+    <DateField Name="UMHSDATA_LASTPROCDATE" Description="Date on the records imported from the UMHSDATA datamart." />
+    <TextField Name="UMEMPLID" Description="U-M Unique (employment) ID" Length="200" DefaultValue=""/>
+    <TextField Name="UMUNIQUENAME" Description="U-M Unique Name" Length="200" DefaultValue="" />
+  </Fields>
+  
+	<!-- define any additional check constraints on the table -->  
+  <Indexes>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+        <IndexField Name="PROVIDERDRNUMBER" Direction="ASC"/>
+      </IndexFields>
+    </Index>
+  </Indexes>
+		
+</TableSpec>

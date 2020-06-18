@@ -1,0 +1,260 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="0df28b0a-7d6a-417b-a990-1218ac17c55b"
+    Name="MIMED Address Add Form"
+    Description="Used for adding a new MIMED Address"
+    Author="UM Dev"
+    RecordType="MIMED Address"
+    DataFormInstanceID="76d17156-002d-415d-a534-23ba9529025d"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    FormHeader="Add MIMED Address"
+    >
+  <SPDataForm>
+    <LoadImplementation SPName="USP_UMHS_DATAFORMTEMPLATE_ADD_ADDRESS_PRELOAD" >
+      <c:CreateProcedureSQL>
+        <![CDATA[
+            create procedure dbo.USP_UMHS_DATAFORMTEMPLATE_ADD_ADDRESS_PRELOAD (
+				    @UMHSID uniqueidentifier,
+				    @ISPRIMARY bit = null output,						
+						@COUNTRYID uniqueidentifier = null output,	
+            @VALIDATIONCOUNTRIES xml = null output,
+						@ZIPLOOKUPCOUNTRIES xml = null output,
+						@FORCEDPRIMARY bit = null output,			-- used by constituent data review
+						@CANEDITPRIMARY bit = null output,			-- used by constituent data review
+						@INVALIDFIELDS nvarchar(256) = null output	-- used by constituent data review
+			 
+			        ) as 
+						set nocount on;						
+						
+            exec @COUNTRYID = dbo.UFN_COUNTRY_GETDEFAULT;
+            
+							select
+								@ISPRIMARY = case when count(ADDRESS.ID) = 0 then 1 else 0 end
+							from
+								dbo.USR_UMHS_ADDRESS ADDRESS
+							where
+								ADDRESS.UMHSID = @UMHSID;
+								
+						select @VALIDATIONCOUNTRIES = dbo.UFN_COUNTRY_GETVALIDATIONCOUNTRIES_TOITEMLISTXML();
+				    select @ZIPLOOKUPCOUNTRIES = dbo.UFN_ZIPCITYSTATE_GETCOUNTRIES_TOITEMLISTXML();
+						
+			            return 0;
+        
+        ]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_ADDRESS">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_ADDRESS (@ID                    UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                            @CHANGEAGENTID         UNIQUEIDENTIFIER = NULL,
+                                                                            @UMHSID                UNIQUEIDENTIFIER,
+                                                                            @ADDRESSTYPECODEID     UNIQUEIDENTIFIER = NULL,
+                                                                            @ISPRIMARY             BIT = 0,
+                                                                            @DONOTMAIL             BIT = 0,
+                                                                            @COUNTRYID             UNIQUEIDENTIFIER,
+                                                                            @STATEID               UNIQUEIDENTIFIER = NULL,
+                                                                            @ADDRESSBLOCK          NVARCHAR(150) = '',
+                                                                            @CITY                  NVARCHAR(50) = '',
+                                                                            @POSTCODE              NVARCHAR(12) = '',
+                                                                            @DONOTMAILREASONCODEID UNIQUEIDENTIFIER = NULL,
+                                                                            @HISTORICALSTARTDATE   DATETIME = NULL,
+                                                                            @HISTORICALENDDATE     DATETIME = NULL,
+                                                                            @ISCONFIDENTIAL        BIT = 0,
+                                                                            @INFOSOURCECODEID      UNIQUEIDENTIFIER = NULL,
+                                                                            @INFOSOURCECOMMENTS    NVARCHAR(256) = ''
+)
+AS
+  SET NOCOUNT ON;
+
+  IF @ID IS NULL
+    SET @ID = NEWID()
+
+  IF @CHANGEAGENTID IS NULL
+    EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+      @CHANGEAGENTID OUTPUT
+
+  DECLARE @CURRENTDATE DATETIME = GETDATE()
+
+  BEGIN TRY
+
+    --
+    -- Clear the primary indicator for all of the current addresses
+    -- order to set the Primary flag on the new address
+    --
+    if @ISPRIMARY = 1 
+    begin
+    update dbo.USR_UMHS_ADDRESS
+    set
+	    ISPRIMARY = 0,
+	    CHANGEDBYID = @CHANGEAGENTID,
+	    DATECHANGED = @CURRENTDATE
+    where
+      UMHSID=@UMHSID				
+    end
+              
+    -- Insert new address
+    INSERT INTO DBO.USR_UMHS_ADDRESS
+      (ID,
+        UMHSID,
+        ADDRESSTYPECODEID,
+        ISPRIMARY,
+        DONOTMAIL,
+        COUNTRYID,
+        STATEID,
+        ADDRESSBLOCK,
+        CITY,
+        POSTCODE,
+        DONOTMAILREASONCODEID,
+        HISTORICALSTARTDATE,
+        HISTORICALENDDATE,
+        ISCONFIDENTIAL,
+        INFOSOURCECODEID,
+        INFOSOURCECOMMENTS,
+        ADDEDBYID,
+        CHANGEDBYID,
+        DATEADDED,
+        DATECHANGED)
+    VALUES      
+       (@ID,
+        @UMHSID,
+        @ADDRESSTYPECODEID,
+        @ISPRIMARY,
+        @DONOTMAIL,
+        @COUNTRYID,
+        @STATEID,
+        @ADDRESSBLOCK,
+        @CITY,
+        @POSTCODE,
+        @DONOTMAILREASONCODEID,
+        @HISTORICALSTARTDATE,
+        @HISTORICALENDDATE,
+        @ISCONFIDENTIAL,
+        @INFOSOURCECODEID,
+        @INFOSOURCECOMMENTS,
+        @CHANGEAGENTID,
+        @CHANGEAGENTID,
+        @CURRENTDATE,
+        @CURRENTDATE)
+                               
+  END TRY
+
+  BEGIN CATCH
+      EXEC DBO.USP_RAISE_ERROR
+
+      RETURN 1
+  END CATCH
+
+RETURN 0 
+		
+
+            ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions xmlns="bb_appfx_commontypes">
+        <Constraints>
+          <Constraint Name="CK_USR_UMHS_ADDRESS_PRIMARYCOUNT" Field="ISPRIMARY" Type="Format">
+            <CustomErrorMsg>There is already a primary address for this contact.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_ADDRESS_VALIDHISTORICALDATERANGE" Field="HISTORICALENDDATE" Type="Format">
+            <CustomErrorMsg>The start date must be on or before the end date.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_ADDRESS_ENDDATEINVALIDIFPRIMARY" Field="HISTORICALENDDATE" Type="Format">
+            <c:CustomErrorMsg>Primary address cannot have an end date.</c:CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_ADDRESS_UNIQUEADDRESSANDTYPE" Field="ADDRESSBLOCK" Type="Format">
+            <CustomErrorMsg>The address you entered already exists for this contact.</CustomErrorMsg>
+          </Constraint>
+        </Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="ADDRESSTYPECODEID" DataType="Guid" Caption="Address type">
+        <CodeTable CodeTableName="ADDRESSTYPECODE" />
+      </FormField>
+      <FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Set as primary address" />
+      <FormField FieldID="ADDRESSBLOCK" MaxLength="150" Caption="Address" Multiline="true" />
+      <FormField FieldID="CITY" MaxLength="50" Caption="City" />
+      <FormField FieldID="STATEID" DataType="Guid" Caption="State">
+        <SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7">
+          <Params>
+            <Param ID="COUNTRYID">
+              <Value>Fields!COUNTRYID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="COUNTRYID" DataType="Guid" Required="true" Caption="Country">
+        <SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+      </FormField>
+      <FormField FieldID="POSTCODE" MaxLength="12" Caption="ZIP" DefaultValueText="">
+        <SearchList SearchListID="e5de8c33-de58-4dc6-9a13-48be9f03db81" DisplayTextIsValue="true" />
+      </FormField>
+      <!--<FormField FieldID="VALIDATIONMESSAGE" MaxLength="100" Caption="Validation message" DefaultValueText="" CaptionResourceKey="$$validation_message" />-->
+
+      <FormField FieldID="ZIPLOOKUPCOUNTRIES" DataType="XML" ReadOnly="true" Hidden="true">
+        <Collection>
+          <Fields>
+            <FormField FieldID="COUNTRYID" DataType="Guid" Caption="CountryID" CaptionResourceKey="$$countryid" />
+            <FormField FieldID="COUNTRYNAME" Caption="Name" CaptionResourceKey="$$name" />
+          </Fields>
+        </Collection>
+      </FormField>
+      <FormField FieldID="VALIDATIONCOUNTRIES" DataType="XML" ReadOnly="true" Hidden="true">
+        <Collection>
+          <Fields>
+            <FormField FieldID="COUNTRYID" DataType="Guid" Caption="CountryID" CaptionResourceKey="$$countryid" />
+            <FormField FieldID="BROWSABLE" DataType="Boolean" Caption="Browsable" CaptionResourceKey="$$browsable" />
+          </Fields>
+        </Collection>
+      </FormField>
+      <FormField FieldID="DONOTMAIL" DataType="Boolean" Caption="Do not send mail to this address" />
+      <FormField FieldID="DONOTMAILREASONCODEID" DataType="Guid" Caption="Reason">
+        <CodeTable CodeTableName="DONOTMAILREASONCODE" />
+      </FormField>
+      <FormField FieldID="HISTORICALSTARTDATE" DataType="Date" Caption="Start date" />
+      <FormField FieldID="HISTORICALENDDATE" DataType="Date" Caption="End date" />
+      <FormField FieldID="ISCONFIDENTIAL" DataType="Boolean" Caption="This address is confidential" />
+      <FormField FieldID="FORCEDPRIMARY" DataType="Boolean" ReadOnly="true" Hidden="true" />
+      <FormField FieldID="CANEDITPRIMARY" DataType="Boolean" ReadOnly="true" Hidden="true" />
+      <FormField FieldID="INVALIDFIELDS" ReadOnly="true" Hidden="true" MaxLength="256" />
+      <FormField FieldID="INFOSOURCECODEID" DataType="Guid" Caption="Information source">
+        <CodeTable CodeTableName="INFOSOURCECODE" />
+      </FormField>
+      <FormField FieldID="INFOSOURCECOMMENTS" MaxLength="256" Caption="Comments" Multiline="true" />
+    </FormFields>
+
+        <WebUIComponent>
+            <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSAddressFormUIModel" />
+            <WebUI>
+                <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSAddressForm.html" />
+            </WebUI>
+        </WebUIComponent>
+    
+    <FieldGroups>
+      <FieldGroup ID="ADDRESSINFORMATION" Caption="Address information" CaptionResourceKey="$$address_information">
+        <Fields>
+          <Field>ADDRESSTYPECODEID</Field>
+          <Field>COUNTRYID</Field>
+          <Field>ADDRESSBLOCK</Field>
+          <Field>CITY</Field>
+          <Field>STATEID</Field>
+          <Field>POSTCODE</Field>
+          <Field>ISPRIMARY</Field>
+          <Field>DONOTMAIL</Field>
+          <Field>DONOTMAILREASONCODEID</Field>
+          <Field>ISCONFIDENTIAL</Field>
+        </Fields>
+      </FieldGroup>
+      <FieldGroup ID="ADDRESSSOURCE" Caption="Address source" CaptionResourceKey="$$address_source">
+        <Fields>
+          <Field>INFOSOURCECODEID</Field>
+          <Field>INFOSOURCECOMMENTS</Field>
+        </Fields>        
+      </FieldGroup>
+    </FieldGroups>
+  </FormMetaData>
+</AddDataFormTemplateSpec>

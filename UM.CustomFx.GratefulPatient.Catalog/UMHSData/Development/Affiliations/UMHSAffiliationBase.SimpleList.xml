@@ -1,0 +1,32 @@
+﻿<SimpleDataListSpec
+	xmlns="bb_appfx_simpledatalist"
+	xmlns:c="bb_appfx_commontypes"
+	ID="4c646cee-0f5b-4197-b4d3-0869693cfc2d"
+	Name="MIMED Affiliation Base Simple Data List"
+	Description="A simple data list that returns MIMED affiliation base records"
+	Author="UM Dev"
+	TranslationFunctionID="00000000-0000-0000-0000-000000000000"
+	>
+
+	<SPSimpleList SPName="USR_UM_USP_SIMPLEDATALIST_UMHSAFFILIATIONBASE">
+		<c:CreateProcedureSQL >
+			<![CDATA[
+create procedure dbo.USR_UM_USP_SIMPLEDATALIST_UMHSAFFILIATIONBASE
+		(
+		@AFFILIATIONCATEGORYCODEID uniqueidentifier = null
+		)
+		as
+		IF @AFFILIATIONCATEGORYCODEID is not null
+		BEGIN
+		SELECT
+		ID AS VALUE,
+		UMHSAFFILIATIONBASENAME AS LABEL
+		FROM dbo.USR_UMHS_AFFILIATIONBASE
+		WHERE UMHSAFFILIATIONCATEGORYCODEID = @AFFILIATIONCATEGORYCODEID
+		ORDER BY UMHSAFFILIATIONBASENAME
+		END
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSimpleList>
+
+</SimpleDataListSpec>

@@ -1,0 +1,18 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="82cc78c7-4b28-43f4-b923-afe3848b80f5"
+	Name="MIMED Constituent"
+	Description="Stores information about MIMED constituent records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_CONSTITUENT_EXT"		   
+	IsBuiltIn="false" 
+  PrimaryKeyAsForeignKeyTablename="CONSTITUENT"
+	>
+	<!-- define fields on the table -->
+	<Fields>
+    <NumberField Name="MSEQUENCE" Type="bigint" Description="holds the sequence for the MIMED Friend lastname">
+      <Identity Increment="1" Seed="1"/>
+    </NumberField>
+  </Fields>
+</TableSpec>

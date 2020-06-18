@@ -1,0 +1,42 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="14c244cd-4cdf-4050-9103-e6a3c43f42ee"
+	Name="USR_USP_UMHS_GETUMHSFRIENDKEYNAME"
+	Description="Get new MIMED Friend keyname value for creating a MIMED constituent shell record"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_GETUMHSFRIENDKEYNAME"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USR_USP_UMHS_GETUMHSFRIENDKEYNAME
+(
+  @CONSTITUENTID uniqueidentifier = null OUTPUT,
+  @UMHSFRIENDKEYNAME nvarchar(50) OUTPUT
+)
+as
+begin
+  declare @UMHSFRIENDNUMBER bigint;
+
+
+  
+	exec dbo.USR_USP_UMHS_GETUMHSFRIENDNUMBER @CONSTITUENTID=@CONSTITUENTID OUTPUT, @UMHSFRIENDNUMBER=@UMHSFRIENDNUMBER OUTPUT;
+  
+  /*
+    * Format the UMHS Friend Keyname base off of the new UMHS Friend Number
+    */
+  SET @UMHSFRIENDKEYNAME=CAST(@UMHSFRIENDNUMBER AS NVARCHAR(50));
+
+  if len(@UMHSFRIENDKEYNAME) < 10
+  begin
+    set @UMHSFRIENDKEYNAME =  replicate('0', 10 - len(@UMHSFRIENDKEYNAME)) + @UMHSFRIENDKEYNAME;
+  end
+  
+  set @UMHSFRIENDKEYNAME =  N'MIMED Friend M' +  @UMHSFRIENDKEYNAME;
+  
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

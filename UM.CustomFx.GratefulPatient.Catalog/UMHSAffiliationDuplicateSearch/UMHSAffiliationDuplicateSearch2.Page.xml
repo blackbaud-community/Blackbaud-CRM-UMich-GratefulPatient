@@ -1,0 +1,132 @@
+﻿<PageDefinitionSpec 
+    xmlns="bb_appfx_pagedefinition" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="a119b42e-a24c-4373-a183-ff279880229c"
+    Name="UMHS Contact and U-M Affiliation Duplicate Review Page"
+    Description="Displays list of MIMED Contact Duplicates to U-M Affiliated Constituents that need review"
+    Author="UM Dev"
+    ContextRecordType="Deleted MIMED Contacts and Friend (shell) records"	
+    >
+
+	<!-- define how the page header should appear -->
+	<PageHeader Caption="MIMED Friend Constituent Duplicate Review" />
+  
+	<!-- define the tabs for the page - note that if only one tab is present, then that tab's sections are promoted to the page level (ie., the tab
+	itself isn't shown -->
+	<Tabs>
+		<Tab ID="D87D03A0-CFD6-4F84-8C84-50286416FDE5" Caption="Review Duplicates">
+
+			<!-- define the sections for this tab -->
+			<Sections>
+        <Section ID="2CE8F4CF-36EA-4B05-8FFE-280242ED193C" Caption="Review MIMED Contact and U-M Affiliation Duplicate">
+          <ListBuilder QueryViewID="e7a024a1-1ae0-42d3-a14b-8446c8c7a6cb">
+            <RequiredColumns>
+              <Column Name="ID" />
+              <Column Name="MATCHSETID" />
+              <Column Name="MATCHEDCONSTITUENTID" />
+              <Column Name="MATCHEDCONSTITUENTNAME" />
+              <Column Name="MRN" />
+              <Column Name="MIMEDCONSTITUENTID" />
+              <Column Name="MIMEDCONSTITUENTLOOKUPID" />
+            </RequiredColumns>
+            <RenderStyle>
+              <StandardView>
+              </StandardView>
+            </RenderStyle>
+          </ListBuilder>
+					<Actions>
+            <Action ID="5F774869-B057-411D-BC6A-0553213AA13C" Caption="Review Status: Complete" ImageKey="RES:check">
+              <c:ExecuteRecordOperation RecordOperationID="48d4b4e1-7d29-4253-ad51-ff0208265b71" ShowPrompt="false">
+                <c:ActionContext>
+                  <c:SectionField>ID</c:SectionField>
+                </c:ActionContext>
+                <c:PostActionEvent>
+                  <c:RefreshSection/>
+                </c:PostActionEvent>
+                <c:AllowsMultiSelect/>
+              </c:ExecuteRecordOperation>
+            </Action>
+            <Action ID="D87D03A0-CFD6-4F84-8C84-50286416FDE5" Caption="Review Status: Delete" ImageKey="RES:actions">
+              <c:ExecuteRecordOperation RecordOperationID="e8830cb8-0be5-4185-b1ac-0be495962749" ShowPrompt="false">
+                <c:ActionContext>
+                  <c:SectionField>ID</c:SectionField>
+                </c:ActionContext>
+                <c:PostActionEvent>
+                  <c:RefreshSection/>
+                </c:PostActionEvent>
+                <c:AllowsMultiSelect/>
+              </c:ExecuteRecordOperation>
+            </Action>
+            <Action ID="E9126D9C-6FEA-4395-93A5-861F38E34864" Caption="Review Status: Review" ImageKey="RES:process">
+              <c:ExecuteRecordOperation RecordOperationID="939ad065-11e5-462a-b2c0-733a1e7a0ae3" ShowPrompt="false">
+                <c:ActionContext>
+                  <c:SectionField>ID</c:SectionField>
+                </c:ActionContext>
+                <c:PostActionEvent>
+                  <c:RefreshSection/>
+                </c:PostActionEvent>
+                <c:AllowsMultiSelect/>
+              </c:ExecuteRecordOperation>
+            </Action>
+            <Action ID="69A0473D-1376-4978-BA06-CDCD62198B02" Caption="Go to Matched Constituent" DefaultAction="false" LinkFieldID="MATCHEDCONSTITUENTNAME" >
+              <ShowPage xmlns="bb_appfx_commontypes" PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+                <ActionContext>
+                  <SectionField>MATCHEDCONSTITUENTID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+            <Action ID="F845DFD5-18A2-4671-B04A-615D79C36403" Caption="Go to Matched Constituent" DefaultAction="false" LinkFieldID="MATCHEDCONSTITUENTLOOKUPID" >
+              <ShowPage xmlns="bb_appfx_commontypes" PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+                <ActionContext>
+                  <SectionField>MATCHEDCONSTITUENTID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+            <Action ID="97B414F0-ADF1-419F-B477-0189765AFE9D" Caption="Go to MIMED Constituent" DefaultAction="false" LinkFieldID="MRN" >
+              <ShowPage xmlns="bb_appfx_commontypes" PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+                <ActionContext>
+                  <SectionField>MIMEDCONSTITUENTID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+            <Action ID="75903B34-5C4A-429D-AA64-D6273B481BFB" Caption="Go to MIMED Constituent" DefaultAction="false" LinkFieldID="MIMEDCONSTITUENTLOOKUPID" >
+              <ShowPage xmlns="bb_appfx_commontypes" PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+                <ActionContext>
+                  <SectionField>MIMEDCONSTITUENTID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+            <Action ID="E10F45FD-3CC7-4C2C-AAB5-54C68E02CD5A" Caption="Go to MIMED Constituent" DefaultAction="false" LinkFieldID="MIMEDCONSTITUENTNAME" >
+              <ShowPage xmlns="bb_appfx_commontypes" PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+                <ActionContext>
+                  <SectionField>MIMEDCONSTITUENTID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+            <Action ID="70E7163C-B892-4637-9391-80494ABAF6E6" Caption="Go to MIMED Constituent" DefaultAction="false" LinkFieldID="MIMEDCONTACTNAME" >
+              <ShowPage xmlns="bb_appfx_commontypes" PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+                <ActionContext>
+                  <SectionField>MIMEDCONSTITUENTID</SectionField>
+                </ActionContext>
+              </ShowPage>
+            </Action>
+          </Actions>
+				</Section>
+			</Sections>
+		</Tab>
+    <Tab ID="DDE59C7B-4ECA-4052-8326-9B67CBFF53ED" Caption="History">
+      <!-- define the sections for this tab -->
+      <Sections>
+        <Section ID="69A0473D-1376-4978-BA06-CDCD62198B02" Caption="History">
+          <ListBuilder QueryViewID="53e34667-8657-4864-9774-8bf6545e5851" >
+            <RequiredColumns>
+              <Column Name="ID" />
+              <Column Name="MATCHSETID" />
+              <Column Name="MIMEDMATCHEDRECORDSTOREVIEW" />
+            </RequiredColumns>
+          </ListBuilder>
+        </Section>
+      </Sections>
+    </Tab>
+  </Tabs>
+</PageDefinitionSpec>

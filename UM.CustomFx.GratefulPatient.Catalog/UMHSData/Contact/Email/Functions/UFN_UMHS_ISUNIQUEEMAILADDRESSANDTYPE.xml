@@ -1,0 +1,42 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="2d4a1f90-ffc7-4917-b076-8b5a2cc9d30c"
+	Name="USR_UFN_UMHS_ISUNIQUEEMAILADDRESSANDTYPE"
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_ISUNIQUEEMAILADDRESSANDTYPE"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_ISUNIQUEEMAILADDRESSANDTYPE
+(
+  @UMHSID uniqueidentifier = null,
+	@EMAILADDRESS nvarchar(100) = '',
+	@EMAILADDRESSTYPECODEID uniqueidentifier = null
+)
+returns bit with execute as caller
+as 
+begin
+  DECLARE @EMAILADDRESSCOUNT INT = 0;
+  DECLARE @ISUNIQUE BIT = 1;
+  
+  SELECT 
+    @EMAILADDRESSCOUNT=COUNT(1)
+  FROM USR_UMHS_EMAILADDRESS
+  WHERE
+      UMHSID=@UMHSID
+  AND EMAILADDRESS=@EMAILADDRESS
+  AND EMAILADDRESSTYPECODEID=@EMAILADDRESSTYPECODEID
+  AND NULLIF(isnull(ENDDATE, ''), '') is NULL  
+  
+  IF @EMAILADDRESSCOUNT > 1
+    SET @ISUNIQUE=0;
+    
+  return @ISUNIQUE;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

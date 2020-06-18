@@ -1,0 +1,46 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="2be691e2-9af4-4991-a009-d8e10b23e96a"
+	Name="USP_USR_UMHS_BATCH_ENDDATEPHONE"
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_BATCH_ENDDATEPHONE"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_BATCH_ENDDATEPHONE
+(
+   @ID uniqueidentifier
+  ,@ENDDATE datetime
+  ,@REASONCODEID uniqueidentifier = null
+  ,@CHANGEAGENTID uniqueidentifier = null
+)
+as
+begin
+
+  set nocount on;
+  
+  declare @CURRENTDATE datetime
+
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	set @CURRENTDATE = getdate()
+  
+  update dbo.USR_UMHS_PHONE 
+  set
+     ISPRIMARY=0
+    ,DONOTCALL = 1
+    ,ENDDATE=@ENDDATE
+    ,DONOTCALLREASONCODEID=@REASONCODEID
+    ,CHANGEDBYID=@CHANGEAGENTID
+    ,DATECHANGED=@CURRENTDATE
+  where
+    ID=@ID
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

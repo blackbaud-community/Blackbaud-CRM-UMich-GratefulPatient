@@ -1,0 +1,123 @@
+<GlobalChangeSpec 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    ID="770726C2-48F7-4DEE-A35D-B89D5B4AE0B5"
+    Name="MIMED Interactions Delete Global Change"
+    Description="Deletes selected query of MIMED interactions"
+    Author="UM Dev"
+    SPName="USR_USP_GLOBALCHANGE_DELETE_MIMEDINTERACTIONS"
+    DisplayName="Delete MIMED Interactions"
+    GlobalChangeFolder="MIMED Data"
+    xmlns="bb_appfx_globalchange"
+    >
+  <CreateProcedureSQL>
+<![CDATA[
+ CREATE PROCEDURE DBO.USR_USP_GLOBALCHANGE_DELETE_MIMEDINTERACTIONS (
+  @CHANGEAGENTID    UNIQUEIDENTIFIER = NULL,
+  @ASOF             AS DATETIME = NULL,
+  @NUMBERADDED      INT = 0 OUTPUT,
+  @NUMBEREDITED     INT = 0 OUTPUT,
+  @NUMBERDELETED    INT = 0 OUTPUT,
+  @IDSETREGISTERID  UNIQUEIDENTIFIER = NULL,
+  @CURRENTAPPUSERID UNIQUEIDENTIFIER = NULL
+)
+AS
+  SET NOCOUNT OFF;
+
+  DECLARE @BPID UNIQUEIDENTIFIER;
+  DECLARE @BYPASSSECURITY BIT;
+  DECLARE @BYPASSSITE BIT;
+
+  begin try
+    -- check security permissions and get change agent
+    SET @BPID = '3269A1D1-31CB-4D28-945C-B7623A3EFCCA';
+      declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate();
+	set @NUMBERADDED = 0;
+	set @NUMBEREDITED = 0;
+	set @NUMBERDELETED = 0; 
+
+    EXEC DBO.USP_SECURITY_APPUSER_BYPASSSECURITYFORBUSINESSPROCESS
+      @CURRENTAPPUSERID,
+      @BPID,
+      @BYPASSSECURITY OUTPUT,
+      @BYPASSSITE OUTPUT;
+
+    IF @CHANGEAGENTID IS NULL
+      EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+        @CHANGEAGENTID OUTPUT;
+
+    DECLARE @SELECTION TABLE (
+      ID UNIQUEIDENTIFIER NOT NULL PRIMARY KEY
+    )
+    DECLARE @MIMEDID UNIQUEIDENTIFIER;
+
+    IF @BYPASSSECURITY = 0 OR @BYPASSSITE = 0 -- insert records for which the user has rights
+      BEGIN
+          INSERT INTO @SELECTION
+          SELECT  SELECTEDCONSTITUENT.ID
+          FROM   DBO.UFN_IDSETREADER_GETRESULTS_GUID(@IDSETREGISTERID) SELECTEDCONSTITUENT
+                  LEFT JOIN DBO.UFN_SECURITY_APPUSER_GRANTED_CONSTITIDS_FORBUSINESSPROCESS(@CURRENTAPPUSERID, @BPID) AS CONSTIT_RACS ON SELECTEDCONSTITUENT.ID = CONSTIT_RACS.ID
+          WHERE  ( @BYPASSSECURITY = 1
+                    OR CONSTIT_RACS.ID IS NOT NULL )
+                  AND ( @BYPASSSITE = 1
+                        OR EXISTS (SELECT 1
+                                    FROM   DBO.CONSTITUENTSITE
+                                    WHERE  CONSTITUENTSITE.CONSTITUENTID = SELECTEDCONSTITUENT.ID
+                                          AND DBO.UFN_SECURITY_APPUSER_GRANTED_BUSINESSPROCESS_FORSITE(@CURRENTAPPUSERID, @BPID, CONSTITUENTSITE.SITEID) = 1) )
+      END
+    ELSE
+      BEGIN
+          INSERT INTO @SELECTION
+          SELECT  SELECTEDCONSTITUENT.ID
+          FROM   DBO.UFN_IDSETREADER_GETRESULTS_GUID(@IDSETREGISTERID) SELECTEDCONSTITUENT
+      END
+
+    WHILE (SELECT COUNT(ID) FROM @SELECTION) > 0
+      BEGIN
+          SELECT TOP 1 @MIMEDID = ID FROM @SELECTION
+          
+         DECLARE @MIMEDINTERACTIONIDLIST TABLE (ID UNIQUEIDENTIFIER) 
+          INSERT INTO @MIMEDINTERACTIONIDLIST SELECT I.ID FROM USR_UMHS_INTERACTION I 
+	          JOIN USR_UMHS_DATA D ON D.ID = I.UMHSID
+	          WHERE D.ID =  @MIMEDID
+          
+            WHILE (SELECT COUNT(ID) FROM @MIMEDINTERACTIONIDLIST) > 0
+            BEGIN 
+              declare @MIMEDINTERACTIONID UNIQUEIDENTIFIER
+              SELECT @MIMEDINTERACTIONID = (select top 1 ID from @MIMEDINTERACTIONIDLIST)
+                begin
+	                EXEC DBO.USR_USP_UMHS_INTERACTION_DELETE @ID = @MIMEDINTERACTIONID, @CHANGEAGENTID = @CHANGEAGENTID
+                  set @NUMBERDELETED = @NUMBERDELETED + 1;
+                end
+              DELETE FROM @MIMEDINTERACTIONIDLIST WHERE ID = @MIMEDINTERACTIONID
+            END
+          DELETE FROM @SELECTION WHERE  ID = @MIMEDID
+      END 
+      
+  end try
+  begin catch
+  	exec dbo.USP_RAISE_ERROR;
+		return 1;
+  end catch
+
+]]>
+  </CreateProcedureSQL>
+  <ParametersFormMetaData>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="IDSETREGISTERID" DataType="Guid" Required="true" Caption="Selection">
+          <SearchList SearchListID="98d0070e-c4a7-495b-a438-2ac12da79068" EnableQuickFind="true">
+          </SearchList>
+        </FormField>
+      </FormFields>
+
+        <WebUIComponent>
+            <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDInteractionsDeleteGlobalChangeUIModel" />
+            <WebUI>
+                <DefaultWebUI />
+            </WebUI>
+        </WebUIComponent>
+    </FormMetaData>
+  </ParametersFormMetaData>
+</GlobalChangeSpec>

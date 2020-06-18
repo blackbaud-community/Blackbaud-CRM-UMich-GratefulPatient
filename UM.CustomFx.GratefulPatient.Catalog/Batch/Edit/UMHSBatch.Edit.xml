@@ -1,0 +1,362 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="719f5e47-1f84-44e2-a85d-d143e513d36a" 
+	Name="MIMED Batch Edit Data Form"
+	Description="A data form for editing MIMED batch records" 
+	Author="UM Dev"
+	DataFormInstanceID="30561ffb-6162-435c-a782-3ba7c117ca69" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Edit an MIMED batch"
+	>
+
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH
+(
+     @ID uniqueidentifier
+    ,@BATCHCONSTITUENTID UNIQUEIDENTIFIER = NULL OUTPUT
+    ,@DATALOADED bit = 0  output
+    ,@TSLONG bigint = 0 output
+    ,@SEQUENCE int = null  output
+    -- Batch fields
+    ,@CONSTITUENTID uniqueidentifier = null output    -- Primary Record ID
+    ,@MRN           nvarchar(50) = null output
+    ,@CPISEQUENCE   nvarchar(50) = null output
+    ,@CONSTITUENTLOOKUPID nvarchar(200) = null output
+    ,@FIRSTNAME     nvarchar(50) = null output
+    ,@MIDDLENAME    nvarchar(50) = null output
+    ,@LASTNAME      nvarchar(100) = null output
+    ,@ISUMAFFILATION bit = null output
+    ,@SUFFIXCODEID  uniqueidentifier = null output
+    ,@BIRTHDATE     udt_fuzzydate = null output
+    ,@ADDRESSBLOCK       nvarchar(500) = null output
+    ,@CITY          nvarchar(100) = null output
+    ,@STATEID   uniqueidentifier  = null output
+    ,@POSTCODE       nvarchar(24) = null output
+    ,@COUNTRYID uniqueidentifier = null output
+    ,@ADDRESSTYPECODEID uniqueidentifier = null output
+    ,@INFOSOURCECODEID uniqueidentifier = null output
+    ,@HISTORICALSTARTDATE date = null output
+    ,@PHONENUMBER nvarchar(200) = null output
+    ,@PHONETYPECODEID uniqueidentifier = null output
+    ,@PHONE_COUNTRYID uniqueidentifier = null output
+    ,@PHONE_OTHER nvarchar(200) = null output
+    ,@PHONE_OTHERTYPECODEID uniqueidentifier = null output
+    ,@PHONE_OTHER_COUNTRYID uniqueidentifier = null output
+    ,@PHONESTARTDATE date = null output
+    ,@EMAILADDRESS  nvarchar(100) = null output  
+    ,@EMAILADDRESSTYPECODEID uniqueidentifier = null output 
+    ,@EMAILADDRESSSTARTDATE date = null output
+    ,@GENDERCODE    tinyint  = null output
+    ,@ISDMINELIGIBLE  bit = null output
+    ,@DMINELIGIBLEREASONCODEID uniqueidentifier = null output
+    ,@WEDMSCORECODEID        uniqueidentifier = null output
+    ,@WEDMSCORESTARTDATE date = null output
+    ,@WEESTGIVCAPACITYCODEID uniqueidentifier = null output
+    ,@WEESTGIVCAPACITYCOMMENT nvarchar(510) = null output
+    ,@WEESTGIVCAPACITYSTARTDATE date = null output
+    ,@UMHSDATA_LASTPROCDATE datetime = null output
+    ,@ISGPIMPORTEDRECORD bit = null output    
+    ,@HASUMAFFILIATION bit = null output
+    ,@WEALTHSCORES_TOTALESTIMATEDASSETS nvarchar(50) = null output
+    ,@WEALTHSCORES_RATINGID uniqueidentifier = null output
+)
+as
+
+	set nocount on;
+  
+	-- be sure to set these, in case the select returns no rows
+	set @DATALOADED = 0
+  set @TSLONG = 0
+  
+	-- populate the output parameters, which correspond to fields on the form.  Note that
+	-- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+	-- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+	-- can be considered.
+	select
+     @DATALOADED = 1
+		,@TSLONG = b.TSLONG
+    ,@BATCHCONSTITUENTID = B.BATCHCONSTITUENTID
+    ,@CONSTITUENTID = b.CONSTITUENTID
+	  ,@SEQUENCE = b.SEQUENCE
+    ,@MRN = b.MRN
+    ,@CPISEQUENCE= b.CPISEQUENCE
+    ,@CONSTITUENTLOOKUPID = c.LOOKUPID
+    ,@FIRSTNAME = b.FIRSTNAME
+    ,@MIDDLENAME = b.MIDDLENAME
+    ,@LASTNAME = b.LASTNAME
+    ,@SUFFIXCODEID = b.SUFFIXCODEID
+    ,@BIRTHDATE = b.BIRTHDATE
+    ,@ADDRESSBLOCK = b.ADDRESSBLOCK
+    ,@CITY = b.CITY
+    ,@STATEID = b.STATEID
+    ,@POSTCODE = b.POSTCODE
+    ,@COUNTRYID = b.ADDRESSCOUNTRYID
+    ,@ADDRESSTYPECODEID = b.ADDRESSTYPECODEID
+    ,@INFOSOURCECODEID = b.INFOSOURCECODEID
+    ,@HISTORICALSTARTDATE = b.HISTORICALSTARTDATE
+    ,@PHONENUMBER = b.PHONE
+    ,@PHONETYPECODEID = b.PHONETYPECODEID
+    ,@PHONE_COUNTRYID = b.PHONE_COUNTRYID
+    ,@PHONE_OTHER = b.PHONE_OTHER
+    ,@PHONE_OTHERTYPECODEID = b.PHONE_OTHERTYPECODEID
+    ,@PHONE_OTHER_COUNTRYID = b.PHONE_OTHER_COUNTRYID
+    ,@PHONESTARTDATE = b.PHONESTARTDATE
+    ,@EMAILADDRESS =  b.EMAILADDRESS
+    ,@EMAILADDRESSTYPECODEID = b.EMAILADDRESSTYPECODEID
+    ,@EMAILADDRESSSTARTDATE = b.EMAILADDRESSSTARTDATE
+    ,@GENDERCODE = b.GENDERCODE
+    ,@ISDMINELIGIBLE = b.ISDMINELIGIBLE
+    ,@DMINELIGIBLEREASONCODEID = b.DMINELIGIBLEREASONCODEID
+    ,@WEALTHSCORES_TOTALESTIMATEDASSETS = b.WEALTHSCORES_TOTALESTIMATEDASSETS
+    ,@WEALTHSCORES_RATINGID = b.WEALTHSCORES_RATINGID
+    ,@UMHSDATA_LASTPROCDATE = b.UMHSDATA_LASTPROCDATE
+    ,@ISGPIMPORTEDRECORD = b.ISGPIMPORTEDRECORD
+    ,@HASUMAFFILIATION = b.HASUMAFFILIATION
+	from dbo.USR_UMHS_BATCH b
+  left outer join dbo.CONSTITUENT c on c.ID=b.CONSTITUENTID
+	where 
+      b.ID = @ID
+  
+  set @ISUMAFFILATION=@HASUMAFFILIATION;
+  
+	return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH 
+(
+     @ID uniqueidentifier
+    ,@BATCHCONSTITUENTID UNIQUEIDENTIFIER
+    ,@CHANGEAGENTID uniqueidentifier
+    ,@SEQUENCE int
+    -- Batch fields
+    ,@CONSTITUENTID uniqueidentifier    -- Primary Record ID
+    ,@MRN           nvarchar(50)
+    ,@CPISEQUENCE   nvarchar(50)
+    ,@CONSTITUENTLOOKUPID nvarchar(200)
+    ,@FIRSTNAME nvarchar(50)
+    ,@MIDDLENAME nvarchar(50)
+    ,@LASTNAME nvarchar(100)
+    ,@SUFFIXCODEID  uniqueidentifier
+    ,@BIRTHDATE udt_fuzzydate
+    ,@ADDRESSBLOCK nvarchar(500)
+    ,@CITY nvarchar(100)
+    ,@STATEID uniqueidentifier
+    ,@POSTCODE nvarchar(24)
+    ,@COUNTRYID uniqueidentifier
+    ,@ADDRESSTYPECODEID uniqueidentifier
+    ,@INFOSOURCECODEID uniqueidentifier
+    ,@HISTORICALSTARTDATE date
+    ,@PHONENUMBER nvarchar(200)
+    ,@PHONETYPECODEID uniqueidentifier
+    ,@PHONE_COUNTRYID uniqueidentifier
+    ,@PHONE_OTHER nvarchar(200)
+    ,@PHONE_OTHERTYPECODEID uniqueidentifier
+    ,@PHONE_OTHER_COUNTRYID uniqueidentifier
+    ,@PHONESTARTDATE date
+    ,@EMAILADDRESS  nvarchar(100)  
+    ,@EMAILADDRESSTYPECODEID uniqueidentifier 
+    ,@EMAILADDRESSSTARTDATE date
+    ,@GENDERCODE tinyint
+    ,@ISDMINELIGIBLE  bit
+    ,@DMINELIGIBLEREASONCODEID uniqueidentifier
+    ,@WEDMSCORECODEID        uniqueidentifier
+    ,@WEDMSCORESTARTDATE date
+    ,@WEESTGIVCAPACITYCODEID uniqueidentifier
+    ,@WEESTGIVCAPACITYCOMMENT nvarchar(510)
+    ,@WEESTGIVCAPACITYSTARTDATE date
+    ,@UMHSDATA_LASTPROCDATE datetime
+    ,@HASUMAFFILIATION bit
+    ,@WEALTHSCORES_TOTALESTIMATEDASSETS nvarchar(50)
+    ,@WEALTHSCORES_RATINGID uniqueidentifier
+)
+as
+
+	set nocount on;
+  
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate()
+  
+	begin try
+  
+    /* Get flag to indication constituent's affiliation to U-M Faculty, Staff or 
+       Board Member or spouse of a U-M Faculty, Staff or Board Member */
+    exec dbo.USP_USR_UMHS_HASUMAFFILIATION @CONSTITUENTID=@CONSTITUENTID, @HASUMAFFILIATION=@HASUMAFFILIATION OUTPUT;
+  
+		update dbo.USR_UMHS_BATCH
+    set
+			 SEQUENCE = @SEQUENCE
+      ,BATCHCONSTITUENTID = @BATCHCONSTITUENTID
+		  ,CHANGEDBYID = @CHANGEAGENTID
+		  ,DATECHANGED = @CURRENTDATE
+      ,CONSTITUENTID = @CONSTITUENTID
+      ,MRN = LTRIM(RTRIM(@MRN))
+      ,CPISEQUENCE = LTRIM(RTRIM(@CPISEQUENCE))
+      ,FIRSTNAME = LTRIM(RTRIM(@FIRSTNAME))
+      ,MIDDLENAME = LTRIM(RTRIM(@MIDDLENAME))
+      ,LASTNAME = LTRIM(RTRIM(@LASTNAME))
+      ,SUFFIXCODEID = @SUFFIXCODEID
+      ,BIRTHDATE = @BIRTHDATE
+      ,ADDRESSBLOCK = @ADDRESSBLOCK
+      ,CITY = @CITY
+      ,STATEID = @STATEID
+      ,POSTCODE = @POSTCODE
+      ,ADDRESSCOUNTRYID = @COUNTRYID
+      ,ADDRESSTYPECODEID = @ADDRESSTYPECODEID
+      ,INFOSOURCECODEID = @INFOSOURCECODEID
+      ,HISTORICALSTARTDATE = @HISTORICALSTARTDATE
+      ,PHONE = @PHONENUMBER
+      ,PHONETYPECODEID = @PHONETYPECODEID
+      ,PHONE_COUNTRYID = @PHONE_COUNTRYID
+      ,PHONE_OTHER = @PHONE_OTHER
+      ,PHONE_OTHERTYPECODEID = @PHONE_OTHERTYPECODEID
+      ,PHONE_OTHER_COUNTRYID = @PHONE_OTHER_COUNTRYID
+      ,PHONESTARTDATE = @PHONESTARTDATE
+      ,EMAILADDRESS = LTRIM(RTRIM(ISNULL(@EMAILADDRESS, N'')))
+      ,EMAILADDRESSTYPECODEID = @EMAILADDRESSTYPECODEID
+      ,EMAILADDRESSSTARTDATE = @EMAILADDRESSSTARTDATE
+      ,GENDERCODE = @GENDERCODE
+      ,ISDMINELIGIBLE = @ISDMINELIGIBLE
+      ,DMINELIGIBLEREASONCODEID = @DMINELIGIBLEREASONCODEID
+      ,WEALTHSCORES_TOTALESTIMATEDASSETS = @WEALTHSCORES_TOTALESTIMATEDASSETS
+      ,WEALTHSCORES_RATINGID = @WEALTHSCORES_RATINGID
+      ,HASUMAFFILIATION = @HASUMAFFILIATION
+    where 
+      ID = @ID
+	
+  end try
+	begin catch
+		exec dbo.USP_RAISE_ERROR
+		return 1
+	end catch
+
+return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Constituent" Hidden="false">
+        <SearchList SearchListID="747530a1-be80-4054-a021-d2a599248261"  EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="BATCHCONSTITUENTID" DataType="Guid" Hidden="true" Caption="BATCHCONSTITUENTID"/>
+      <FormField FieldID="SEQUENCE" Caption="Sequence" Required="true" Hidden="true" />
+      <!--Batch fields-->
+      <FormField FieldID="MRN" Caption="Medical Record Number (MRN)"  DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="CPISEQUENCE" Caption="CPI sequence" DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="CONSTITUENTLOOKUPID" Caption="Constituent Lookup ID" Description="Constituent's Lookup ID" DataType="String" MaxLength="200" />
+      <FormField FieldID="FIRSTNAME" Caption="First name" DataType="String" MaxLength="50" Required="true" />
+      <FormField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" MaxLength="50" />
+      <FormField FieldID="LASTNAME" Caption="Last name" DataType="String" MaxLength="100" Required="true"/>
+		  <FormField FieldID="ISUMAFFILATION" Description="Is the Constituent have an affilation with U-M?" Caption="Is U-M affiliated" DataType="Boolean" ReadOnly="true">
+		    <Link IDColumn="HASUMAFFILIATION"/>
+		  </FormField>
+      <FormField FieldID="SUFFIXCODEID" Caption="Suffix" DataType="Guid">
+        <CodeTable CodeTableName="SUFFIXCODE"/>
+      </FormField>
+      <FormField FieldID="BIRTHDATE" Caption="Birth date" DataType="FuzzyDate" Required="true" />
+      <FormField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" MaxLength="500" Category="Address"/>
+      <FormField FieldID="CITY" Caption="City" DataType="String" MaxLength="100"  Category="Address"/>
+      <FormField FieldID="STATEID" Caption="State" DataType="Guid"  Category="Address">
+        <SimpleDataList SimpleDataListID="cae6185d-898e-474f-84d1-dadaa4b63ad3" />
+      </FormField>
+      <FormField FieldID="POSTCODE" Caption="Post code" DataType="String" MaxLength="24"  Category="Address"/>
+      <!-- Default Country: United States -->
+      <FormField FieldID="COUNTRYID" Caption="Address country" DataType="Guid"  Category="Address">
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <!-- Default code type for Address: "Home" -->
+      <FormField FieldID="ADDRESSTYPECODEID" Caption="Address type code" DataType="Guid" Category="Address">
+        <CodeTable CodeTableName="ADDRESSTYPECODE"/>
+      </FormField>
+      <!-- Default Infosource code: "Med/Hospital"-->
+      <FormField FieldID="INFOSOURCECODEID" Caption="Information source code" DataType="Guid" Category="Address" >
+        <CodeTable CodeTableName="INFOSOURCECODE"/>
+      </FormField>
+      <FormField FieldID="HISTORICALSTARTDATE" Description="Start date for Address" Caption="Historical start date" DataType="Date" Category="Address"/>
+      <FormField FieldID="PHONENUMBER" Caption="Phone" DataType="String" MaxLength="200" Category="Phone" />
+      <!-- Default code type for Phone Other: "Home" -->
+      <FormField FieldID="PHONETYPECODEID" Caption="Phone type code" DataType="Guid" Category="Phone">
+        <CodeTable CodeTableName="PHONETYPECODE"/>
+      </FormField>
+      <!-- Default Country: United States -->
+      <FormField FieldID="PHONE_COUNTRYID" Caption="Phone country" DataType="Guid"  Category="Phone" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONE_OTHER" Caption="Phone (other)" DataType="String" MaxLength="200" Category="Phone" />
+      <!-- Default code type for Phone Other: "Other" -->
+      <FormField FieldID="PHONE_OTHERTYPECODEID" Caption="Phone (other) type code" DataType="Guid" Category="Phone" >
+        <CodeTable CodeTableName="PHONETYPECODE"/>
+      </FormField>
+      <!-- Default Country: United States -->
+      <FormField FieldID="PHONE_OTHER_COUNTRYID" Caption="Phone (other) country" DataType="Guid"  Category="Phone" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONESTARTDATE" Caption="Phone start date" DataType="Date" Category="Phone" />
+      <FormField FieldID="EMAILADDRESS" Caption="Email address" DataType="String" MaxLength="100" Category="Email" />
+      <!-- Default code type for Email Address: "Home E-mail Address" -->
+      <FormField FieldID="EMAILADDRESSTYPECODEID" Caption="Email address type code" DataType="Guid" Category="Email" >
+        <CodeTable CodeTableName="EMAILADDRESSTYPECODE"/>
+      </FormField>
+      <FormField FieldID="EMAILADDRESSSTARTDATE" Caption="Email start date" DataType="Date" Category="Email" />
+      <FormField FieldID="GENDERCODE" Caption="Gender" DataType="TinyInt" DefaultValueText="0" Required="true">
+        <ValueList>
+          <Items>
+            <Item>
+              <Value>0</Value>
+              <Label>Unknown</Label>
+            </Item>
+            <Item>
+              <Value>1</Value>
+              <Label>Male</Label>
+            </Item>
+            <Item>
+              <Value>2</Value>
+              <Label>Female</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="ISDMINELIGIBLE" Caption="Direct Mail Ineligible" DataType="Boolean"  DefaultValueText="0" AllowNullValue="false" />
+      <FormField FieldID="DMINELIGIBLEREASONCODEID" Caption="Direct Mail Ineligible Reason" DataType="Guid" >
+        <CodeTable CodeTableName="USR_UMHS_DMINELIGIBLEREASONCODE"/>
+      </FormField>
+	    <FormField FieldID="WEDMSCORECODEID" Caption="Wealth Engine Data Mining Score (Med)" DataType="Guid" Category="Wealth Engine" Hidden="true" >
+	        <CodeTable CodeTableName="WEDMSCORECODE" />
+	    </FormField>
+	    <FormField FieldID="WEDMSCORESTARTDATE" Caption="Wealth Engine Data Mining Score (Med) start date" DataType="Date" Category="Wealth Engine" Hidden="true" />
+	    <FormField FieldID="WEESTGIVCAPACITYCODEID" Caption="Wealth Engine Est Giv Capacity (Med)" DataType="Guid"  Category="Wealth Engine" Hidden="true" >
+	        <CodeTable CodeTableName="WEESTGIVCAPACITYCODE"/>
+	    </FormField>
+	    <FormField FieldID="WEESTGIVCAPACITYCOMMENT" Caption="Wealth Engine Est Giv Capacity (Med) comment" DataType="String" MaxLength="510" Category="Wealth Engine" DefaultValueText="" Hidden="true" />
+      <FormField FieldID="WEESTGIVCAPACITYSTARTDATE" Caption="Wealth Engine Est Giv Capacity (Med) start date" DataType="Date" Category="Wealth Engine" Hidden="true" />
+      <FormField FieldID="UMHSDATA_LASTPROCDATE" Description="MIMED Imported last process date" Caption="MIMED Imported last process date" DataType="Date" IncludeTimeOnDate="true" Category="MIMED Import (only)" Hidden="true" />
+      <FormField FieldID="ISGPIMPORTEDRECORD" Description="Is record imported from the Grateful Patient import process" Caption="Is Grateful Patient imported record" DataType="TinyInt" MinValue="0" MaxValue="1" Hidden="true" ReadOnly="true" />
+      <FormField FieldID="HASUMAFFILIATION" Description="Does the constiuent have an affilation and/or constiteuncy of Faculty, Staff, or Board Member with U-M" DataType="TinyInt" MinValue="0" MaxValue="1" Hidden="true" ReadOnly="false" />
+      <FormField FieldID="WEALTHSCORES_TOTALESTIMATEDASSETS" Description="Wealth Scores Total Estimated Assets" Caption="Wealth Scores Total Estimated Assets" DataType="String" MaxLength="50" Category="Blackbaud Wealth Scores Ratings" />
+      <FormField FieldID="WEALTHSCORES_RATINGID" Description="Wealth Scores Rating" Caption="Wealth Scores Rating" DataType="Guid" Category="Blackbaud Wealth Scores Ratings" >
+          <CodeTable CodeTableName="WEALTHPOINTRATINGCATEGORYCODE" />
+      </FormField>
+    </FormFields>
+	</FormMetaData>
+
+</EditDataFormTemplateSpec>

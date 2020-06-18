@@ -1,0 +1,468 @@
+<SearchListSpec 
+    xmlns="bb_appfx_searchlist"
+    xmlns:c="bb_appfx_commontypes"
+    ID="0724fade-676e-4e54-84ae-8ab6ef10abe6"
+    Name="MIMED Batch Duplicate Search"
+    Description="A search list for locating MIMED records"
+    Author="UM Dev"
+    RecordType="MIMED Data"
+    TranslationFunctionID="e58d466f-1532-4dea-9b50-dd046094ed31"
+    >
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.ConstituentBatchDuplicateLookupID.Search" />
+	<!-- describe the SP used to fetch the results from the given filters.  Note that the @MAXROWS parameter is required, and should be 
+	used to limit the number of rows returned to a reasonable number. -->
+	<SPSearchList SPName="USR_USP_SEARCHLIST_UMHS_BATCH_DUPCHECK">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+      create procedure dbo.USR_USP_SEARCHLIST_UMHS_BATCH_DUPCHECK
+      (
+        @ID uniqueidentifier = null,  -- Constituent ID
+        @CONSTITUENTLOOKUPID nvarchar(200) = null,
+	      @MRN nvarchar(50) = null,
+        @FIRSTNAME nvarchar(50) = null,
+        @MIDDLENAME NVARCHAR(50) = NULL,
+        @LASTNAME nvarchar(100) = null,
+        @BIRTHDATE udt_fuzzydate = '00000000',
+        @ADDRESSTYPECODEID uniqueidentifier = null,
+        @ADDRESSBLOCK nvarchar(500) = NULL,
+        @CITY nvarchar(100) = '',
+        @STATEID   uniqueidentifier = null,
+        @OVERALLMATCHTHRESHOLD decimal(20, 4) = null,
+        @DUPLICATERECORDID uniqueidentifier = null,
+        @AUTOMATCHTHRESHOLD decimal(20, 4) = null,
+        @DOMANUALREVIEWFORAUTOMATCH bit = 0,
+        @BATCHID uniqueidentifier = null,
+        @TITLECODEID uniqueidentifier = null,
+        @PHONETYPECODEID uniqueidentifier = NULL, 
+        @EMAILTYPECODEID uniqueidentifier = NULL,
+        @SUFFIXCODEID uniqueidentifier = null,
+        @POSTCODE nvarchar(12) = NULL,
+        @COUNTRYID uniqueidentifier = NULL,
+        @PHONENUMBER nvarchar(200) = '',
+        @PHONE_COUNTRYID uniqueidentifier = null,
+        @PHONE_OTHER nvarchar(200) = '',
+        @PHONE_OTHERTYPECODEID uniqueidentifier = null,
+        @PHONE_OTHER_COUNTRYID uniqueidentifier = null,
+        @PHONESTARTDATE date = null,
+        @EMAILADDRESS  nvarchar(100) = '',
+        @EMAILADDRESSTYPECODEID uniqueidentifier = null,
+        @EMAILADDRESSSTARTDATE date = null,
+        @BATCHCONSTITUENTID uniqueidentifier = null,
+        @CONSTITUENTID uniqueidentifier = null,
+        @MAXROWS smallint = 100
+      )
+      as
+
+          set nocount on;
+          declare @ERRORMESSAGE nvarchar(4000)=null;
+          declare @ERRORSEVERITY int;
+          declare @ERRORSTATE int;
+          declare @CANDIDATEID uniqueidentifier;
+          declare @CANDIDATECONSTITUENTID uniqueidentifier;
+          declare @CANDIDATEHASUMAFFILIATION bit;
+          declare @CANDIDATEMATCHPERCENTAGE decimal;
+          
+          
+          set @EMAILADDRESS = ltrim(rtrim(isnull(@EMAILADDRESS, N'')));
+          
+          /*
+           * Validate the email address.
+           */
+          if (0 < LEN(@EMAILADDRESS))
+          begin
+            if 0 = [dbo].[UFN_VALIDEMAILADDRESS](@EMAILADDRESS)
+            begin
+              -- Clear the email address if not valid.
+              set @EMAILADDRESS = N'';
+            end
+          end
+  
+          declare @CANDIDATE table
+          (
+            ID uniqueidentifier,
+            CONSTITUENTID uniqueidentifier,
+            MRN NVARCHAR(50),
+            ADDRESSID uniqueidentifier,
+            EMAILADDRESSID uniqueidentifier,
+            PHONEID uniqueidentifier,
+            MATCHPERCENTAGE numeric(5, 2),
+            LOOKUPIDTYPE nvarchar(100),
+            LOOKUPID nvarchar(100),
+            STREETNUMBERRESULT tinyint,
+            STREETNAMERESULT tinyint,
+            POSTCODERESULT tinyint,
+            HASUMAFFILIATION bit,
+            ISEMAILADDRESSFORMATVALID bit
+          )
+          
+          select @CONSTITUENTID = CONSTITUENTID 
+          from dbo.USR_UMHS_DATA
+          where MRN = @MRN 
+    
+          if (@CONSTITUENTID is NULL) and (nullif(isnull(@CONSTITUENTLOOKUPID, ''), '') is not null)
+          begin
+            select @CONSTITUENTID=ID
+            from dbo.CONSTITUENT
+            where LOOKUPID=@CONSTITUENTLOOKUPID
+          end
+    
+          if @CONSTITUENTID is NULL
+          begin
+            /*
+             * Since a Patient wasn't found based on the MRN, search for a matching Constituent.
+             */
+       
+            if @OVERALLMATCHTHRESHOLD is null and @BATCHID is not null
+            begin
+              select @OVERALLMATCHTHRESHOLD = OVERALLMATCHTHRESHOLD, @AUTOMATCHTHRESHOLD = AUTOMATCHTHRESHOLD from dbo.BATCH where ID = @BATCHID
+            end
+       
+            insert into @CANDIDATE (
+              ID,
+              CONSTITUENTID,
+              MRN,
+              ADDRESSID, 
+              EMAILADDRESSID, 
+              PHONEID, 
+              MATCHPERCENTAGE, 
+              LOOKUPIDTYPE, 
+              LOOKUPID, 
+              STREETNUMBERRESULT, 
+              STREETNAMERESULT, 
+              POSTCODERESULT,
+              HASUMAFFILIATION
+            )
+            select
+              newid() ID,
+              DUPLICATES.CONSTITUENTID,
+              NULL,
+              DUPLICATES.ADDRESSID,
+              DUPLICATES.EMAILADDRESSID,
+              DUPLICATES.PHONEID,
+              DUPLICATES.MATCHPERCENTAGE,
+              'Lookup ID' LOOKUPIDTYPE,
+              null, 
+              STREETNUMBERRESULT, 
+              STREETNAMERESULT, 
+              POSTCODERESULT,
+              0
+            from DBO.USR_UMHS_UFN_FINDCONSTITUENTMATCHES_COMPOSITETHRESHOLD (
+                @TITLECODEID, 
+                @FIRSTNAME, 
+                @MIDDLENAME, 
+                @LASTNAME, 
+                @SUFFIXCODEID, 
+                @ADDRESSBLOCK, 
+                @POSTCODE, 
+                @COUNTRYID, 
+                0, 
+                0, 
+                @CONSTITUENTLOOKUPID, 
+                NULL, 
+                @EMAILADDRESS, 
+                @PHONENUMBER, 
+                @OVERALLMATCHTHRESHOLD, 
+                @AUTOMATCHTHRESHOLD) DUPLICATES
+                
+            /*
+             * If there is more that one record in the automatch range (i.e. 100-95% range), then update these
+             * percentages to be in the duplicate match range by setting them to one less that the automatch percentage. 
+             *
+             * This is to make the logic for duplicates consistent with the logic in the GP Import process where if there
+             * is more than one record in the automatch range (i.e. 100-95%), then don't match on any of the records in the 
+             * automatch range, but instead flag them as duplicates. Since the batch validate/commit's "out of the box" behavior
+             * is to select the highest percentage if there is more than one record in the automatch range, this is a way to 
+             * work around the "out of the box" behavior by setting the match values to be one less than the automatch percentage.
+             *
+             */
+            declare @automatch2 decimal(20, 4) = @AUTOMATCHTHRESHOLD - 1;
+            
+            if 1 < (select count(1) from @CANDIDATE where MATCHPERCENTAGE >= @AUTOMATCHTHRESHOLD)
+            begin
+	            update @CANDIDATE set MATCHPERCENTAGE=@automatch2 where MATCHPERCENTAGE >= @AUTOMATCHTHRESHOLD
+            end
+             
+            /*
+             * Filter out the constituent candidates that have a U-M constituency/affiliation of Faculty, Staff or Board Member
+             * or is a spouse of on of these U-M constituency/affilations
+             */
+            declare c CURSOR FAST_FORWARD 
+	            FOR 
+		            select ID, CONSTITUENTID, MATCHPERCENTAGE from  @CANDIDATE;
+
+            begin try
+              open c;
+
+              fetch next from c into @CANDIDATEID, @CANDIDATECONSTITUENTID, @CANDIDATEMATCHPERCENTAGE;
+
+              while @@FETCH_STATUS = 0
+              begin
+
+                exec dbo.USP_USR_UMHS_HASUMAFFILIATION @CONSTITUENTID=@CANDIDATECONSTITUENTID, @HASUMAFFILIATION=@CANDIDATEHASUMAFFILIATION OUTPUT;
+                
+                -- Set flag to indicate U-M Affiliation
+                if (1 = @CANDIDATEHASUMAFFILIATION)
+                  update @CANDIDATE set HASUMAFFILIATION=@CANDIDATEHASUMAFFILIATION where ID=@CANDIDATEID
+                
+	              fetch next from c into @CANDIDATEID, @CANDIDATECONSTITUENTID, @CANDIDATEMATCHPERCENTAGE;
+
+              end
+
+            end try
+            begin catch
+              SELECT 
+                  @ERRORMESSAGE = ERROR_MESSAGE(),
+                  @ERRORSEVERITY = ERROR_SEVERITY(),
+                  @ERRORSTATE = ERROR_STATE();
+            end catch
+
+            /* Close cursor resources */
+            close c;
+            deallocate c;
+
+            /* Throw exception if one was caught above */
+            if nullif(isnull(@ERRORMESSAGE, ''), '') is not null
+            begin
+              RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+            end
+          end
+          else
+            begin
+              --MRN was found - Return MIMED Data
+              insert into @CANDIDATE (
+                ID,
+                CONSTITUENTID, 
+                MRN,
+                ADDRESSID, 
+                EMAILADDRESSID, 
+                PHONEID, 
+                MATCHPERCENTAGE, 
+                LOOKUPIDTYPE, 
+                LOOKUPID, 
+                STREETNUMBERRESULT, 
+                STREETNAMERESULT, 
+                POSTCODERESULT,
+                HASUMAFFILIATION
+              )
+                select
+                  newid() ID,
+                  c.ID  CONSTITUENTID,
+                  d.MRN MRN,
+                  NULL ADDRESSID,
+                  NULL EMAILADDRESSID,
+                  NULL PHONEID,
+                  100.0 as MATCHPERCENTAGE,
+                  'Lookup ID' LOOKUPIDTYPE,
+                  C.LOOKUPID,
+                  NULL STREETNUMBERRESULT,
+                  NULL STREETNAMERESULT,
+                  NULL POSTCODERESULT,
+                  0
+              from dbo.USR_UMHS_DATA d
+              inner join dbo.CONSTITUENT c on c.ID=d.CONSTITUENTID
+              where
+                d.CONSTITUENTID=@CONSTITUENTID
+            end
+  
+          declare @NULLVALUE uniqueidentifier = (select cast(cast(0 as binary) as uniqueidentifier))
+    
+          select top(@MAXROWS)  
+            ID,
+            MATCHPERCENTAGE,
+            NAME,
+            ADDRESSBLOCK,
+            CITY,
+            ABBREVIATION,
+            POSTCODE,
+            LOOKUPIDTYPE,
+            LOOKUPID,
+            DATECHANGED,
+            ADDRESSID,
+            EMAILADDRESSID,
+            PHONEID,
+            STREETNUMBERRESULT, 
+            STREETNAMERESULT, 
+            POSTCODERESULT  ,
+            case when ADDRESSID is not null then dbo.UFN_BUILDFULLADDRESS(ADDRESSID,ADDRESSBLOCK,CITY,STATEID,POSTCODE,COUNTRYID) else dbo.UFN_CONSTITUENTDUPLICATESEARCH_DEFAULTADDRESS(ID,@ADDRESSTYPECODEID) end as FULLADDRESS,
+            HASUMAFFILIATION
+          from 
+              (select
+                C.ID,
+                D.MATCHPERCENTAGE,
+                C.NAME,
+                A.ADDRESSBLOCK,
+                A.CITY,
+                S.ABBREVIATION,
+                A.POSTCODE,
+                D.LOOKUPIDTYPE,
+                coalesce(D.LOOKUPID, C.LOOKUPID) as LOOKUPID,
+                C.DATECHANGED,
+                A.ID ADDRESSID,
+                D.EMAILADDRESSID,
+                D.PHONEID,
+                ROW_NUMBER() over(partition by D.CONSTITUENTID order by MATCHPERCENTAGE desc,
+                                            case when isnull(A.ADDRESSTYPECODEID,@NULLVALUE) = isnull(@ADDRESSTYPECODEID,@NULLVALUE) then 1 else 2 end,
+                                            case when isnull(P.PHONETYPECODEID,@NULLVALUE) = isnull(@PHONETYPECODEID,@NULLVALUE) then 1 else 2 end, 
+                                            case when isnull(E.EMAILADDRESSTYPECODEID,@NULLVALUE) = isnull(@EMAILTYPECODEID,@NULLVALUE) then 1 else 2 end,
+                                            case when isnull(A.ADDRESSBLOCK,'') = isnull(@ADDRESSBLOCK,'') then 1 else 2 end,
+                                            case when A.ISPRIMARY = 1 then 1 else 2 end,
+                                            case when P.ISPRIMARY = 1 then 1 else 2 end,
+                                            case when E.ISPRIMARY = 1 then 1 else 2 end) ROWNO,
+                C.KEYNAME,
+                C.FIRSTNAME,
+                D.STREETNUMBERRESULT, 
+                D.STREETNAMERESULT, 
+                D.POSTCODERESULT,A.STATEID,A.COUNTRYID,
+                A.ADDRESSTYPECODEID,
+                P.PHONETYPECODEID,
+                E.EMAILADDRESSTYPECODEID,
+                A.ISPRIMARY ADDRESSISPRIMARY,
+                P.ISPRIMARY PHONEISPRIMARY,
+                E.ISPRIMARY EMAILISPRIMARY,
+                D.HASUMAFFILIATION
+              from @CANDIDATE D
+              inner join dbo.CONSTITUENT C on D.CONSTITUENTID = C.ID
+              left join dbo.ADDRESS A on D.ADDRESSID = A.ID
+              left join dbo.STATE S on A.STATEID = S.ID
+              left join dbo.PHONE P on D.PHONEID = P.ID
+              left join dbo.EMAILADDRESS E on D.EMAILADDRESSID = E.ID
+              ) Q
+          where ROWNO = 1
+          order by MATCHPERCENTAGE desc , 
+              case when KEYNAME = @LASTNAME then 1 else 2 end, 
+              case when isnull(FIRSTNAME,'') = isnull(@FIRSTNAME,'') then 1 else 2 end,
+              case when isnull(ADDRESSTYPECODEID,@NULLVALUE) = isnull(@ADDRESSTYPECODEID,@NULLVALUE) then 1 else 2 end,
+              case when isnull(PHONETYPECODEID,@NULLVALUE) = isnull(@PHONETYPECODEID,@NULLVALUE) then 1 else 2 end, 
+              case when isnull(EMAILADDRESSTYPECODEID,@NULLVALUE) = isnull(@EMAILTYPECODEID,@NULLVALUE) then 1 else 2 end,
+              case when isnull(ADDRESSBLOCK,'') = isnull(@ADDRESSBLOCK,'') then 1 else 2 end,
+              ADDRESSISPRIMARY desc,
+              PHONEISPRIMARY desc,
+              EMAILISPRIMARY desc 
+  
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSearchList>
+
+	<!-- describe the filter fields for the search screen -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="ID" DataType="Guid" Caption="Constituent" Hidden="true" />
+      <FormField FieldID="BATCHID" DataType="Guid" Hidden="true" Caption="BATCHID" />
+      <FormField FieldID="MRN" Caption="MRN" DataType="String" MaxLength="50" />
+      <FormField FieldID="CONSTITUENTLOOKUPID" Caption="Constituent Lookup ID" DataType="String" />
+      <FormField FieldID="TITLECODEID" DataType="Guid" Caption="Title" CaptionResourceKey="$$title">
+        <CodeTable CodeTableName="TITLECODE" />
+      </FormField>
+      <FormField FieldID="FIRSTNAME" Caption="First name" DataType="String" />
+      <FormField FieldID="MIDDLENAME" MaxLength="50" Caption="Middle name" CaptionResourceKey="$$middle_name" />
+      <FormField FieldID="LASTNAME" Caption="Last name" DataType="String" />
+      <FormField FieldID="SUFFIXCODEID" DataType="Guid" Caption="Suffix" CaptionResourceKey="$$suffix">
+        <CodeTable CodeTableName="SUFFIXCODE" />
+      </FormField>
+      <FormField FieldID="BIRTHDATE" Caption="Birthdate" DataType="FuzzyDate" />
+      <FormField FieldID="ADDRESSTYPECODEID" Caption="Address type code" DataType="Guid" Category="Address">
+        <CodeTable CodeTableName="ADDRESSTYPECODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" MaxLength="500" Category="Address" />
+      <FormField FieldID="CITY" Caption="City" DataType="String" MaxLength="100" Category="Address" />
+      <FormField FieldID="STATEID" Caption="State" DataType="Guid" Category="Address">
+        <SimpleDataList SimpleDataListID="cae6185d-898e-474f-84d1-dadaa4b63ad3" />
+      </FormField>
+      <FormField FieldID="POSTCODE" Caption="Post code" DataType="String" MaxLength="12" Category="Address" />
+      <FormField FieldID="COUNTRYID" Caption="Address country" DataType="Guid" Category="Address">
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONENUMBER" Caption="Phone" DataType="String" MaxLength="200" Category="Phone" />
+      <FormField FieldID="PHONETYPECODEID" Caption="Phone type code" DataType="Guid" Category="Phone">
+        <CodeTable CodeTableName="PHONETYPECODE" />
+      </FormField>
+      <FormField FieldID="PHONE_COUNTRYID" Caption="Phone country" DataType="Guid" Category="Phone">
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONE_OTHER" Caption="Phone (other)" DataType="String" MaxLength="200" Category="Phone" />
+      <FormField FieldID="PHONE_OTHERTYPECODEID" Caption="Phone (other) type code" DataType="Guid" Category="Phone">
+        <CodeTable CodeTableName="PHONETYPECODE" />
+      </FormField>
+      <FormField FieldID="PHONE_OTHER_COUNTRYID" Caption="Phone (other) country" DataType="Guid" Category="Phone">
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="EMAILADDRESS" Caption="Email address" DataType="String" MaxLength="100" Category="Email" />
+      <FormField FieldID="EMAILADDRESSTYPECODEID" Caption="Email address type code" DataType="Guid" Category="Email">
+        <CodeTable CodeTableName="EMAILADDRESSTYPECODE" />
+      </FormField>
+      <FormField FieldID="DUPLICATERECORDID" DataType="Guid" Hidden="true" Caption="DUPLICATERECORDID" />
+      <FormField FieldID="OVERALLMATCHTHRESHOLD" DataType="Decimal" Hidden="true" Caption="Overall match threshold" Precision="20" Scale="4" AvailableToClient="false" />
+      <FormField FieldID="AUTOMATCHTHRESHOLD" DataType="Decimal" Hidden="true" Caption="Auto match threshold" Precision="20" Scale="4" AvailableToClient="false" />
+      <FormField FieldID="DOMANUALREVIEWFORAUTOMATCH" DataType="Boolean" Hidden="true" Caption="DOMANUALREVIEWFORAUTOMATCH" DefaultValueText="False" />
+      <FormField FieldID="BATCHCONSTITUENTID" DataType="Guid" Hidden="true" Caption="BATCHCONSTITUENTID" />
+      <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="CONSTITUENTID" />
+    </FormFields>
+    <WebUIComponent>
+        <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSBatchDupeCheckUIModel" />
+        <WebUI>
+            <ExternalResource Url="browser/htmlforms/constituent/duplicatecheck/DuplicateConstituentSearch.html" />
+        </WebUI>
+    </WebUIComponent>
+    <UIFields>
+      <FormField FieldID="GOTONEXTRECORD" DataType="Boolean" Caption="Automatically go to the next duplicate exception" DefaultValueText="true" CaptionResourceKey="$$automatically_go_to_the_next_duplicate_exception" />
+    </UIFields>
+    <UIActions>
+      <UIAction ActionID="SAVE" Caption="Skip" CaptionResourceKey="$$skip" />
+      <UIAction ActionID="CANCEL" Caption="Cancel" CaptionResourceKey="$$cancel" />
+    </UIActions>
+  </FormMetaData>
+  
+	<!-- also describe the output fields for the search screen -->
+	<Output>
+		<OutputFields>
+      <OutputField FieldID="ID" Caption="Constituent ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="MATCHPERCENTAGE" Caption="% Match" DataType="Decimal" />
+      <OutputField FieldID="NAME" Caption="Name" DataType="String" />
+      <OutputField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" />
+      <OutputField FieldID="CITY" Caption="City" DataType="String" />
+      <OutputField FieldID="STATE" Caption="State" DataType="String" />
+      <OutputField FieldID="POSTCODE" Caption="ZIP/Postal Code" DataType="String" />
+      <OutputField FieldID="LOOKUPIDTYPE" Caption="Lookup ID Type" DataType="String" />
+      <OutputField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String" />
+      <OutputField FieldID="DATECHANGED" Caption="Date changed" IsHidden="true" DataType="Date" />
+      <OutputField FieldID="ADDRESSID" Caption="ADDRESSID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="EMAILADDRESSID" Caption="EMAILADDRESSID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="PHONEID" Caption="PHONEID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="STREETNUMBERRESULT" Caption="STREETNUMBERRESULT" IsHidden="true" DataType="TinyInt" />
+      <OutputField FieldID="STREETNAMERESULT" Caption="STREETNAMERESULT" IsHidden="true" DataType="TinyInt" />
+      <OutputField FieldID="POSTCODERESULT" Caption="POSTCODERESULT" IsHidden="true" DataType="TinyInt" />
+      <OutputField FieldID="FULLADDRESS" Caption="FULLADDRESS" IsHidden="true" DataType="String" />
+      <OutputField FieldID="HASUMAFFILIATION" Caption="Has U-M Affiliation" DataType="TinyInt" IsHidden="true" />
+		</OutputFields>
+	</Output>
+  <LookupView ViewName="V_SEARCHLIST_INDIVIDUAL">
+    <ViewSQL>
+
+      select CONSTITUENT.ID,
+      [NAME],
+      [ADDRESS].ADDRESSBLOCK [ADDRESS],
+      [ADDRESS].CITY,
+      [STATE].DESCRIPTION [STATE],
+      [ADDRESS].POSTCODE,
+      CONSTITUENT.LOOKUPID,
+      [ADDRESS].ID [ADDRESSID]
+      from dbo.CONSTITUENT
+      left join dbo.[ADDRESS] on CONSTITUENT.ID = [ADDRESS].CONSTITUENTID
+      left join dbo.[STATE] on [ADDRESS].STATEID = [STATE].ID;
+
+    </ViewSQL>
+    <Output TranslationField="NAME">
+      <OutputFields>
+        <OutputField FieldID="ADDRESS" Caption="Address" DataType="String" CaptionResourceKey="$$address" />
+        <OutputField FieldID="ADDRESSID" Caption="ADDRESSID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$addressid" />
+        <OutputField FieldID="CITY" Caption="City" DataType="String" CaptionResourceKey="$$city" />
+        <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" CaptionResourceKey="$$id" />
+        <OutputField FieldID="LOOKUPID" Caption="Lookup ID" DataType="String" CaptionResourceKey="$$lookup_id" />
+        <OutputField FieldID="NAME" Caption="Name" DataType="String" CaptionResourceKey="$$name" />
+        <OutputField FieldID="POSTCODE" Caption="ZIP/Postal code" DataType="String" CaptionResourceKey="$$zip/postal_code0" />
+        <OutputField FieldID="STATE" Caption="State" DataType="String" CaptionResourceKey="$$state" />
+      </OutputFields>
+    </Output>
+  </LookupView>
+</SearchListSpec>
+

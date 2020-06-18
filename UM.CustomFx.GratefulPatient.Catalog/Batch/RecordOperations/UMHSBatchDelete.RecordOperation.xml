@@ -1,0 +1,40 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="526e90a6-61ea-4c94-9779-2630c3ba271a" 
+	Name="Delete MIMED Batch Data record" 
+	Description="Delete MIMED Batch Data record"
+	Author="UM Dev"
+	OperationType="Delete"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_USP_RECORDOPERATION_UMHSBATCHDELETE">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_RECORDOPERATION_UMHSBATCHDELETE
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as begin
+	--check deletion rules, if any
+
+	-- use the system generated delete routine to allow proper recording of the deleting agent
+	exec USP_USR_UMHS_BATCH_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	return 0;
+	
+end
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+	<!-- optionally, offer a prompt before executing the record operation -->
+	<Prompt>
+		<StandardPrompt Text="Are you sure you want to continue?" />
+	</Prompt>
+
+</RecordOperationSpec>

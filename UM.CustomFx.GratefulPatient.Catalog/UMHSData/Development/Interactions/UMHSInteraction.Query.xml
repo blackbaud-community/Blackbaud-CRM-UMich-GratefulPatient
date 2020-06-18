@@ -1,0 +1,117 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="066da449-eec4-4036-a1bb-5332db9fdab5"
+	Name="MIMED Interaction Query"
+	Description="A view defined for querying on MIMED interaction records"
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSINTERACTION">
+		<ViewSQL>
+			<![CDATA[
+      SELECT I.ID,
+             I.UMHSID,
+             I.FUNDRAISERID,
+             I.SUMMARY,
+             IC.NAME                          AS CATEGORY_TRANSLATION,
+             ISC.NAME                         AS SUBCATEGORY_TRANSLATION,
+             ITC.DESCRIPTION                  CONTACTMETHOD_TRANSLATION,
+             DBO.UFN_EVENT_GETNAME(I.EVENTID) AS EVENTNAME,
+             I.EXPECTEDDATE,
+             I.ACTUALDATE,
+             I.COMMENTS,
+             IEX.DESCRIPTION                  AS STATUS,
+             I.STATUSCODEID                   AS STATUSCODEID,
+             ADDEDBY.APPLICATIONNAME          AS ADDEDBY_APPLICATION,
+             ADDEDBY.USERNAME                 AS ADDEDBY_USERNAME,
+             CHANGEDBY.APPLICATIONNAME        AS CHANGEDBY_APPLICATION,
+             CHANGEDBY.USERNAME               AS CHANGEDBY_USERNAME,
+             I.DATEADDED,
+             I.DATECHANGED,
+             I.INTERACTIONCATEGORYID,
+             I.INTERACTIONSUBCATEGORYID,
+             I.CONTACTMETHODCODEID,
+             I.EVENTID
+      FROM   DBO.USR_UMHS_INTERACTION I
+             LEFT JOIN USR_INTERACTION_STATUSCODE IEX ON IEX.ID = I.STATUSCODEID
+             LEFT JOIN DBO.CHANGEAGENT ADDEDBY ON ADDEDBY.ID = I.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT CHANGEDBY ON CHANGEDBY.ID = I.CHANGEDBYID
+             LEFT OUTER JOIN DBO.INTERACTIONTYPECODE ITC ON ITC.ID = I.CONTACTMETHODCODEID
+             LEFT OUTER JOIN DBO.INTERACTIONSUBCATEGORY ISC ON ISC.ID = I.INTERACTIONSUBCATEGORYID
+             LEFT OUTER JOIN DBO.INTERACTIONCATEGORY IC ON IC.ID = ISC.INTERACTIONCATEGORYID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="MIMED ID" Category="System Fields" Name="UMHSID" />
+      <OutputField Caption="Contact method" Name="CONTACTMETHOD_TRANSLATION"  >
+        <LookupInfo IDField="CONTACTMETHODCODEID">
+          <CodeTable CodeTableName="INTERACTIONTYPECODE" IncludeInactive="true" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Summary" Name="SUMMARY"/>
+      <OutputField Caption="Expected date" Name="EXPECTEDDATE"  />
+      <OutputField Caption="Actual date" Name="ACTUALDATE"  />
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" Category="System Fields" />
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" Category="System Fields" />
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" Category="System Fields" />
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" Category="System Fields" />
+      <OutputField Caption="Date added" Category="System Fields" Name="DATEADDED" />
+      <OutputField Caption="Date changed" Category="System Fields" Name="DATECHANGED" />
+      <OutputField Caption="Comments" Name="COMMENTS"/>
+      <OutputField Caption="Event system ID" DataType="Guid" Name="EVENTID" IsHidden="true">
+        <LookupInfo>
+          <SearchList ID="21452A39-7C7D-4334-8B89-6C0EA619ACEC" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Event Name" DataType="String" Name="EVENTNAME" />
+      <OutputField Caption="Category" Name="CATEGORY_TRANSLATION">
+        <LookupInfo IDField="INTERACTIONCATEGORYID">
+          <SimpleDataList SimpleDataListID="CBBA7545-B66F-44AC-AA24-D9C2F8CBC4EC">
+            <c:Params>
+              <c:Param ID="INCLUDEINACTIVE">
+                <c:Value>1</c:Value>
+              </c:Param>
+            </c:Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Caption="Subcategory" Name="SUBCATEGORY_TRANSLATION">
+        <LookupInfo IDField="INTERACTIONSUBCATEGORYID">
+          <SimpleDataList SimpleDataListID="0EACC39B-07D1-4641-8774-E319559535A7">
+            <c:Params>
+              <c:Param ID="INCLUDEINACTIVE">
+                <c:Value>1</c:Value>
+              </c:Param>
+            </c:Params>
+          </SimpleDataList>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="STATUS" Caption="Status">
+        <LookupInfo>
+          <CodeTable CodeTableName="USR_INTERACTION_STATUSCODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="STATUSCODEID" Caption="STATUSCODEID" IsHidden="true">
+      </OutputField>
+      <OutputField Caption="Owner ID" Name="FUNDRAISERID" IsHidden="true"/>
+      <OutputField Caption="Interaction category ID" DataType="Guid" IsHidden="true" Name="INTERACTIONCATEGORYID"  />
+      <OutputField Caption="Interaction subcategory ID" DataType="Guid" IsHidden="true" Name="INTERACTIONSUBCATEGORYID"  />
+      <OutputField Caption="CONTACTMETHODCODEID" DataType="Guid" IsHidden="true" Name="CONTACTMETHODCODEID"  />
+    </OutputFields>
+  </Output>
+  <RelationshipOperations>    
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Interaction"/>
+    <AddRelatedView RelatedView="V_QUERY_CONSTITUENT" RelatedField="ID" Field="OWNERID" PathAlias="Owner" DisplayAliasResourceKey="$$owner" />
+    <AddRelatedView RelatedView="USR_V_QUERY_UMHSINTERACTIONPARTICIPANT" RelatedField="INTERACTIONID" Field="ID" PathAlias="Participants" DisplayAliasResourceKey="$$participants" />
+  </RelationshipOperations>
+</QueryViewSpec>

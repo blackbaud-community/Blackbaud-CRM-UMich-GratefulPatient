@@ -1,0 +1,53 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="b06aa680-dcac-45b5-ad5f-871205553f49"
+	Name="USP_USR_UMHS_UPDATE_CUSTOM_STATUS"
+	Description="USP_USR_UMHS_UPDATE_CUSTOM_STATUS"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_UPDATE_CUSTOM_STATUS"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USR_USP_UMHS_UPDATE_CUSTOM_STATUS
+as
+begin
+	      update USR_INTERACTION_EXTENSION_29442
+        set INTERACTION_STATUSCODE_CODEID = (SELECT id from USR_INTERACTION_STATUSCODE where DESCRIPTION = 'Completed')
+        from
+		    dbo.INTERACTION
+        inner JOIN dbo.USR_INTERACTION_EXTENSION_29442 IEX
+        ON INTERACTION.ID = IEX.ID
+        inner JOIN USR_INTERACTION_STATUSCODE UIS
+        ON IEX.INTERACTION_STATUSCODE_CODEID = UIS.ID
+        where interaction.STATUS = 'Completed'
+        and UIS.DESCRIPTION <> 'Completed'
+        
+        update USR_INTERACTION_EXTENSION_29442
+        set INTERACTION_STATUSCODE_CODEID = (SELECT id from USR_INTERACTION_STATUSCODE where DESCRIPTION = 'Cancelled')
+        from
+		    dbo.INTERACTION
+        inner JOIN dbo.USR_INTERACTION_EXTENSION_29442 IEX
+        ON INTERACTION.ID = IEX.ID
+        inner JOIN USR_INTERACTION_STATUSCODE UIS
+        ON IEX.INTERACTION_STATUSCODE_CODEID = UIS.ID
+        where interaction.STATUS = 'Cancelled'
+        and UIS.DESCRIPTION <> 'Cancelled'
+        
+        update USR_INTERACTION_EXTENSION_29442
+        set INTERACTION_STATUSCODE_CODEID = (SELECT id from USR_INTERACTION_STATUSCODE where DESCRIPTION = 'Declined')
+        from
+		    dbo.INTERACTION
+        inner JOIN dbo.USR_INTERACTION_EXTENSION_29442 IEX
+        ON INTERACTION.ID = IEX.ID
+        inner JOIN USR_INTERACTION_STATUSCODE UIS
+        ON IEX.INTERACTION_STATUSCODE_CODEID = UIS.ID
+        where interaction.STATUS = 'Declined'
+        and UIS.DESCRIPTION <> 'Declined'
+        
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

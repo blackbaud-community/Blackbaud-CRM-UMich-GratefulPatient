@@ -1,0 +1,183 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0eba95c8-22a7-451c-9fab-55d27024b8d0" 
+	Name="MIMED Referral Batch Add Data Form"
+	Description="A data form for adding MIMED referral batch records" 
+	Author="UM Dev"
+	DataFormInstanceID="bad277c2-d30b-4adb-8359-05b10d1bbacd" 
+	RecordType="MIMED Referral Batch"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Add MIMED referral batch"
+	>
+
+	<SPDataForm>
+		
+
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_REFERRALBATCH">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_REFERRALBATCH (@ID                         UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                              @BATCHID                    UNIQUEIDENTIFIER,
+                                                                              @SEQUENCE                   INT = NULL,
+                                                                              @UMHSID                     UNIQUEIDENTIFIER = NULL,
+                                                                              @REFERRALID                 UNIQUEIDENTIFIER = NULL,
+                                                                              @CHANGEAGENTID              UNIQUEIDENTIFIER = NULL,                                                                                                                                                        
+                                                                              @REFERRERID                 UNIQUEIDENTIFIER = NULL,
+                                                                              @REFERRERROLECODEID         UNIQUEIDENTIFIER = NULL,
+                                                                              @DEPARTMENTID               UNIQUEIDENTIFIER = NULL,
+                                                                              @SUBDEPARTMENTID            UNIQUEIDENTIFIER = NULL,
+                                                                              @FOLLOWUPCOMPLETED          bit = null,
+                                                                              @FOLLOWUPSTATUSCODE         tinyint = 0,
+                                                                              @REFERRALDATE               DATETIME = NULL,
+                                                                              @UMHSDEVSTAFFID             UNIQUEIDENTIFIER = NULL,                                                                            
+                                                                              @COMMENTS                   NVARCHAR(MAX) = '')
+        AS
+            SET NOCOUNT ON;
+
+            IF @ID IS NULL
+              SET @ID = NEWID()
+
+            IF @CHANGEAGENTID IS NULL
+              EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                @CHANGEAGENTID OUTPUT
+
+            DECLARE @CURRENTDATE DATETIME = GETDATE();           
+
+
+          BEGIN TRY
+              -- handle inserting the data
+              INSERT INTO DBO.USR_UMHS_REFERRALBATCH
+                          (ID,
+                            BATCHID,
+                            SEQUENCE,
+                            REFERRALID,
+                            UMHSID,
+                            REFERRERID,
+                            REFERRERROLECODEID,
+                            DEPARTMENTID,
+                            SUBDEPARTMENTID,
+                            FOLLOWUPCOMPLETED,
+                            FOLLOWUPSTATUSCODE,
+                            REFERRALDATE,
+                            UMHSDEVSTAFFID,                          
+                            COMMENTS,
+                            ADDEDBYID,
+                            CHANGEDBYID,
+                            DATEADDED,
+                            DATECHANGED)
+              VALUES      (@ID,
+                            @BATCHID,
+                            @SEQUENCE,
+                            @REFERRALID,
+                            @UMHSID,
+                            @REFERRERID,                           
+                            @REFERRERROLECODEID,
+                            @DEPARTMENTID,
+                            @SUBDEPARTMENTID,
+                            @FOLLOWUPCOMPLETED,
+                            @FOLLOWUPSTATUSCODE,
+                            @REFERRALDATE,
+                            @UMHSDEVSTAFFID,
+                            @COMMENTS,
+                            @CHANGEAGENTID,
+                            @CHANGEAGENTID,
+                            @CURRENTDATE,
+                            @CURRENTDATE)
+          END TRY
+
+          BEGIN CATCH
+              EXEC DBO.USP_RAISE_ERROR
+
+              RETURN 1
+          END CATCH
+
+            RETURN 0 
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe the context ID for this form (if applicable), which corresponds to a parameter in the SP. -->
+	<Context ContextRecordType="BATCH" RecordIDParameter="BATCHID"/>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="REFERRALID" DataType="Guid" Caption="MIMED Referral ID" Hidden="false"/>
+      <c:FormField FieldID="UMHSID" DataType="Guid" Caption="MIMED Constituent" Hidden="false" Required="true">
+        <c:SearchList SearchListID="875b6cfb-b52f-45a0-bf30-9f1992ab28ae" EnableQuickFind="true">
+          <c:FormFieldOverrides>
+            <FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true"/>
+            <FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false"/>
+            <c:FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="true"/>
+          </c:FormFieldOverrides>
+        </c:SearchList>
+      </c:FormField>
+      <!--<c:FormField FieldID="PATIENTNAME" Caption="Patient" ReadOnly="true"  Hidden="true" />-->
+      <FormField FieldID="REFERRERID" DataType="Guid" Caption="REFERRER" Hidden="false">
+        <c:SearchList SearchListID="76d8c79c-b8d4-4349-beb5-283b4bad4285" EnableQuickFind="true">
+          <c:FormFieldOverrides>
+            <c:FormFieldOverride FieldID="Individuals"  DefaultValueText="true"/>
+            <c:FormFieldOverride FieldID="Organizations"  DefaultValueText="false"/>
+            <c:FormFieldOverride FieldID="Groups/Households"  DefaultValueText="false"/>
+          </c:FormFieldOverrides>
+        </c:SearchList>
+      </FormField>
+      <FormField FieldID="SEQUENCE" Caption="Sequence" DataType="Integer"  Required="true" Hidden="true" />
+      <c:FormField FieldID="REFERRERROLECODEID" DataType="Guid" Caption="Referrer role">
+        <c:CodeTable CodeTableName="USR_UMHS_REFERRERROLECODE" />
+      </c:FormField>
+      <c:FormField FieldID="DEPARTMENTID" DataType="Guid" Caption="MIMED department">
+        <c:SimpleDataList SimpleDataListID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325">
+        </c:SimpleDataList>
+      </c:FormField>
+      <c:FormField FieldID="SUBDEPARTMENTID" DataType="Guid" Caption="MIMED subdepartment">
+        <c:SimpleDataList SimpleDataListID="879b4e21-6a71-4c60-9b41-771fa39ef9cf">
+          <c:Params>
+            <c:Param ID="DEPARTMENTID">
+              <c:Value>Fields!DEPARTMENTID</c:Value>
+            </c:Param>
+          </c:Params>
+        </c:SimpleDataList>
+      </c:FormField>
+      <c:FormField FieldID="FOLLOWUPCOMPLETED" DataType="Boolean" Caption="Follow-up completed"  >
+      </c:FormField>
+      <c:FormField FieldID="FOLLOWUPSTATUSCODE" DataType="TinyInt" Caption="Follow-up status" DefaultValueText="0" AllowNullValue="false"  >
+        <c:ValueList>
+          <c:Items>
+            <c:Item>
+              <c:Value>0</c:Value>
+              <c:Label> </c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>1</c:Value>
+              <c:Label>Unsuccessful</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>2</c:Value>
+              <c:Label>Successful</c:Label>
+            </c:Item>
+          </c:Items>
+        </c:ValueList>
+      </c:FormField>
+      <c:FormField FieldID="REFERRALDATE" DataType="Date" Caption="Referral date" />
+      <c:FormField FieldID="UMHSDEVSTAFFID" DataType="Guid" Caption="MIMED staff" Hidden="false">
+        <!--<c:SearchList SearchListID="35fa0186-b669-436f-913a-5e9fd5e59982" EnableQuickFind="true" EnableAutoSearch="true" />-->
+        <c:SearchList SearchListID="76d8c79c-b8d4-4349-beb5-283b4bad4285" EnableQuickFind="true">
+          <c:FormFieldOverrides>
+            <c:FormFieldOverride FieldID="Individuals"  DefaultValueText="1"/>
+            <c:FormFieldOverride FieldID="Organizations"  DefaultValueText="0"/>
+            <c:FormFieldOverride FieldID="Groups/Households"  DefaultValueText="0"/>
+            <c:FormFieldOverride FieldID="Constituency" DefaultValueText="d2dca06a-be6e-40b3-b95d-59a926181923"/> <!--Fundraiser-->
+          </c:FormFieldOverrides>
+        </c:SearchList>
+      </c:FormField>
+      <c:FormField FieldID="COMMENTS" Caption="Comments" />
+    </FormFields>
+	</FormMetaData>
+
+</AddDataFormTemplateSpec>

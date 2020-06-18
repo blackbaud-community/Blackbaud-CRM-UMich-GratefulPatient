@@ -1,0 +1,69 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="4C6165A7-4D7B-46AF-AC1D-D6ABC51F030B"
+	Name="USR_UMHS_UFN_FINDMIMEDMATCHES_COMPOSITETHRESHOLD"
+	Description="Points to the new patient search UFN"
+	Author="UM Dev"
+	DBFunctionName="USR_UMHS_UFN_FINDMIMEDMATCHES_COMPOSITETHRESHOLD"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+CREATE FUNCTION [DBO].[USR_UMHS_UFN_FINDMIMEDMATCHES_COMPOSITETHRESHOLD] (@TITLECODEID           UNIQUEIDENTIFIER,
+                                                                        @FIRSTNAME             NVARCHAR(50),
+                                                                        @MIDDLENAME            NVARCHAR(50),
+                                                                        @KEYNAME               NVARCHAR(100),
+                                                                        @SUFFIXCODEID          UNIQUEIDENTIFIER,
+                                                                        @ADDRESSBLOCK          NVARCHAR(150),
+                                                                        @POSTCODE              NVARCHAR(12),
+                                                                        @COUNTRYID             UNIQUEIDENTIFIER,
+                                                                        @ISORGANIZATION        BIT,
+                                                                        @ISGROUP               BIT,
+                                                                        @LOOKUPID              NVARCHAR(100),
+                                                                        @ALTERNATELOOKUPIDS    XML,
+                                                                        @EMAILADDRESS          NVARCHAR(100),
+                                                                        @PHONENUMBER           NVARCHAR(100),
+                                                                        @OVERALLMATCHTHRESHOLD TINYINT,
+                                                                        @AUTOMATCHTHRESHOLD    TINYINT)
+RETURNS @MATCHES TABLE (
+  CONSTITUENTID      UNIQUEIDENTIFIER,
+  ADDRESSID          UNIQUEIDENTIFIER,
+  EMAILADDRESSID     UNIQUEIDENTIFIER,
+  PHONEID            UNIQUEIDENTIFIER,
+  MATCHPERCENTAGE    TINYINT,
+  STREETNUMBERRESULT TINYINT,
+  STREETNAMERESULT   TINYINT,
+  POSTCODERESULT     TINYINT )
+AS
+  BEGIN
+      -- use the given threshold if provided, otherwise fetch it from the table
+      IF @OVERALLMATCHTHRESHOLD IS NULL OR @AUTOMATCHTHRESHOLD IS NULL
+        SELECT TOP(1) @OVERALLMATCHTHRESHOLD = ISNULL(@OVERALLMATCHTHRESHOLD, OVERALLMATCHTHRESHOLD),
+                      @AUTOMATCHTHRESHOLD = ISNULL(@AUTOMATCHTHRESHOLD, AUTOMATCHTHRESHOLD)
+        FROM  DBO.CONSTITUENTDUPLICATESEARCHSETTINGS
+        WHERE TRANSACTIONTYPE = 'Default Criteria'
+        ORDER BY DATECHANGED;
+
+      IF @AUTOMATCHTHRESHOLD > 0 OR @OVERALLMATCHTHRESHOLD > 0
+        BEGIN
+            INSERT INTO @MATCHES
+            SELECT CONSTITUENTID,
+                   ADDRESSID,
+                   EMAILADDRESSID,
+                   PHONEID,
+                   COMPOSITESCORE,
+                   STREETNUMBERRESULT,
+                   STREETNAMERESULT,
+                   POSTCODERESULT
+            FROM   DBO.USR_UMHS_UFN_FINDMIMEDMATCHES(@TITLECODEID, @FIRSTNAME, @MIDDLENAME, @KEYNAME, @SUFFIXCODEID, @ADDRESSBLOCK, @POSTCODE, @COUNTRYID, @ISORGANIZATION, @ISGROUP, @LOOKUPID, @ALTERNATELOOKUPIDS, @EMAILADDRESS, @PHONENUMBER, @OVERALLMATCHTHRESHOLD, @AUTOMATCHTHRESHOLD) AS MATCHES
+            WHERE COMPOSITESCORE >= ISNULL(NULLIF(@OVERALLMATCHTHRESHOLD, 0), @AUTOMATCHTHRESHOLD)
+        END
+
+      RETURN
+  END 
+
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

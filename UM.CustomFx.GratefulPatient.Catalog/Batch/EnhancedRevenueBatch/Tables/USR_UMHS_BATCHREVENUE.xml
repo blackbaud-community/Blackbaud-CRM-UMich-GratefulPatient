@@ -1,0 +1,16 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0230464c-387a-46af-84de-7949a6655180"
+	Name="MIMED Batch Revenue Constituent Ext"
+	Description="Stores information about MIMED Batch records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_BATCHREVENUE"		   
+	IsBuiltIn="false" 
+  PrimaryKeyAsForeignKeyTablename="BATCHREVENUE"
+	>
+	<!-- define fields on the table -->
+	<Fields>
+    <ForeignKeyField ForeignTable="USR_UMHS_DATA" Name="MIMEDCONSTITUENTID" OnDelete="CascadeDelete"/>
+  </Fields>
+</TableSpec>

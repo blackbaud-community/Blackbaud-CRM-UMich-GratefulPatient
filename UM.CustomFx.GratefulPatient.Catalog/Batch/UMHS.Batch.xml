@@ -1,0 +1,126 @@
+﻿<BatchTypeSpec
+	xmlns="bb_appfx_batchtype"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="294542b7-4644-429c-8273-3c9836adc4dc" 
+	Name="MIMED Contacts Data Batch"
+	Description="A batch type for adding MIMED Data records" 
+	Author="UM Dev"
+	BaseTableName="USR_UMHS_BATCH" 
+	Category="MIMED Data" 
+	>
+
+  <c:DependencyList>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.RecordOperation.xml"/>
+  </c:DependencyList>
+  
+	<!-- indicate the form used to add a row to the batch (note that this is the template ID, not the instance ID) -->
+	<AddRowDataFormTemplate CatalogItemID="8116645f-0962-4431-a6fb-237da408bf70" />
+
+	<!-- indicate the form used to edit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<EditRowDataFormTemplate CatalogItemID="719f5e47-1f84-44e2-a85d-d143e513d36a" />
+
+	<!-- indicate the form used to commit a row in the batch (note that this is the template ID, not the instance ID) -->
+	<CommitRowDataForms>
+		<CommitRowAddDataFormTemplate CatalogItemID="ada59d70-2505-4751-a07e-8fdedaefef00" />
+    <CommitRowEditDataFormTemplate CatalogItemID="6b2cb52a-1c9c-40e0-a041-280405d60673" EditLoadField="CONSTITUENTID"/>
+	</CommitRowDataForms>
+  	
+	<!-- Record operation to delete a row from the UMHS (Contacts) batch -->
+	<BatchDeleteRowRecordOperation CatalogItemID="526e90a6-61ea-4c94-9779-2630c3ba271a" />
+  
+  <!-- Record operation to delete a UMHS (Contacts) Batch -->
+  <DeleteBatchRecordOperation CatalogItemID="35975872-5e8f-4100-8f5e-ae90783d60d4"/>
+  
+  <DefaultSelectedFields>
+    <Field>CONSTITUENTID</Field>
+    <Field>BATCHCONSTITUENTID</Field>
+    <Field>MRN</Field>
+    <Field>CPISEQUENCE</Field>
+    <Field>FIRSTNAME</Field>
+    <Field>LASTNAME</Field>
+    <Field>BIRTHDATE</Field>
+  </DefaultSelectedFields>
+  
+  <FieldsRequiredByDesign>
+    <Field>CONSTITUENTID</Field>
+  </FieldsRequiredByDesign>
+  
+  <DuplicateRecordCheck SearchListID="0724fade-676e-4e54-84ae-8ab6ef10abe6"
+    DuplicateResolutionHeaderCaption="Resolve Duplicate"
+    IdentifiedDuplicateActionToPerform="Update" 
+    LinkFieldID="CONSTITUENTID"
+    IdentifiedDuplicateActionCaption="Update Duplicate"
+	  HideSearchResults="true"
+	  DuplicateMatchThresholdField="OVERALLMATCHTHRESHOLD"
+	  NextDuplicateRecordField="GOTONEXTRECORD"
+  >
+    
+    <c:DuplicateResolutionUIComponent xmlns="bb_appfx_commontypes" FormUIComponentType="CustomComponent">
+      <CustomComponentID AssemblyName="Blackbaud.AppFx.Constituent.ClientComponents.dll" 
+                         ClassName="Blackbaud.AppFx.Constituent.ClientComponents.DuplicateConstituentResolutionView" />
+    </c:DuplicateResolutionUIComponent>
+    <NoMatchMsg MessageText="No duplicates found"
+                MessageTextResourceKey="$$no_matches_found" />
+    <SingleMatchMsg MessageText="Single duplicate constituent found"
+                    MessageTextResourceKey="$$single_match_found" />
+
+    <MultipleMatchesMsg MessageText="Multiple duplicate constituents found."/>
+    <AutoMatch 
+      AutoMatchThresholdDataFormID="8cdcd98d-3cf0-4440-bfd3-1267678a3a51"
+      AutoMatchThresholdFormFieldID="AUTOMATCHTHRESHOLD"
+      OverallMatchThresholdFormFieldID="OVERALLMATCHTHRESHOLDBATCH"
+      SearchResultScoreColumn="MATCHPERCENTAGE"      
+      SaveAutoMatchDataFormID="24c292c6-4bc4-4700-9acc-46d3d5d04050" 
+      SaveAutoMatchDataFormMatchedFieldID="CONSTITUENTID" 
+    >
+      <UIAddIn AssemblyName="Blackbaud.AppFx.Constituent.UIModel.dll" ClassName="Blackbaud.AppFx.Constituent.UIModel.BatchConstituentDuplicateCheckAddIn" />
+      <!--<RaiseExceptions RaiseExceptionDataListID="511771b7-d728-4d3f-a5fc-f41069b46e32" BatchRowFieldID="BATCHROWID" AutoMatchRecordFieldID="AUTOMATCHRECORDID" RaiseExceptionColumn="DOMANUALREVIEWFORAUTOMATCH" />-->
+    </AutoMatch>
+  </DuplicateRecordCheck>
+
+	<!-- optionally, describe the batch row context window -->
+	<!--<RowContextWindow Caption="REPLACE_WITH_CAPTION" 
+				      ViewDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  EditDataFormTemplateID="REPLACE_WITH_FORMID" 
+					  ImageKey="REPLACE_WITH_IMAGEKEY" 
+					  RecordType="REPLACE_WITH_RECORDTYPE" 
+					  ContextFieldID="REPLACE_WITH_CONTEXTFIELDID" 
+					  />-->
+
+	<!-- optionally, you can indicate a report to use as the validation report for the batch -->
+	<!--<ValidationReport CatalogItemID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe a control report for batches of this type -->
+	<!--<ControlReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				   QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+				   ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe an exception report for batches of this type -->
+	<!--<ExceptionReport QueryViewSpecID="REPLACE_WITH_QUERYID" 
+				     QueryViewJoinField="REPLACE_WITH_JOINFIELD" 
+					 ReportSpecID="REPLACE_WITH_REPORTID" />-->
+
+	<!-- optionally, describe the client-side summary panel for batches of this type.  This should refer to a class that inherits 
+	from Browser.Batch.BatchSummaryPanelHandler -->
+	<!--<SummaryPanelHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />-->
+
+	<!-- optionally, list any client-side event handlers that will be plugged into the event model for the batch data entry form.  Each handler
+	refers to a class that inherits from Browser.Batch.BatchEntryHandler -->
+	<!--<EventHandlers>
+		<BatchEventHandler AssemblyName="REPLACE_WITH_FULLASSEMBLYNAME" ClassName="REPLACE_WITH_FULLCLASSNAME" />
+	</EventHandlers>-->
+
+	<!-- optionally, indicate a list of fields from the Add/Edit form that should be included by default in the batch design.  This list
+	does not need to include required or hidden fields, as they are already included by default.	
+	-->                           
+  <!--
+  <DefaultSelectedFields>
+		<Field>CONSTITUENTID</Field>
+	</DefaultSelectedFields>
+  -->
+  
+</BatchTypeSpec>

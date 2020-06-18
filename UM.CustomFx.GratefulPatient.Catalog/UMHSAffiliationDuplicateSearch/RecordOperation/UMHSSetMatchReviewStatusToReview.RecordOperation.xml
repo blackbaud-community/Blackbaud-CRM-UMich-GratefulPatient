@@ -1,0 +1,44 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="939ad065-11e5-462a-b2c0-733a1e7a0ae3" 
+	Name="UMHS Set Match Review Status To Review Record Operation" 
+	Description="Update that review status to Review on the match set record"
+	Author="UM Dev"
+	OperationType="Update"
+	RecordType="Matched MIMED Friend Contacts to U-M affiliations"
+	c:SecurityUIFolder="UMHS Duplicate Search"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_UM_USP_RECORDOPERATION_UMHSSETMATCHREVIEWSTATUSTOREVIEW">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_RECORDOPERATION_UMHSSETMATCHREVIEWSTATUSTOREVIEW
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as begin
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate()
+
+  update USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS
+  set
+    REVIEWSTATUSCODE=0,
+    CHANGEDBYID=@CHANGEAGENTID,
+    DATECHANGED=@CURRENTDATE
+  where
+    ID=@ID
+    
+	return 0;
+	
+end
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+</RecordOperationSpec>

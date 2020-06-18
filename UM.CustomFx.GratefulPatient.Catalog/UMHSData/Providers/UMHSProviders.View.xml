@@ -1,0 +1,135 @@
+﻿<ViewDataFormTemplateSpec 
+	xmlns="bb_appfx_viewdataformtemplate" 
+	xmlns:c="bb_appfx_commontypes" 
+	ID="3ab2ddf8-d66f-4d8d-b1c9-d0a622b5f468" 
+	Name="MIMED Provider View for Auditing"
+	Description="A view form for MIMED Provider records created for recording the views for auditing"
+	Author="UM Dev"
+	DataFormInstanceID="0926d6e2-0cf6-4924-9033-922a7a8dace1" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the SP that returns the data used by the form -->
+	<SPDataForm SPName="USR_USP_UMHS_PROVIDERS_VIEW">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create Procedure dbo.USR_USP_UMHS_PROVIDERS_VIEW
+          (         
+            @ID uniqueidentifier ,
+            --@UMHSID uniqueidentifier = null output,
+		        @CONSTITUENTID uniqueidentifier = null output ,
+            @PROVIDERNAME nvarchar(100) = null output,
+            @PROVIDERDRNUMBER nvarchar(100) = null output,
+            @DEPARTMENT nvarchar(100) = null output,
+            @SUBDEPARTMENT nvarchar(100) = null output,
+            @ADMITDOCTORIND bit = null output,
+            @ATTENDDOCTORIND bit = null output,
+            @RESIDENTDOCTORIND bit = null output,
+            @CONSULTDOCTORIND bit = null output,
+            @PHONE nvarchar(100) = null output,
+            @DATALOADED              BIT = 0 OUTPUT,
+            --@MSG  NVARCHAR(100) = NULL OUTPUT, --may need latter if they want to capture things in event viewer.
+            @CURRENTAPPUSERID  uniqueidentifier 
+          )         
+          as       
+         
+        select DISTINCT
+          p.ID,
+          c.ID as CONSTITUENTID,
+          c.NAME as PROVIDERNAME,
+          p.PROVIDERDRNUMBER,
+          case
+            when d.ID is NOT null
+            then
+              d.NAME
+            else
+              N''
+          end as DEPARTMENT,
+          case
+            when sd.ID is NOT null
+            then
+              sd.NAME
+            else
+              N''
+          end as SUBDEPARTMENT,
+          p.ADMITDOCTORIND,
+          p.ATTENDDOCTORIND,
+          p.RESIDENTDOCTORIND,
+          p.CONSULTDOCTORIND,         
+          dbo.USR_UFN_UM_FORMATPHONE(p.PHONE) as PHONE 
+          
+        from dbo.USR_UMHS_PROVIDERS p
+        inner join USR_UMHS_VISITS v on v.providerid = p.ID
+        inner join dbo.CONSTITUENT c on c.ID = p.CONSTITUENTID
+        left join USR_UMHS_DATA u on u.ID = v.UMHSID
+        --left outer join [STATE] s on s.ID = p.STATEID
+        left outer join USR_UMHS_DEPARTMENT d on d.ID = p.DEPARTMENTID
+        left outer join USR_UMHS_SUBDEPARTMENT sd on sd.ID = p.SUBDEPARTMENTID
+        WHERE v.UMHSID = @ID
+        
+        /* --Audit code start */
+			          DECLARE @USERNAME VARCHAR(100)
+			          DECLARE @DISPLAYNAME VARCHAR(100)
+			          DECLARE @NAME VARCHAR(200)
+			          DECLARE @EVENTMESSAGE VARCHAR(1000)
+			          DECLARE @PID VARCHAR(100)
+			          DECLARE @PATIENTONLY BIT
+			          DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+			          SELECT @USERNAME = USERNAME
+					        ,@DISPLAYNAME = DISPLAYNAME
+			          FROM APPUSER 
+			          WHERE ID = @CURRENTAPPUSERID
+  
+			          SELECT @NAME = NAME
+					        ,@PID = LOOKUPID
+			          FROM CONSTITUENT
+				        inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+			          WHERE gp.ID = @ID
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+
+				        Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='3f47b8c0-4552-4b85-a8ef-ed4cf8733b46' --MIMED Provider subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @ID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              --set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+  	
+	
+			]]>	  
+		</c:CreateProcedureSQL>
+    
+	</SPDataForm>
+
+  <c:FormMetaData FixedDialog="true">
+    
+    <c:FormFields>
+      <!--<c:FormField FieldID="CONSTITUENTID" Caption="Constituent" DataType="Guid" Hidden="true"/>
+      <c:FormField FieldID="PROVIDERNAME" Caption="Provider Name" DataType="String" />
+      <c:FormField FieldID="PROVIDERDRNUMBER" Caption="Provider #" DataType="String" />
+      <c:FormField FieldID="DEPARTMENT" Caption="MIMED department" DataType="String" />
+      <c:FormField FieldID="SUBDEPARTMENT" Caption="MIMED subdepartment" DataType="String" />
+      <c:FormField FieldID="ADMITDOCTORIND" Caption="Admitting Provider?" DataType="Boolean" />
+      <c:FormField FieldID="ATTENDDOCTORIND" Caption="Attending Provider?" DataType="Boolean" />
+      <c:FormField FieldID="RESIDENTDOCTORIND" Caption="Resident Provider?" DataType="Boolean" />
+      <c:FormField FieldID="CONSULTDOCTORIND" Caption="Consulting Provider?" DataType="Boolean" />
+      <c:FormField FieldID="PHONE" Caption="Provider Phone" DataType="String" />-->
+     <!-- <c:FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100"  Hidden="true" />-->
+
+    </c:FormFields>    
+  </c:FormMetaData>
+</ViewDataFormTemplateSpec>

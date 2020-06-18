@@ -1,0 +1,56 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="ea34ef97-53a5-4fc0-b53d-8d3b71d27cbf" 
+	Name="MIMED departments List"
+	Description="A data list showing MIMED department records." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Department.DataList" />
+
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSDEPARTMENT">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_UM_USP_DATALIST_UMHSDEPARTMENT
+(
+	 @INCLUDEINACTIVE bit = 1
+)
+as
+	set nocount on;
+
+select	
+							D.ID,
+							D.NAME,
+							D.SORTMETHOD,
+							1-D.ISINACTIVE
+						from 
+							dbo.USR_UMHS_DEPARTMENT D
+						where (@INCLUDEINACTIVE = 1 or D.ISINACTIVE = 0)
+						order by
+							D.NAME;
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe any parameters (other than the context ID) defined on the SP -->
+	 <Parameters>
+    <c:FormMetaData>
+      <c:FormFields>
+        <c:FormField FieldID="INCLUDEINACTIVE" DataType="Boolean" Caption="Include inactive" DefaultValueText="1" CaptionResourceKey="$$include_inactive" />
+      </c:FormFields>
+    </c:FormMetaData>
+  </Parameters>
+
+	<!-- define the output fields in the list -->
+	 <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="NAME" Caption="Name" DataType="String" CaptionResourceKey="$$name" />
+      <OutputField FieldID="SORTMETHOD" Caption="Sort Method" DataType="String" CaptionResourceKey="$$sort_method" />
+      <OutputField FieldID="ISACTIVE" Caption="Active" DataType="Boolean" CaptionResourceKey="$$active" />
+    </OutputFields>
+  </Output>
+
+</DataListSpec>

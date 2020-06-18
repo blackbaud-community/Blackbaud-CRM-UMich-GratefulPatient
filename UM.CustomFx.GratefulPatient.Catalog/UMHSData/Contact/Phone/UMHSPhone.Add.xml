@@ -1,0 +1,238 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="f76a4009-eabb-4ad8-9603-10c572cf0fe5"
+    Name="MIMED Phone Add Form"
+    Description="Used for adding a new MIMED Phone."
+    Author="UM Dev"
+    RecordType="MIMED Phone"
+    DataFormInstanceID="10f54640-0b72-4569-99a4-334c9a12fd3b"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    FormHeader="Add MIMED Phone"
+    >
+   <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Phone.View" />
+  <SPDataForm>
+    <LoadImplementation SPName="USP_UMHS_DATAFORMTEMPLATE_ADD_PHONE_PRELOAD" >
+      <c:CreateProcedureSQL>
+        <![CDATA[
+            create procedure dbo.USP_UMHS_DATAFORMTEMPLATE_ADD_PHONE_PRELOAD (
+				    @UMHSID uniqueidentifier,
+				    @ISPRIMARY bit = null output,						
+						@COUNTRYID uniqueidentifier = null output,
+						@COUNTRYCODES xml = null output,
+						@FORCEDPRIMARY bit = null output,			-- used by constituent data review
+						@CANEDITPRIMARY bit = null output,			-- used by constituent data review
+						@INVALIDFIELDS nvarchar(256) = null output	-- used by constituent data review
+			        ) as 
+						set nocount on;						
+						
+							select
+								@ISPRIMARY = case when count(PHONE.ID) = 0 then 1 else 0 end
+							from
+								dbo.USR_UMHS_PHONE PHONE
+							where
+								PHONE.UMHSID = @UMHSID;
+								
+						declare @CURRENTDATE date;
+						set @CURRENTDATE = getdate();								
+						
+										  
+						select @COUNTRYID = USR_UMHS_ADDRESS.COUNTRYID from dbo.USR_UMHS_ADDRESS where USR_UMHS_ADDRESS.UMHSID = @UMHSID and USR_UMHS_ADDRESS.ISPRIMARY = 1
+						set @COUNTRYID = coalesce(@COUNTRYID, dbo.UFN_COUNTRY_GETDEFAULT());				  
+						
+						select @COUNTRYCODES = dbo.UFN_COUNTRY_GETCOUNTRYCODES_TOITEMLISTXML();
+						
+			            return 0;
+        
+        ]]>
+      </c:CreateProcedureSQL>
+    </LoadImplementation>
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_PHONE">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_PHONE (@ID                    UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                          @UMHSID                UNIQUEIDENTIFIER,
+                                                                          @CHANGEAGENTID         UNIQUEIDENTIFIER = NULL,
+                                                                          @PHONETYPECODEID       UNIQUEIDENTIFIER = NULL,
+                                                                          @NUMBER                NVARCHAR(100),
+                                                                          @ISPRIMARY             BIT = 0,
+                                                                          @DONOTCALL             BIT = 0,
+                                                                          @INFOSOURCECODEID      UNIQUEIDENTIFIER = NULL,
+                                                                          @INFOSOURCECOMMENTS    NVARCHAR(256) = '',
+                                                                          @STARTDATE             DATETIME = NULL,
+                                                                          @ENDDATE               DATETIME = NULL,
+                                                                          @DONOTCALLREASONCODEID UNIQUEIDENTIFIER = NULL,
+                                                                          @COUNTRYID             UNIQUEIDENTIFIER = null,
+                                                                          @CALLBEFORE            TIME(0) = NULL,
+                                                                          @CALLAFTER             TIME(0) = NULL,
+                                                                          @ISCONFIDENTIAL        BIT = 0)
+            AS
+                SET NOCOUNT ON;
+
+                IF @ID IS NULL
+                  SET @ID = NEWID()
+
+                IF @CHANGEAGENTID IS NULL
+                  EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                    @CHANGEAGENTID OUTPUT
+
+                DECLARE @CURRENTDATE DATETIME = GETDATE()
+
+              BEGIN TRY
+              
+                    if @ISPRIMARY = 1
+						      update
+							      dbo.[USR_UMHS_PHONE]
+						      set
+							      ISPRIMARY = 0,
+							      CHANGEDBYID = @CHANGEAGENTID,
+							      DATECHANGED = @CURRENTDATE
+						      where
+							      UMHSID = @UMHSID and
+							      ISPRIMARY = 1;
+              
+                  -- handle inserting the data
+                  INSERT INTO DBO.USR_UMHS_PHONE
+                              (ID,
+                                UMHSID,
+                                PHONETYPECODEID,
+                                NUMBER,
+                                ISPRIMARY,
+                                DONOTCALL,
+                                INFOSOURCECODEID,
+                                INFOSOURCECOMMENTS,
+                                STARTDATE,
+                                ENDDATE,
+                                DONOTCALLREASONCODEID,
+                                COUNTRYID,
+                                CALLBEFORE,
+                                CALLAFTER,
+                                ISCONFIDENTIAL,
+                                ADDEDBYID,
+                                CHANGEDBYID,
+                                DATEADDED,
+                                DATECHANGED)
+                  VALUES      (@ID,
+                                @UMHSID,
+                                @PHONETYPECODEID,
+                                @NUMBER,
+                                @ISPRIMARY,
+                                @DONOTCALL,
+                                @INFOSOURCECODEID,
+                                @INFOSOURCECOMMENTS,
+                                @STARTDATE,
+                                @ENDDATE,
+                                @DONOTCALLREASONCODEID,
+                                @COUNTRYID,
+                                @CALLBEFORE,
+                                @CALLAFTER,
+                                @ISCONFIDENTIAL,
+                                @CHANGEAGENTID,
+                                @CHANGEAGENTID,
+                                @CURRENTDATE,
+                                @CURRENTDATE)
+              END TRY
+
+              BEGIN CATCH
+                  EXEC DBO.USP_RAISE_ERROR
+
+                  RETURN 1
+              END CATCH
+
+                RETURN 0 
+			
+
+            ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions xmlns="bb_appfx_commontypes">
+        <Constraints>
+          <Constraint Name="CK_USR_UMHS_PHONE_PRIMARYCOUNT" Field="ISPRIMARY" Type="Format">
+            <CustomErrorMsg>There is already a primary phone for this contact.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_PHONE_VALIDDATERANGE" Field="ENDDATE" Type="Format">
+            <CustomErrorMsg>The start date must be on or before the end date.</CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_PHONE_ENDDATEINVALIDIFPRIMARY" Field="ENDDATE" Type="Format">
+            <c:CustomErrorMsg>Primary phone cannot have an end date.</c:CustomErrorMsg>
+          </Constraint>
+          <Constraint Name="CK_USR_UMHS_PHONE_UNIQUENUMBERANDTYPE" Field="NUMBER" Type="Format">
+            <CustomErrorMsg>The phone you entered already exists for this contact.</CustomErrorMsg>
+          </Constraint>
+        </Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <c:FormMetaData FixedDialog="true">
+    <c:FormFields>
+      <c:FormField FieldID="PHONETYPECODEID" DataType="Guid" Caption="Phone type">
+        <c:CodeTable CodeTableName="PHONETYPECODE" />
+      </c:FormField>
+      <c:FormField FieldID="NUMBER" Required="true" MaxLength="100" Caption="Number" ApplyPhoneFormatting="true" />
+      <c:FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Set as primary phone number" />
+      <c:FormField FieldID="COUNTRYID" DataType="Guid" Required="true" Caption="Country">
+        <c:SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+      </c:FormField>
+      <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" />
+      <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+      <c:FormField FieldID="DONOTCALL" DataType="Boolean" Caption="Do not call this phone number" />
+      <c:FormField FieldID="DONOTCALLREASONCODEID" DataType="Guid" Caption="Reason">
+        <c:CodeTable CodeTableName="DONOTCALLREASONCODE" />
+      </c:FormField>
+      <c:FormField FieldID="INFOSOURCECODEID" DataType="Guid" Caption="Information source">
+        <c:CodeTable CodeTableName="INFOSOURCECODE" />
+      </c:FormField>
+      <c:FormField FieldID="INFOSOURCECOMMENTS" MaxLength="256" Caption="Comments" Multiline="true" />
+      <c:FormField FieldID="CALLBEFORE" Caption="Call before" DataType="Time"></c:FormField>
+      <c:FormField FieldID="CALLAFTER" Caption="Call after" DataType="Time"></c:FormField>
+      <c:FormField FieldID="ISCONFIDENTIAL" DataType="Boolean" Caption="This phone number is confidential" />
+      <c:FormField FieldID="COUNTRYCODES" DataType="XML" ReadOnly="true" Hidden="true">
+        <c:Collection>
+          <c:Fields>
+            <c:FormField FieldID="COUNTRYID" DataType="Guid" Caption="CountryID" CaptionResourceKey="$$countryid" />
+            <c:FormField FieldID="COUNTRYCODE" Caption="Country code" CaptionResourceKey="$$country_code" />
+          </c:Fields>
+        </c:Collection>
+      </c:FormField>
+      <c:FormField FieldID="FORCEDPRIMARY" DataType="Boolean" ReadOnly="true" Hidden="true" />
+      <c:FormField FieldID="CANEDITPRIMARY" DataType="Boolean" ReadOnly="true" Hidden="true" />
+      <c:FormField FieldID="INVALIDFIELDS" ReadOnly="true" Hidden="true" MaxLength="256" />
+    </c:FormFields>
+    <c:FormUIComponent />
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSPhoneFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSPhoneForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+        
+    <c:FieldGroups>
+        <c:FieldGroup ID="PHONEINFORMATION" Caption="Phone information" CaptionResourceKey="$$phone_information">
+          <c:Fields>
+            <c:Field>PHONETYPECODEID</c:Field>
+            <c:Field>NUMBER</c:Field>
+            <c:Field>ISPRIMARY</c:Field>
+            <c:Field>DONOTCALL</c:Field>
+            <c:Field>ISCONFIDENTIAL</c:Field>
+          </c:Fields>
+        </c:FieldGroup>
+        <c:FieldGroup ID="SOURCEINFORMATION" Caption="Phone source" CaptionResourceKey="$$phone_source">
+          <c:Fields>
+            <c:Field>INFOSOURCECODEID</c:Field>
+            <c:Field>INFOSOURCECOMMENTS</c:Field>
+          </c:Fields>
+        </c:FieldGroup>
+      </c:FieldGroups>
+      
+   
+    <c:UIFields>
+      <c:FormField FieldID="COUNTRYCODE" />
+      <c:FormField FieldID="SHOWINVALID" DataType="Boolean" Hidden="true" />
+      <c:FormField FieldID="INVALIDFIELD3" Hidden="true" />
+      <c:FormField FieldID="INVALIDFIELD4" Hidden="true" />
+      <c:FormField FieldID="ORIGINCODETRANSLATION" Caption="Information source" CaptionResourceKey="$$information_source" />
+    </c:UIFields>
+  </c:FormMetaData>
+  
+</AddDataFormTemplateSpec>

@@ -1,0 +1,262 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c84a6344-808e-4dbb-8428-3fd7beda0a39" 
+	Name="MIMED Batch Add Commit Provider Data Form"
+	Description="MIMED Batch Add Commit Provider Data Form" 
+	Author="UM Dev"
+	DataFormInstanceID="693f1739-afe0-40ab-81b9-a86467e79794" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Add commit MIMED batch Provider data"
+	>
+
+	<SPDataForm>
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCHCOMMIT_PROVIDERS">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_ADD_UMHSBATCHCOMMIT_PROVIDERS
+(
+   @ID uniqueidentifier = null output
+  ,@CHANGEAGENTID uniqueidentifier = null
+  ,@VALIDATEONLY bit = 0
+  -- Batch fields
+  ,@CONSTITUENTID uniqueidentifier = null
+  ,@PROVIDERDRNUMBER nvarchar(50) = ''
+  ,@UMEMPLID nvarchar(200) = ''
+  ,@UMUNIQUENAME nvarchar(200) = ''
+  ,@LASTNAME nvarchar(200) = ''
+  ,@FIRSTNAME nvarchar(100) = ''
+  ,@PHONE nvarchar(100) = ''
+  ,@ADMITDOCTORIND bit = 0
+  ,@ATTENDDOCTORIND bit = 0
+  ,@RESIDENTDOCTORIND bit = 0
+  ,@CONSULTDOCTORIND bit = 0
+  ,@DEPARTMENTID uniqueidentifier = null
+  ,@SUBDEPARTMENTID uniqueidentifier = null 
+  ,@UMHSDATA_LASTPROCDATE datetime = null
+)
+as
+
+set nocount on;
+
+if @ID is null
+    set @ID = newid()
+
+if @CHANGEAGENTID is null  
+    exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+    
+declare @CURRENTAPPUSERID uniqueidentifier=null;    
+select @CURRENTAPPUSERID=ID from appuser where windowsusername=SUSER_NAME();    
+
+declare @CURRENTDATE datetime
+set @CURRENTDATE = getdate()
+
+begin try
+
+  /*
+   * Create a new Constituent in DART if one doesn't exist for the Provider, which should be updated
+   * by then next run of the DART HRMS import process.
+   */
+  if @CONSTITUENTID is NULL
+  begin
+        exec dbo.USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD
+              @ID=@CONSTITUENTID output
+             ,@UMEMPLID=@UMEMPLID
+             ,@UMUNIQUENAME=@UMUNIQUENAME
+             ,@LASTNAME=@LASTNAME
+             ,@FIRSTNAME=@FIRSTNAME
+
+      /*
+       * Set Non-Alum constituency on the Provider's new consituent record
+       */
+      declare @CONSTITUENCYID uniqueidentifier;
+      declare @CONSTITUENCYCODEID_NONALUM uniqueidentifier='BA102635-D715-4B17-B902-E96501F375D9';   
+      
+      if not exists(select 1 from CONSTITUENCY where CONSTITUENTID=@CONSTITUENTID and CONSTITUENCYCODEID=@CONSTITUENCYCODEID_NONALUM)
+      begin
+
+	      exec dbo.USP_DATAFORMTEMPLATE_ADD_CONSTITUENCY
+			      @ID = @CONSTITUENCYID output,
+			      @CONSTITUENTID = @CONSTITUENTID,
+			      @CONSTITUENCYCODEID = @CONSTITUENCYCODEID_NONALUM,
+			      @DATEFROM = @CURRENTDATE;
+      end
+  end
+ 
+  /*
+   * Commit sub-department if it is a sub-department of the department
+   */
+  declare @MATCHEDSUBDEPARTMENTID uniqueidentifier;
+  
+  set @MATCHEDSUBDEPARTMENTID = dbo.USR_UFN_UMHSBATCH_GETMATCHEDSUBDEPARTMENTID(@DEPARTMENTID, @SUBDEPARTMENTID);
+
+  /*
+   * Get U-M ID and Unique Name on the Constituent record instead of imported from the UMHSDATA DW 
+   * due to the U-M ID and Unique Name can be inconsistent over time in the UMHSDATA DW, so using 
+   * DART as the definitive source for a Constituent's U-M ID and Unique Name. 
+   *
+   * The purpose of saving the associated Constituent's UMEMPLID and UMUNIQUENAME is for the Constituent Compare's 
+   * Constituent merge process. The merge will move over the UMEMPLID and UMUNIQUENAME from the Source Constituent 
+   * to the Target Constituent if the Target Constiuent doesn't have values for these fields. In order to merge the
+   * associated Provider that is linked to the Source Constituent, the merge process (as executed in the stored 
+   * procedure USR_USP_MERGETASK_MIMED) will use the UMEMPLID and UMUNIQUENAME values set on the Provider record 
+   * to see if there is a match to the Target Constiutent and if so, then reset the CONSTITUENTID on the Provider
+   * record to that of the ID on the Target Constituent record.
+   */
+  declare @CONSTITUENT_UMEMPLID nvarchar(200)=N'', @CONSTITUENT_UMUNIQUENAME nvarchar(200)=N'';
+   
+  select
+      @CONSTITUENT_UMEMPLID=a.ALTERNATELOOKUPID
+  from constituent c
+  inner join alternatelookupid a on a.CONSTITUENTID=c.ID
+  inner join ALTERNATELOOKUPIDTYPECODE atc on atc.ID=a.ALTERNATELOOKUPIDTYPECODEID
+  where
+      c.ID=@CONSTITUENTID
+  and atc.ID='97CE11D1-6793-47D5-9FEE-B54B90DA16DA' -- University of Michigan ID-UMID
+     
+  /*
+   * Get the U-M Unique Name for the Target Constituent that will be used to match up with the Provider record
+   */
+  select
+      @CONSTITUENT_UMUNIQUENAME=a.ALTERNATELOOKUPID
+  from constituent c
+  inner join alternatelookupid a on a.CONSTITUENTID=c.ID
+  inner join ALTERNATELOOKUPIDTYPECODE atc on atc.ID=a.ALTERNATELOOKUPIDTYPECODEID
+  where
+      c.ID=@CONSTITUENTID
+  and atc.ID='4073AA02-1416-4F6F-9238-9FCEFDEE6423' -- U-M Uniqname   
+    
+  insert into dbo.USR_UMHS_PROVIDERS
+  ( ID
+   ,CONSTITUENTID
+   ,PROVIDERDRNUMBER
+   ,ADMITDOCTORIND
+   ,ATTENDDOCTORIND
+   ,RESIDENTDOCTORIND
+   ,CONSULTDOCTORIND
+   ,PHONE
+   ,DEPARTMENTID
+   ,SUBDEPARTMENTID
+   ,UMHSDATA_LASTPROCDATE
+   ,UMEMPLID
+   ,UMUNIQUENAME
+   ,ADDEDBYID
+   ,CHANGEDBYID
+   ,DATEADDED
+   ,DATECHANGED)
+  values 
+  ( NEWID()
+   ,@CONSTITUENTID
+   ,@PROVIDERDRNUMBER
+   ,@ADMITDOCTORIND
+   ,@ATTENDDOCTORIND
+   ,@RESIDENTDOCTORIND
+   ,@CONSULTDOCTORIND
+   ,@PHONE
+   ,@DEPARTMENTID
+   ,@MATCHEDSUBDEPARTMENTID
+   ,@UMHSDATA_LASTPROCDATE
+   ,@CONSTITUENT_UMEMPLID
+   ,@CONSTITUENT_UMUNIQUENAME
+   ,@CHANGEAGENTID
+   ,@CHANGEAGENTID
+   ,@CURRENTDATE
+   ,@CURRENTDATE)
+  
+end try
+
+begin catch
+    exec dbo.USP_RAISE_ERROR
+    return 1
+end catch
+
+return 0				
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="VALIDATEONLY" Caption="Validate only" Hidden="true" />
+      <!--Batch fields-->
+      <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Constituent" Hidden="false">
+        <SearchList SearchListID="27dffa05-1147-4ceb-a0da-36158da56b98"  EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="PROVIDERDRNUMBER" Caption="Provider DR Number" DataType="String" MaxLength="50" Required="true"/>
+      <FormField FieldID="UMEMPLID" Caption="U-M Employment ID" Description="U-M Employment ID" DataType="String" MaxLength="200"  />
+      <FormField FieldID="UMUNIQUENAME" Caption="U-M Unique Name" Description="U-M Unique Name" DataType="String" MaxLength="200"  />
+      <FormField FieldID="LASTNAME" Caption="Last Name" Description="Provider's last name" DataType="String" MaxLength="200" />
+      <FormField FieldID="FIRSTNAME" Caption="First Name" Description="Provider's first name" DataType="String" MaxLength="100" />
+      <FormField FieldID="PHONE" Caption="Phone" Description="Provider's Phone" MaxLength="100"  Category="Phone" DataType="String" ApplyPhoneFormatting="true"/>
+      <FormField FieldID="ADMITDOCTORIND" Caption="Admitting Provider" Description="Admitting Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="ATTENDDOCTORIND" Caption="Attending Provider" Description="Attending Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="RESIDENTDOCTORIND" Caption="Resident Provider" Description="Resident Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="CONSULTDOCTORIND" Caption="Consulting Provider" Description="Consulting Provider" DataType="Boolean" DefaultValueText="0">
+        <ValueList EnableTypeAhead="false" UseRadioButtons="true">
+          <Items>
+            <Item>
+              <Value>1</Value>
+              <Label>Y</Label>
+            </Item>
+            <Item>
+              <Value>0</Value>
+              <Label>N</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="DEPARTMENTID" Caption="Department" Description="MIMED department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="df5aac7a-1861-4c47-8649-85f405d95ce7"/>
+      </FormField>
+      <FormField FieldID="SUBDEPARTMENTID" Caption="Subdepartment" Description="MIMED Sub-Department" DataType="Guid">
+        <SimpleDataList SimpleDataListID="287fe463-4ca5-40e7-8064-3df34dd15864" />
+      </FormField>
+      <FormField FieldID="UMHSDATA_LASTPROCDATE" Description="UMHSDATA Import of the Process Date." Caption="UMHSDATA Import process date" DataType="Date" IncludeTimeOnDate="true" Category="UMHSDATA Import (only)" />
+    </FormFields>
+	</FormMetaData>
+
+</AddDataFormTemplateSpec>

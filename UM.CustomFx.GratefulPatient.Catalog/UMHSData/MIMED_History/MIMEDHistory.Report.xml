@@ -1,0 +1,245 @@
+﻿<ReportSpec 
+	xmlns="bb_appfx_report"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="9702af99-888a-43d0-940c-e65a98ea4a46" 
+	Name="MIMED History Report"
+	Description="A report showing information about MIMED history records."
+	Author="UM Dev"
+	>
+  <InstalledProductList xmlns="bb_appfx_commontypes">
+    <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+    <InstalledProduct ID="6f77d512-d0d1-444f-9b46-b8603a6fe5f1" />
+  </InstalledProductList>
+	<RDLFileName>UM.CustomFx.GratefulPatient.Catalog.UMHSData.MIMED_History.MIMED History Report.rdl</RDLFileName>
+	<Folder>MIMED Data</Folder>
+	
+	<DataRetrieval>
+		<CreateSQL ObjectName="dbo.USR_USP_REPORT_UMHSHISTORY" ObjectType="SQLStoredProc"  >
+			<![CDATA[
+          create procedure dbo.USR_USP_REPORT_UMHSHISTORY
+                 (
+                   -- declare  
+					            @UMHSID uniqueidentifier,-- ='42F78278-FF09-4559-AE47-04FBCEB57895',
+                      @CONSTITUENTID uniqueidentifier= null,
+					            @USERID uniqueidentifier,
+                      @ACTIONTYPECODE tinyint ,
+                      @DATETYPE tinyint,
+                      @DATERANGEDISPLAY nvarchar(100) ,
+                      @STARTDATE datetime ,
+                      @ENDDATE datetime ,
+                      @RECORDTYPECODE tinyint = 0,
+                      @CURRENTAPPUSERID uniqueidentifier
+                  )
+                  with execute as owner
+                  as
+                      set nocount on;
+                      
+                  -- Use internal variables to solve parameter sniffing issues
+                  DECLARE @UMHSIDInternal AS uniqueidentifier;
+				          DECLARE @CONSTITUENTIDInternal as uniqueidentifier;
+                  DECLARE @USERIDInternal AS uniqueidentifier;
+                  DECLARE @ACTIONTYPECODEInternal AS tinyint;
+                  DECLARE @DATETYPEInternal AS tinyint;
+                  DECLARE @DATERANGEDISPLAYInternal AS nvarchar(100) ;
+                  DECLARE @STARTDATEInternal AS datetime ;
+                  DECLARE @ENDDATEInternal AS datetime ;
+                  DECLARE @RECORDTYPECODEInternal AS tinyint ;
+
+                  -- Copy the parameters into the internal variables
+                  SET @UMHSIDInternal = (SELECT ID FROM dbo.USR_UMHS_DATA where CONSTITUENTID = @UMHSID); -- this is because the search is picking up the constituent name by default.
+				          SET @CONSTITUENTIDInternal = @CONSTITUENTID;
+                  SET @USERIDInternal = @USERID ;
+                  SET @ACTIONTYPECODEInternal = ISNULL(@ACTIONTYPECODE,0) ;
+                  SET @DATETYPEInternal = @DATETYPE ;
+                  SET @DATERANGEDISPLAYInternal = ISNULL(@DATERANGEDISPLAY,'') ;
+                  SET @STARTDATEInternal = @STARTDATE ;
+                  SET @ENDDATEInternal = @ENDDATE ;
+                  SET @RECORDTYPECODEInternal = @RECORDTYPECODE ;
+                     
+                 exec dbo.USR_USP_UMHS_GETHISTORY @UMHSIDInternal, @CONSTITUENTIDInternal, @USERIDInternal, @ACTIONTYPECODEInternal, @STARTDATEInternal, @ENDDATEInternal, @RECORDTYPECODEInternal;
+                 
+                 
+                 ]]>
+		</CreateSQL>
+	</DataRetrieval>
+ 
+  <c:FormMetaData xmlns="bb_appfx_commontypes">
+    <c:FormFields>
+      <c:FormField FieldID="UMHSID" DataType="Guid" Caption="MIMED Constituent Name" Hidden="false" >
+        <c:SearchList SearchListID="747530a1-be80-4054-a021-d2a599248261" EnableQuickFind="true" >
+          <c:FormFieldOverrides>
+            <FormFieldOverride FieldID="INCLUDEINDIVIDUALS" DefaultValueText="true"/>
+            <FormFieldOverride FieldID="INCLUDEORGANIZATIONS" DefaultValueText="false"/>
+            <FormFieldOverride FieldID="INCLUDEGROUPS" DefaultValueText="false"/>
+            <c:FormFieldOverride FieldID="PATIENTSONLY" DefaultValueText="true"/>
+          </c:FormFieldOverrides>
+        </c:SearchList>
+      </c:FormField>
+      <c:FormField FieldID="USERID" DataType="Guid" Caption="User" Description="Filter the list based on the user who made the change." CaptionResourceKey="$$user" DescriptionResourceKey="$$filter_the_list_based_on_the_user_who_made_the_change">
+        <SimpleDataList SimpleDataListID="c8f924ea-3aaf-4025-bd9e-36bc9fadee75" />
+      </c:FormField>
+      <c:FormField FieldID="ACTIONTYPECODE" DataType="TinyInt" Required="true" Caption="Action" Description="Filter the list based on database actions." DefaultValueText="0" CaptionResourceKey="$$action" DescriptionResourceKey="$$filter_the_list_based_on_database_actions">
+        <ValueList>
+          <Items>
+            <Item LabelResourceKey="$$all">
+              <Value>0</Value>
+              <Label>All</Label>
+            </Item>
+            <Item LabelResourceKey="$$add">
+              <Value>1</Value>
+              <Label>Add</Label>
+            </Item>
+            <Item LabelResourceKey="$$edit">
+              <Value>2</Value>
+              <Label>Edit</Label>
+            </Item>
+            <Item LabelResourceKey="$$delete">
+              <Value>3</Value>
+              <Label>Delete</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </c:FormField>
+      <c:FormField FieldID="DATETYPE" DataType="SmallInt" Required="true" Caption="Show" Description="Filter the list based on a time frame." DefaultValueText="56" CaptionResourceKey="$$show" DescriptionResourceKey="$$filter_the_list_based_on_a_time_frame">
+        <ValueList>
+          <Items>
+            <Item LabelResourceKey="$$specific_date">
+              <Value>0</Value>
+              <Label>Specific Date</Label>
+            </Item>
+            <Item LabelResourceKey="$$all_dates">
+              <Value>1</Value>
+              <Label>All Dates</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_30_days">
+              <Value>56</Value>
+              <Label>Last 30 days</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_60_days">
+              <Value>57</Value>
+              <Label>Last 60 days</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_90_days">
+              <Value>46</Value>
+              <Label>Last 90 days</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_6_months">
+              <Value>47</Value>
+              <Label>Last 6 months</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_year">
+              <Value>48</Value>
+              <Label>Last year</Label>
+            </Item>
+            <Item LabelResourceKey="$$last_5_years">
+              <Value>58</Value>
+              <Label>Last 5 years</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </c:FormField>
+      <c:FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Description="Beginning of the date range on which to filter the list." CaptionResourceKey="$$start_date" DescriptionResourceKey="$$beginning_of_the_date_range_on_which_to_filter_the_list" />
+      <c:FormField FieldID="ENDDATE" DataType="Date" Caption="End date" Description="End of the date range on which to filter the list." CaptionResourceKey="$$end_date" DescriptionResourceKey="$$end_of_the_date_range_on_which_to_filter_the_list" />
+      <c:FormField FieldID="RECORDTYPECODE" DataType="TinyInt" Required="true" Caption="Field type" Description="Filter the list based on database actions." DefaultValueText="0" CaptionResourceKey="$$field_type" DescriptionResourceKey="$$filter_the_list_based_on_database_actions">
+        <ValueList>
+          <Items>
+            <Item LabelResourceKey="$$all">
+              <Value>0</Value>
+              <Label>All</Label>
+            </Item>
+            <Item LabelResourceKey="$$address">
+              <Value>6</Value>
+              <Label>Address</Label>
+            </Item>
+            <Item LabelResourceKey="$$alias">
+              <Value>13</Value>
+              <Label>Alias</Label>
+            </Item>
+            <Item LabelResourceKey="$$application_user_link">
+              <Value>4</Value>
+              <Label>Application user link</Label>
+            </Item>
+            <Item LabelResourceKey="$$constituency">
+              <Value>10</Value>
+              <Label>Constituency</Label>
+            </Item>
+            <Item LabelResourceKey="$$constituent">
+              <Value>1</Value>
+              <Label>Constituent</Label>
+            </Item>
+            <Item LabelResourceKey="$$deceased_constituent">
+              <Value>2</Value>
+              <Label>Deceased constituent</Label>
+            </Item>
+            <Item LabelResourceKey="$$documentation">
+              <Value>12</Value>
+              <Label>Documentation</Label>
+            </Item>
+            <Item LabelResourceKey="$$educational_history">
+              <Value>11</Value>
+              <Label>Educational history</Label>
+            </Item>
+            <Item LabelResourceKey="$$email_address">
+              <Value>7</Value>
+              <Label>Email address</Label>
+            </Item>
+            <Item LabelResourceKey="$$financial_account">
+              <Value>16</Value>
+              <Label>Financial account</Label>
+              <InstalledProductList>
+                <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+                <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+              </InstalledProductList>
+            </Item>
+            <Item LabelResourceKey="$$interest">
+              <Value>8</Value>
+              <Label>Interest</Label>
+            </Item>
+            <Item LabelResourceKey="$$matching_gift_condition">
+              <Value>9</Value>
+              <Label>Matching gift condition</Label>
+              <InstalledProductList>
+                <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+                <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+              </InstalledProductList>
+            </Item>
+            <Item LabelResourceKey="$$name_format">
+              <Value>14</Value>
+              <Label>Name format</Label>
+            </Item>
+            <Item LabelResourceKey="$$organization_data">
+              <Value>3</Value>
+              <Label>Organization data</Label>
+            </Item>
+            <Item LabelResourceKey="$$phone">
+              <Value>5</Value>
+              <Label>Phone</Label>
+            </Item>
+            <Item LabelResourceKey="$$relationship">
+              <Value>15</Value>
+              <Label>Relationship</Label>
+            </Item>
+            <Item LabelResourceKey="$$security_group">
+              <Value>17</Value>
+              <Label>Security group</Label>
+              <InstalledProductList>
+                <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+                <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+              </InstalledProductList>
+            </Item>
+          </Items>
+        </ValueList>
+      </c:FormField>
+      <c:FormField FieldID="DATERANGEDISPLAY" Hidden="true" />
+  
+  </c:FormFields>
+    
+    <WebUIComponent>
+      <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDHistoryReportUIModel" />
+      <WebUI>
+        <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/MIMEDHistoryReport.html" />
+      </WebUI>
+    </WebUIComponent>
+  </c:FormMetaData>
+</ReportSpec>

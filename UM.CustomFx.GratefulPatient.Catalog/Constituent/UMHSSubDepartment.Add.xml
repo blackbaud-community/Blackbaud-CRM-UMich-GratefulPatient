@@ -1,0 +1,103 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="05670e3a-04f6-43f4-b656-bd4931673802" 
+	Name="MIMED subdepartment Add Form"
+	Description="A data form for adding MIMED sub department records" 
+	Author="UM Dev"
+	DataFormInstanceID="ce2d1c08-af11-4453-87d2-94c5bdba65c5" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Add MIMED subdepartment"
+  FormHeaderResourceKey="$$add_a_subcategory"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.Department.DataList" />
+  <SPDataForm>
+		<!-- describe the preload SP (if applicable), which should be used to fetch field default values from the database.  If no
+		preload is needed, then this section can be removed -->
+
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSSUBDEPARTMENT">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSSUBDEPARTMENT
+  (
+                        @ID uniqueidentifier = null output,
+                        @CHANGEAGENTID uniqueidentifier = null, 
+                        @DEPARTMENTID uniqueidentifier,
+                        @NAME nvarchar(100)
+                    )
+                    as
+                        set nocount on;
+                         
+                        declare @CURRENTDATE datetime;
+                        declare @SEQUENCE int;
+                         
+                        if @ID is null
+                            set @ID = newid();
+ 
+                        if @CHANGEAGENTID is null  
+                            exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+ 
+                        set @CURRENTDATE = getdate();
+                         
+                        set @SEQUENCE = (SELECT isnull(max(SEQUENCE)+1,0) from dbo.USR_UMHS_SUBDEPARTMENT where DEPARTMENTID = @DEPARTMENTID);
+                         
+                        begin try
+                            insert into dbo.USR_UMHS_SUBDEPARTMENT
+                            (
+                                ID,
+                                DEPARTMENTID,
+                                NAME,
+                                SEQUENCE,
+                                ADDEDBYID,
+                                CHANGEDBYID,
+                                DATEADDED,
+                                DATECHANGED
+                            )
+                            values
+                            (
+                                @ID,
+                                @DEPARTMENTID,
+                                @NAME,
+                                @SEQUENCE,
+                                @CHANGEAGENTID,
+                                @CHANGEAGENTID,
+                                @CURRENTDATE,
+                                @CURRENTDATE
+                            );
+                               
+                        end try
+ 
+                        begin catch
+                            exec dbo.USP_RAISE_ERROR;
+                            return 1;
+                        end catch
+	          return 0;	
+
+return 0				
+				]]>
+			</c:CreateProcedureSQL>
+      <ExpectedDBExceptions xmlns="bb_appfx_commontypes">
+        <Constraints>
+          <Constraint Name="CK_USR_UMHS_SUBDEPARTMENT_NAME" Field="NAME" Type="Unique">
+            <CustomErrorMsg>There is an existing subdepartment in this department with the same name.</CustomErrorMsg>
+          </Constraint>
+        </Constraints>
+      </ExpectedDBExceptions>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe the context ID for this form (if applicable), which corresponds to a parameter in the SP. -->
+  <Context ContextRecordType="Department" RecordIDParameter="DEPARTMENTID" />
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+  <FormMetaData xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="ID" DataType="Guid" Hidden="true" />
+      <FormField FieldID="NAME" Required="true" MaxLength="100" Caption="Name" CaptionResourceKey="$$name" />
+    </FormFields>
+   
+  </FormMetaData>
+
+</AddDataFormTemplateSpec>

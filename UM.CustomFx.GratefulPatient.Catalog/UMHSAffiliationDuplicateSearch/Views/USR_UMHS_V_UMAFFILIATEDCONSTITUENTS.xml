@@ -1,0 +1,128 @@
+﻿<SQLViewSpec
+	xmlns="bb_appfx_sqlview"
+	xmlns:t="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 	
+	ID="8265d136-51a4-4a5b-bea5-700d1f5954c0"
+	Name="USR_UMHS_V_UMAFFILIATEDCONSTITUENTS"
+	Description="Individual constituents who are affiliate to U-M as faculty, staff, board member, or someone who is a spouse of an affiliate"
+	Author="UM Dev"
+	DBViewName="USR_UMHS_V_UMAFFILIATEDCONSTITUENTS"
+	>
+
+	<CreateViewSQL>
+		<![CDATA[
+create view dbo.USR_UMHS_V_UMAFFILIATEDCONSTITUENTS (CONSTITUENTID)
+with SCHEMABINDING
+AS
+	/* 
+	 * UM Faculty and Staff 
+	 */
+	select 
+		c.ID as CONSTITUENTID
+	from dbo.CONSTITUENT c
+	inner join dbo.USR_CONSTITUENTAFFILIATION ca on ca.CONSTITUENTID=c.ID
+	inner join dbo.USR_CONSTITUENTAFFILIATIONBASE cab on ca.AFFILIATIONBASENAMECODEID = cab.ID
+	inner join dbo.USR_CONSTITUENTAFFILIATIONCATEGORYTYPECODE cat on cab.[CONSTITUENTAFFILIATIONCATEGORYCODEID] = cat.ID
+	where
+			c.ISORGANIZATION = 0 
+		and c.ISGROUP = 0 
+		and c.ISINACTIVE = 0 
+		and c.KEYNAME NOT like 'MIMED FRIEND M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+		and ca.AFFILIATIONENDDATE is null
+		and cab.ID in ('F039E43C-0C9D-470A-AB9F-1D831DEB81A8', '20C8E83D-AD3C-4125-9717-604835115CAC') -- 'U-M Staff - Active' and 'U-M Faculty - Active'
+		and cat.ID = '91853F90-5D7D-46AA-B85A-B24F8CB4C384' -- 'U-M Employment'
+		and cat.ACTIVE=1
+	group by c.ID
+	union
+	/* 
+	 * U-M Board Members (i.e. Regents present and past)
+	 */
+	select 
+		c.ID as CONSTITUENTID
+	from dbo.CONSTITUENT c
+	inner join dbo.BOARDMEMBERDATERANGE b on b.CONSTITUENTID=c.ID
+	where
+			c.ISORGANIZATION = 0 
+		and c.ISGROUP = 0 
+		and c.ISINACTIVE = 0 
+		and c.KEYNAME NOT like 'MIMED FRIEND M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+	group by c.ID
+  union
+	/*
+	 * Spouses of UM Affiliates (Faculty, Staff)
+	 */
+	select
+		s.CONSTITUENTID          -- Spouse who is married to an individual who is affiliated to U-M
+	from
+	(
+		/* Spouses */
+		select
+			c1.ID CONSTITUENTID,        -- Spouse of a UM Affiliated constituent
+			c2.ID SPOUSECOUNSTITUENTID  -- UM Affiliated constituent (Faculty, Staff)
+		from dbo.CONSTITUENT c1
+		inner join dbo.RELATIONSHIP r on r.RELATIONSHIPCONSTITUENTID=c1.ID
+		inner join dbo.RELATIONSHIPTYPECODE rtc on rtc.ID=r.RELATIONSHIPTYPECODEID
+		inner join dbo.CONSTITUENT c2 on r.RECIPROCALCONSTITUENTID = c2.ID
+		where 
+				c1.ISORGANIZATION = 0 
+			and c1.ISGROUP = 0 
+			and c1.ISINACTIVE = 0 
+			and c1.KEYNAME NOT like 'MIMED FRIEND M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+			and (	r.STARTDATE is null
+					or (CAST(r.STARTDATE as DATE) <= CAST(getdate() as DATE)))
+			and (	r.ENDDATE is null
+					or (CAST(r.ENDDATE as DATE) >= CAST(getdate() as DATE)))
+			and c2.ISORGANIZATION = 0 
+			and c2.ISGROUP = 0 
+			and c2.ISINACTIVE = 0 
+			and c2.KEYNAME NOT like 'MIMED FRIEND M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+			and rtc.ID = '42798B89-CAD1-4BE1-AD09-41299F07232B'  -- 'Spouse/Partner'
+			and r.ENDDATE IS NULL
+	) s
+	inner join dbo.USR_CONSTITUENTAFFILIATION ca on ca.CONSTITUENTID=s.SPOUSECOUNSTITUENTID
+	inner join dbo.USR_CONSTITUENTAFFILIATIONBASE cab on ca.AFFILIATIONBASENAMECODEID = cab.ID
+	inner join dbo.USR_CONSTITUENTAFFILIATIONCATEGORYTYPECODE cat on cab.[CONSTITUENTAFFILIATIONCATEGORYCODEID] = cat.ID
+	where
+			ca.[CONSTITUENTID] = s.SPOUSECOUNSTITUENTID            
+		and ca.AFFILIATIONENDDATE is null
+		and cab.ID in ('F039E43C-0C9D-470A-AB9F-1D831DEB81A8', '20C8E83D-AD3C-4125-9717-604835115CAC') -- 'U-M Staff - Active' and 'U-M Faculty - Active'
+		and cat.ID = '91853F90-5D7D-46AA-B85A-B24F8CB4C384' -- 'U-M Employment'
+		and cat.ACTIVE=1
+    group by s.CONSTITUENTID
+  union
+  /*
+   * Spouses of UM Affiliates (U-M Board Members (i.e. Regents present and past))
+   */
+	select
+		s.CONSTITUENTID          -- Spouse who is married to an individual who is affiliated to U-M
+	from
+	(
+		/* All Spouses */
+		select
+			c1.ID CONSTITUENTID,        -- Spouse of a UM Affiliated constituent
+			c2.ID SPOUSECOUNSTITUENTID  -- UM Affiliated constituent (Board Member)
+		from dbo.CONSTITUENT c1
+		inner join dbo.RELATIONSHIP r on r.RELATIONSHIPCONSTITUENTID=c1.ID
+		inner join dbo.RELATIONSHIPTYPECODE rtc on rtc.ID=r.RELATIONSHIPTYPECODEID
+		inner join dbo.CONSTITUENT c2 on r.RECIPROCALCONSTITUENTID = c2.ID
+		where 
+				c1.ISORGANIZATION = 0 
+			and c1.ISGROUP = 0 
+			and c1.ISINACTIVE = 0 
+			and c1.KEYNAME NOT like 'MIMED FRIEND M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+			and (	r.STARTDATE is null
+					or (CAST(r.STARTDATE as DATE) <= CAST(getdate() as DATE)))
+			and (	r.ENDDATE is null
+					or (CAST(r.ENDDATE as DATE) >= CAST(getdate() as DATE)))
+			and c2.ISORGANIZATION = 0 
+			and c2.ISGROUP = 0 
+			and c2.ISINACTIVE = 0 
+			and c2.KEYNAME NOT like 'MIMED FRIEND M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
+			and rtc.ID = '42798B89-CAD1-4BE1-AD09-41299F07232B'  -- 'Spouse/Partner'
+			and r.ENDDATE IS NULL
+	) s
+	inner join dbo.BOARDMEMBERDATERANGE b on b.CONSTITUENTID=s.SPOUSECOUNSTITUENTID
+  group by s.CONSTITUENTID		]]>
+	</CreateViewSQL>
+
+</SQLViewSpec>

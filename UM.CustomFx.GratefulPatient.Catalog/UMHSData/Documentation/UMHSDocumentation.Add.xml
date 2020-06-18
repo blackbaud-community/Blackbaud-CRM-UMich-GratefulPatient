@@ -1,0 +1,164 @@
+<AddDataFormTemplateSpec 
+    xmlns="bb_appfx_adddataformtemplate"
+    xmlns:c="bb_appfx_commontypes"
+    ID="5cc0148b-3314-41a6-912e-81b8fd6308c4"
+    Name="MIMED Documentation Add Form"
+    Description="A data form for adding MIMED documentation records"
+    Author="UM Dev"
+    DataFormInstanceID="c1acc6db-8da4-4586-bb88-3e785f88370d"
+    RecordType="MIMED Data"
+    c:SecurityUIFolder="MIMED Data"
+    FormHeader="Add a note"
+    FormHeaderResourceKey="$$add_a_note"
+    >
+  <c:InstalledProductList>
+    <c:InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+    <c:InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+    <c:InstalledProduct ID="6f77d512-d0d1-444f-9b46-b8603a6fe5f1" />
+    <c:InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+  </c:InstalledProductList>
+  <!--<ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.ConstituentNote.Add" />-->
+
+
+  <SPDataForm>
+		<!-- describe the preload SP (if applicable), which should be used to fetch field default values from the database.  If no
+		preload is needed, then this section can be removed -->
+		<LoadImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSDOCUMENTATION_PRELOAD">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSDOCUMENTATION_PRELOAD
+(
+  @CURRENTAPPUSERID uniqueidentifier,
+	@AUTHORID uniqueidentifier = null output,  
+	@UMHSID uniqueidentifier ,
+	@CONTEXTTYPE smallint = null output
+	
+)
+as
+	set nocount on;
+		
+	/* populate the fields that have default values that should be fetched from the database*/
+  set @CONTEXTTYPE = 3;
+  
+  select top 1
+							@AUTHORID = CONSTITUENTID 
+						from
+							dbo.APPUSER
+						where
+							ID = @CURRENTAPPUSERID;
+							
+						return 0;
+            
+		
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSDOCUMENTATION">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSDOCUMENTATION
+(
+            @ID uniqueidentifier = null output,
+						@CHANGEAGENTID uniqueidentifier = null,	
+						@DATEENTERED datetime,
+						@TITLE nvarchar(50) = '',
+						@AUTHORID uniqueidentifier = null,
+						@TEXTNOTE nvarchar(max) = '',
+						@NOTETYPECODEID uniqueidentifier,
+						@UMHSID uniqueidentifier,
+						@HTMLNOTE nvarchar(max) = ''
+)
+as
+
+set nocount on;
+
+declare @CURRENTDATE datetime;
+
+begin try
+							if @ID is null
+								set @ID = newid();
+			
+							if @CHANGEAGENTID is null  
+								exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+				
+							set @CURRENTDATE = getdate();
+						
+								
+							insert into dbo.[USR_UMHS_NOTE] (
+								[ID],
+								[DATEENTERED],
+								[TITLE],
+								[AUTHORID],
+								[TEXTNOTE],
+								[UMHSNOTETYPECODEID],
+								[UMHSID],
+								[HTMLNOTE],
+								[ADDEDBYID],
+								[CHANGEDBYID],
+								[DATEADDED],
+								[DATECHANGED]
+							) values (
+								@ID,
+								@DATEENTERED,
+								@TITLE,
+								@AUTHORID,
+								@TEXTNOTE, 
+								@NOTETYPECODEID,
+								@UMHSID,
+								coalesce(@HTMLNOTE, N''),
+								@CHANGEAGENTID,
+								@CHANGEAGENTID,
+								@CURRENTDATE,
+								@CURRENTDATE
+							);
+						
+						end try
+						begin catch
+							exec dbo.USP_RAISE_ERROR;
+							return 1;
+						end catch
+						
+						return 0;
+				]]>
+			</c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="FK_USR_UMHS_NOTE_UMHSNOTETYPECODEID" Field="NOTETYPECODEID" Type="ForeignKey" />
+          <c:Constraint Name="USR_UMHS_NOTE.DATEENTERED" Field="DATEENTERED" Type="Required" />
+          <c:Constraint Name="USR_UMHS_NOTE.UMHSNOTETYPECODEID" Field="NOTETYPECODEID" Type="Required" />
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+		</SaveImplementation>
+	</SPDataForm>
+
+	<!-- describe the context ID for this form (if applicable), which corresponds to a parameter in the SP. -->
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="CONTEXTTYPE" DataType="Integer" ReadOnly="true" Hidden="true" Caption="Context type" />
+      <c:FormField FieldID="TITLE" MaxLength="50" Caption="Title" Description="The title of this note" DefaultValueText=""  />
+      <c:FormField FieldID="DATEENTERED" DataType="Date" Required="true" Caption="Date" Description="The date this note was entered"  />
+      <c:FormField FieldID="AUTHORID" DataType="Guid" Caption="Author" Description="The author of this note">
+        <c:SearchList SearchListID="23c5c603-d7d8-4106-aecc-65392b563887" EnableQuickFind="true" />
+      </c:FormField>
+      <c:FormField FieldID="NOTETYPECODEID" DataType="Guid" Required="true" Caption="Type" Description="The user-defined type of this note" >
+        <c:CodeTable CodeTableName="USR_UMHS_NOTETYPECODE" />
+      </c:FormField>
+      <c:FormField FieldID="TEXTNOTE" Hidden="true" Caption="Notes" Description="The plain text that comprises this note" DefaultValueText=""  />
+      <c:FormField FieldID="HTMLNOTE" Caption="Notes" Description="The HTML that comprises this note" DefaultValueText="" >
+        <c:Html PlainTextFieldID="TEXTNOTE" />
+      </c:FormField>
+    </c:FormFields>
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSDocumentationFormUIModel" />
+            <c:WebUI>
+                <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSDocumentationForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+   
+  </c:FormMetaData>
+
+</AddDataFormTemplateSpec>

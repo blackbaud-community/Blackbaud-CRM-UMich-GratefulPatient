@@ -1,0 +1,31 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="020796a3-217b-4f62-86f2-f83968fdc2da"
+	Name="USR_UFN_UMHSBATCH_GETMATCHEDSUBDEPARTMENTID"
+	Description="Returns the Sub-Department ID if a Sub-department of Department"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHSBATCH_GETMATCHEDSUBDEPARTMENTID"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHSBATCH_GETMATCHEDSUBDEPARTMENTID(@DEPARTMENTID uniqueidentifier, @SUBDEPARTMENTID uniqueidentifier)
+returns uniqueidentifier
+with execute as caller
+as begin
+  declare @MATCHEDSUBDEPARTMENTID uniqueidentifier=null;
+
+  select 
+    @MATCHEDSUBDEPARTMENTID=ID
+  from dbo.USR_UMHS_SUBDEPARTMENT
+  where
+      ID=@SUBDEPARTMENTID
+  and DEPARTMENTID=@DEPARTMENTID
+  
+  return @MATCHEDSUBDEPARTMENTID
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

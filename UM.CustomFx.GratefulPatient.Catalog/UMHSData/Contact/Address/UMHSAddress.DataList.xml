@@ -1,0 +1,138 @@
+<DataListSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="9dd57596-43ec-47cf-be2b-17d69f460675"
+    Name="MIMED Address List"
+    Description="Returns all MIMED Address records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+    <SPDataList SPName="USR_USP_DATALIST_UMHS_ADDRESS">
+        <c:CreateProcedureSQL>
+        <![CDATA[
+        create procedure dbo.USR_USP_DATALIST_UMHS_ADDRESS(
+          @UMHSID uniqueidentifier, 
+	        @INCLUDEFORMER bit	= 0,
+          @MSG  NVARCHAR(100) = NULL OUTPUT,
+          @CURRENTAPPUSERID  uniqueidentifier
+        )
+        as
+	        
+          set nocount on;
+
+	        declare @CURRENTDATE datetime = dbo.UFN_DATE_GETEARLIESTTIME(getdate());
+          
+        select 
+            ADDRESSES.ID,       
+            case
+                when ADDRESSES.ISCONFIDENTIAL = 0
+                    then ADDRESSES.DESCRIPTION
+                else
+                    N'(Confidential) ' + ADDRESSES.DESCRIPTION
+            end as CONTACTINFO,
+            case
+                when ((ADDRESSES.HISTORICALENDDATE is null) or (ADDRESSES.HISTORICALENDDATE > @CURRENTDATE))
+                    then coalesce(ADDRESSES.ADDRESSTYPE, N'') + N' (Current)'
+                else
+                    coalesce(ADDRESSES.ADDRESSTYPE, N'') + N' (Former)'
+            end as TYPE,
+            case when ADDRESSES.ISPRIMARY = 0 then '' else 'Yes' end as ISPRIMARY,
+            case when ADDRESSES.DONOTMAIL = 0 then '' else 'Do not mail' end as DONOTCONTACT,
+            ADDRESSES.ISCONFIDENTIAL,
+            ADDRESSES.ISFORMER,
+            ADDRESSES.HISTORICALSTARTDATE,
+            ADDRESSES.HISTORICALENDDATE,
+            ADDRESSES.ISGEOCODED,
+            ADDRESSES.PENDINGGEOCODE,
+            ADDRESSES.INVALIDGEOCODE,
+            ADDRESSES.MAPCONTEXTID,     
+            ADDRESSES.IMAGEKEY
+        from
+            dbo.USR_UFN_UMHS_ADDRESSES(@UMHSID, @INCLUDEFORMER) ADDRESSES
+        order by
+            ISPRIMARY desc, ISFORMER asc, ENDDATE_SORT desc, STARTDATE_SORT desc, DATEADDED desc
+             /* --Audit code start */
+	              DECLARE @USERNAME VARCHAR(100)
+	              DECLARE @DISPLAYNAME VARCHAR(100)
+	              DECLARE @NAME VARCHAR(200)
+	              DECLARE @EVENTMESSAGE VARCHAR(1000)
+	              DECLARE @PID VARCHAR(100)
+	              DECLARE @PATIENTONLY BIT
+	              DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	              SELECT @USERNAME = USERNAME
+	                           ,@DISPLAYNAME = DISPLAYNAME
+		              FROM APPUSER 
+	              WHERE ID = @CURRENTAPPUSERID
+  	              SELECT @NAME = NAME
+	                           ,@PID = LOOKUPID
+	                            FROM CONSTITUENT
+	              inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		               WHERE gp.ID = @UMHSID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='1ccf9d10-57fa-425c-8c18-9d3286fe6a26' --MIMED Contact subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @UMHSID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+        ]]>
+    </c:CreateProcedureSQL>
+    </SPDataList>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <Parameters>
+    <c:FormMetaData>
+      <c:FormFields>
+        <c:FormField FieldID="INCLUDEFORMER" DataType="Boolean" Caption="Show former contact information" DefaultValueText="0" />
+        <c:FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100"  Hidden="true"  />
+      </c:FormFields>
+    </c:FormMetaData>
+  </Parameters>
+  <Output>
+      <OutputFields>
+        <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+        <OutputField FieldID="CONTACTINFO" Caption="Contact information" DataType="String" Format="Bold"  />
+        <OutputField FieldID="TYPE" Caption="Type" DataType="String" >
+          <InstalledProductList xmlns="bb_appfx_commontypes">
+            <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+            <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+            <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+            <InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+          </InstalledProductList>
+        </OutputField>
+        <OutputField FieldID="ISPRIMARY" Caption="Primary" DataType="String"  />
+        <OutputField FieldID="DONOTCONTACT" Caption="Do not contact" DataType="String" >
+          <InstalledProductList xmlns="bb_appfx_commontypes">
+            <InstalledProduct ID="3117d2c8-7f46-42f2-abeb-b654f2f63046" />
+            <InstalledProduct ID="42c15648-749e-4859-a56d-3a6474814cc7" />
+            <InstalledProduct ID="bb9873d7-f1ed-430a-8ab4-f09f47056538" />
+            <InstalledProduct ID="f5ac53c4-d0ce-4e20-bca6-aacdfc01b302" />
+          </InstalledProductList>
+        </OutputField>
+        <OutputField FieldID="ISCONFIDENTIAL" Caption="Confidential" IsHidden="true" DataType="Boolean" />
+        <OutputField FieldID="ISFORMER" Caption="IsFormer" IsHidden="true" DataType="Boolean" />
+        <OutputField FieldID="HISTORICALSTARTDATE" Caption="Start date" DataType="Date"  />
+        <OutputField FieldID="HISTORICALENDDATE" Caption="End date" DataType="Date"  />
+        <OutputField FieldID="ISGEOCODED" Caption="IsGeocoded" IsHidden="true" DataType="Boolean" />
+        <OutputField FieldID="PENDINGGEOCODE" Caption="PendingGeocode" IsHidden="true" DataType="Boolean" />
+        <OutputField FieldID="INVALIDGEOCODE" Caption="InvalidGeocode" IsHidden="true" DataType="Boolean" />
+        <OutputField FieldID="MAPCONTEXTID" Caption="MapContextID" IsHidden="true" DataType="String" />
+        <OutputField FieldID="IMAGEKEY" Caption="ImageKey" IsHidden="true" DataType="String" IsImageKey="true" />
+      </OutputFields>
+    </Output>
+</DataListSpec>

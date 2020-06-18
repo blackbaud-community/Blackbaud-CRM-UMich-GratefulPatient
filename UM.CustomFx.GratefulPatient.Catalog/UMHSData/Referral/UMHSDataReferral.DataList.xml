@@ -1,0 +1,112 @@
+<DataListSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="04055a2c-3fe7-4c03-88d3-a3051956b497"
+    Name="MIMED Referral List"
+    Description="Returns all MIMED Referral records."
+    Author="UM Dev"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_datalist"
+    >
+    <SPDataList SPName="USR_USP_DATALIST_UMHS_DATA_REFERRAL">
+        <c:CreateProcedureSQL>
+        <![CDATA[
+        create procedure dbo.USR_USP_DATALIST_UMHS_DATA_REFERRAL
+        (
+          @UMHSID uniqueidentifier,
+          @MSG  NVARCHAR(100) = NULL OUTPUT,
+          @CURRENTAPPUSERID  uniqueidentifier
+        )
+        as
+	        set nocount on;
+
+          SELECT REF.[ID],
+                 REF.REFERRERID,
+                 RC.NAME                               REFERRER,
+                  D.NAME as DEPARTMENTNAME,
+                 SD.NAME as SUBDEPARTMENTNAME,
+                 USR_UMHS_REFERRERROLECODE.DESCRIPTION REFERRERROLE,
+                 REF.[REFERRALDATE],
+                 MEDSTAFF.NAME,                
+                 REF.FOLLOWUPCOMPLETED,
+                 REF.FOLLOWUPSTATUS,
+                 REF.[COMMENTS]
+          FROM   USR_UMHS_REFERRAL REF
+                 --JOIN USR_UMHS_RELATIONSHIP C ON C.UMHSID = REF.UMHSID  -- C.ID = REF.UMHSDATACONNECTIONID
+                 LEFT JOIN dbo.USR_UMHS_DATA U on U.ID = REF.UMHSID
+                 LEFT JOIN CONSTITUENT RC
+                        ON RC.ID = REF.REFERRERID
+                 LEFT JOIN CONSTITUENT MEDSTAFF
+                        ON MEDSTAFF.ID = REF.[UMHSDEVSTAFFID]
+                 LEFT JOIN DBO.USR_UMHS_REFERRERROLECODE
+                        ON REF.[REFERRERROLECODEID] = USR_UMHS_REFERRERROLECODE.ID
+                 LEFT JOIN USR_UMHS_DEPARTMENT D on D.[ID] = REF.[DEPARTMENTID]
+                 LEFT JOIN USR_UMHS_SUBDEPARTMENT SD on SD.[ID] = REF.[SUBDEPARTMENTID]
+                
+          WHERE REF.UMHSID = @UMHSID 
+           /* --Audit code start */
+	              DECLARE @USERNAME VARCHAR(100)
+	              DECLARE @DISPLAYNAME VARCHAR(100)
+	              DECLARE @NAME VARCHAR(200)
+	              DECLARE @EVENTMESSAGE VARCHAR(1000)
+	              DECLARE @PID VARCHAR(100)
+	              DECLARE @PATIENTONLY BIT
+	              DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	              SELECT @USERNAME = USERNAME
+	                           ,@DISPLAYNAME = DISPLAYNAME
+		              FROM APPUSER 
+	              WHERE ID = @CURRENTAPPUSERID
+  	              SELECT @NAME = NAME
+	                           ,@PID = LOOKUPID
+	                            FROM CONSTITUENT
+	              inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		               WHERE gp.ID = @UMHSID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='3f786808-afe8-465e-9125-d8ebce7a63a9' --MIMED Referral subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @UMHSID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+        ]]>
+        </c:CreateProcedureSQL>
+    </SPDataList>
+    <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID"/>
+  <Parameters>
+    <c:FormMetaData>
+      <c:FormFields>
+        <c:FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100"  Hidden="true"  />
+      </c:FormFields>
+    </c:FormMetaData>
+  </Parameters>
+    <Output>
+        <OutputFields>
+            <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+            <OutputField FieldID="REFERRERID" Caption="Referre ID" DataType="Guid" IsHidden="true" />
+            <OutputField FieldID="REFERRER" Caption="Referrer" DataType="String" />
+            <OutputField FieldID="DEPARTMENTNAME" Caption="Referrer department"  DataType="Guid" />
+            <OutputField FieldID="SUBDEPARTMENTNAME" Caption="Referrer subdepartment"  DataType="Guid" />
+            <OutputField FieldID="REFERRERROLECODEID" Caption="Referrer role" DataType="String" />
+            <OutputField FieldID="REFERRALDATE" Caption="Referral date" DataType="Date" />
+            <OutputField FieldID="UMHSDEVSTAFFID" Caption="MIMED Development staff" DataType="String" />
+            <OutputField FieldID="FOLLOWUPCOMPLETED" DataType="Boolean" Caption="Follow-up completed" />
+            <OutputField FieldID="FOLLOWUPSTATUS" DataType="TinyInt" Caption="Follow-up status" />
+          <OutputField FieldID="COMMENTS" Caption="Comments" DataType="String" />
+        </OutputFields>
+    </Output>
+</DataListSpec>

@@ -1,0 +1,36 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="3f166360-ae24-42d3-8870-e95e85cccffd"
+    Name="MIMED Affiliation Delete"
+    Description="Used to delete the given MIMED Affiliation"
+    Author="UM Dev"
+    RecordType="MIMED Affiliation"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_UMHS_AFFILIATION_DELETE">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            create procedure dbo.USR_USP_UMHS_AFFILIATION_DELETE
+            (
+	            @ID uniqueidentifier,
+	            @CHANGEAGENTID uniqueidentifier
+            )
+            as begin
+	            --check deletion rules, if any
+
+	            -- use the system generated delete routine to allow proper recording of the deleting agent
+	            exec USP_USR_UMHS_AFFILIATION_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	            return 0;
+	
+            end
+            ]]>
+            </c:CreateProcedureSQL>
+        </SPOperationImplementation>
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this MIMED Affiliation?" />
+    </Prompt>
+</RecordOperationSpec>

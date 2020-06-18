@@ -1,0 +1,30 @@
+﻿<TableSpec
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes"
+	ID="004ab8f6-a558-4643-9270-9591920d3d02"
+	Name="MIMED Interaction Participant"
+	Description="Stores information about usr MIMED interactionparticipant records."
+	Author="UM Dev"
+	Tablename="USR_UMHS_INTERACTIONPARTICIPANT"
+	IsBuiltIn="false"
+	>
+  <!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Name="INTERACTIONID" Required="true" ForeignTable="USR_UMHS_INTERACTION" OnDelete="CascadeDelete" />
+    <ForeignKeyField Name="CONSTITUENTID" Required="true" ForeignTable="CONSTITUENT" />
+    <SequenceField Name="SEQUENCE"/>
+  </Fields>
+  <Indexes>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="INTERACTIONID" />
+        <IndexField Name="CONSTITUENTID" />
+      </IndexFields>
+    </Index>
+    <Index>
+      <IndexFields>
+        <IndexField Name="CONSTITUENTID" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+</TableSpec>

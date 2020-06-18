@@ -1,0 +1,33 @@
+﻿<SimpleDataListSpec
+	xmlns="bb_appfx_simpledatalist"
+	xmlns:c="bb_appfx_commontypes"
+	ID="0cbdb7f1-f629-4e7b-a7e1-c3e4ebd7d325"
+	Name="MIMED Deapartment Simple Data List"
+	Description="A simple data list that returns MIMED deapartment records"
+	Author="UM Dev"
+	TranslationFunctionID="6eb22cbc-8e57-494f-93a0-227af6cc41db"
+	>
+
+	<SPSimpleList SPName="USR_UM_USP_SIMPLEDATALIST_UMHSDEPARTMENT">
+		<c:CreateProcedureSQL >
+			<![CDATA[
+          create procedure dbo.USR_UM_USP_SIMPLEDATALIST_UMHSDEPARTMENT as
+	          select 
+		          ID as VALUE, 
+		          USR_UMHS_DEPARTMENT.NAME as LABEL
+	          from dbo.USR_UMHS_DEPARTMENT
+	          order by USR_UMHS_DEPARTMENT.NAME
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSimpleList>
+  <LookupView ViewName="V_SIMPLEDATALIST_DEPARTMENTSFORUSER">
+    <ViewSQL>
+
+      select
+      [NAME] as LABEL
+      from
+      dbo.USR_UMHS_DEPARTMENT;
+
+    </ViewSQL>
+  </LookupView>
+</SimpleDataListSpec>

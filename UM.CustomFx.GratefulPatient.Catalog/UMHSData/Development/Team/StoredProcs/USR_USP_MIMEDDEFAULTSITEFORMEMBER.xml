@@ -1,0 +1,30 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="b6d8a114-3427-48ac-8599-e2c7ad4959cc"
+	Name="USR_USP_MIMEDDEFAULTSITEFORMEMBER"
+	Description="Returns the siteid for the organization role"
+	Author="UM Dev"
+	SPName="USR_USP_MIMEDDEFAULTSITEFORMEMBER" 
+  GrantServiceRolePermission="true"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+CREATE PROCEDURE DBO.USR_USP_MIMEDDEFAULTSITEFORMEMBER (@TEAMMEMBERID UNIQUEIDENTIFIER)
+AS
+  BEGIN
+      DECLARE @SITEID UNIQUEIDENTIFIER = NULL;
+
+      SELECT @SITEID = SITEID
+      FROM   DBO.ORGANIZATIONPOSITION O
+             INNER JOIN ORGANIZATIONPOSITIONHOLDER OH ON OH.POSITIONID = O.ID
+      WHERE  OH.CONSTITUENTID = @TEAMMEMBERID
+
+      SELECT @SITEID;
+  END 
+
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

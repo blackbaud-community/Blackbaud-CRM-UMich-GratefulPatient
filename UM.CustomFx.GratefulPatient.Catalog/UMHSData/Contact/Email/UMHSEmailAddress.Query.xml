@@ -1,0 +1,84 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="112a9c30-3543-4c5b-a399-fe8d2da6f92d"
+	Name="MIMED Email Address Query"
+	Description="A view defined for querying on MIMED email address records."
+	Author="UM Dev"
+	IsRoot="false"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSEMAILADDRESS">
+		<ViewSQL>
+			<![CDATA[
+      SELECT E.ID,
+             UMHSID,
+             ISPRIMARY,
+             ETC.DESCRIPTION             EMAILTYPECODE_DESCRIPTION,
+             EMAILADDRESS,
+             DONOTEMAIL,
+             E.SEQUENCE,
+             I.DESCRIPTION               INFOSOURCE_DESCRIPTION,
+             INFOSOURCECOMMENTS,
+             STARTDATE,
+             ENDDATE,
+             ISCONFIDENTIAL,
+             [ADDEDBY].APPLICATIONNAME   AS ADDEDBY_APPLICATION,
+             [ADDEDBY].USERNAME          AS ADDEDBY_USERNAME,
+             [CHANGEDBY].APPLICATIONNAME AS CHANGEDBY_APPLICATION,
+             [CHANGEDBY].USERNAME        AS CHANGEDBY_USERNAME,
+             E.DATEADDED,
+             E.DATECHANGED,
+             EMAILADDRESSTYPECODEID,
+             INFOSOURCECODEID
+      FROM   DBO.USR_UMHS_EMAILADDRESS E
+             LEFT JOIN EMAILADDRESSTYPECODE ETC ON ETC.ID = E.EMAILADDRESSTYPECODEID
+             LEFT JOIN INFOSOURCECODE I ON I.ID = E.INFOSOURCECODEID
+             LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY] ON [ADDEDBY].ID = E.ADDEDBYID
+             LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY] ON [CHANGEDBY].ID = E.CHANGEDBYID 
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+	<!-- describe each field in the view output -->
+	<Output>
+		<OutputFields>
+			<OutputField Caption="System record ID" Category="System Fields" Name="ID" />
+      <OutputField Caption="MIMED ID" Category="System Fields" Name="UMHSID" />
+      <OutputField Name="ISPRIMARY" Caption="Is primary" DataType="Boolean"/>
+      <OutputField Name="EMAILTYPECODE_DESCRIPTION" Caption="Email type" DataType="String">
+        <LookupInfo IDField="EMAILADDRESSTYPECODEID">
+          <CodeTable CodeTableName="EMAILADDRESSTYPECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="EMAILADDRESS" Caption="Email address" DataType="String" />
+      <OutputField Name="DONOTEMAIL" Caption="Do not email" DataType="Boolean"/>
+      <OutputField Name="SEQUENCE" Caption="Sequence" DataType="Integer"/>
+      <OutputField Name="INFOSOURCE_DESCRIPTION" Caption="Information source" DataType="String">
+        <LookupInfo IDField="INFOSOURCECODEID">
+          <CodeTable CodeTableName="INFOSOURCECODE"/>
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="INFOSOURCECOMMENTS" Caption="Information source comments" DataType="String"/>
+      <OutputField Name="STARTDATE" Caption="Start date" DataType="Date"/>
+      <OutputField Name="ENDDATE" Caption="End date" DataType="Date"/>
+      <OutputField Name="ISCONFIDENTIAL" Caption="Is confidential" DataType="Boolean"/>
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" DataType="String" Category="System Fields"/>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" DataType="String" Category="System Fields"/>
+      <OutputField Name="DATEADDED" Caption="Date added" DataType="Date" Category="System Fields"/>
+      <OutputField Name="DATECHANGED" Caption="Date changed" DataType="Date" Category="System Fields"/>
+      <OutputField Caption="EMAILADDRESSTYPECODEID" Name="EMAILADDRESSTYPECODEID" DataType="Guid" IsHidden="true" />
+      <OutputField Caption="INFOSOURCECODEID" Name="INFOSOURCECODEID" DataType="Guid" IsHidden="true" />
+		</OutputFields>
+	</Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Email Address"/>
+  </RelationshipOperations>
+</QueryViewSpec>
+

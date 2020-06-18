@@ -1,0 +1,111 @@
+﻿<AddDataFormTemplateSpec 
+	xmlns="bb_appfx_adddataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="87024ee9-50f7-431d-a3de-5edb875abc34" 
+	Name="MIMED department Add Data Form"
+	Description="A data form for adding MIMED department records" 
+	Author="UM Dev"
+	DataFormInstanceID="a35813a0-3a69-4dc8-9e38-996d4104e808" 
+	RecordType="MIMED department"
+	c:SecurityUIFolder="MIMED Data"
+	FormHeader="Add MIMED department"
+	>
+
+	<SPDataForm>		
+		<!-- describe the save SP -->
+		<SaveImplementation SPName="USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSDEPARTMENT">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+            create procedure dbo.USR_UM_USP_DATAFORMTEMPLATE_ADD_UMHSDEPARTMENT
+            (
+						@ID uniqueidentifier = null output,
+						@CHANGEAGENTID uniqueidentifier = null,	
+						@NAME nvarchar(100),
+						@SORTMETHODCODE tinyint = 0
+					)
+					as
+						set nocount on;
+						
+						declare @CURRENTDATE datetime;
+						
+						if @ID is null
+							set @ID = newid();
+
+						if @CHANGEAGENTID is null  
+							exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+
+						set @CURRENTDATE = getdate();
+						
+						begin try
+							insert into dbo.USR_UMHS_DEPARTMENT
+							(
+								ID,
+								NAME,
+								SORTMETHODCODE,
+								ADDEDBYID,
+								CHANGEDBYID,
+								DATEADDED,
+								DATECHANGED
+							)
+							values
+							(
+								@ID,
+								@NAME,
+								@SORTMETHODCODE,
+								@CHANGEAGENTID,
+								@CHANGEAGENTID,
+								@CURRENTDATE,
+								@CURRENTDATE
+							);
+							  
+						end try
+
+						begin catch
+							exec dbo.USP_RAISE_ERROR;
+							return 1;
+						end catch	
+            
+						return 0;
+				]]>
+			</c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="CK_USR_UMHS_DEPARTMENT_NAME" Field="NAME" Type="Unique">
+            <c:CustomErrorMsg>There is an existing Department with the same name.</c:CustomErrorMsg>
+          </c:Constraint>
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+		</SaveImplementation>
+	</SPDataForm>
+
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system parameters 
+	like the context @ID, @CONTEXTID, and @CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="ID" DataType="Guid" Hidden="true" />
+      <c:FormField FieldID="NAME" Required="true" MaxLength="100" Caption="Name" CaptionResourceKey="$$name" />
+      <c:FormField FieldID="SORTMETHODCODE" DataType="TinyInt" Required="true" Caption="Sort Method" DefaultValueText="0" CaptionResourceKey="$$sort_method">
+        <c:ValueList>
+          <c:Items>
+            <c:Item>
+              <c:Value>0</c:Value>
+              <c:Label>Alpha</c:Label>
+            </c:Item>
+            <c:Item>
+              <c:Value>1</c:Value>
+              <c:Label>User-Defined</c:Label>
+            </c:Item>
+          </c:Items>
+        </c:ValueList>
+      </c:FormField>
+		</FormFields>
+    <!--<c:WebUIComponent>
+      <c:UIModel AssemblyName="Blackbaud.AppFx.Constituent.UIModel.dll" ClassName="Blackbaud.AppFx.Constituent.UIModel.InteractionCategoryAddFormUIModel" />
+      <c:WebUI>
+        <c:ExternalResource Url="browser/htmlforms/constituent/interaction/InteractionCategoryAddForm.html" />
+      </c:WebUI>
+    </c:WebUIComponent>-->
+    </FormMetaData>
+
+</AddDataFormTemplateSpec>

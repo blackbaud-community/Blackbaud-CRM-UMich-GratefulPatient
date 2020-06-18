@@ -1,0 +1,40 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="f923eec3-9d07-4737-9f68-04da647b9d6a" 
+	Name="Add Shell Record Key Name Record Operation" 
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	OperationType="Delete"
+	RecordType="REPLACE_WITH_RECORDTYPE"
+	c:SecurityUIFolder="REPLACE_WITH_SECURITYUIFOLDER"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_UM_USP_RECORDOPERATION_ADDSHELLRECORDKEYNAME">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_UM_USP_RECORDOPERATION_ADDSHELLRECORDKEYNAME
+(
+	@ID uniqueidentifier,
+	@CHANGEAGENTID uniqueidentifier
+)
+as begin
+	--check deletion rules, if any
+
+	-- use the system generated delete routine to allow proper recording of the deleting agent
+	exec USP_TABLE1_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	return 0;
+	
+end
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+	<!-- optionally, offer a prompt before executing the record operation -->
+	<Prompt>
+		<StandardPrompt Text="Are you sure you want to continue?" />
+	</Prompt>
+
+</RecordOperationSpec>

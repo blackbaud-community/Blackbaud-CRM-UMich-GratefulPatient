@@ -1,0 +1,111 @@
+<AddDataFormTemplateSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="e4c3131d-dda7-47e9-8773-202344189b96"
+    Name="MIMED Team Add Form"
+    Description="Used for adding a new MIMED Team"
+    Author="UM Dev"
+    RecordType="MIMED Team"
+    DataFormInstanceID="416dde6f-dde3-4ca1-b0a9-62c19f25fc4b"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_adddataformtemplate"
+    FormHeader="Add MIMED Team"
+    >
+  <SPDataForm>
+    
+    <SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_ADD_UMHS_TEAM">
+      <c:CreateProcedureSQL>
+        <![CDATA[
+            CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_ADD_UMHS_TEAM (@ID             UNIQUEIDENTIFIER = NULL OUTPUT,
+                                                                         @CHANGEAGENTID  UNIQUEIDENTIFIER = NULL,
+                                                                         @UMHSID         UNIQUEIDENTIFIER,
+                                                                         @TEAMMEMBERID   UNIQUEIDENTIFIER = NULL,
+                                                                         @SITEID         UNIQUEIDENTIFIER = NULL,
+                                                                         @TEAMROLECODEID UNIQUEIDENTIFIER = NULL,
+                                                                         @STARTDATE      DATETIME = NULL,
+                                                                         @ENDDATE        DATETIME = NULL)
+            AS
+                SET NOCOUNT ON;
+               -- SET @SITEID = (SELECT SITEID from dbo.APPUSER where APPUSER.CONSTITUENTID = @TEAMMEMBERID)
+                IF @ID IS NULL
+                  SET @ID = NEWID()
+
+                IF @CHANGEAGENTID IS NULL
+                  EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+                    @CHANGEAGENTID OUTPUT
+
+                DECLARE @CURRENTDATE DATETIME
+
+                SET @CURRENTDATE = GETDATE()
+               
+
+              BEGIN TRY
+                  -- handle inserting the data
+                  INSERT INTO DBO.USR_UMHS_TEAM
+                              (ID,
+                               UMHSID,
+                               TEAMMEMBERID,
+                               SITEID,
+                               TEAMROLECODEID,
+                               STARTDATE,
+                               ENDDATE,
+                               ADDEDBYID,
+                               CHANGEDBYID,
+                               DATEADDED,
+                               DATECHANGED)
+                  VALUES      (@ID,
+                               @UMHSID,
+                               @TEAMMEMBERID,
+                               @SITEID,
+                               @TEAMROLECODEID,
+                               @STARTDATE,
+                               @ENDDATE,
+                               @CHANGEAGENTID,
+                               @CHANGEAGENTID,
+                               @CURRENTDATE,
+                               @CURRENTDATE)
+              END TRY
+
+              BEGIN CATCH
+                  EXEC DBO.USP_RAISE_ERROR
+
+                  RETURN 1
+              END CATCH
+
+                RETURN 0 
+	
+            ]]>
+      </c:CreateProcedureSQL>
+      <c:ExpectedDBExceptions>
+        <c:Constraints>
+          <c:Constraint Name="FK_USR_UMHS_TEAM_TEAMMEMBERID" Field="TEAMMEMBERID" Type="ForeignKey" />
+          <c:Constraint Name="FK_USR_UMHS_TEAM_TEAMROLECODEID" Field="TEAMROLECODEID" Type="ForeignKey" />
+        </c:Constraints>
+      </c:ExpectedDBExceptions>
+    </SaveImplementation>
+  </SPDataForm>
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="UMHSID" />
+  <FormMetaData FixedDialog="true" xmlns="bb_appfx_commontypes">
+    <FormFields>
+      <FormField FieldID="TEAMMEMBERID" DataType="Guid" Caption="Team member" Required="true">
+        <SearchList SearchListID="35fa0186-b669-436f-913a-5e9fd5e59982" EnableQuickFind="true" />
+      </FormField>
+      <FormField FieldID="SITEID" DataType="Guid" Required="false" Caption="Site" CaptionResourceKey="$$site">
+        <SimpleDataList SimpleDataListID="c8e8d3ba-2725-421f-a796-e2fcc1202780">
+          <SearchList SearchListID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="TEAMROLECODEID" DataType="Guid" Caption="Team role" Required="true">
+        <CodeTable CodeTableName="USR_UMHS_TEAMROLECODE" />
+      </FormField>
+      <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" Required="true" />
+      <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+    </FormFields>
+
+        <WebUIComponent>
+            <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.MIMEDTeamAddFormUIModel" />
+            <WebUI>
+                <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/MIMEDTeamAddForm.html" />
+            </WebUI>
+        </WebUIComponent>
+  </FormMetaData>
+</AddDataFormTemplateSpec>

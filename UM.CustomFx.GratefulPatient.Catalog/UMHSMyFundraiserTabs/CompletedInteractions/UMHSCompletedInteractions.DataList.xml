@@ -1,0 +1,93 @@
+﻿<DataListSpec 
+	xmlns="bb_appfx_datalist"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="35dc1be3-c7a5-4c1c-8731-9b1265e2edad" 
+	Name="MIMED Completed Interactions Data List"
+	Description="A data list showing MIMED completed interactions records." 
+	Author="UM Dev"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<!-- define the SP that returns the data for the datalist -->
+	<SPDataList SPName="USR_UM_USP_DATALIST_UMHSCOMPLETEDINTERACTIONS">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+      create procedure dbo.USR_UM_USP_DATALIST_UMHSCOMPLETEDINTERACTIONS
+      (
+	      @FUNDRAISERID uniqueidentifier
+       ,@DATEFILTER tinyint = 0
+       ,@STARTDATE datetime = null
+       ,@ENDDATE datetime = null
+       ,@TYPEFILTER uniqueidentifier = null
+       ,@FILTERNAME varchar(max) = ''
+      )
+      as
+	      set nocount on;
+	      BEGIN
+          
+          EXEC dbo.USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION @FUNDRAISERID, @DATEFILTER, @STARTDATE, @ENDDATE, @TYPEFILTER, @FILTERNAME
+        
+        END
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataList>
+
+	<!-- describe the context ID parameter for the SP (if applicable)-->
+  <Context ContextRecordType="MIMED Data" RecordIDParameter="FUNDRAISERID" />
+
+  <Parameters>
+    <FormMetaData xmlns="bb_appfx_commontypes">
+      <FormFields>
+        <FormField FieldID="FILTERNAME" Caption="Name" CaptionResourceKey="$$filtername" />
+        <FormField FieldID="DateFilter" DataType="TinyInt" Caption="Dates" DefaultValueText="11">
+          <ValueList>
+            <Items>
+              <Item>
+                <Value>10</Value>
+                <Label>All dates</Label>
+              </Item>
+              <Item>
+                <Value>3</Value>
+                <Label>Last 7 days</Label>
+              </Item>
+              <Item>
+                <Value>5</Value>
+                <Label>Last 30 days</Label>
+              </Item>
+              <Item>
+                <Value>9</Value>
+                <Label>Last 12 months</Label>
+              </Item>
+              <Item>
+                <Value>11</Value>
+                <Label>Current fiscal year</Label>
+              </Item>
+              <Item>
+                <Value>0</Value>
+                <Label>Specific dates</Label>
+              </Item>
+            </Items>
+          </ValueList>
+        </FormField>
+        <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" />
+        <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" />
+        <FormField FieldID="TYPEFILTER" DataType="Guid" Hidden="true" Caption="Interaction type" FixedValueText="00000000-0000-0000-0000-000000000000" />
+      </FormFields>
+    </FormMetaData>
+  </Parameters>
+  <Output>
+    <OutputFields>
+      <OutputField FieldID="ID" Caption="ID" IsHidden="true" DataType="Guid" />
+      <OutputField FieldID="NAME" Caption="Name" DataType="String" />
+      <OutputField FieldID="CONID" Caption="CONID" IsHidden="true" DataType="Guid" />
+      <!--<OutputField FieldID="FIRSTNAME" Caption="First name" DataType="String" />
+      <OutputField FieldID="KEYNAME" Caption="Last name" DataType="String" />-->
+      <OutputField FieldID="DATE" Caption="Date" DataType="Date" />
+      <OutputField FieldID="STATUS" Caption="Status" DataType="String" />
+      <OutputField FieldID="OWNER" Caption="Owner" DataType="String" />
+      <OutputField FieldID="OBJECTIVE" Caption="Summary" DataType="String" />
+      <OutputField FieldID="TYPE" Caption="Contact method" DataType="String" />
+      <OutputField FieldID="SITES" Caption="Sites" DataType="String" />
+    </OutputFields>
+  </Output>
+</DataListSpec>

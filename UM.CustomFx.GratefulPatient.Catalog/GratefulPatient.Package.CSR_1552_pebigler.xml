@@ -1,0 +1,14 @@
+﻿<PackageSpec 
+	xmlns="bb_appfx_package"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="c41cbf06-6502-4231-aa0d-3e9bc1fb3556" 
+	Name="GratefulPatient.Package.CSR_1552_pebigler"
+	Description="GP Provider Batch: Add Non Alum for new Providers (DAR-602)" 
+	Author="UM Dev"
+	>
+
+	<DependencyList xmlns="bb_appfx_commontypes">
+	  <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Providers.xml" />
+  </DependencyList>
+
+</PackageSpec>

@@ -1,0 +1,1472 @@
+<PackageSpec
+    xmlns="bb_appfx_package"
+    xmlns:c="bb_appfx_commontypes"
+    ID="6482b272-529e-40e6-84cf-1604d16d8c21"
+    Name="Grateful Patient Package (All Packages)"
+    Description="Package containing specs for the Grateful patient customization"
+    Author="UM Dev"
+    >
+  <c:DependencyList>
+    
+    <!--*******************-->
+    <!--*** Code tables ***-->
+    <!--*******************-->
+    <!--UMHS Development/Affiliations code tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationCategory.CodeTable.xml" />
+    <!--UMHS Development/Interests code tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterestType.CodeTable.xml" />
+    <!--UMHS Development/Team code tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.UMHSTeamRole.CodeTable.xml" />
+    <!--UMHS Documentation code tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.USR_UMHS_NOTETYPECODE.CodeTable.xml"/>
+    <!--UMHS Info code tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.USR_UMHS_DMINELIGIBLEREASONCODE.CodeTable.xml" />
+    <!--
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSPatientOrigination.CodeTable.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSProspectOrigination.CodeTable.xml" />-->
+    <!--UMHS Referral code tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSReferrerRole.CodeTable.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSFollowUpStatus.CodeTable.xml" />
+    
+
+    <!--************************************-->
+    <!--*** Objects referenced by tables ***-->
+    <!--************************************-->
+    <!-- Functions -->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Functions.UFN_UMHS_VALIDATE_STARTEND_DATES.xml" />
+    <!--UMHS Contact/Address functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.Functions.UFN_UMHS_ADDRESS_TRANSLATE.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.Functions.UFN_UMHS_PRIMARYADDRESSCNT.xml" />
+    <!--UMHS Contact/Email functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.Functions.USR_UFN_UMHS_PRIMARYEMAILADDRESSCNT.xml" />
+    <!--UMHS Contact/Phone functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.Functions.UFN_UMHS_PRIMARYPHONECNT.xml" />
+    <!--UMHS Info/Relationships functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.Functions.USR_UFN_UMHS_RELATIONSHIP_DESCRIPTION.Function.xml"/>
+    
+    <!--Functions for UMHS ERB Batch Ext - Not for Go-Live will deploy later again -->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Functions.USR_UMHS_UFN_FINDCONSTITUENTMATCHES.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Functions.USR_UMHS_UFN_FINDCONSTITUENTMATCHES_COMPOSITETHRESHOLD.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Functions.USR_UMHS_UFN_FINDMIMEDMATCHES.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Functions.USR_UMHS_UFN_FINDMIMEDMATCHES_COMPOSITETHRESHOLD.xml" />
+    <!--Stored procedure for ERB-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.StoredProcs.USR_USP_UMHS_ADDCONTACTINFORMATIONFORBBISMIMEDDONOR.xml" />
+
+
+    <!--Functions for MIMED History tab-->
+    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.MIMED_History.Functions.USR_UFN_UMHSHISTORY_APPUSER_AUDIT.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.MIMED_History.Functions.USR_UFN_UMHSHISTORY_UMHSCHILDTABLES_RECORDTYPE_AUDIT.xml" />
+
+    <!--**************-->
+    <!--*** Tables ***-->
+    <!--**************-->
+    <!--Views Audit Table-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAuditing.USR_UMHS_MIMEDTABVIEWLOG.Table.xml" />
+    <!--Constituent tables-->
+    <!--<c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.USR_UMHS_CONSTITUENT_EXT.Table.xml" />-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.USR_UMHS_FRIENDNUMBERS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.USR_UMHS_DEPARTMENT.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.USR_UMHS_SUBDEPARTMENT.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.USR_UFN_UMHS_DEPARTMENT_GETSUBDEPARTMENT.xml" />
+    <!--UMHS Info tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.USR_UMHS_DATA.Table.xml" />
+    <!--UMHS Contacts tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.USR_UMHS_ADDRESS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.USR_UMHS_EMAILADDRESS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.USR_UMHS_PHONE.Table.xml" />
+    <!--UMHS Affiliations tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.USR_UMHS_AFFILIATIONBASE.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.USR_UMHS_AFFILIATION.Table.xml" />
+    <!--UMHS Development/Interactions tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.USR_UMHS_INTERACTION.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.USR_UMHS_INTERACTIONPARTICIPANT.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.USR_UMHS_INTERACTIONDEPTSUBDEPT.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.USR_UMHS_INTERACTIONSITE.Table.xml" />
+    
+    <!--UMHS Interests tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.USR_UMHS_INTEREST.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.USR_UMHS_INTERESTDEPTSUBDEPT.Table.xml" />
+    <!--UMHS Team tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.USR_UMHS_TEAM.Table.xml" />
+    <!--UMHS Documentation tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.USR_UMHS_NOTE.Table.xml"/>
+    <!--UMHS Providers tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Providers.USR_UMHS_PROVIDERS.Table.xml" />
+    <!--UMHS Referral tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.USR_UMHS_REFERRAL.Table.xml" />
+    <!--UMHS Visit tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.USR_UMHS_VISITS.Table.xml" />
+    <!--UMHS Info tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.USR_UMHS_SEARCHPATIENT.xml" />
+    <!--UMHS Info/Relationships tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.USR_UMHS_RELATIONSHIPSET.Table.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.USR_UMHS_RELATIONSHIP.Table.xml"/>
+    <!--Batch tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH_PROVIDERS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH_VISITS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH_ESTGIVINGCAPTRANSLATION.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Tables.USR_UMHS_BATCH_UMAFFILIATION.Table.xml" />
+    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Tables.USR_UMHS_BATCHREVENUE.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.USR_UMHS_INTERACTIONBATCH.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.USR_UMHS_INTERACTIONBATCHPARTICIPANT.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.USR_UMHS_INTERACTIONBATCHSITE.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.USR_UMHS_AFFILIATIONBATCH.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.USR_UMHS_REFERRALBATCH.Table.xml" />
+    
+    <!--UMAffiliation Duplicate Search tables-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Tables.USR_UMHS_DELETEDMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.Table.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Tables.USR_UMHS_MATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.Table.xml" />
+
+
+    <!--******************************************************-->
+    <!--*** Funtions that are dependent on existing tables ***-->
+    <!--******************************************************-->
+    <!--UMHS Constituent -->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.USR_UFN_UMHS_DEPARTMENT_GETNAME.TranslationFunction.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.USR_UFN_UMHS_SUBDEPARTMENT_GETNAME.TranslationFunction.xml" />    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDataConstituentSearch.TranslationFunction.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.OnlineHelp.MIMEDConstituent.Task.xml" />
+
+    <!--UMHS Contact/Address-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.Functions.UFN_UMHS_ADDRESSES.xml" />
+    <!--UMHS Development/Interests functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.Functions.USR_UFN_UMHS_INTEREST_GETDEPTS.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.Functions.USR_UFN_UMHS_INTEREST_GETDEPTLIST.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.Functions.USR_UFN_UMHS_INTEREST_GETSUBDEPTLIST.xml" />
+    <!--UMHS Development/Interactions functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.Functions.USR_UFN_UMHS_DISPLAYNAME.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.Functions.USR_UFN_UMHS_INTERACTION_ISPLANSTEP.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.Functions.USR_UFN_UMHS_INTERACTION_GETSITES.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.Functions.USR_UFN_UMHS_INTERACTIONPARTICIPANT.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.Functions.USR_UFN_UMHS_INTERACTION_GETSITELIST.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.Functions.USR_UFN_UMHS_INTERACTIONS.xml" />
+
+    <!--Batch functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Functions.UMHSBatch.GetMatchingSubDepartment.Function.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Functions.UMHSBatch.Translation.ConstituentName.Function.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Functions.UMHSBatch.Translation.GivingCapacity.Function.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Functions.UMHSBatch.Translation.ProviderName.Function.xml" />
+    <!--UMHS My Fundraiser Tabs/Portfolio functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.Functions.UFN_UMHS_PROSPECTPLANSUMMARY.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.Functions.UFN_UMHS_REFERRERPLANSUMMARY.xml" />
+    <!--UMHS Relationship Nameformat fiucntions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.Functions.USR_UFN_UMHS_NAMEFORMAT_FROMID.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.Functions.USR_UFN_UMHS_NAMEFORMAT_FROMID_INTERNAL.xml"/>
+
+    <!--Interaction-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UFN_UMHS_INTERACTIONBATCH_GETSITES.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UFN_UMHS_INTERACTIONBATCHPARTICIPANT.xml" />
+
+    <!--UMAffiliation Duplicate Search functions-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Functions.USR_UFN_UMHS_GETTIMEDURATION.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Functions.USR_UFN_UMHS_UMAFFILIATEDCONSTITUENTMATCHES.xml" />
+
+    <!--********************-->
+    <!--*** Search lists ***-->
+    <!--********************-->
+    <!--Constituent search list-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.Search.UMHSDataConstituentSearch.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.Search.UMHSDataConstituentSearchLookupID.xml" />
+    <!--UMHS ERB Search List - Not FOR GO-Live-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.SearchLists.UMHSDataConstituentDuplicateSearch.xml" />
+    
+    
+    <!--Batch search lists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.ConstituentID.Search.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.DupCheck.Search.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.DupCheck.Search.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.Provider.ConstituentID.Search.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.Provider.ID.Search.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SearchLists.UMHSBatch.FundraiserByLookupID.Search.xml" />
+
+    <!--<c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Functions.USR_UMHS_UFN_FINDCONSTITUENTMATCHES.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Functions.USR_UMHS_UFN_FINDCONSTITUENTMATCHES_COMPOSITETHRESHOLD.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.UMHSDataConstituentDuplicateSearch.xml" />-->
+    
+
+    <!--*************************-->
+    <!--*** Record operations ***-->
+    <!--*************************-->
+    <!--Constituent record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartment.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartmentSetActive.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartmentSetInactive.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartment.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartmentSetActive.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartmentSetInactive.RecordOperation.xml" />
+    <!--UMHS Contact record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddressDelete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddressDelete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhoneDelete.RecordOperation.xml" />
+    <!--UMHS Development/Affiliations record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationDelete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationCategory.RecordOperation.xml" />
+    <!--UMHS Development/Interactions record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteractionDelete.RecordOperation.xml" />
+    <!--UMHS Development/Interests record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterestDelete.RecordOperation.xml" />
+    <!--UMHS Development/Team record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.UMHSTeamDelete.RecordOperation.xml" />
+    <!--UMHS Documentation record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.UMHSDocumentation.RecordOperation.xml"/>
+    <!--UMHS Info record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSDataDelete.RecordOperation.xml" />
+    <!--UMHS Info/Relationships record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.UMHSRelationshipDelete.RecordOperation.xml"/>
+    <!--UMHS Referral record operations-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferralDelete.RecordOperation.xml" />
+    <!--Batch record operations-->    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.Providers.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.Visits.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.RecordOperations.UMHSBatchDelete.UMHSBatch.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UMHSInteractionBatchDelete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatchDelete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatchDelete.RecordOperation.xml" />
+    <!--UMAffiliation Duplicate Search simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.RecordOperation.UMHSSetMatchReviewStatusToComplete.RecordOperation.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.RecordOperation.UMHSSetMatchReviewStatusToDeleted.RecordOperation" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.RecordOperation.UMHSSetMatchReviewStatusToReview.RecordOperation.xml" />
+
+
+    <!--************************-->
+    <!--*** Simple datalists ***-->
+    <!--************************-->
+    <!--Constituent simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.UMHSDepartment.SimpleList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.UMHSSubDepartment.SimpleList.xml" />
+    <!--UMHS Development/Affiliations simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationBase.SimpleList.xml"/>
+    <!--UMHS Referral simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataConnections.SimpleList.xml" />
+    <!--Batch simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SimpleDataLists.UMHSBatch.Department.SimpleList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.SimpleDataLists.UMHSBatch.SubDepartment.SimpleList.xml" />
+    <!--UMAffiliation Duplicate Search simple datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.SimpleDatalists.UMHSDupSearchMatchSet.SimpleList.xml" />
+
+    <!--*******************-->
+    <!--**** Datalists ****-->
+    <!--*******************-->
+    <!--Constituent datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartment.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartment.DataList.xml" />
+    <!--UMHS Contact datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.DataList.xml" />
+    <!--UMHS Development/Affiliations datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationBase.DataList.xml"/>
+    <!--UMHS Development/Interactions datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.DataList.xml" />
+    <!--UMHS Development/Interests datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterest.DataList.xml" />
+    <!--UMHS Development/Team datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.UMHSTeam.DataList.xml" />
+    <!--UMHS Documentation datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.UMHSDocumentation.DataList.xml"/>
+    <!--UMHS Info/Relationships datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.UMHSRelationship.DataList.xml"/>
+    <!--UMHS Referral datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.DataList.xml" />
+    <!--UMHS My Fundraiser Tabs/Completed Interactions datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.CompletedInteractions.UMHSCompletedInteractions.DataList.xml" />
+    <!--UMHS My Fundraiser Tabs/Planned and Pending Interactions datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.PlannedAndPendingInteractions.UMHSPendingPlannedInteractions.DataList.xml" />
+    <!--UMHS My Fundraiser Tabs/Portfolio datalists-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.UMHSPortfolioProspects.DataList.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.UMHSPortfolioReferrals.DataList.xml" />
+
+    <!--***Stored Procedures***-->
+    <!--MIMED Team Stored Procs-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.StoredProcs.USR_USP_MIMEDDEFAULTSITEFORMEMBER.xml" />
+    <!--used by the Find friend for ERB-->
+    <!--Commenting out for now. Will need to finish after Go-live.-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.StoredProcs.USP_UMHS_FINDFRIEND.xml" />
+
+    <!--UMHS Development/Interactions stored procedures-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.StoredProcedures.USR_USP_UMHS_CREATEFROMCONSTITUENT.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.StoredProcedures.USR_USP_UMHS_INTERACTION_ADDRECIP.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.StoredProcedures.USR_USP_UMHS_UPDATE_CUSTOM_STATUS.xml" />
+
+    <!--MIMED History stored procedures and Report XML-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.MIMED_History.USR_USP_UMHS_GETHISTORY.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.MIMED_History.UMHSHistory.Report.xml" />
+    
+    <!--UMHS Constituent stored procedures-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.StoredProcedures.USR_USP_UMHS_GETUMHSFRIENDKEYNAME.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.StoredProcedures.USR_USP_UMHS_GETUMHSFRIENDNUMBER.xml" />
+
+    <!--UMAffiliation Duplicate Search stored procedures-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.StoredProcedures.USR_USP_UMHS_DELETEMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.StoredProcedures.USR_USP_UMHS_GETMATCHEDMIMEDCONTACTSTOUMAFFILIATIONS.xml" />
+
+
+    <!--*****************-->
+    <!--*** Add forms ***-->
+    <!--*****************-->
+    <!--Constituent add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartment.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartment.Add.xml" />
+    <!--UMHS Contact add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.Add.xml" />
+    <!--UMHS Development/Affiliations add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationCategory.Add.xml" />    
+    <!--UMHS Development/Interactions add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Add.xml" />
+    <!--UMHS Development/Interests add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterest.Add.xml" />
+   
+    <!--UMHS Development/Team add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.UMHSTeam.Add.xml" />
+    <!--UMHS Documentation add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.UMHSDocumentation.Add.xml"/>
+    <!--UMHS Info add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSData.Add.xml" />
+    <!--UMHS Info/Relationships add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.UMHSRelationship.Add.xml"/>
+    <!--UMHS Referral add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.Add.xml" />
+    <!--Batch add forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatch.Add.Visits.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Add.UMHSBatchCommit.Add.Visits.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UMHSInteractionBatch.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UMHSInteractionBatch.Commit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.Commit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatch.Add.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatch.Commit.xml" />
+                  
+    <!--******************-->
+    <!--*** Edit forms ***-->
+    <!--******************-->
+    <!--Constituent edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartment.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartment.Edit.xml" />   
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartmentOrder.Edit.xml" />
+    <!--UMHS Contact edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.Edit.xml" />
+    <!--UMHS Development/Affiliations edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationCategory.Edit.xml" />
+    <!--UMHS Development/Interactions edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Copy.xml" />
+    <!--UMHS Development/Interests edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterest.Edit.xml" />
+    <!--UMHS Development/Team edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.UMHSTeam.Edit.xml" />
+    <!--UMHS Documentation edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.UMHSDocumentation.Edit.xml"/>
+    <!--UMHS Info edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSData.Edit.xml" />
+    <!--UMHS Info/Relationships edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.UMHSRelationship.Edit.xml"/>
+    <!--UMHS Referral edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.Edit.xml" />
+    <!--Batch edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatchCommit.Edit.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.Edit.Visits.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Edit.UMHSBatch.ReconEdit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.DataForms.UMHSBatchDataForm.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.DataForms.UMHSBatchDataForm.Edit.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UMHSInteractionBatch.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.Edit.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferralBatch.Edit.xml" />
+                  
+    <!--Replaces OOB Edit Duplicate Screen (NOT UPGRADE SAFE)-->
+    <!--If Blackbaud ever changes the duplicate match screen, this form will have to be updated as well-->
+    <!--<c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.UMHSConstituentDuplicateMatch.Edit.xml" />-->
+
+    <!--UMHS My Fundraiser Tabs/Portfolio Edit forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.Portfolio.UMHSPortfolioProspects.Edit.xml" />
+    
+    <!--******************-->
+    <!--*** View forms ***-->
+    <!--******************-->
+    <!--Constituent view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartment.View.xml" />
+    <!--UMHS Contact view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.View.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.View.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.View.xml" />
+    <!--UMHS Development/Affiliations view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.View.xml" />
+    <!--UMHS Development/Interactions view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.View.xml" />
+    <!--UMHS Development/Interests view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterest.View.xml" />
+    <!--UMHS Documentation view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.UMHSDocumentation.View.xml"/>
+    <!--UMHS Info view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSData.View.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSDataExpression.View.xml" />
+    <!--UMHS Referral view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.View.xml" />
+    <!--UMHS My Fundraiser Tabs view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.UMHSInteractionExression.View.xml" />
+    <!--UMAffiliation Duplicate Search view forms-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Views.USR_UMHS_V_UMAFFILIATEDCONSTITUENTS.xml" />
+
+    <!--*************************-->
+    <!--*** Batch Stored Procedures ***-->
+    <!--*************************-->
+    <!--Batch stored procedures-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_ENDDATEADDRESS.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_ENDDATEEMAIL.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_ENDDATEPHONE.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_PROVIDER_CONSTITUENT_ADD.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_ADD_INDIVIDUAL.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_BATCH_EDIT_INDIVIDUAL.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USR_USP_UMHS_CONSTITUENTDUPLICATESEARCHRESOLUTION.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_GETSPOUSEPARTNERID.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_HASUMAFFILIATION.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.StoredProcedures.USP_USR_UMHS_SETUMAFFILIATION.xml" />
+    
+   
+
+    <!--*******************-->
+    <!--*** Batch types ***-->    
+    <!--*******************-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.UMHS.Batch.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.UMHS.Batch.Providers.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.UMHS.Batch.Visits.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Interaction.UMHSInteractionBatch.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Affiliation.UMHSAffiliationBatch.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.Referral.UMHSReferral.Batch.xml" />
+
+    <!--*******************-->
+    <!--*** Batch Extensions ***-->
+    <!--*******************-->
+   <!--Not for Go-Live - will deploy later again-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.UMHSDataERB.BatchExtension.xml" />
+    
+    <!--******************-->
+    <!--*** ID Mappers ***-->
+    <!--******************-->
+    <!--Constituent ID mappers-->    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.ConstiteuntToUMHS.IDMapper.xml" />
+      
+    <!--*************-->
+    <!--*** Views ***-->
+    <!--*************-->
+    <!--UMHS My Fundraiser Tabs/Completed Interactions views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.CompletedInteractions.USR_V_UMHS_INTERACTION_ALL_STATUSES.xml" />
+    <!--UMHS My Fundraiser Tabs/Completed Interactions stored procedures-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.CompletedInteractions.USP_USR_UMHS_DATALIST_PROSPECTMANAGER_INTERACTION.xml" />
+
+
+    <!--*******************-->
+    <!--*** Query views ***-->
+    <!--*******************-->
+    <!-- UMHS Data/Info query views -->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSData.Query.xml" />   
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.UMHSSearchPatientAllNames.Query.xml" />
+    <!--UMHS Contact query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Address.UMHSAddress.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Email.UMHSEmailAddress.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Contact.Phone.UMHSPhone.Query.xml" />
+    <!--UMHS Development/Affiliations query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliation.Query.xml" />
+    <!--UMHS Development/Interactions query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteractionParticipant.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteraction.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteractionParticipant.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interactions.UMHSInteractionSites.Query.xml" />
+
+    <!--UMHS Development/Interests query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterest.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Interests.UMHSInterestDepartments.Query.xml" />
+    <!--UMHS Development/Team query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Team.UMHSTeam.Query.xml" />
+    <!--UMHS Documentation query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Documentation.UMHSDocumentation.Query.xml"/>
+    <!--UMHS Info/Relationships query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Info.Relationships.UMHSRelationship.Query.xml"/>
+    <!--UMHS Providers query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Providers.UMHSProviders.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Providers.UMHSProvidersQuery.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Providers.UMHSProviderView.DataList.xml" />
+    <!--UMHS Referral query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Referral.UMHSDataReferral.Query.xml" />
+    <!--UMHS Visits Detail query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisitInpatient.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisitOutPatient.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisits.Query.xml"/>
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsDetail.UMHSVisitsDetailView.DataList.xml"/>
+
+    <!--UMHS Visits Summary query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummary.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummaryQuery.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummaryQuery.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.VisitsSummary.UMHSVisitsSummary.DataList.xml" />
+
+    <!--UMAffiliation Duplicate Search query views-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Query.UMHSDuplicateSearchMatchSets.Query.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.Query.UMHSDuplicateSearchCleanupHistory.Query.xml" />
+
+    <!--*************-->
+    <!--*** Pages ***-->
+    <!--*************-->
+    <!--Constituent pages-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartment.Page.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSSubDepartment.Page.xml" />
+    <!--UMHS Development/Affiliations pages-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliationConfiguration.Page.xml" />
+    <!--UMHS My Fundraiser Tabs pages-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSMyFundraiserTabs.UMHSInteraction.Page.xml" />
+    <!--UMAffiliation Duplicate Search page-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.UMHSAffiliationDuplicateSearch2.Page.xml" />
+
+    <!--*************-->
+    <!--*** Tasks ***-->    
+    <!--*************-->
+    <!--Constituent tasks-->    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDepartmentSubDepartment.Task.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSDataAdd.Task.xml" />
+    <!--UMHS Development/Affiliations tasks-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.UMHSAffiliations.Task.xml" />
+    <!--UMAffiliation Duplicate Search tasks-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSAffiliationDuplicateSearch.UMHSAffiliationDuplicateSearch.Task.xml" />
+
+    <!--**************-->
+    <!--*** AddIns ***-->
+    <!--**************-->
+    <!--Constituent addins-->    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.UMHSConstituent.AddIn.xml" />
+    <!--UMHS ERB Addin - Not for Go-Live-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Batch.EnhancedRevenueBatch.Addin.UMHSDataERB.AddIn.xml" />
+    
+    <!--**************************-->
+    <!--*** Configuration data ***-->
+    <!--**************************-->
+    <!--Constituent configuration data-->    
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.ConfigExportData.UMHS_Departments.ConfigurationData.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.Constituent.ConfigExportData.UMHS_Subdepartments.ConfigurationData.xml" />
+    <!--UMHS Development/Affiliations configuration data-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.UMHSData.Development.Affiliations.ConfigurationExportData.UMHS_AffiliationBase.ConfigurationData.xml" />
+
+
+    <!--**************************-->
+    <!--*** Global Changes***-->
+    <!--**************************-->
+    <!--MIMED Global Changes-->
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Delete.MIMEDAffiliations.GlobalChange.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Delete.MIMEDInteraction.GlobalChange.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Add.MIMEDTeamMember.GlobalChange.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Change.MIMEDTeamMember.GlobalChange.xml" />
+    <c:Dependency CatalogAssembly="UM.CustomFx.GratefulPatient.Catalog.dll" CatalogItem="UM.CustomFx.GratefulPatient.Catalog.GlobalChange.Delete.MIMEDTeamMember.GlobalChange.xml" />
+  </c:DependencyList>
+
+  <AlterExistingPages xmlns="bb_appfx_pagedefinition">
+    <AlterPages>
+      <!--Constituent Page Changes-->
+      <AlterPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+        <AddPageExpressionForms>
+          <PageExpressionForm DataFormInstanceID="dc6ae57a-bc95-44de-9ac3-2da1d1e42cbd"/>
+        </AddPageExpressionForms>
+      </AlterPage>
+      <AlterPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+        <AlterPageActionGroups>
+          <AlterPageActionGroup PageActionGroupID="6459a910-09ae-44bd-9240-31d2ebbafa7c">
+            <AlterActions>
+              <RemoveRecordOperationAction ActionID="ff63ce2a-b716-4309-8966-c99178bb8f1c" RecordOperationID="a1d9dada-f4d0-4edf-a3e6-0587bafc1a33"/>
+              <RemoveAddDataFormAction ActionID="69c5cd88-8f87-40ce-8e60-373641897e46" DataFormID="a3e4ea4a-1328-467f-99cd-d352c409eee8"/>                
+            </AlterActions>
+          </AlterPageActionGroup>
+        </AlterPageActionGroups>
+      </AlterPage>      
+      <AlterPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f">
+        <AlterPageActionGroups>
+          <AlterPageActionGroup PageActionGroupID="6459a910-09ae-44bd-9240-31d2ebbafa7c">
+            <AlterActions>
+              <AddAction Sequence="998">
+                <Action ID="69c5cd88-8f87-40ce-8e60-373641897e46" Caption="Add MIMED Data" ImageKey="CATALOG:UM.CustomFx.GratefulPatient.Catalog,UM.CustomFx.GratefulPatient.Catalog.Images.Patient.png" Visible="=(Not Page.Fields!HASUMHSDATA AndAlso Not Page.Fields!ISORG AndAlso Not Page.Fields!ISGROUP AndAlso Not Page.Fields!ISHOUSEHOLD)">
+                  <ShowAddDataForm DataFormID="a3e4ea4a-1328-467f-99cd-d352c409eee8" xmlns="bb_appfx_commontypes">
+                    <ActionContext>
+                      <PageContextID />
+                    </ActionContext>
+                    <PostActionEvent>
+                      <RefreshPage/>
+                    </PostActionEvent>                    
+                  </ShowAddDataForm>
+                </Action>
+              </AddAction>
+              <AddAction Sequence="999">
+                <Action ID="ff63ce2a-b716-4309-8966-c99178bb8f1c" Caption="Delete MIMED Data" Visible="= Page.Fields!HASUMHSDATA" ImageKey="RES:Delete">
+                  <ExecuteRecordOperation RecordOperationID="a1d9dada-f4d0-4edf-a3e6-0587bafc1a33" xmlns="bb_appfx_commontypes">
+                    <ActionContext>
+                      <PageExpressionField>UMHSID</PageExpressionField>
+                    </ActionContext>
+                    <PostActionEvent>
+                      <RefreshPage />
+                    </PostActionEvent>
+                  </ExecuteRecordOperation>
+                </Action>
+              </AddAction>
+            </AlterActions>
+          </AlterPageActionGroup>
+        </AlterPageActionGroups>
+        <AlterTabs>
+           <AddTab Sequence="999">
+            <Tab Caption="MIMED Data" ID="d797ffd4-d395-4574-8028-448cced5c31b" Visible="= Page.Fields!HASUMHSDATA">
+              <Tabs>
+                <Tab Caption="MIMED Info" ID="9bd55710-e3fe-4210-aff2-279ac0570f37"  >
+                  <Sections>
+                    <Section ID="687bfedf-e82b-41bb-9ed8-6f9e492d7eaa" Caption="MIMED Info" Visible="true">
+                      <DataForm ID="97d591d1-75b1-417f-94da-a03fca7357e4" />
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="ce3e0c3c-458d-49db-89f6-17c1dac05e8a" Caption="Edit" ImageKey="res:edit" Visible="= Page.Fields!HASUMHSDATA">
+                          <ShowDataForm DataFormID="78513c45-a301-4dc8-8623-23ae2bcb350c" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageContextID />
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshShellNavigation/>                              
+                            </PostActionEvent>   
+                          </ShowDataForm>                          
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="77915343-7c65-47e0-a040-ef4f5661d2a7" Caption="Relationships" Visible="= Page.Fields!HASUMHSDATA">
+                      <DataList ID="969a687f-ec1e-4106-88e1-ef8da2fc424b">
+                        <RenderStyle>
+                          <StandardView AutoSize="true">
+                            <DetailViewForm ViewDataFormID="f0ffbb17-067a-430b-b0a1-b510d236c900" />
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="0a2eefbf-172f-41ff-9f01-4a9435298723" Caption="Add" ImageKey="RES:newitem">
+                          <ShowAddDataForm DataFormID="6f2b393b-80c9-474a-9ffb-f6dffd0f0f2d" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="3dc1cd9d-da50-4826-bc36-8706c89618d2" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="204f8d3a-2e0b-47ca-bc7e-3e10cdf41d49" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshOtherSections>
+                                <Sections>
+                                  <SectionID>687bfedf-e82b-41bb-9ed8-6f9e492d7eaa</SectionID>
+                                  <SectionID>77915343-7c65-47e0-a040-ef4f5661d2a7</SectionID>
+                                </Sections>
+                              </RefreshOtherSections>
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="fcf7c3fc-7ff5-4d1f-899d-bc586a51ceca" Caption="Delete" ImageKey="RES:delete">
+                          <ExecuteRecordOperation RecordOperationID="1c2f993d-aaea-457e-95ca-50ee7a99cf4e" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                        <Action ID="f8a32157-8bb1-4de6-9cb4-ccb227f39cc7" Caption="Go to constituent" LinkFieldID="FULLNAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="77915343-7c65-47e0-a040-ef4f5661d2a7" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>                        
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Contact" ID="1ccf9d10-57fa-425c-8c18-9d3286fe6a26">
+                  <Sections>
+                    <Section ID="df165bf2-edec-4c74-8e1b-2cf084446888" Caption="Addresses" Visible="= Page.Fields!HASUMHSDATA">
+                      <DataList ID="9dd57596-43ec-47cf-be2b-17d69f460675">
+                        <RenderStyle>
+                          <StandardView AutoSize="true">
+                            <DetailViewForm ViewDataFormID="75f282f7-9e30-41fb-84ca-321bc8c9eb98" />
+                            <Legend>
+                              <LegendExpressionList>
+                                <LegendExpression ID="eb66891b-2256-4ebc-b31e-0129b399520e" DisplayStyle="Primary">=Fields!ISPRIMARY.Length&gt;0</LegendExpression>
+                              </LegendExpressionList>
+                            </Legend>
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="29fc0c32-76c5-4c78-93a9-1b775c1f51dc" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="76d17156-002d-415d-a534-23ba9529025d" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="203f8a40-00a5-4d28-ba84-f124553b12bf" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="d2a7d0aa-44c6-46a3-8789-e704a719f0c2" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="948720c1-56ee-45b8-95ce-838acbcc6776" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="a10cbbd3-7a07-4fb4-9c9d-f868af398733" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>                            
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="62e06f38-36ed-4aad-9aee-bb5e04f37b2e" Caption="Email addresses" Visible="= Page.Fields!HASUMHSDATA">
+                      <DataList ID="0be3adc4-1803-43f1-9b81-9d3aea33cb9c">
+                        <RenderStyle>
+                          <StandardView AutoSize="true">
+                            <DetailViewForm ViewDataFormID="67f2d064-dd1c-4512-b2d5-1df37026ab9e" />
+                            <Legend>
+                              <LegendExpressionList>
+                                <LegendExpression ID="acd7c0e5-ddad-41c7-93f9-c43224626be3" DisplayStyle="Primary">=Fields!ISPRIMARY.Length&gt;0</LegendExpression>
+                              </LegendExpressionList>
+                            </Legend>
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="a647b960-892e-48b4-8181-a9a280ef790c" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="3e721531-9f45-4351-bcc3-9f7226551251" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="9b9ee7d6-5495-4880-bd42-9bcbf8241e5e" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="6792394f-6b42-4e33-987a-fa5d82abb79b" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="04fb5183-e8e1-4660-809e-ad0a67b2badd" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="2ea8cba1-bf39-40cb-a3c3-ddf1de3e0f99" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="4552504a-f920-4134-8c04-110725e3b860" Caption="Phone numbers" Visible="= Page.Fields!HASUMHSDATA">
+                      <DataList ID="214b4790-23ec-4196-a53f-57c2546a5893">
+                        <RenderStyle>
+                          <StandardView AutoSize="true">
+                            <DetailViewForm ViewDataFormID="dc0be8a6-d96c-4374-aee5-897404ad975b" />
+                            <Legend>
+                              <LegendExpressionList>
+                                <LegendExpression ID="0726758c-4f55-11dc-8314-0800200c9a66" ForeColor="#000000" DisplayStyle="Primary">=Fields!ISPRIMARY.Length&gt;0</LegendExpression>
+                              </LegendExpressionList>
+                            </Legend>
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="5d215f6c-62f3-4d54-9fe6-0717e76aa8e1" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="10f54640-0b72-4569-99a4-334c9a12fd3b" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="2d186f89-5276-430c-bd22-a5b8cd286417" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="fe1b9773-0793-4a8b-aea6-71cfe6bc2027" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>                            
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="6e03cf56-637a-4c2b-a786-8e9065849637" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="5eaee431-25d1-4824-9a4b-1e67274de179" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>                
+                <Tab Caption="MIMED Development" ID="e2980b90-93c0-4d24-9907-148bc61a3d34">
+                  <Sections>
+                    <Section ID="768aa854-0e32-41df-8b1e-fa27d4cd56b8" Caption="Affiliations">
+                      <DataList ID="368939de-2808-4eb4-adea-9f825e1da1e9">
+                        <RenderStyle>
+                          <StandardView>
+                            <DetailViewForm ViewDataFormID="006174cc-a87b-4abe-9455-2199129354d0" DefaultVisible="false" />
+                          </StandardView> 
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="c25f292e-72d1-4ae7-ac0e-bd7a83fb9e7a" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="65adbaf0-2296-4adb-83c3-8547b71db0bb" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="445c3d51-a6bb-40f8-9af7-b8783b3b9ce7" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="4da32618-3d0d-4035-81f2-5323083a3f79" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="7d1f85c6-1a0f-4607-b5b9-8aada8b0ec73" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="3f166360-ae24-42d3-8870-e95e85cccffd" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="c145e431-195c-4f09-a014-3215d4995c9a" Caption="Interactions">
+                      <DataList ID="139b6c5f-c676-4f41-9cfb-7edd09a0c53f">
+                        <RenderStyle>
+                          <GroupedView>
+                            <Groups>
+                              <Group ColumnName="STATUS" />
+                              <Group ColumnName="OWNER" />
+                              <Group ColumnName="TYPE" />
+                              <Group ColumnName="DATE" />
+                            </Groups>
+                            <DetailViewForm ViewDataFormID="a20b702c-9466-42aa-9cc0-5060a9036f28" HeaderCaption="Details" HeaderCaptionResourceKey="$$details" />
+                          </GroupedView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <!--<Action ID="" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="b3a04417-321f-44c4-a3b7-4b115e5eeafc" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>-->
+                        <Action ID="6191389b-5cdc-4761-9903-3d8ab1f7fb44" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="b3a04417-321f-44c4-a3b7-4b115e5eeafc" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="3d37ddef-5be8-432c-a69f-4cfdaee72b1e" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="689e3a9a-f16b-4dfe-bed7-afb7c77854f2" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="7932FD79-8111-43CB-9962-D5616FF862EA" Caption="Copy" ImageKey="res:copy">
+                          <ShowDataForm DataFormID="459f298b-b383-451a-8dbe-fbc2cf26ebda" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="4b879038-0c68-4b42-a8e0-ccea65d39b87" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="e9d4d5f3-7472-45a1-878f-8283b1e49c23" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="2fc92613-49a6-4824-9ea3-c67eed084697" Caption="Interests">
+                      <DataList ID="3c124409-8ce0-41af-8111-156b7fd98b5b">
+                        <RenderStyle>
+                          <StandardView>
+                            <!--<Groups>
+                              <Group ColumnName="STATUS" />
+                              <Group ColumnName="OWNER" />
+                              <Group ColumnName="TYPE" />
+                              <Group ColumnName="DATE" />
+                            </Groups>-->
+                            <DetailViewForm ViewDataFormID="82a8aa13-3948-4153-b4c7-16f847350243" HeaderCaption="Details" HeaderCaptionResourceKey="$$details" />
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="97f46222-efb7-45df-9b2f-edcaa600a465" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="91e075c3-9fb3-4764-809b-9b43675477ab" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="aaaed8e8-c790-486c-8f61-d733d80a05fd" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="05f0c647-e80a-48d8-874d-9d03c25d0231" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="67dab803-8cf9-4853-b81e-000375f72bd3" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="ad5817f8-3c7e-4459-b875-1cf945683aa6" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection/>
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="63bf5fc9-259a-439d-a5b3-55cc152dc3a1" Caption="Team">
+                      <DataList ID="f20767fc-abb4-424d-9537-8f3c05d74fa2">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="d10bb456-3921-4c7b-936c-1d5bd064a93f" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="416dde6f-dde3-4ca1-b0a9-62c19f25fc4b" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="03ac0d9a-521f-414d-8a5c-07d3824d1dfd" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="b827de23-7950-43c9-bd61-7b3863c062c6" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="8ef4c7ca-2984-4a22-93b6-cda7e2c0bf0d" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="59e59de8-f8cc-4fc4-a5b6-697f89cfc54e" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                            <PostActionEvent>
+                              <RefreshSection />
+                            </PostActionEvent>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Referrals" ID="3f786808-afe8-465e-9125-d8ebce7a63a9">
+                  <Sections>
+                    <Section ID="c1738ce5-c36d-41a6-8ec3-59dfc9e316e3" Caption="Referrals" Visible="= Page.Fields!HASUMHSDATA">
+                      <DataList ID="04055a2c-3fe7-4c03-88d3-a3051956b497">
+                        <RenderStyle>
+                          <StandardView>
+                            <DetailViewForm ViewDataFormID="f6b2aa47-83d5-4446-aab8-c09da3cf3b6e" HeaderCaption="Details" HeaderCaptionResourceKey="$$details" />
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="ef8520c8-ed59-41f1-a537-5c67168958a6" Caption="Add" ImageKey="res:newitem">
+                          <ShowAddDataForm DataFormID="77fc6de5-1849-4d84-aa6e-56dd5300f20b" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="f4fed2b4-289d-41db-8c18-a128e2800b3c" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="3932591d-8049-40ee-8e51-2d20eb5ad6fa" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="28f7fe91-f282-468e-9b26-ab0a3514390d" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="7b09d16c-0a04-4508-ac8a-e2b71f656ff9" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                          </ExecuteRecordOperation>
+                        </Action>
+                        <Action ID="44763a99-14f7-483d-afa6-2e82ab97c7b5" Caption="Go to constituent" LinkFieldID="REFERRER">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>REFERRERID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Visits Summary" ID="c912b1cd-cbc9-41d4-ae73-f7be642a6087" CaptionResourceKey="$$visits" >
+                  <Sections>
+                    <Section ID="1562d87b-530f-4664-ae39-ce441d0bf991" Caption="Visits Summary">
+                      <ListBuilder QueryViewID="e6adb038-cc06-498e-8fb7-86b3e6fbba84" HideExportToCSV="true" HideExportToXLSX="true">
+                        <RequiredColumns>
+                          <Column Name="DEPARTMENT"/>
+                          <Column Name="SUBDEPARTMENT"/>
+                          <Column Name="CONSTITUENTID" />
+                          <Column Name="PROVIDERFULLNAME"/>
+                          <Column Name="PROVIDERDRNUMBER"/>
+                          <Column Name="NUMBEROFVISITS"/>
+                        </RequiredColumns>
+                      </ListBuilder>
+                      <SectionContext>
+                          <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>                       
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="11da003c-75c4-4121-974b-7a649c3798e7" Caption="Go to constituent" LinkFieldID="PROVIDERFULLNAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <!--Below section is for the hidden view form to captures the views of the provider tab for auditing. Can not hide section because we need to execute the procedure to insert in to audit view table. So hiding all fields in it.-->
+                    <Section ID="bcc1b495-8c0f-4e01-a696-b8ab46e28355" Caption="" HideCaption="True" HideRefresh="true" DisplayStyle="Inline">
+                      <DataList ID="0d7c5842-9c2d-486c-a648-0643cde0bbd4" ShowRowTotals="False" AllowSort="False" HideExportToCSV="true" HideExportToXLSX="true" HideResetGrid="true" HideAutosizeAllColumns="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Visits Detail" ID="33e31e17-aa65-42db-ad1a-06563999b697" CaptionResourceKey="$$visits" >
+                  <Sections>
+                    <Section ID="75da3ff5-bfe0-4db9-a546-bbaeafb965da" Caption="Inpatient Visits">
+                      <ListBuilder QueryViewID="50eddcd7-fb2c-48d3-a668-3784c3520af8" HideExportToCSV="true" HideExportToXLSX="true">
+                        <RequiredColumns>
+                          <Column Name="LASTPROCDATE" />                          
+                          <Column Name="CSN" />
+                          <Column Name="VISITSTARTDATE" />
+                          <Column Name="VISITENDDATE" />
+                          <Column Name="CONSTITUENTID" />
+                          <Column Name="PROVIDERDRNUMBER" />
+                          <Column Name="PROVIDERFULLNAME" />
+                          <Column Name="DEPARTMENT" />
+                          <Column Name="SUBDEPARTMENT" />
+                          <Column Name="PROVIDERROLE" />                         
+                        </RequiredColumns>
+                      </ListBuilder>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="84064ec6-56c0-4cb7-9199-c2a172919577" Caption="Go to constituent" LinkFieldID="PROVIDERFULLNAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="86cf54e7-0437-4f95-b5dc-08809cf45665" Caption="Outpatient Visits">
+                      <ListBuilder QueryViewID="bc65fc78-af31-4ace-ab52-b09d0073ec16" HideExportToCSV="true" HideExportToXLSX="true">
+                        <RequiredColumns>
+                          <Column Name="LASTPROCDATE" />                          
+                          <Column Name="CSN"/>
+                          <Column Name="VISITSTARTDATE"/>
+                          <Column Name="VISITENDDATE"/>
+                          <Column Name="CONSTITUENTID" />
+                          <Column Name="PROVIDERDRNUMBER"/>
+                          <Column Name="PROVIDERFULLNAME"/>
+                          <Column Name="DEPARTMENT" />
+                          <Column Name="SUBDEPARTMENT" />
+                          <Column Name="PROVIDERROLE" />
+                        </RequiredColumns>
+                      </ListBuilder>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="0edfe269-c22d-47cc-9d19-789dff6806c0" Caption="Go to constituent" LinkFieldID="PROVIDERFULLNAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="00000000-0000-0000-0000-000000000000" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <!--Below section is for the hidden view form to captures the views of the provider tab for auditing. Can not hide section because we need to execute the procedure to insert in to audit view table. So hiding all fields in it.-->
+                    <Section ID="140b880b-83cb-4764-b4cf-8be4c14d30ff" Caption="" HideCaption="True" HideRefresh="true" DisplayStyle="Inline">
+                      <DataList ID="bbf609d2-62b8-4f9e-bac4-646fade8cad6" ShowRowTotals="False" AllowSort="False" HideExportToCSV="true" HideExportToXLSX="true" HideResetGrid="true" HideAutosizeAllColumns="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Providers" ID="3f47b8c0-4552-4b85-a8ef-ed4cf8733b46" CaptionResourceKey="$$prpoviders">
+                  <Sections>
+                    <Section ID="a70d7f83-7103-4132-baf0-283a8274e431" Caption="Providers">
+                      <ListBuilder QueryViewID="ca86bb02-b12d-4955-b193-3fd9f52fc29d" >
+                        <RequiredColumns>
+                          <Column Name="CONSTITUENTID" />
+                          <Column Name="PROVIDERNAME" />
+                          <Column Name="PROVIDERDRNUMBER"/>
+                          <Column Name="DEPARTMENT"/>
+                          <Column Name="SUBDEPARTMENT"/>
+                          <Column Name="ADMITDOCTORIND"/>
+                          <Column Name="ATTENDDOCTORIND"/>
+                          <Column Name="RESIDENTDOCTORIND"/>
+                          <Column Name="CONSULTDOCTORIND"/>
+                          <Column Name="PHONE"/>                                                                         
+                        </RequiredColumns>
+                      </ListBuilder>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                      <!-- DAR-403: GP UI: Make Provider name a hyperlink to the provider's constituent record  -->
+                      <Actions>
+                        <Action ID="A0BBCCDD-01CB-445F-90D9-BABAF7AC49B5" Caption="Go to constituent" LinkFieldID ="PROVIDERNAME">
+                          <c:ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" SectionID="00000000-0000-0000-0000-000000000000" TabID="00000000-0000-0000-0000-000000000000">
+                            <c:ActionContext>
+                              <c:SectionField>CONSTITUENTID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>    
+                      </Actions>                                 
+                    </Section>
+                    <!--Below section is for the hidden view form to captures the views of the provider tab for auditing. Can not hide section because we need to execute the procedure to insert in to audit view table. So hiding all fields in it.-->
+                    <Section ID="5b6e9598-95a8-43d5-9962-753b2141dca6" Caption="" HideCaption="True" HideRefresh="true" DisplayStyle="Inline">
+                      <DataList ID="52dea511-53e1-47bd-b560-1e3655ebbde6" ShowRowTotals="False" AllowSort="False" HideExportToCSV="true" HideExportToXLSX="true" HideResetGrid="true" HideAutosizeAllColumns="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>
+                      </SectionContext>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Documentation Note" ID="2605d220-0622-4020-9fad-98aa7ba742bd">
+                  <Sections>
+                    <Section ID="5de817d5-33b7-4016-8fa0-60728bf0e7b2" Caption="Documentation Note">
+                      <DataList ID="2e589ff4-c1c3-428a-b552-26408423295d">
+                        <RenderStyle>
+                          <StandardView AutoSize="true">
+                            <DetailViewForm ViewDataFormID="029aa8fa-1271-40f0-ae7f-6a467ced8da7" />
+                          </StandardView>
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <Expression xmlns="bb_appfx_commontypes">= Page.Fields!UMHSID</Expression>
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="7e0207c2-1dfc-4691-833e-0e5d731abadf" Caption="Add">
+                          <ShowAddDataForm xmlns="bb_appfx_commontypes" DataFormID="c1acc6db-8da4-4586-bb88-3e785f88370d">
+                            <ActionContext>
+                              <PageExpressionField>UMHSID</PageExpressionField>
+                            </ActionContext>
+                          </ShowAddDataForm>
+                        </Action>
+                        <Action ID="ef289ac8-36d0-4438-be84-755a4186db29" Caption="Edit" ImageKey="res:edit">
+                          <ShowDataForm DataFormID="1aa3d040-b173-49b0-ae92-2c3d1d4a63c1" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                          </ShowDataForm>
+                        </Action>
+                        <Action ID="4bf5ea4e-3a0b-4637-84d8-e3e83a808f78" Caption="Delete" ImageKey="res:delete">
+                          <ExecuteRecordOperation RecordOperationID="71cfa8cc-3c1a-4e84-8692-45b8a3f09f95" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>ID</SectionField>
+                            </ActionContext>
+                          </ExecuteRecordOperation>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                
+                <!--MIMED History tab: Making is invisible for now...need to move this report on constituent fucntional area-->
+                <Tab Caption="MIMED History" ID="eba534f5-fca2-4c08-97a5-0cb2d3bdfe35" CaptionResourceKey="$$history" Visible="false">
+                      <Sections>
+                        <Section ID="d5b2806e-1e99-4e9c-8e49-97b7ec8f1ea2" Caption="MIMED History" CaptionResourceKey="$$history" Visible="false" >
+                          <Report ID="9702af99-888a-43d0-940c-e65a98ea4a46">
+                            <ParameterValues>
+                              <c:ParameterValue ID="UMHSID" xmlns="bb_appfx_commontypes">
+                                <c:Value>                                          
+                                    <PageExpressionField xmlns="bb_appfx_commontypes">UMHSID</PageExpressionField>                                
+                                </c:Value>
+                              </c:ParameterValue>
+                            </ParameterValues>
+                          </Report>
+                        </Section>
+                      </Sections>
+                    </Tab>
+                    <!--<Tab Caption="Origin" ID="9a4e005d-d0a7-4a77-8e91-ac743028c5d7" CaptionResourceKey="$$origin">
+                      <Sections>
+                        <Section ID="53eb15ca-173f-4cc0-bd90-e8969738a1cf" Caption="Origin" CaptionResourceKey="$$origin">
+                          <DataForm ID="aa0fb4eb-6613-4e70-a23c-c5297a3614ca" />
+                          <Actions>
+                            <Action ID="3a694401-bc54-4257-8390-12de9a5c1fb4" Caption="Edit" ImageKey="RES:Edit" CaptionResourceKey="$$edit">
+                              <ShowDataForm DataFormID="84a0168b-8f1c-4604-b90c-10b0d6a3aeae" xmlns="bb_appfx_commontypes">
+                                <ActionContext>
+                                  <PageContextID />
+                                </ActionContext>
+                                <PostActionEvent>
+                                  <RefreshSection />
+                                </PostActionEvent>
+                              </ShowDataForm>
+                              <HelpKey>CRMConstituentHistoryOrigin.html</HelpKey>
+                            </Action>
+                          </Actions>
+                          <HelpKey>CRMConstituentHistoryOrigin.html</HelpKey>
+                        </Section>
+                      </Sections>
+                    </Tab>
+                  </Tabs>
+                </Tab>-->
+                <!--MIMED History tab ends-->
+              </Tabs>
+            </Tab>
+          </AddTab>
+        </AlterTabs>
+      </AlterPage>
+      <!--My Fundraiser Tabs Page Changes-->
+
+      <AlterPage PageID="baee8762-6727-43a7-9645-5dd776f6289a">
+        <AddPageExpressionForms>
+          <PageExpressionForm DataFormInstanceID="dc6ae57a-bc95-44de-9ac3-2da1d1e42cbd"/>
+        </AddPageExpressionForms>
+      </AlterPage>
+      <AlterPage PageID="baee8762-6727-43a7-9645-5dd776f6289a">
+        <AlterTabs>
+          <AddTab Sequence="1">
+            <Tab Caption="My MIMED" ID="12732c9a-d98d-46e7-95e1-3658467020d0">
+              <Tabs>
+                <Tab Caption="Pending Interactions" ID="c0e00bc8-8aad-480a-bf45-8aa1f79b42ab">
+                  <Sections>
+                    <Section ID="9958077a-7257-4577-b532-2a8a5b64f38f" Caption="Pending Interactions">
+                      <DataList ID="5d630dd0-b1b8-4b37-8450-6fb80b797016">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="4A1DDB8E-8691-4637-ADCF-70192E86B3DE" Caption="Go to interaction" LinkFieldID="OBJECTIVE">
+                          <c:ShowPage PageID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0">
+                            <c:ActionContext>
+                              <c:SectionField>ID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>
+                        <Action ID="c743c8b8-ba7c-423d-9a14-ef42f6d687a0" Caption="Go to Constituent" LinkFieldID="NAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Completed Interactions" ID="578e5bb8-fc17-45fd-9ec7-a62ce8cbd94a">
+                  <Sections>
+                    <Section ID="f09f9a4c-9702-4e58-a1a0-67e1a2de1ec6" Caption="Completed Interactions">
+                      <DataList ID="35dc1be3-c7a5-4c1c-8731-9b1265e2edad">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="5C8FF1CB-5E97-4868-B231-D5403502953A" Caption="Go to interaction" LinkFieldID="OBJECTIVE">
+                          <c:ShowPage PageID="c88e14bf-0f55-43d6-94d4-27b7ae018ff0">
+                            <c:ActionContext>
+                              <c:SectionField>ID</c:SectionField>
+                            </c:ActionContext>
+                          </c:ShowPage>
+                        </Action>
+                        <Action ID="1bdeae3a-7452-4ba2-909d-26e94d3a0dd4" Caption="Go to Constituent" LinkFieldID="NAME">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+                <Tab Caption="Referrals and Team Assignments" ID="c3fac4f7-c422-4bed-8241-a8cc30c4e02a">
+                  <Sections>
+                    <Section ID="4e1afffc-15c3-45e1-aab5-83ff027d95a0" Caption="Referrals">
+                      <DataList ID="1071c8eb-4c82-4fd1-9e35-6aace93a01ec" AutoDisplayFilters="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <Actions>
+                        <Action ID="8075be6a-6d81-42e0-af80-8354a66ad771" Caption="Go to prospect" LinkFieldID="PROSPECT">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                    <Section ID="42b0fda1-686a-4c5d-8562-a80346d80fb7" Caption="Team Assignments">
+                      <DataList ID="4cceb8ef-f245-4643-ad11-daa63ee7e277" AutoDisplayFilters="true">
+                        <RenderStyle>
+                          <StandardView />
+                        </RenderStyle>
+                      </DataList>
+                      <SectionContext>
+                        <PageContextID xmlns="bb_appfx_commontypes" />
+                      </SectionContext>
+                      <Actions>
+                        <Action ID="c68172c3-5221-4920-b48f-5760f6689bdd" Caption="Go to team member" LinkFieldID="TEAMMEMBER">
+                          <ShowPage PageID="88159265-2b7e-4c7b-82a2-119d01ecd40f" TabID="d797ffd4-d395-4574-8028-448cced5c31b" SectionID="00000000-0000-0000-0000-000000000000" xmlns="bb_appfx_commontypes">
+                            <ActionContext>
+                              <SectionField>CONSTITUENTID</SectionField>
+                            </ActionContext>
+                          </ShowPage>
+                        </Action>
+                      </Actions>
+                    </Section>
+                  </Sections>
+                </Tab>
+              </Tabs>
+            </Tab>
+          </AddTab>
+        </AlterTabs>
+      </AlterPage>
+    </AlterPages>
+  </AlterExistingPages>
+</PackageSpec>

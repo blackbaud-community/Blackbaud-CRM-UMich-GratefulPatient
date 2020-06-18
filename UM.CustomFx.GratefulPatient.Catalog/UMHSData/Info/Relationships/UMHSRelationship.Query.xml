@@ -1,0 +1,107 @@
+<QueryViewSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="7fc5c97b-c7ac-47e6-8106-e86e1aa60264"
+    Name="MIMED Relationship Query"
+    Description="A view defined for querying on MIMED relationship record."
+    Author="UM Dev"
+    PrimaryKeyField="ID"
+    RecordType="MIMED Data"
+    IsRoot="false"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_queryview"
+    >
+    <ViewImplementation ViewName="USR_V_QUERY_USR_UMHS_RELATIONSHIP">
+        <ViewSQL>
+          <![CDATA[
+          SELECT USR_UMHS_RELATIONSHIP.ID,
+                 USR_UMHS_RELATIONSHIP.UMHSID,
+                 USR_UMHS_RELATIONSHIP.[RECIPROCALUMHSID],
+                 KEYNAME,
+                 FIRSTNAME,
+                 (SELECT RELATIONSHIPTYPECODE.DESCRIPTION
+                  FROM   DBO.RELATIONSHIPTYPECODE
+                  WHERE  RELATIONSHIPTYPECODE.ID = USR_UMHS_RELATIONSHIP.[RELATIONSHIPTYPECODEID]) AS RELATIONSHIPTYPECODEID_TRANSLATION,
+                 (SELECT RELATIONSHIPTYPECODE.DESCRIPTION
+                  FROM   DBO.RELATIONSHIPTYPECODE
+                  WHERE  RELATIONSHIPTYPECODE.ID = USR_UMHS_RELATIONSHIP.[RECIPROCALTYPECODEID])   AS RECIPROCALTYPECODEID_TRANSLATION,
+                 USR_UMHS_RELATIONSHIP.[STARTDATE],
+                 USR_UMHS_RELATIONSHIP.[ENDDATE],
+                 USR_UMHS_RELATIONSHIP.[ISSPOUSE],
+                 USR_UMHS_RELATIONSHIP.[ISPRIMARYBUSINESS],
+                 USR_UMHS_RELATIONSHIP.[ISCONTACT],
+                 (SELECT CONTACTTYPECODE.DESCRIPTION
+                  FROM   DBO.CONTACTTYPECODE
+                  WHERE  CONTACTTYPECODE.ID = USR_UMHS_RELATIONSHIP.[CONTACTTYPECODEID])           AS CONTACTTYPECODEID_TRANSLATION,
+                 USR_UMHS_RELATIONSHIP.[ISPRIMARYCONTACT],
+                 USR_UMHS_RELATIONSHIP.[ISMATCHINGGIFTRELATIONSHIP],
+                 USR_UMHS_RELATIONSHIP.[DESCRIPTION],
+                 USR_UMHS_RELATIONSHIP.[RELATIONSHIPSETID],
+                 USR_UMHS_RELATIONSHIP.[COMMENTS],
+                 USR_UMHS_RELATIONSHIP.[ISEMERGENCYCONTACT],
+                 USR_UMHS_RELATIONSHIP.[RECEIVESREPORTCARD],
+                 USR_UMHS_RELATIONSHIP.[ISGUARANTOR],
+                 ADDEDBY.APPLICATIONNAME                                                           AS [ADDEDBY_APPLICATION],
+                 ADDEDBY.USERNAME                                                                  AS [ADDEDBY_USERNAME],
+                 CHANGEDBY.APPLICATIONNAME                                                         AS [CHANGEDBY_APPLICATION],
+                 CHANGEDBY.USERNAME                                                                AS [CHANGEDBY_USERNAME],
+                 USR_UMHS_RELATIONSHIP.DATEADDED,
+                 USR_UMHS_RELATIONSHIP.DATECHANGED,
+                 USR_UMHS_RELATIONSHIP.TSLONG
+          FROM   DBO.USR_UMHS_RELATIONSHIP
+                 JOIN USR_UMHS_DATA D
+                   ON D.ID = [RECIPROCALUMHSID]
+                 LEFT JOIN DBO.CHANGEAGENT AS [ADDEDBY]
+                        ON [ADDEDBY].ID = USR_UMHS_RELATIONSHIP.ADDEDBYID
+                 LEFT JOIN DBO.CHANGEAGENT AS [CHANGEDBY]
+                        ON [CHANGEDBY].ID = USR_UMHS_RELATIONSHIP.CHANGEDBYID 
+
+          ]]>
+        </ViewSQL>
+    </ViewImplementation>
+    <Output>
+        <OutputFields>
+            <OutputField Name="ID" Caption="System record ID" Category="System Fields" DataType="Guid" />
+            <OutputField Name="UMHSID" Caption="MIMED ID" DataType="Guid" Category="System Fields" />
+            <OutputField Name="RECIPROCALUMHSID" Caption="Reciprocal MIMED ID" DataType="Guid" Category="System Fields" />
+            <OutputField Name="KEYNAME" Caption="Last name" DataType="String" />
+            <OutputField Name="FIRSTNAME" Caption="First name" DataType="String" />
+            <OutputField Name="RELATIONSHIPTYPECODEID_TRANSLATION" Caption="Relationship type">                
+            </OutputField>
+            <OutputField Name="RECIPROCALTYPECODEID_TRANSLATION" Caption="Reciprocal type">                
+            </OutputField>
+            <OutputField Name="STARTDATE" Caption="Start date" DataType="Date" />
+            <OutputField Name="ENDDATE" Caption="End date" DataType="Date" />
+            <OutputField Name="ISSPOUSE" Caption="Spouse" DataType="Boolean" />
+            <OutputField Name="ISPRIMARYBUSINESS" Caption="Primary business" DataType="Boolean" />
+            <OutputField Name="ISCONTACT" Caption="Contact" DataType="Boolean" />
+            <OutputField Name="CONTACTTYPECODEID_TRANSLATION" Caption="Contact type">                
+            </OutputField>
+            <OutputField Name="ISPRIMARYCONTACT" Caption="Primary contact" DataType="Boolean" />
+            <OutputField Name="ISMATCHINGGIFTRELATIONSHIP" Caption="Matching gift relationship" DataType="Boolean" />
+            <OutputField Name="DESCRIPTION" Caption="Description" />
+            <OutputField Name="RELATIONSHIPSETID" Caption="Relationship set" DataType="Guid" />
+            <OutputField Name="COMMENTS" Caption="Comments" />
+            <OutputField Name="ISEMERGENCYCONTACT" Caption="Emergency contact" DataType="Boolean" />
+            <OutputField Name="RECEIVESREPORTCARD" Caption="Receives report card" DataType="Boolean" />
+            <OutputField Name="ISGUARANTOR" Caption="Is guarantor" DataType="Boolean" />
+            <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" Category="System Fields">
+                
+            </OutputField>
+            <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" Category="System Fields">
+               
+            </OutputField>
+            <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" Category="System Fields">
+               
+            </OutputField>
+            <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" Category="System Fields">
+               
+            </OutputField>
+            <OutputField Name="DATEADDED" Caption="Date added" Category="System Fields" DataType="Date" />
+            <OutputField Name="DATECHANGED" Caption="Date changed" Category="System Fields" DataType="Date" />
+            <OutputField Name="TSLONG" Caption="Timestamp value" IsHidden="true" Category="System Fields" DataType="Long" />
+        </OutputFields>
+    </Output>
+  <RelationshipOperations>
+    <AddToParentView ParentView="USR_V_QUERY_UMHS_DATA" Field="UMHSID" ParentViewRelatedField="ID" PathAlias="MIMED Relationship"/>
+  </RelationshipOperations>
+</QueryViewSpec>

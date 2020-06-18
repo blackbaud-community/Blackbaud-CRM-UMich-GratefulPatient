@@ -1,0 +1,244 @@
+<EditDataFormTemplateSpec 
+    xmlns="bb_appfx_editdataformtemplate"
+    xmlns:c="bb_appfx_commontypes"
+    ID="85021f57-46f4-4198-880d-5af69efae00f"
+    Name="MIMED Interaction Copy to DART"
+    Description="A data form for editing MIMED interaction records"
+    Author="UM Dev"
+    DataFormInstanceID="459f298b-b383-451a-8dbe-fbc2cf26ebda"
+    RecordType="MIMED Interaction"
+    c:SecurityUIFolder="MIMED Data"
+    FormHeader="Copy MIMED Interactions"
+    >
+
+	<SPDataForm>
+
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSINTERACTION">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+        create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSINTERACTION
+        (
+            @ID uniqueidentifier,
+            @DATALOADED bit = 0 output,
+            @TSLONG bigint = 0 output,
+	          @INTERACTIONS XML = null output
+        )
+        as
+
+	        set nocount on;
+
+	        -- be sure to set these, in case the select returns no rows
+	        set @DATALOADED = 0
+	        set @TSLONG = 0
+       
+          select
+		        @DATALOADED = 1,
+		        @TSLONG = TSLONG,
+		        @INTERACTIONS = dbo.USR_UFN_UMHS_INTERACTIONS_TOITEMLISTXML(@ID)
+	        from dbo.USR_UMHS_INTERACTION
+	        where UMHSID = @ID
+
+	        return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHSINTERACTION">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+CREATE PROCEDURE DBO.USR_USP_DATAFORMTEMPLATE_EDIT_UMHSINTERACTION (@ID            UNIQUEIDENTIFIER,
+                                                                    @CHANGEAGENTID UNIQUEIDENTIFIER = NULL,
+                                                                    @INTERACTIONS  XML)
+AS
+    SET NOCOUNT ON;
+
+    IF @CHANGEAGENTID IS NULL
+      EXEC DBO.USP_CHANGEAGENT_GETORCREATECHANGEAGENT
+        @CHANGEAGENTID OUTPUT
+
+    DECLARE @CURRENTDATE DATETIME = GETDATE()
+
+    BEGIN TRY
+        
+        --get all the selected interactions
+        DECLARE @SELECTEDINTERACTIONS TABLE (
+          ID UNIQUEIDENTIFIER
+        )
+
+        INSERT INTO @SELECTEDINTERACTIONS
+        SELECT ID FROM DBO.USR_UFN_UMHS_INTERACTIONS_FROMITEMLISTXML(@INTERACTIONS)
+
+        DECLARE @CONSTITUENTID            UNIQUEIDENTIFIER,
+                @EXPECTEDDATE             DATETIME = NULL,
+                @ACTUALDATE               DATETIME = NULL,
+                @FUNDRAISERID             UNIQUEIDENTIFIER = NULL,
+                @INTERACTIONTYPECODEID    UNIQUEIDENTIFIER,
+                @OBJECTIVE                NVARCHAR(100) = '',
+                @STATUSCODEID             UNIQUEIDENTIFIER = NULL,
+                @COMMENT                  NVARCHAR(MAX) = '',
+                @EVENTID                  UNIQUEIDENTIFIER = NULL,
+                @PARTICIPANTS             XML = NULL,
+                @INTERACTIONCATEGORYID    UNIQUEIDENTIFIER = NULL,
+                @INTERACTIONSUBCATEGORYID UNIQUEIDENTIFIER = NULL,
+                @SITES                    XML = NULL,
+                @SELECTEDCONSTITUENTID    UNIQUEIDENTIFIER = NULL,
+                @EXPECTEDSTARTTIME        DBO.UDT_HOURMINUTE = NULL,
+                @EXPECTEDENDTIME          DBO.UDT_HOURMINUTE = NULL,
+                @ISALLDAYEVENT            BIT = NULL,
+                @TIMEZONEENTRYID          UNIQUEIDENTIFIER = NULL,
+                @ACTUALSTARTTIME          DBO.UDT_HOURMINUTE = NULL,
+                @ACTUALENDTIME            DBO.UDT_HOURMINUTE = NULL,
+                @LOCATIONID               UNIQUEIDENTIFIER = NULL,
+                @OTHERLOCATION            NVARCHAR(300) = '',
+                @SCDESCRIPTION            NVARCHAR(100) = ''
+
+        WHILE EXISTS(SELECT TOP 1 ID FROM @SELECTEDINTERACTIONS)
+          BEGIN
+              DECLARE @DARTINTERACTIONID  UNIQUEIDENTIFIER = NULL,
+                      @SELECTEDID UNIQUEIDENTIFIER = (SELECT TOP 1 ID FROM @SELECTEDINTERACTIONS)
+
+              SELECT @CONSTITUENTID = D.CONSTITUENTID,
+                     @EXPECTEDDATE = I.EXPECTEDDATE,
+                     @ACTUALDATE = I.ACTUALDATE,
+                     @FUNDRAISERID = I.FUNDRAISERID,
+                     @INTERACTIONTYPECODEID = I.CONTACTMETHODCODEID,
+                     @OBJECTIVE = I.SUMMARY,
+                     @STATUSCODEID = I.STATUSCODEID,
+                     @COMMENT = I.COMMENTS,
+                     @EVENTID = I.EVENTID,
+                     @PARTICIPANTS = DBO.USR_UFN_UMHS_INTERACTIONPARTICIPANTS_TOITEMLISTXML(I.ID),
+                     @INTERACTIONCATEGORYID = I.INTERACTIONCATEGORYID,
+                     @INTERACTIONSUBCATEGORYID = I.INTERACTIONSUBCATEGORYID,
+                     @SITES = DBO.USR_UFN_UMHS_INTERACTION_GETSITES_TOITEMLISTXML(I.ID),
+                     @CONSTITUENTID = D.CONSTITUENTID,
+                     @EXPECTEDSTARTTIME = I.EXPECTEDSTARTTIME,
+                     @EXPECTEDENDTIME = I.EXPECTEDENDTIME,
+                     @ISALLDAYEVENT = I.ISALLDAYEVENT,
+                     @TIMEZONEENTRYID = I.TIMEZONEENTRYID,
+                     @ACTUALSTARTTIME = I.ACTUALSTARTTIME,
+                     @ACTUALENDTIME = I.ACTUALENDTIME,
+                     @LOCATIONID = NULL,
+                     @OTHERLOCATION = NULL,
+                     @SCDESCRIPTION = SC.DESCRIPTION
+              FROM   USR_UMHS_INTERACTION I
+                     JOIN USR_UMHS_DATA D ON D.ID = I.UMHSID
+                     LEFT JOIN USR_UMHS_INTERACTIONPARTICIPANT IP ON IP.INTERACTIONID = I.ID
+                     LEFT JOIN USR_UMHS_INTERACTIONSITE SITES ON SITES.INTERACTIONID = I.ID
+                     LEFT JOIN USR_INTERACTION_STATUSCODE SC ON SC.ID = I.STATUSCODEID
+              WHERE  I.ID = @SELECTEDID
+
+              --create the dart interaction
+              DECLARE @STATUSCODE INT;
+              
+              /*
+              <CheckExpression="(STATUSCODE in (0,1) and ACTUALDATE is null) or (STATUSCODE in (2,3) and ACTUALDATE is not null) or (STATUSCODE in (4,5))" />
+              
+              <EnumField Name="STATUSCODE" DefaultValue="0">
+                <EnumValues>
+                  <EnumValue ID="0" Translation="Planned" />
+                  <EnumValue ID="1" Translation="Pending" />
+                  <EnumValue ID="2" Translation="Completed" />
+                  <EnumValue ID="3" Translation="Unsuccessful" />
+                  <EnumValue ID="4" Translation="Canceled" />
+                  <EnumValue ID="5" Translation="Declined" />
+                </EnumValues>
+              </EnumField>
+              */
+              
+              --translate the status code for the OOB interaction table
+              SELECT @STATUSCODE = (
+                CASE @SCDESCRIPTION 
+                  WHEN 'Planned' THEN 1
+                  WHEN 'Pending' THEN 1
+                  WHEN 'Completed' THEN 2
+                  WHEN 'Unsuccessful' THEN 3
+                  WHEN 'Canceled' THEN 4
+                  WHEN 'Declined' THEN 5
+                  ELSE 1
+                END
+              )              
+              
+		          IF NOT EXISTS(SELECT 1 FROM INTERACTION WHERE ID = @SELECTEDID)
+		          BEGIN
+              
+			          EXEC DBO.USP_DATAFORMTEMPLATE_ADD_INTERACTION_2
+                  @ID = @SELECTEDID OUTPUT,
+				          @CHANGEAGENTID = @CHANGEAGENTID,
+				          @CONSTITUENTID = @CONSTITUENTID,
+				          @EXPECTEDDATE = @EXPECTEDDATE,
+				          @ACTUALDATE = @ACTUALDATE,
+				          @FUNDRAISERID = @FUNDRAISERID,
+				          @INTERACTIONTYPECODEID = @INTERACTIONTYPECODEID,
+				          @OBJECTIVE = @OBJECTIVE,
+				          @STATUSCODE = @STATUSCODE,
+				          @COMMENT = @COMMENT,
+				          @EVENTID = @EVENTID,
+				          @PARTICIPANTS = @PARTICIPANTS,
+				          @INTERACTIONCATEGORYID = @INTERACTIONCATEGORYID,
+				          @INTERACTIONSUBCATEGORYID = @INTERACTIONSUBCATEGORYID,
+				          @SITES = @SITES,
+				          @SELECTEDCONSTITUENTID = @SELECTEDCONSTITUENTID,
+				          @EXPECTEDSTARTTIME = @EXPECTEDSTARTTIME,
+				          @EXPECTEDENDTIME = @EXPECTEDENDTIME,
+				          @ISALLDAYEVENT = @ISALLDAYEVENT,
+				          @TIMEZONEENTRYID = @TIMEZONEENTRYID,
+				          @ACTUALSTARTTIME = @ACTUALSTARTTIME,
+				          @ACTUALENDTIME = @ACTUALENDTIME
+              
+			            --add the extension record with the custom status code table id
+			            DECLARE @IDEXT UNIQUEIDENTIFIER = NEWID();
+
+			            EXEC DBO.USP_DATAFORMTEMPLATE_ADD_INTERACTIONEXTENSION_29442
+				            @ID = @IDEXT,
+				            @INTERACTIONID = @SELECTEDID,
+				            @INTERACTION_STATUSCODE_CODEID = @STATUSCODEID,
+				            @CHANGEAGENTID = @CHANGEAGENTID
+			        END
+              
+              --remove the item from the temp table
+              DELETE FROM @SELECTEDINTERACTIONS WHERE  ID = @SELECTEDID
+              --08/16 - JIRA-DAR589 - Also delete from the USR_UMHS_Interaction table once its copied over to DART proper.
+              exec USP_USR_UMHS_INTERACTION_DELETEBYID_WITHCHANGEAGENTID @SELECTEDID, @CHANGEAGENTID
+          END
+    END TRY
+    BEGIN CATCH
+        EXEC DBO.USP_RAISE_ERROR
+        RETURN 1
+    END CATCH
+
+    RETURN 0; 
+
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+
+	</SPDataForm>
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="INTERACTIONS" Caption="Interactions" DataType="XML">
+        <Collection RenderStyle="Default" ViewMode="Grid">
+          <Fields>
+            <FormField Caption="ID" DataType="Guid" Hidden="true" FieldID="ID" />
+            <FormField Caption="Selected" DataType="Boolean" FieldID="SELECTED" />
+            <FormField Caption="Date" DataType="Date" FieldID="DATE" ReadOnly="true" />
+            <FormField Caption="Status" DataType="String" FieldID="STATUS" ReadOnly="true" />
+            <FormField Caption="Category" DataType="String" FieldID="CATEGORY" ReadOnly="true" />
+            <FormField Caption="Sub category" DataType="String" FieldID="SUBCATEGORY" ReadOnly="true" />
+            <FormField Caption="Summary" DataType="String" FieldID="SUMMARY" ReadOnly="true" />
+            <FormField Caption="Contact method" DataType="String" FieldID="CONTACTMETHOD" ReadOnly="true" />
+          </Fields>
+        </Collection>
+      </FormField>
+		</FormFields>
+    <WebUIComponent>
+        <UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSInteractionCopyUIModel" />
+        <WebUI>
+            <ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSInteractionCopy.html" />
+        </WebUI>
+    </WebUIComponent>
+    <UIActions>
+      <UIAction Caption="Select All" ActionID="SELECTALL" />
+    </UIActions>
+  </FormMetaData>
+</EditDataFormTemplateSpec>

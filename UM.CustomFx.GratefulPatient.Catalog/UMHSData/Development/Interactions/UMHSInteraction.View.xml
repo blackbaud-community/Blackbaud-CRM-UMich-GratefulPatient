@@ -1,0 +1,162 @@
+<ViewDataFormTemplateSpec 
+    xmlns="bb_appfx_viewdataformtemplate"
+    xmlns:c="bb_appfx_commontypes"
+    ID="fc825438-2a74-43a7-b417-0deb017eb863"
+    Name="MIMED Interaction View Data Form"
+    Description="A data form for viewing MIMED interaction records."
+    Author="UM Dev"
+    DataFormInstanceID="a20b702c-9466-42aa-9cc0-5060a9036f28"
+    RecordType="MIMED Interaction"
+    c:SecurityUIFolder="MIMED Data"
+    >
+
+	<!-- define the SP that returns the data used by the form -->
+	<SPDataForm SPName="USR_USP_UMHS_DATAFORMTEMPLATE_VIEW_INTERACTIONDETAIL">
+		<c:CreateProcedureSQL>
+			<![CDATA[
+create procedure dbo.USR_USP_UMHS_DATAFORMTEMPLATE_VIEW_INTERACTIONDETAIL
+				(
+					@ID uniqueidentifier,
+					@PARTICIPANTS nvarchar(max) = null output,          
+					@COMMENT nvarchar(max) = null output,
+					@BELONGSTO nvarchar(700) = null output,
+					@DATALOADED bit = 0 output,
+					@EXPECTEDDATE datetime = null output,
+					@ACTUALDATE datetime = null output,
+					@STATUS nvarchar(100) = null output,
+					@OBJECTIVE nvarchar(100) = null output,
+					@OWNER nvarchar(154) = null output,
+					@TYPE nvarchar(100) = null output,
+					@INTERACTIONCATEGORY nvarchar(100) = null output,
+					@INTERACTIONSUBCATEGORY nvarchar(100) = null output,
+					@SITES nvarchar(1024) = null output,
+          --@DEPARTMENTS xml = null output,
+					@EXPECTEDSTARTTIME dbo.UDT_HOURMINUTE = null output,
+					@EXPECTEDENDTIME dbo.UDT_HOURMINUTE = null output,
+					@TIMEZONE nvarchar(255) = null output,
+					@ACTUALSTARTTIME dbo.UDT_HOURMINUTE = null output,
+					@ACTUALENDTIME dbo.UDT_HOURMINUTE = null output,
+           @MSG  NVARCHAR(100) = NULL OUTPUT,
+          @CURRENTAPPUSERID  uniqueidentifier 
+				) as
+					set nocount on;
+					select					
+                @PARTICIPANTS = 
+							belongs.NAME + 
+								(select
+									case
+										when dbo.UDA_BUILDLIST(distinct NF.NAME) = '' then ''
+										else '; ' + dbo.UDA_BUILDLIST(distinct NF.NAME)
+									end
+								from dbo.USR_UMHS_INTERACTIONPARTICIPANT IP
+									outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(IP.CONSTITUENTID) NF
+								where IP.INTERACTIONID = @ID),
+						@COMMENT = i.COMMENTS,           
+						@BELONGSTO = belongs.NAME,
+						@DATALOADED = 1,
+						@EXPECTEDDATE = EXPECTEDDATE,
+						@ACTUALDATE = ACTUALDATE,
+						@STATUS = SC.DESCRIPTION,
+						@OBJECTIVE = i.SUMMARY,
+						@TYPE = INTERACTIONTYPECODE.[DESCRIPTION] ,
+						@OWNER = owns.NAME,
+						@INTERACTIONCATEGORY = ic.NAME,
+						@INTERACTIONSUBCATEGORY = isc.NAME,
+            @SITES = dbo.USR_UFN_UMHS_INTERACTION_GETSITELIST(I.ID),
+            --@DEPARTMENTS = DBO.USR_UFN_UMHS_INTERACTION_GETDEPT_TOITEMLISTXML(I.ID),
+						@EXPECTEDSTARTTIME = I.EXPECTEDSTARTTIME,
+						@EXPECTEDENDTIME = I.EXPECTEDENDTIME,
+						@TIMEZONE = (select DISPLAYNAME from TIMEZONEENTRY where TIMEZONEENTRY.ID = I.TIMEZONEENTRYID),
+						@ACTUALSTARTTIME = I.ACTUALSTARTTIME,
+						@ACTUALENDTIME = I.ACTUALENDTIME
+					from dbo.USR_UMHS_INTERACTION i
+						outer apply dbo.USR_UFN_UMHS_DISPLAYNAME(i.UMHSID) belongs
+						outer apply dbo.UFN_CONSTITUENT_DISPLAYNAME(i.FUNDRAISERID) owns
+						left join dbo.INTERACTIONSUBCATEGORY isc on i.INTERACTIONSUBCATEGORYID = isc.ID
+						left join dbo.INTERACTIONCATEGORY ic on isc.INTERACTIONCATEGORYID = ic.ID
+            left join dbo.INTERACTIONTYPECODE on i.CONTACTMETHODCODEID = INTERACTIONTYPECODE.ID            
+            LEFT JOIN USR_INTERACTION_STATUSCODE SC ON SC.ID = I.STATUSCODEID
+            
+					where I.ID = @ID
+          
+          /* --Audit code start */
+	DECLARE @USERNAME VARCHAR(100)
+	DECLARE @DISPLAYNAME VARCHAR(100)
+	DECLARE @NAME VARCHAR(200)
+	DECLARE @EVENTMESSAGE VARCHAR(1000)
+	DECLARE @PID VARCHAR(100)
+	DECLARE @PATIENTONLY BIT
+	DECLARE @PATIENTSECURITY VARCHAR(100)
+  
+	SELECT @USERNAME = USERNAME
+	             ,@DISPLAYNAME = DISPLAYNAME
+		FROM APPUSER 
+	WHERE ID = @CURRENTAPPUSERID
+  	SELECT @NAME = NAME
+	             ,@PID = LOOKUPID
+	              FROM CONSTITUENT
+	inner join USR_UMHS_DATA gp on gp.CONSTITUENTID = CONSTITUENT.ID
+		 WHERE CONSTITUENT.ID = @ID
+
+                DECLARE @CHANGEAGENTID UNIQUEIDENTIFIER
+
+                IF @CHANGEAGENTID is null
+                EXEC dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+  
+                Declare @PAGEID uniqueidentifier ='88159265-2b7e-4c7b-82a2-119d01ecd40f' --Constituent Page
+				        Declare @TABID uniqueidentifier ='d797ffd4-d395-4574-8028-448cced5c31b' --MIMED Data
+				        Declare @SUBTABID uniqueidentifier ='e2980b90-93c0-4d24-9907-148bc61a3d34' --MIMED Developmnet subtab
+				
+              --Insert in to log table for auditing purpose.
+                INSERT INTO dbo.USR_UMHS_MIMEDTABVIEWLOG(APPUSERID,PAGEID, TABID, SUBTABID, CONTEXTRECORDID, ISPATIENTVIEW, ADDEDBYID, CHANGEDBYID,DATEADDED, DATECHANGED )
+		            VALUES
+		            ( @CURRENTAPPUSERID,@PAGEID,@TABID,@SUBTABID, @ID, 1,  @CHANGEAGENTID , @CHANGEAGENTID, GETDATE(), GETDATE()  )  
+
+              --ADD TO EVENT VIEWER --commenting for now.
+               -- SET @EVENTMESSAGE = 'Username: ' + @USERNAME + ' Displayname: ' + @DISPLAYNAME + ' viewed ' + @NAME + ' PID - ' + @PID + '  GP tab.  This record is a ' + @PATIENTSECURITY
+                -- EXEC master.dbo.xp_logevent 60000, @EVENTMESSAGE, informational
+                
+                 -- declare @Msg as varchar(100)
+              set @Msg =  'Your View of MIMED Info Data has been logged! '
+            /* --Audit code end */
+			]]>
+		</c:CreateProcedureSQL>
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the context @ID, @DATALOADED, and @CURRENTAPPUSERID need not be listed. -->
+	<c:FormMetaData>
+    <c:FormFields>
+      <c:FormField FieldID="PARTICIPANTS" Caption="Participants" CaptionResourceKey="$$participants" />
+      <c:FormField FieldID="COMMENT" Caption="Comments" CaptionResourceKey="$$comment" />    
+      <c:FormField FieldID="BELONGSTO" MaxLength="700" Caption="Belongs to" CaptionResourceKey="$$belongs_to" />
+      <c:FormField FieldID="EXPECTEDDATE" DataType="Date" Caption="Expected date" CaptionResourceKey="$$expected_date" />
+      <c:FormField FieldID="ACTUALDATE" DataType="Date" Caption="Actual date" CaptionResourceKey="$$actual_date" />
+      <c:FormField FieldID="OBJECTIVE" MaxLength="100" Caption="Summary" CaptionResourceKey="$$summary" />
+      <c:FormField FieldID="STATUS" MaxLength="100" Caption="Status" CaptionResourceKey="$$status" />
+      <c:FormField FieldID="OWNER" MaxLength="154" Caption="Owner" CaptionResourceKey="$$owner" />
+      <c:FormField FieldID="TYPE" MaxLength="100" Caption="Contact method" CaptionResourceKey="$$contact_method" />
+      <c:FormField FieldID="INTERACTIONCATEGORY" MaxLength="100" Caption="Category" CaptionResourceKey="$$category" />
+      <c:FormField FieldID="INTERACTIONSUBCATEGORY" MaxLength="100" Caption="Subcategory" CaptionResourceKey="$$subcategory" />     
+      <c:FormField FieldID="SITES" MaxLength="1024" Caption="Sites" CaptionResourceKey="$$sites"></c:FormField>
+      <c:FormField FieldID="EXPECTEDSTARTTIME" DataType="HourMinute" Caption="Expected start time" CaptionResourceKey="$$expected_start_time" />
+      <c:FormField FieldID="EXPECTEDENDTIME" DataType="HourMinute" Caption="Expected end time" CaptionResourceKey="$$expected_end_time" />
+      <c:FormField FieldID="TIMEZONE" MaxLength="255" Caption="Time zone" CaptionResourceKey="$$time_zone" />
+      <c:FormField FieldID="ACTUALSTARTTIME" DataType="HourMinute" Caption="Actual start time" CaptionResourceKey="$$actual_start_time" />
+      <c:FormField FieldID="ACTUALENDTIME" DataType="HourMinute" Caption="Actual end time" CaptionResourceKey="$$actual_end_time" />
+      <c:FormField FieldID="MSG" Caption="Message" DataType="String" MaxLength="100"  />
+    </c:FormFields>
+
+        <c:WebUIComponent>
+            <c:UIModel AssemblyName="UM.CustomFx.GratefulPatient.UIModel.dll" ClassName="UM.CustomFx.GratefulPatient.UIModel.UMHSInteractionViewDataFormUIModel" />
+            <c:WebUI>
+              <c:ExternalResource Url="browser/htmlforms/custom/um.customfx.gratefulpatient/UMHSInteractionsViewForm.html" />
+            </c:WebUI>
+        </c:WebUIComponent>
+
+    
+    
+    
+  </c:FormMetaData>
+
+</ViewDataFormTemplateSpec>

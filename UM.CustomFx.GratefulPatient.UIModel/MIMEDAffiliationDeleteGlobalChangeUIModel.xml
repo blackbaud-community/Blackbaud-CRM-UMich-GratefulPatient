@@ -1,0 +1,10 @@
+﻿<UIModelWizardMetadata>
+  <SpecFileName>Delete.MIMEDAffiliations.GlobalChange.xml</SpecFileName>
+  <Namespace></Namespace>
+  <ClassName>MIMEDAffiliationDeleteGlobalChangeUIModel</ClassName>
+  <HtmlInfo GenerateHtml="true">
+    <HtmlFile>MIMEDAffiliationDeleteGlobalChange.html</HtmlFile>
+    <HtmlFolder>htmlforms\custom\um.customfx.gratefulpatient\</HtmlFolder>
+  </HtmlInfo>
+  <GenerateFromDatabase>true</GenerateFromDatabase>
+</UIModelWizardMetadata>

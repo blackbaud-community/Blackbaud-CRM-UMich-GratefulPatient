@@ -1,0 +1,11 @@
+﻿<CodeTableSpec 
+	xmlns="bb_appfx_codetable" 
+	xmlns:c="bb_appfx_commontypes"
+	ID="dc4d522e-89bb-4c77-973e-c4779b82f685" 
+	Name="MIMED Data Referrer Role"
+	Description="Stores translations for MIMED Data referrer role codes"
+	Author="UM Dev"
+	DBTablename="USR_UMHS_REFERRERROLECODE"
+	Category="MIMED Data"
+	SortMethod="Alpha"
+/>

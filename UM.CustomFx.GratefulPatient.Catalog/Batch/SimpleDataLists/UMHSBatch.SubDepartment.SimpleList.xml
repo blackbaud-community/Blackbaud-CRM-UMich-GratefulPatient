@@ -1,0 +1,23 @@
+﻿<SimpleDataListSpec
+	xmlns="bb_appfx_simpledatalist"
+	xmlns:c="bb_appfx_commontypes"
+	ID="287fe463-4ca5-40e7-8064-3df34dd15864"
+	Name="MIMED Batch Simple Data List for Sub-Departments"
+	Description="MIMED Batch Simple Data List for Sub-Departments"
+	Author="UM Dev"
+	>
+
+	<SPSimpleList SPName="USR_USP_SIMPLEDATALIST_UMHSBATCH_SUBDEPARTMENT">
+		<c:CreateProcedureSQL >
+			<![CDATA[
+create procedure dbo.USR_USP_SIMPLEDATALIST_UMHSBATCH_SUBDEPARTMENT as
+    select
+	     ID as [VALUE]
+	    ,NAME as [LABEL]
+    from dbo.USR_UMHS_SUBDEPARTMENT
+    order by NAME
+			]]>
+		</c:CreateProcedureSQL>
+	</SPSimpleList>
+
+</SimpleDataListSpec>

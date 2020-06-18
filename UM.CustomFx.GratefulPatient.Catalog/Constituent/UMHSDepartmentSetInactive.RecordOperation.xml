@@ -1,0 +1,78 @@
+﻿<RecordOperationSpec 
+	xmlns="bb_appfx_recordoperation"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="3efaaa0a-af59-4b08-b25d-1cd5e1b95c0a" 
+	Name="MIMED department: Mark Inactive" 
+	Description="Set the MIMED department as inactive"
+	Author="UM Dev"
+	OperationType="Update"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+
+	<SPRecord>
+		<SPOperationImplementation SPName="USR_UM_USP_RECORDOPERATION_UMHSDEPARTMENTSETINACTIVE">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+          create procedure dbo.USR_UM_USP_RECORDOPERATION_UMHSDEPARTMENTSETINACTIVE
+         (
+					@ID uniqueidentifier,
+					@CHANGEAGENTID uniqueidentifier = null
+				)
+				as
+					set nocount on;
+					
+					if @CHANGEAGENTID is null  
+						exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output;
+					
+					update
+						dbo.USR_UMHS_DEPARTMENT
+					set
+						ISINACTIVE = 1,
+						CHANGEDBYID = @CHANGEAGENTID,
+						DATECHANGED = getdate()
+					where
+						USR_UMHS_DEPARTMENT.ID = @ID;
+	          return 0;
+	
+          
+				]]>
+			</c:CreateProcedureSQL>
+		</SPOperationImplementation>
+	</SPRecord>
+
+	<!-- optionally, offer a prompt before executing the record operation -->
+	<Prompt>
+    <StandardPrompt Text="Are you sure you want to mark &quot;{0}&quot; inactive?" >
+      <PromptData>
+        <Arguments>
+          <Argument>Name</Argument>
+        </Arguments>
+        <Provider SPName="USR_UM_USP_RECORDOPERATION_UMHSDEPARTMENTMARKINACTIVEPROMPT">
+          <c:CreateProcedureSQL>
+            <![CDATA[
+                create procedure dbo.USR_UM_USP_RECORDOPERATION_UMHSDEPARTMENTMARKINACTIVEPROMPT
+                (
+                    @ID uniqueidentifier,
+                    @NAME nvarchar(100) output
+                )
+                as
+                set nocount on;
+
+                select
+                  @NAME = NAME
+                from
+                  dbo.USR_UMHS_DEPARTMENT
+                where
+                  ID = @ID;
+              
+                  return 0; 
+                     
+				]]>
+          </c:CreateProcedureSQL>
+        </Provider>
+      </PromptData>
+    </StandardPrompt>
+	</Prompt>
+
+</RecordOperationSpec>

@@ -1,0 +1,179 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes"
+	ID="043da6af-e440-4492-8d9f-7feb921806c2"
+	Name="USR_USP_UMHS_CONSTITUENTDUPLICATESEARCHRESOLUTION"
+	Description="USR_USP_UMHS_CONSTITUENTDUPLICATESEARCHRESOLUTION"
+	Author="UM Dev"
+	SPName="USR_USP_UMHS_CONSTITUENTDUPLICATESEARCHRESOLUTION" 
+  GrantServiceRolePermission="true"
+	>
+
+  <CreateProcedureSQL>
+    <![CDATA[
+create procedure dbo.USR_USP_UMHS_CONSTITUENTDUPLICATESEARCHRESOLUTION
+(
+	@BATCHCONSTITUENTID uniqueidentifier,
+	@BATCHID uniqueidentifier = null output,
+	@NAME nvarchar(154) = null output,
+	@LASTNAME nvarchar(100) = null output,
+	@FIRSTNAME nvarchar(50) = null output,
+	@MIDDLENAME nvarchar(50) = null output,
+	@PHONETYPECODEID uniqueidentifier = null output,
+	@EMAILADDRESSTYPECODEID uniqueidentifier = null output,
+	@ADDRESSTYPECODEID uniqueidentifier = null output,
+	@ADDRESS_COUNTRYID uniqueidentifier = null output,
+	@ADDRESS_ADDRESSBLOCK nvarchar(150) = null output,
+	@ADDRESS_CITY nvarchar(50) = null output,
+	@ADDRESS_STATEID uniqueidentifier = null output,
+	@ADDRESS_POSTCODE nvarchar(12) = null output,
+	@PHONENUMBER nvarchar(100) = null output,
+	@ADDRESS_TYPECODEID uniqueidentifier = null output,
+	@EMAILADDRESS dbo.UDT_EMAILADDRESS = null output
+          
+/*                    
+          @SUFFIXCODEID uniqueidentifier = null output,
+					@TITLECODEID uniqueidentifier = null output,
+					@BATCHNUMBER nvarchar(100) = null output,
+					@CREATEDON date = null output
+					
+					@BIRTHDATE dbo.UDT_FUZZYDATE = null output,
+					@BATCHID uniqueidentifier = null output,
+					@BATCHTYPE int = null output,
+					@DATALOADED bit = 0 output,
+					
+					@PRIMARYRECORDID uniqueidentifier = null output,
+					@BATCHROWID uniqueidentifier = null output,
+					@NAMECODE tinyint = null output,
+					@SIMILARADDRESSCODE tinyint = null output,
+					@UNSIMILARADDRESSCODE tinyint = null output,
+					@NEWADDRESSPRIMARYCODE tinyint = null output,          
+					@DIFFERENTPHONECODE tinyint = null output,
+					@NEWPHONEPRIMARYCODE tinyint = null output,
+					@DIFFERENTEMAILCODE tinyint = null output,
+					@NEWEMAILPRIMARYCODE tinyint = null output,
+					@BIRTHDATERULECODE tinyint = null output,
+					@INCOMINGADDRESSID uniqueidentifier = null output,
+					@INCOMINGEMAILID uniqueidentifier = null output,
+					@INCOMINGPHONEID uniqueidentifier = null output,
+					@MAIDENNAME nvarchar(100) = null output,
+					@NICKNAME nvarchar(50) = null output,
+					@GENDERCODE tinyint = null output,
+					@DECEASED bit = null output,
+					@DECEASEDDATE dbo.UDT_FUZZYDATE = null output,
+					@GIVESANONYMOUSLY bit = null output,
+					@MARITALSTATUSCODEID uniqueidentifier = null output,
+					@WEBADDRESS dbo.UDT_WEBADDRESS = null output,
+					@ADDRESSHISTORICALSTARTDATE date = null output,
+					@ADDRESSHISTORICALENDDATE date = null output,
+					@ADDRESSDONOTMAIL bit = null output,
+					@ADDRESSDONOTMAILREASONCODEID uniqueidentifier = null output,
+					@ADDRESSSTARTDATE dbo.UDT_MONTHDAY = null output,
+					@ADDRESSENDDATE dbo.UDT_MONTHDAY = null output,
+					@ADDRESSDPC nvarchar(max) = null output,
+					@ADDRESSCART nvarchar(max) = null output,
+					@ADDRESSLOT nvarchar(5) = null output,
+					@ADDRESSINFOSOURCECODEID uniqueidentifier = null output,
+					@ADDRESSINFOSOURCECOMMENTS nvarchar(256) = null output,
+					@ADDRESSCOUNTYCODEID uniqueidentifier = null output,
+					@ADDRESSREGIONCODEID uniqueidentifier = null output,
+					@ADDRESSCONGRESSIONALDISTRICTCODEID uniqueidentifier = null output,
+					@ADDRESSSTATEHOUSEDISTRICTCODEID uniqueidentifier = null output,
+					@ADDRESSSTATESENATEDISTRICTCODEID uniqueidentifier = null output,
+					@ADDRESSLOCALPRECINCTCODEID uniqueidentifier = null output,
+					@ADDRESSCERTIFICATIONDATA int = null output,
+					@ADDRESSLASTVALIDATIONATTEMPTDATE date = null output,
+					@ADDRESSOMITFROMVALIDATION bit = null output,
+					@ADDRESSVALIDATIONMESSAGE nvarchar(200) = null output,
+					@PHONEDONOTCALL bit = 0 output,
+					@PHONESTARTTIME dbo.UDT_HOURMINUTE = null output,
+					@PHONEENDTIME dbo.UDT_HOURMINUTE = null output,
+					@PHONEINFOSOURCECODEID uniqueidentifier = null output,
+					@PHONECOUNTRYID uniqueidentifier = null output,
+					@PHONESTARTDATE date = null output,
+					@PHONEENDDATE date = null output,
+					@PHONESEASONALSTARTDATE dbo.UDT_MONTHDAY = null output,
+					@PHONESEASONALENDDATE dbo.UDT_MONTHDAY = null output,
+					@EMAILADDRESSDONOTEMAIL bit = null output,
+					@EMAILADDRESSINFOSOURCECODEID uniqueidentifier = null output,
+					@EMAILADDRESSSTARTDATE date = null output,
+					@EMAILADDRESSENDDATE date = null output,
+					@NAMEFORMATS xml = null output,
+					@ADDRESSISPRIMARY bit = null output,
+					@PHONEISPRIMARY bit = null output,
+					@EMAILISPRIMARY bit = null output,
+					@CONSTITUENCIES xml = null output,
+          @ORIGINAL_KEYNAME nvarchar(100) = null output,
+          @ORIGINAL_FIRSTNAME nvarchar(50) = null output
+          */
+				)
+				as
+					set nocount on
+				begin
+
+					select
+            					@BATCHID = UMHS.BATCHID,
+						@NAME = (CASE FIRSTNAME WHEN '' THEN '' ELSE FIRSTNAME + ' ' END
+									+
+									CASE MIDDLENAME WHEN '' THEN '' ELSE LEFT(MIDDLENAME,1) + '. ' END
+									+ 
+									LASTNAME),
+						@LASTNAME = UMHS.LASTNAME,
+						@FIRSTNAME = UMHS.FIRSTNAME,
+						@MIDDLENAME = UMHS.MIDDLENAME,
+						@ADDRESS_ADDRESSBLOCK = UMHS.ADDRESSBLOCK,
+						@ADDRESS_CITY = UMHS.CITY,
+						@ADDRESS_STATEID = UMHS.STATEID,
+						@ADDRESS_POSTCODE = UMHS.POSTCODE,
+						@PHONENUMBER = UMHS.PHONE,
+						@PHONETYPECODEID = UMHS.PHONETYPECODEID,
+						@EMAILADDRESS = UMHS.EMAILADDRESS,
+						@EMAILADDRESSTYPECODEID = UMHS.EMAILADDRESSTYPECODEID,
+						@ADDRESS_TYPECODEID = UMHS.ADDRESSTYPECODEID
+						
+/*          
+            @TITLECODEID = UMHS.TITLECODEID
+            @SUFFIXCODEID = UMHS.SUFFIXCODEID,            
+						@ADDRESS_COUNTRYID = UMHS.COUNTRYID,            
+            @BATCHNUMBER = B.BATCHNUMBER,
+						@CREATEDON = B.DATEADDED
+						@BIRTHDATE = UMHS.BIRTHDATE,
+						@BATCHID = B.ID,
+						@BATCHTYPE = 1, --case when BR.ID is not null then 0 else 1 end, -- CUB or ERB
+						@DATALOADED = 1,
+						@PRIMARYRECORDID = UMHS.CONSTITUENTID, --PRIMARYRECORDID,
+            @NAMECODE =  1, --coalesce(BR.NAMECODE,UMHS.NAMECODE),          
+            @SIMILARADDRESSCODE = 3, --coalesce(BR.SIMILARADDRESSCODE,UMHS.SIMILARADDRESSCODE),
+            @UNSIMILARADDRESSCODE = 3, --coalesce(BR.UNSIMILARADDRESSCODE,UMHS.UNSIMILARADDRESSCODE),
+            @NEWADDRESSPRIMARYCODE = 1, --coalesce(BR.NEWADDRESSPRIMARYCODE,UMHS.NEWADDRESSPRIMARYCODE),          
+            @DIFFERENTPHONECODE = 3, --coalesce(BR.DIFFERENTPHONECODE,UMHS.DIFFERENTPHONECODE),      
+            @NEWPHONEPRIMARYCODE = 1, --coalesce(BR.NEWPHONEPRIMARYCODE,UMHS.NEWPHONEPRIMARYCODE),
+            @DIFFERENTEMAILCODE = 3, --coalesce(BR.DIFFERENTEMAILCODE,UMHS.DIFFERENTEMAILCODE),        
+            @NEWEMAILPRIMARYCODE = 1, --coalesce(BR.NEWEMAILPRIMARYCODE,UMHS.NEWEMAILPRIMARYCODE),
+            @BIRTHDATERULECODE = 0, --coalesce(BR.BIRTHDATERULECODE, UMHS.BIRTHDATERULECODE),
+		        @INCOMINGADDRESSID = UMHSA.ID,
+		        @INCOMINGEMAILID = UMHS.ID,
+		        @INCOMINGPHONEID = UMHS.ID,          
+            @MAIDENNAME = '', --UMHS.MAIDENNAME,
+            @NICKNAME = '', --UMHS.NICKNAME,
+            @GENDERCODE = UMHS.GENDERCODE,
+            @ADDRESSCOUNTYCODEID = UMHS.COUNTYCODEID,
+            @ADDRESSOMITFROMVALIDATION = UMHS.OMITFROMVALIDATION,
+            @ADDRESSVALIDATIONMESSAGE = UMHS.VALIDATIONMESSAGE,
+            @PHONECOUNTRYID = UMHS.PHONE_COUNTRYID,
+            @PHONEINFOSOURCECODEID = UMHSP.INFOSOURCECODEID,
+            @EMAILADDRESSDONOTEMAIL = UMHSE.DONOTEMAIL,
+            @EMAILADDRESSSTARTDATE = UMHSE.STARTDATE,
+            @EMAILADDRESSENDDATE = UMHSE.ENDDATE,
+            @EMAILADDRESSINFOSOURCECODEID = UMHSE.INFOSOURCECODEID,
+            @ORIGINAL_KEYNAME = '', --UMHS.ORIGINAL_KEYNAME,
+            @ORIGINAL_FIRSTNAME = '' --UMHS.ORIGINAL_FIRSTNAME
+*/            
+					FROM DBO.USR_UMHS_BATCH UMHS
+					  INNER JOIN DBO.BATCH B ON B.ID = UMHS.BATCHID
+					WHERE UMHS.BATCHCONSTITUENTID = @BATCHCONSTITUENTID
+				end
+		]]>
+  </CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

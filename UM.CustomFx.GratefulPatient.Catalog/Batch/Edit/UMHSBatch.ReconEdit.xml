@@ -1,0 +1,630 @@
+﻿<EditDataFormTemplateSpec 
+	xmlns="bb_appfx_editdataformtemplate"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="00B51100-70ED-4BB4-890D-123C8B2C1BC3" 
+	Name="MIMED Batch Edit Recon Data Form"
+	Description="A data form for editing MIMED recon batch records" 
+	Author="UM Dev"
+	DataFormInstanceID="4417055D-0EFD-4F02-AF00-EA24CD901E7E" 
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Batch"
+	FormHeader="Edit an MIMED batch"
+	>
+	<SPDataForm>
+		<!-- define the edit load SP, which is used to load the data for the form -->
+		<LoadImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH_RECON">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDITLOAD_UMHSBATCH_RECON
+(
+     @ID uniqueidentifier
+    ,@BATCHCONSTITUENTID UNIQUEIDENTIFIER = NULL OUTPUT
+    ,@BATCHID UNIQUEIDENTIFIER = NULL OUTPUT
+    ,@DATALOADED bit = 0  output
+    ,@TSLONG bigint = 0 output
+    ,@SEQUENCE int = null  output
+    -- Batch fields
+    ,@CONSTITUENTID uniqueidentifier = null output    -- Primary Record ID
+    ,@MRN           nvarchar(50) = null output
+    ,@CPISEQUENCE   nvarchar(50) = null output
+    ,@CONSTITUENTLOOKUPID nvarchar(200) = null output
+    ,@FIRSTNAME     nvarchar(50) = null output
+    ,@MIDDLENAME    nvarchar(50) = null output
+    ,@LASTNAME      nvarchar(100) = null output
+    ,@BIRTHDATE     udt_fuzzydate = null output
+    ,@ADDRESSBLOCK       nvarchar(500) = null output
+    ,@CITY          nvarchar(100) = null output
+    ,@STATEID   uniqueidentifier  = null output
+    ,@POSTCODE       nvarchar(24) = null output
+    ,@ADDRESSCOUNTRYID uniqueidentifier = null output
+    ,@ADDRESSTYPECODEID uniqueidentifier = null output
+    ,@INFOSOURCECODEID uniqueidentifier = null output
+    ,@HISTORICALSTARTDATE date = null output
+    ,@PHONE nvarchar(200) = null output
+    ,@PHONETYPECODEID uniqueidentifier = null output
+    ,@PHONE_COUNTRYID uniqueidentifier = null output
+    ,@PHONE_OTHER nvarchar(200) = null output
+    ,@PHONE_OTHERTYPECODEID uniqueidentifier = null output
+    ,@PHONE_OTHER_COUNTRYID uniqueidentifier = null output
+    ,@PHONESTARTDATE date = null output
+    ,@EMAILADDRESS  udt_emailaddress = null output  
+    ,@EMAILADDRESSTYPECODEID uniqueidentifier = null output 
+    ,@EMAILADDRESSSTARTDATE date = null output
+    ,@GENDERCODE    tinyint  = null output
+    ,@WEBADDRESS NVARCHAR(100) = null output,
+     @LOOKUPID                           NVARCHAR(50) = NULL OUTPUT,
+    @SUFFIXCODEID                       UNIQUEIDENTIFIER = NULL OUTPUT,
+    @TITLECODEID                        UNIQUEIDENTIFIER = NULL OUTPUT,
+    @MAIDENNAME                         NVARCHAR(100) = NULL OUTPUT,
+    @NICKNAME                           NVARCHAR(50) = NULL OUTPUT,
+    @ADDRESSID                          UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESS_ADDRESSBLOCK               NVARCHAR(150) = NULL OUTPUT,
+    @ADDRESS_CITY                       NVARCHAR(50) = NULL OUTPUT,
+    @ADDRESS_POSTCODE                   NVARCHAR(12) = NULL OUTPUT,
+    @ADDRESS_COUNTRYID                  UNIQUEIDENTIFIER = NULL OUTPUT,
+    @PHONEID                            UNIQUEIDENTIFIER = NULL OUTPUT,
+    @PHONENUMBER                        NVARCHAR(100) = NULL OUTPUT,
+    @EMAILID                            UNIQUEIDENTIFIER = NULL OUTPUT,
+    @CREATEDON                          DATETIME = NULL OUTPUT,
+    @DATECHANGED                        DATETIME = NULL OUTPUT,
+    @SPOUSENAME                         NVARCHAR(154) = NULL OUTPUT,
+    @SPOUSELOOKUPID                     NVARCHAR(50) = NULL OUTPUT,
+    @SPOUSESTARTDATE                    DATETIME = NULL OUTPUT,
+    @SPOUSEENDDATE                      DATETIME = NULL OUTPUT,
+    @HOUSEHOLDNAME                      NVARCHAR(154) = NULL OUTPUT,
+    @HOUSEHOLDLOOKUPID                  NVARCHAR(50) = NULL OUTPUT,
+    @BUSINESSNAME                       NVARCHAR(154) = NULL OUTPUT,
+    @BUSINESSLOOKUPID                   NVARCHAR(50) = NULL OUTPUT,
+    @CONSTITUENTACTION                  TINYINT = NULL OUTPUT,
+    @ADDRESSACTION                      TINYINT = NULL OUTPUT,
+    @EMAILACTION                        TINYINT = NULL OUTPUT,
+    @PHONEACTION                        TINYINT = NULL OUTPUT,
+    @ISORGANIZATION                     BIT = NULL OUTPUT,
+    @INDUSTRYCODEID                     UNIQUEIDENTIFIER = NULL OUTPUT,
+    @NUMEMPLOYEES                       INT = NULL OUTPUT,
+    @NUMSUBSIDIARIES                    INT = NULL OUTPUT,
+    @DECEASED                           BIT = NULL OUTPUT,
+    @DECEASEDDATE                       DBO.UDT_FUZZYDATE = NULL OUTPUT,
+    @GIVESANONYMOUSLY                   BIT = NULL OUTPUT,
+    @MARITALSTATUSCODEID                UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSHISTORICALSTARTDATE         DATE = NULL OUTPUT,
+    @ADDRESSHISTORICALENDDATE           DATE = NULL OUTPUT,
+    @ADDRESSDONOTMAIL                   BIT = NULL OUTPUT,
+    @ADDRESSDONOTMAILREASONCODEID       UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSSTARTDATE                   DBO.UDT_MONTHDAY = NULL OUTPUT,
+    @ADDRESSENDDATE                     DBO.UDT_MONTHDAY = NULL OUTPUT,
+    @ADDRESSDPC                         NVARCHAR(MAX) = NULL OUTPUT,
+    @ADDRESSCART                        NVARCHAR(MAX) = NULL OUTPUT,
+    @ADDRESSLOT                         NVARCHAR(5) = NULL OUTPUT,
+    @ADDRESSINFOSOURCECODEID            UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSINFOSOURCECOMMENTS          NVARCHAR(256) = NULL OUTPUT,
+    @ADDRESSCOUNTYCODEID                UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSREGIONCODEID                UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSCONGRESSIONALDISTRICTCODEID UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSSTATEHOUSEDISTRICTCODEID    UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSSTATESENATEDISTRICTCODEID   UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSLOCALPRECINCTCODEID         UNIQUEIDENTIFIER = NULL OUTPUT,
+    @ADDRESSCERTIFICATIONDATA           INT = NULL OUTPUT,
+    @ADDRESSLASTVALIDATIONATTEMPTDATE   DATE = NULL OUTPUT,
+    @ADDRESSOMITFROMVALIDATION          BIT = NULL OUTPUT,
+    @ADDRESSVALIDATIONMESSAGE           NVARCHAR(200) = NULL OUTPUT,
+    @PHONEDONOTCALL                     BIT = NULL OUTPUT,
+    @PHONESTARTTIME                     DBO.UDT_HOURMINUTE = NULL OUTPUT,
+    @PHONEENDTIME                       DBO.UDT_HOURMINUTE = NULL OUTPUT,
+    @PHONEINFOSOURCECODEID              UNIQUEIDENTIFIER = NULL OUTPUT,
+    @PHONECOUNTRYID                     UNIQUEIDENTIFIER = NULL OUTPUT,
+    @PHONEENDDATE                       DATE = NULL OUTPUT,
+    @PHONESEASONALSTARTDATE             DBO.UDT_MONTHDAY = NULL OUTPUT,
+    @PHONESEASONALENDDATE               DBO.UDT_MONTHDAY = NULL OUTPUT,
+    @EMAILADDRESSDONOTEMAIL             BIT = NULL OUTPUT,
+    @EMAILADDRESSINFOSOURCECODEID       UNIQUEIDENTIFIER = NULL OUTPUT,
+    @EMAILADDRESSENDDATE                DATE = NULL OUTPUT,
+    @DEFAULTCOUNTRYID                   UNIQUEIDENTIFIER = NULL OUTPUT,
+    @CONSTITUENCIES                     XML = NULL OUTPUT,
+    @ADDRESS_STATEID                    UNIQUEIDENTIFIER = null output,
+    @ADDRESSES                          XML = null output,
+    @PHONES                             XML = null output,
+    @EMAILS                             XML = null output
+)
+as
+
+	set nocount on;
+  
+	-- be sure to set these, in case the select returns no rows
+	set @DATALOADED = 0
+  set @TSLONG = 0
+  
+	-- populate the output parameters, which correspond to fields on the form.  Note that
+	-- we set @DATALOADED = 1 to indicate that the load was successful.  Otherwise, the system
+	-- will display a "no data loaded" message.  Also note that we fetch the TSLONG so that concurrency
+	-- can be considered.
+	select
+     @DATALOADED = 1
+		,@TSLONG = b.TSLONG
+    ,@CONSTITUENTID = b.CONSTITUENTID
+	  ,@SEQUENCE = b.SEQUENCE
+    ,@BATCHID = b.BATCHID
+    ,@MRN = b.MRN
+    ,@CPISEQUENCE= b.CPISEQUENCE
+    ,@CONSTITUENTLOOKUPID = c.LOOKUPID
+    ,@FIRSTNAME = b.FIRSTNAME
+    ,@MIDDLENAME = b.MIDDLENAME
+    ,@LASTNAME = b.LASTNAME
+    ,@BIRTHDATE = b.BIRTHDATE
+    ,@ADDRESSBLOCK = b.ADDRESSBLOCK
+    ,@CITY = b.CITY
+    ,@STATEID = b.STATEID
+    ,@POSTCODE = b.POSTCODE
+    ,@ADDRESSCOUNTRYID = b.ADDRESSCOUNTRYID
+    ,@ADDRESSTYPECODEID = b.ADDRESSTYPECODEID
+    ,@INFOSOURCECODEID = b.INFOSOURCECODEID
+    ,@HISTORICALSTARTDATE = b.HISTORICALSTARTDATE
+    ,@PHONE = b.PHONE
+    ,@PHONETYPECODEID = b.PHONETYPECODEID
+    ,@PHONE_COUNTRYID = b.PHONE_COUNTRYID
+    ,@PHONE_OTHER = b.PHONE_OTHER
+    ,@PHONE_OTHERTYPECODEID = b.PHONE_OTHERTYPECODEID
+    ,@PHONE_OTHER_COUNTRYID = b.PHONE_OTHER_COUNTRYID
+    ,@PHONESTARTDATE = b.PHONESTARTDATE
+    ,@EMAILADDRESS = b.EMAILADDRESS
+    ,@EMAILADDRESSTYPECODEID = b.EMAILADDRESSTYPECODEID
+    ,@EMAILADDRESSSTARTDATE = b.EMAILADDRESSSTARTDATE
+    ,@GENDERCODE = b.GENDERCODE
+	from dbo.USR_UMHS_BATCH b
+  left outer join dbo.CONSTITUENT c on c.ID=b.CONSTITUENTID
+	where b.BATCHCONSTITUENTID = @ID
+
+	return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</LoadImplementation>
+
+		<SaveImplementation SPName="USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH_RECON">
+			<c:CreateProcedureSQL>
+				<![CDATA[
+create procedure dbo.USR_USP_DATAFORMTEMPLATE_EDIT_UMHSBATCH_RECON 
+(
+     @ID uniqueidentifier
+    ,@BATCHCONSTITUENTID UNIQUEIDENTIFIER
+    ,@CHANGEAGENTID uniqueidentifier
+    ,@SEQUENCE int
+    -- Batch fields
+    ,@CONSTITUENTID uniqueidentifier    -- Primary Record ID
+    ,@MRN nvarchar(50)
+    ,@CPISEQUENCE nvarchar(50)
+    ,@CONSTITUENTLOOKUPID nvarchar(200)
+    ,@FIRSTNAME nvarchar(50)
+    ,@MIDDLENAME nvarchar(50)
+    ,@LASTNAME nvarchar(100)
+    ,@BIRTHDATE udt_fuzzydate
+    ,@ADDRESSBLOCK nvarchar(500)
+    ,@CITY nvarchar(100)
+    ,@STATEID uniqueidentifier
+    ,@POSTCODE nvarchar(24)
+    ,@ADDRESSCOUNTRYID uniqueidentifier
+    ,@ADDRESSTYPECODEID uniqueidentifier
+    ,@INFOSOURCECODEID uniqueidentifier
+    ,@HISTORICALSTARTDATE date
+    ,@PHONE nvarchar(200)
+    ,@PHONETYPECODEID uniqueidentifier
+    ,@PHONE_COUNTRYID uniqueidentifier
+    ,@PHONE_OTHER nvarchar(200)
+    ,@PHONE_OTHERTYPECODEID uniqueidentifier
+    ,@PHONE_OTHER_COUNTRYID uniqueidentifier
+    ,@PHONESTARTDATE date
+    ,@EMAILADDRESS  udt_emailaddress  
+    ,@EMAILADDRESSTYPECODEID uniqueidentifier 
+    ,@EMAILADDRESSSTARTDATE date
+    ,@GENDERCODE tinyint,
+    @LOOKUPID                           NVARCHAR(50),
+    @SUFFIXCODEID                       UNIQUEIDENTIFIER,
+    @TITLECODEID                        UNIQUEIDENTIFIER,
+    @MAIDENNAME                         NVARCHAR(100),
+    @NICKNAME                           NVARCHAR(50),
+    @ADDRESSID                          UNIQUEIDENTIFIER,
+    @ADDRESS_ADDRESSBLOCK               NVARCHAR(150),
+    @ADDRESS_CITY                       NVARCHAR(50),
+    @ADDRESS_POSTCODE                   NVARCHAR(12),
+    @ADDRESS_COUNTRYID                  UNIQUEIDENTIFIER,
+    @PHONEID                            UNIQUEIDENTIFIER,
+    @PHONENUMBER                        NVARCHAR(100),
+    @EMAILID                            UNIQUEIDENTIFIER,
+    @CREATEDON                          DATETIME,
+    @DATECHANGED                        DATETIME,
+    @SPOUSENAME                         NVARCHAR(154),
+    @SPOUSELOOKUPID                     NVARCHAR(50),
+    @SPOUSESTARTDATE                    DATETIME,
+    @SPOUSEENDDATE                      DATETIME,
+    @HOUSEHOLDNAME                      NVARCHAR(154),
+    @HOUSEHOLDLOOKUPID                  NVARCHAR(50),
+    @BUSINESSNAME                       NVARCHAR(154),
+    @BUSINESSLOOKUPID                   NVARCHAR(50),
+    @CONSTITUENTACTION                  TINYINT,
+    @ADDRESSACTION                      TINYINT,
+    @EMAILACTION                        TINYINT,
+    @PHONEACTION                        TINYINT,
+    @ISORGANIZATION                     BIT,
+    @INDUSTRYCODEID                     UNIQUEIDENTIFIER,
+    @NUMEMPLOYEES                       INT,
+    @NUMSUBSIDIARIES                    INT,
+    @DECEASED                           BIT,
+    @DECEASEDDATE                       DBO.UDT_FUZZYDATE,
+    @GIVESANONYMOUSLY                   BIT,
+    @MARITALSTATUSCODEID                UNIQUEIDENTIFIER,
+    @WEBADDRESS                         DBO.UDT_WEBADDRESS,
+    @ADDRESSHISTORICALSTARTDATE         DATE,
+    @ADDRESSHISTORICALENDDATE           DATE,
+    @ADDRESSDONOTMAIL                   BIT,
+    @ADDRESSDONOTMAILREASONCODEID       UNIQUEIDENTIFIER,
+    @ADDRESSSTARTDATE                   DBO.UDT_MONTHDAY,
+    @ADDRESSENDDATE                     DBO.UDT_MONTHDAY,
+    @ADDRESSDPC                         NVARCHAR(MAX),
+    @ADDRESSCART                        NVARCHAR(MAX),
+    @ADDRESSLOT                         NVARCHAR(5),
+    @ADDRESSINFOSOURCECODEID            UNIQUEIDENTIFIER,
+    @ADDRESSINFOSOURCECOMMENTS          NVARCHAR(256),
+    @ADDRESSCOUNTYCODEID                UNIQUEIDENTIFIER,
+    @ADDRESSREGIONCODEID                UNIQUEIDENTIFIER,
+    @ADDRESSCONGRESSIONALDISTRICTCODEID UNIQUEIDENTIFIER,
+    @ADDRESSSTATEHOUSEDISTRICTCODEID    UNIQUEIDENTIFIER,
+    @ADDRESSSTATESENATEDISTRICTCODEID   UNIQUEIDENTIFIER,
+    @ADDRESSLOCALPRECINCTCODEID         UNIQUEIDENTIFIER,
+    @ADDRESSCERTIFICATIONDATA           INT,
+    @ADDRESSLASTVALIDATIONATTEMPTDATE   DATE,
+    @ADDRESSOMITFROMVALIDATION          BIT,
+    @ADDRESSVALIDATIONMESSAGE           NVARCHAR(200),
+    @PHONEDONOTCALL                     BIT,
+    @PHONESTARTTIME                     DBO.UDT_HOURMINUTE,
+    @PHONEENDTIME                       DBO.UDT_HOURMINUTE,
+    @PHONEINFOSOURCECODEID              UNIQUEIDENTIFIER,
+    @PHONECOUNTRYID                     UNIQUEIDENTIFIER,
+    @PHONEENDDATE                       DATE,
+    @PHONESEASONALSTARTDATE             DBO.UDT_MONTHDAY,
+    @PHONESEASONALENDDATE               DBO.UDT_MONTHDAY,
+    @EMAILADDRESSDONOTEMAIL             BIT,
+    @EMAILADDRESSINFOSOURCECODEID       UNIQUEIDENTIFIER,
+    @EMAILADDRESSENDDATE                DATE,
+    @CONSTITUENCIES                     XML,
+    @ADDRESS_STATEID                    UNIQUEIDENTIFIER,
+    @ADDRESSES                          XML,
+    @PHONES                             XML,
+    @EMAILS                             XML
+)
+as
+
+	set nocount on;
+  
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	declare @CURRENTDATE datetime
+	set @CURRENTDATE = getdate()
+
+	begin try
+  
+    set @CONSTITUENTLOOKUPID = @LOOKUPID;
+    
+    select 
+        @CONSTITUENTID=ID
+    from dbo.CONSTITUENT c
+    where 
+        c.LOOKUPID=@CONSTITUENTLOOKUPID;
+
+    declare @HASUMAFFILIATION bit;
+    
+    /* Get flag to indication constituent's affiliation to U-M Faculty, Staff or 
+       Board Member or spouse of a U-M Faculty, Staff or Board Member */
+    exec dbo.USP_USR_UMHS_HASUMAFFILIATION @CONSTITUENTID=@CONSTITUENTID, @HASUMAFFILIATION=@HASUMAFFILIATION OUTPUT;
+  
+    /*
+    * Only updating the Constituent IDs and leaving the imported data unchanged.
+    */
+    update dbo.USR_UMHS_BATCH
+    set
+		     CONSTITUENTLOOKUPID = @CONSTITUENTLOOKUPID
+        ,CONSTITUENTID = @CONSTITUENTID
+        ,HASUMAFFILIATION=@HASUMAFFILIATION
+        ,CHANGEDBYID = @CHANGEAGENTID
+        ,DATECHANGED = @CURRENTDATE
+        /*
+        ,CONSTITUENTLOOKUPID = @CONSTITUENTLOOKUPID
+        ,CONSTITUENTID = @CONSTITUENTID
+        ,MRN = @MRN
+        ,CPISEQUENCE = @CPISEQUENCE
+        ,FIRSTNAME = @FIRSTNAME
+        ,MIDDLENAME = @MIDDLENAME
+        ,LASTNAME = @LASTNAME
+        ,BIRTHDATE = @BIRTHDATE
+        ,ADDRESSBLOCK = @ADDRESSBLOCK
+        ,CITY = @CITY
+        ,STATEID = @STATEID
+        ,POSTCODE = @POSTCODE
+        ,ADDRESSCOUNTRYID = @ADDRESSCOUNTRYID
+        ,ADDRESSTYPECODEID = @ADDRESSTYPECODEID
+        ,INFOSOURCECODEID = @INFOSOURCECODEID
+        ,HISTORICALSTARTDATE = @HISTORICALSTARTDATE
+        ,PHONE = @PHONE
+        ,PHONETYPECODEID = @PHONETYPECODEID
+        ,PHONE_COUNTRYID = @PHONE_COUNTRYID
+        ,PHONE_OTHER = @PHONE_OTHER
+        ,PHONE_OTHERTYPECODEID = @PHONE_OTHERTYPECODEID
+        ,PHONE_OTHER_COUNTRYID = @PHONE_OTHER_COUNTRYID
+        ,PHONESTARTDATE = @PHONESTARTDATE
+        ,EMAILADDRESS = @EMAILADDRESS
+        ,EMAILADDRESSTYPECODEID = @EMAILADDRESSTYPECODEID
+        ,EMAILADDRESSSTARTDATE = @EMAILADDRESSSTARTDATE
+        ,GENDERCODE = @GENDERCODE
+        */
+    where 
+    BATCHCONSTITUENTID = @ID
+	
+  end try
+	begin catch
+		exec dbo.USP_RAISE_ERROR
+		return 1
+	end catch
+
+return 0;
+				]]>
+			</c:CreateProcedureSQL>
+		</SaveImplementation>
+
+	</SPDataForm>
+
+	<!-- describe fields on the form, which correspond to parameters on the SP.  Note that system paramters 
+	like the record ID, DATALOADED, TSLONG, and CURRENTAPPUSERID need not be listed. -->
+	<FormMetaData xmlns="bb_appfx_commontypes">
+		<FormFields>
+      <FormField FieldID="CONSTITUENTID" DataType="Guid" Caption="Constituent" Hidden="false"/>
+      <FormField FieldID="BATCHCONSTITUENTID" DataType="Guid" Hidden="true" Caption="BATCHCONSTITUENTID"/>
+      <FormField FieldID="BATCHID" DataType="Guid" Hidden="true" Caption="BATCHID" ReadOnly="true" />
+      <FormField FieldID="SEQUENCE" Caption="Sequence" Required="true" Hidden="true" />
+      <!--Batch fields-->
+      <FormField FieldID="MRN" Caption="Medical Record Number (MRN)"  DataType="String" MaxLength="50" />
+      <FormField FieldID="CPISEQUENCE" Caption="CPI sequence" DataType="String" MaxLength="50" />
+      <FormField FieldID="CONSTITUENTLOOKUPID" Caption="Constituent Lookup ID" Description="Constituent's Lookup ID" DataType="String" MaxLength="200" />
+      <FormField FieldID="FIRSTNAME" Caption="First name" DataType="String" MaxLength="50"  />
+      <FormField FieldID="MIDDLENAME" Caption="Middle name" DataType="String" MaxLength="50" />
+      <FormField FieldID="LASTNAME" Caption="Last name" DataType="String" MaxLength="100"/>
+      <FormField FieldID="BIRTHDATE" Caption="Birth date" DataType="FuzzyDate" />
+      <FormField FieldID="ADDRESSBLOCK" Caption="Address" DataType="String" MaxLength="500" Category="Address"/>
+      <FormField FieldID="CITY" Caption="City" DataType="String" MaxLength="100"  Category="Address"/>
+      <FormField FieldID="STATEID" Caption="State" DataType="Guid"  Category="Address">
+        <SimpleDataList SimpleDataListID="cae6185d-898e-474f-84d1-dadaa4b63ad3" />
+      </FormField>
+      <FormField FieldID="POSTCODE" Caption="Post code" DataType="String" MaxLength="24"  Category="Address"/>
+      <!-- Default Country: United States -->
+      <FormField FieldID="ADDRESSCOUNTRYID" Caption="Address country" DataType="Guid"  Category="Address">
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <!-- Default code type for Address: "Home" -->
+      <FormField FieldID="ADDRESSTYPECODEID" Caption="Address type code" DataType="Guid" Category="Address">
+        <CodeTable CodeTableName="ADDRESSTYPECODE"/>
+      </FormField>
+      <!-- Default Infosource code: "Med/Hospital"-->
+      <FormField FieldID="INFOSOURCECODEID" Caption="Information source code" DataType="Guid" Category="Address" >
+        <CodeTable CodeTableName="INFOSOURCECODE"/>
+      </FormField>
+      <FormField FieldID="HISTORICALSTARTDATE" Description="Start date for Address, Phone, and Email Address" Caption="Historical start date" DataType="Date" Category="Address"/>
+      <FormField FieldID="PHONE" Caption="Phone" DataType="String" MaxLength="200" Category="Phone" />
+      <!-- Default code type for Phone Other: "Home" -->
+      <FormField FieldID="PHONETYPECODEID" Caption="Phone type code" DataType="Guid" Category="Phone">
+        <CodeTable CodeTableName="PHONETYPECODE"/>
+      </FormField>
+      <!-- Default Country: United States -->
+      <FormField FieldID="PHONE_COUNTRYID" Caption="Phone country" DataType="Guid"  Category="Phone" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONE_OTHER" Caption="Phone (other)" DataType="String" MaxLength="200" Category="Phone" />
+      <!-- Default code type for Phone Other: "Other" -->
+      <FormField FieldID="PHONE_OTHERTYPECODEID" Caption="Phone (other) type code" DataType="Guid" Category="Phone" >
+        <CodeTable CodeTableName="PHONETYPECODE"/>
+      </FormField>
+      <!-- Default Country: United States -->
+      <FormField FieldID="PHONE_OTHER_COUNTRYID" Caption="Phone (other) country" DataType="Guid"  Category="Phone" >
+        <SimpleDataList SimpleDataListID="5a7ceca8-d00f-497a-ba94-498520028f5c" />
+      </FormField>
+      <FormField FieldID="PHONESTARTDATE" Caption="Phone start date" DataType="Date" Category="Phone" />
+      <FormField FieldID="EMAILADDRESS" Caption="Email address" DataType="EmailAddress" Category="Email" />
+      <!-- Default code type for Email Address: "Home E-mail Address" -->
+      <FormField FieldID="EMAILADDRESSTYPECODEID" Caption="Email address type code" DataType="Guid" Category="Email" >
+        <CodeTable CodeTableName="EMAILADDRESSTYPECODE"/>
+      </FormField>
+      <FormField FieldID="EMAILADDRESSSTARTDATE" Caption="Email start date" DataType="Date" Category="Email" />
+      <FormField FieldID="GENDERCODE" Caption="Gender" DataType="TinyInt" DefaultValueText="0">
+        <ValueList>
+          <Items>
+            <Item>
+              <Value>0</Value>
+              <Label>Unknown</Label>
+            </Item>
+            <Item>
+              <Value>1</Value>
+              <Label>Male</Label>
+            </Item>
+            <Item>
+              <Value>2</Value>
+              <Label>Female</Label>
+            </Item>
+          </Items>
+        </ValueList>
+      </FormField>
+      <FormField FieldID="LOOKUPID" MaxLength="50" Caption="Lookupid" CaptionResourceKey="$$lookupid" />
+      <FormField FieldID="SUFFIXCODEID" DataType="Guid" Caption="Suffix" CaptionResourceKey="$$suffix" />
+      <FormField FieldID="TITLECODEID" DataType="Guid" Caption="Title" CaptionResourceKey="$$title" />
+      <FormField FieldID="MAIDENNAME" MaxLength="100" Caption="Maiden name" CaptionResourceKey="$$maiden_name" />
+      <FormField FieldID="NICKNAME" MaxLength="50" Caption="Nickname" CaptionResourceKey="$$nickname" />
+      <FormField FieldID="ADDRESSID" DataType="Guid" Caption="Address ID" CaptionResourceKey="$$address_id" />
+      <FormField FieldID="ADDRESS_ADDRESSBLOCK" MaxLength="150" Caption="Address" CaptionResourceKey="$$address" />
+      <FormField FieldID="ADDRESS_CITY" MaxLength="50" Caption="City" CaptionResourceKey="$$city" />
+      <FormField FieldID="ADDRESS_POSTCODE" MaxLength="12" Caption="ZIP" CaptionResourceKey="$$zip" />
+      <FormField FieldID="ADDRESS_COUNTRYID" DataType="Guid" Caption="Countryid" CaptionResourceKey="$$countryid" />
+      <FormField FieldID="PHONEID" DataType="Guid" Caption="Phone ID" CaptionResourceKey="$$phone_id" />
+      <FormField FieldID="PHONENUMBER" MaxLength="100" Caption="Phone" CaptionResourceKey="$$phone" />
+      <FormField FieldID="EMAILID" DataType="Guid" Caption="Email ID" CaptionResourceKey="$$email_id" />
+      <FormField FieldID="CREATEDON" DataType="Date" Caption="Created on" CaptionResourceKey="$$created_on" />
+      <FormField FieldID="DATECHANGED" DataType="Date" Caption="Date changed" CaptionResourceKey="$$date_changed" />
+      <FormField FieldID="SPOUSENAME" MaxLength="154" Caption="Spouse name" CaptionResourceKey="$$spouse_name" />
+      <FormField FieldID="SPOUSELOOKUPID" MaxLength="50" Caption="Spouse lookup ID" CaptionResourceKey="$$spouse_lookup_id" />
+      <FormField FieldID="SPOUSESTARTDATE" DataType="Date" Caption="Spouse start date" CaptionResourceKey="$$spouse_start_date" />
+      <FormField FieldID="SPOUSEENDDATE" DataType="Date" Caption="Spouse end date" CaptionResourceKey="$$spouse_end_date" />
+      <FormField FieldID="HOUSEHOLDNAME" MaxLength="154" Caption="Household name" CaptionResourceKey="$$household_name" />
+      <FormField FieldID="HOUSEHOLDLOOKUPID" MaxLength="50" Caption="Household lookup ID" CaptionResourceKey="$$household_lookup_id" />
+      <FormField FieldID="BUSINESSNAME" MaxLength="154" Caption="Business name" CaptionResourceKey="$$business_name" />
+      <FormField FieldID="BUSINESSLOOKUPID" MaxLength="50" Caption="Business lookup ID" CaptionResourceKey="$$business_lookup_id" />
+      <FormField FieldID="CONSTITUENTACTION" DataType="TinyInt" Hidden="true" Caption="CONSTITUENTACTION" />
+      <FormField FieldID="ADDRESSACTION" DataType="TinyInt" Hidden="true" Caption="ADDRESSACTION" />
+      <FormField FieldID="EMAILACTION" DataType="TinyInt" Hidden="true" Caption="EMAILACTION" />
+      <FormField FieldID="PHONEACTION" DataType="TinyInt" Hidden="true" Caption="PHONEACTION" />
+      <FormField FieldID="ISORGANIZATION" DataType="Boolean" Hidden="true" Caption="ISORGANIZATION" />
+      <FormField FieldID="INDUSTRYCODEID" DataType="Guid" Caption="Industry" CaptionResourceKey="$$industry">
+        <CodeTable CodeTableName="INDUSTRYCODE" />
+      </FormField>
+      <FormField FieldID="NUMEMPLOYEES" DataType="Integer" Caption="No. of employees" CaptionResourceKey="$$no_of_employees" />
+      <FormField FieldID="NUMSUBSIDIARIES" DataType="Integer" Caption="No. of subsidiary orgs" CaptionResourceKey="$$no_of_subsidiary_orgs" />
+      <FormField FieldID="MARITALSTATUSCODEID" DataType="Guid" Caption="Marital status" CaptionResourceKey="$$marital_status">
+        <CodeTable CodeTableName="MARITALSTATUSCODE" />
+      </FormField>
+      <FormField FieldID="DECEASED" DataType="Boolean" Caption="Is deceased" CaptionResourceKey="$$is_deceased" />
+      <FormField FieldID="DECEASEDDATE" DataType="FuzzyDate" Caption="Deceased date" CaptionResourceKey="$$deceased_date" />
+      <FormField FieldID="GIVESANONYMOUSLY" DataType="Boolean" Caption="Gives anonymously" CaptionResourceKey="$$gives_anonymously" />
+      <FormField FieldID="WEBADDRESS" DataType="WebAddress" Caption="Website" CaptionResourceKey="$$website" />
+      <FormField FieldID="ADDRESSHISTORICALSTARTDATE" DataType="Date" Caption="Address start date" CaptionResourceKey="$$address_start_date" />
+      <FormField FieldID="ADDRESSHISTORICALENDDATE" DataType="Date" Caption="Address end date" CaptionResourceKey="$$address_end_date" />
+      <FormField FieldID="ADDRESSDONOTMAIL" DataType="Boolean" Caption="Do not send mail to this address" CaptionResourceKey="$$do_not_send_mail_to_this_address" />
+      <FormField FieldID="ADDRESSDONOTMAILREASONCODEID" DataType="Guid" Caption="Do not mail reason" CaptionResourceKey="$$do_not_mail_reason">
+        <CodeTable CodeTableName="DONOTMAILREASONCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSSTARTDATE" DataType="MonthDay" Caption="Seasonal start date" CaptionResourceKey="$$seasonal_start_date" />
+      <FormField FieldID="ADDRESSENDDATE" DataType="MonthDay" Caption="Seasonal end date" CaptionResourceKey="$$seasonal_end_date" />
+      <FormField FieldID="ADDRESSINFOSOURCECODEID" DataType="Guid" Caption="Info source" CaptionResourceKey="$$info_source">
+        <CodeTable CodeTableName="INFOSOURCECODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSCOUNTYCODEID" DataType="Guid" Caption="County" CaptionResourceKey="$$county">
+        <CodeTable CodeTableName="COUNTYCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSDPC" Caption="DPC" CaptionResourceKey="$$dpc" />
+      <FormField FieldID="ADDRESSCART" Caption="CART" CaptionResourceKey="$$cart" />
+      <FormField FieldID="ADDRESSLOT" MaxLength="5" Caption="LOT" CaptionResourceKey="$$lot" />
+      <FormField FieldID="ADDRESSREGIONCODEID" DataType="Guid" Caption="Region" CaptionResourceKey="$$region">
+        <CodeTable CodeTableName="REGIONCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSCONGRESSIONALDISTRICTCODEID" DataType="Guid" Caption="Congressional district" CaptionResourceKey="$$congressional_district">
+        <CodeTable CodeTableName="CONGRESSIONALDISTRICTCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSSTATEHOUSEDISTRICTCODEID" DataType="Guid" Caption="State house district" CaptionResourceKey="$$state_house_district">
+        <CodeTable CodeTableName="STATEHOUSEDISTRICTCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSSTATESENATEDISTRICTCODEID" DataType="Guid" Caption="State senate district" CaptionResourceKey="$$state_senate_district">
+        <CodeTable CodeTableName="STATESENATEDISTRICTCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSLOCALPRECINCTCODEID" DataType="Guid" Caption="Local precinct" CaptionResourceKey="$$local_precinct">
+        <CodeTable CodeTableName="LOCALPRECINCTCODE" />
+      </FormField>
+      <FormField FieldID="ADDRESSCERTIFICATIONDATA" DataType="Integer" Caption="Certification data" CaptionResourceKey="$$certification_data" />
+      <FormField FieldID="ADDRESSLASTVALIDATIONATTEMPTDATE" DataType="Date" Caption="Last validation attempt date" CaptionResourceKey="$$last_validation_attempt_date" />
+      <FormField FieldID="ADDRESSOMITFROMVALIDATION" DataType="Boolean" Caption="Omit from validation" CaptionResourceKey="$$omit_from_validation" />
+      <FormField FieldID="ADDRESSVALIDATIONMESSAGE" MaxLength="200" Caption="Validation message" CaptionResourceKey="$$validation_message" />
+      <FormField FieldID="ADDRESSINFOSOURCECOMMENTS" MaxLength="256" Caption="Info source comments" CaptionResourceKey="$$info_source_comments" />
+      <FormField FieldID="PHONECOUNTRYID" DataType="Guid" Caption="Phone country" CaptionResourceKey="$$phone_country">
+        <SimpleDataList SimpleDataListID="c9649672-353d-42e8-8c25-4d34bbabfbba" />
+      </FormField>
+      <FormField FieldID="PHONESEASONALSTARTDATE" DataType="MonthDay" Caption="Seasonal start" CaptionResourceKey="$$seasonal_start" />
+      <FormField FieldID="PHONESEASONALENDDATE" DataType="MonthDay" Caption="Seasonal end" CaptionResourceKey="$$seasonal_end" />
+      <FormField FieldID="PHONEDONOTCALL" DataType="Boolean" Caption="Do not call this number" CaptionResourceKey="$$do_not_call_this_number" />
+      <FormField FieldID="PHONESTARTTIME" DataType="HourMinute" Caption="Call after" CaptionResourceKey="$$call_after" />
+      <FormField FieldID="PHONEENDTIME" DataType="HourMinute" Caption="Call before" CaptionResourceKey="$$call_before" />
+      <FormField FieldID="PHONEENDDATE" DataType="Date" Caption="Phone end date" CaptionResourceKey="$$phone_end_date" />
+      <FormField FieldID="PHONEINFOSOURCECODEID" DataType="Guid" Caption="Info source" CaptionResourceKey="$$info_source">
+        <CodeTable CodeTableName="INFOSOURCECODE" />
+      </FormField>
+      <FormField FieldID="EMAILADDRESSDONOTEMAIL" DataType="Boolean" Caption="Do not send email to this address" CaptionResourceKey="$$do_not_send_email_to_this_address" />
+      <FormField FieldID="EMAILADDRESSENDDATE" DataType="Date" Caption="Email address end date" CaptionResourceKey="$$email_address_end_date" />
+      <FormField FieldID="EMAILADDRESSINFOSOURCECODEID" DataType="Guid" Caption="Info source" CaptionResourceKey="$$info_source">
+        <CodeTable CodeTableName="INFOSOURCECODE" />
+      </FormField>
+      <FormField FieldID="DEFAULTCOUNTRYID" DataType="Guid" ReadOnly="true" Caption="DEFAULTCOUNTRYID" CaptionResourceKey="$$defaultcountryid" />
+      <FormField FieldID="CONSTITUENCIES" DataType="XML" Hidden="true" Caption="Constituencies">
+        <Collection Serialization="Attribute">
+          <Fields>
+            <FormField FieldID="CONSTITUENCYCODEID" DataType="Guid" Caption="Constituency" CaptionResourceKey="$$constituency" />
+            <FormField FieldID="ORIGINALCONSTITUENCYID" DataType="Guid" Caption="Original constituency" CaptionResourceKey="$$original_constituency" />
+            <FormField FieldID="DATEFROM" DataType="Date" Caption="Date from" CaptionResourceKey="$$date_from" />
+            <FormField FieldID="DATETO" DataType="Date" Caption="Date to" CaptionResourceKey="$$date_to" />
+          </Fields>
+        </Collection>
+      </FormField>
+      <FormField FieldID="ADDRESS_STATEID" DataType="Guid" Caption="State" CaptionResourceKey="$$state">
+        <SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7">
+          <Params>
+            <Param ID="COUNTRYID">
+              <Value>Fields!ADDRESS_COUNTRYID</Value>
+            </Param>
+          </Params>
+        </SimpleDataList>
+      </FormField>
+      <FormField FieldID="ADDRESSES" DataType="XML" Hidden="true">
+        <Collection>
+          <Fields>
+            <FormField FieldID="ADDRESSID" DataType="Guid" Caption="Address ID" CaptionResourceKey="$$address_id" />
+            <FormField FieldID="ADDRESSTYPECODEID" DataType="Guid" Caption="Address type code ID" CaptionResourceKey="$$address_type_code_id">
+              <CodeTable CodeTableName="ADDRESSTYPECODE" />
+            </FormField>
+            <FormField FieldID="ADDRESSBLOCK" Caption="Address block" CaptionResourceKey="$$address_block" />
+            <FormField FieldID="CITY" Caption="City" CaptionResourceKey="$$city" />
+            <FormField FieldID="STATEID" DataType="Guid" Caption="State" CaptionResourceKey="$$state">
+              <SimpleDataList SimpleDataListID="7fa91401-596c-4f7c-936d-6e41683121d7">
+                <Params>
+                  <Param ID="COUNTRYID">
+                    <Value>Fields!ADDRESS_COUNTRYID</Value>
+                  </Param>
+                </Params>
+              </SimpleDataList>
+            </FormField>
+            <FormField FieldID="POSTCODE" Caption="ZIP/Postal Code" CaptionResourceKey="$$zip/postal_code" />
+            <FormField FieldID="STARTDATE" DataType="MonthDay" Caption="Start date" CaptionResourceKey="$$start_date" />
+            <FormField FieldID="ENDDATE" DataType="MonthDay" Caption="End date" CaptionResourceKey="$$end_date" />
+            <FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Is primary" CaptionResourceKey="$$is_primary" />
+            <FormField FieldID="COUNTRYID" DataType="Guid" Caption="Countryid" CaptionResourceKey="$$countryid" />
+            <FormField FieldID="FULLADDRESS" Caption="Full address" CaptionResourceKey="$$full_address" />
+            <FormField FieldID="LASTUPDATED" DataType="Date" Caption="Last updated" CaptionResourceKey="$$last_updated" />
+            <FormField FieldID="HISTORICALSTARTDATE" DataType="Date" Caption="Start" CaptionResourceKey="$$start" />
+            <FormField FieldID="HISTORICALENDDATE" DataType="Date" Caption="End" CaptionResourceKey="$$end" />
+          </Fields>
+        </Collection>
+      </FormField>
+      <FormField FieldID="PHONES" DataType="XML" Hidden="true">
+        <Collection>
+          <Fields>
+            <FormField FieldID="PHONEID" DataType="Guid" Caption="Phone ID" CaptionResourceKey="$$phone_id" />
+            <FormField FieldID="PHONETYPECODEID" DataType="Guid" Caption="Phone type code ID" CaptionResourceKey="$$phone_type_code_id">
+              <CodeTable CodeTableName="PHONETYPECODE" />
+            </FormField>
+            <FormField FieldID="PHONENUMBER" Caption="Phone number" CaptionResourceKey="$$phone_number" ApplyPhoneFormatting="true" />
+            <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" CaptionResourceKey="$$start_date" />
+            <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" CaptionResourceKey="$$end_date" />
+            <FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Is primary" CaptionResourceKey="$$is_primary" />
+            <FormField FieldID="LASTUPDATED" DataType="Date" Caption="Last updated" CaptionResourceKey="$$last_updated" />
+          </Fields>
+        </Collection>
+      </FormField>
+      <FormField FieldID="EMAILS" DataType="XML" Hidden="true">
+        <Collection>
+          <Fields>
+            <FormField FieldID="EMAILADDRESSID" DataType="Guid" Caption="Email address ID" CaptionResourceKey="$$email_address_id" />
+            <FormField FieldID="EMAILADDRESSTYPECODEID" DataType="Guid" Caption="Email address type code id" CaptionResourceKey="$$email_address_type_code_id">
+              <CodeTable CodeTableName="EMAILADDRESSTYPECODE" />
+            </FormField>
+            <FormField FieldID="EMAILADDRESS" DataType="EmailAddress" Caption="Email address" CaptionResourceKey="$$email_address" />
+            <FormField FieldID="STARTDATE" DataType="Date" Caption="Start date" CaptionResourceKey="$$start_date" />
+            <FormField FieldID="ENDDATE" DataType="Date" Caption="End date" CaptionResourceKey="$$end_date" />
+            <FormField FieldID="ISPRIMARY" DataType="Boolean" Caption="Is primary" CaptionResourceKey="$$is_primary" />
+            <FormField FieldID="LASTUPDATED" DataType="Date" Caption="Last updated" CaptionResourceKey="$$last_updated" />
+          </Fields>
+        </Collection>
+      </FormField>
+
+
+    </FormFields>
+	</FormMetaData>
+</EditDataFormTemplateSpec>

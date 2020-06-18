@@ -1,0 +1,42 @@
+﻿<PageDefinitionSpec 
+    xmlns="bb_appfx_pagedefinition" 
+    xmlns:c="bb_appfx_commontypes"
+    ID="a693f390-4dfc-4566-bcc3-751422fa2c1f"
+    Name="MIMED History Report"
+    Description="A page for displaying information about mimed history records"
+    Author="UM Dev"
+    ContextRecordType="MIMED Data"	
+    >
+
+	<!-- Note:  A page can optionally have a view form associated with it as the "Expression form".  While implemented as a view data form,
+	this form has no UI in this context, and is simply used as a way of loading additional information associated with the page.  The fields
+	returned by the expression form can be used as expressions in various properties throughout the page.  To specify an expression form for this
+	page, add the following attribute:		ExpressionDataFormID="<some guid>"-->
+
+	<!-- define how the page header should appear -->
+	<PageHeader Caption="UM MIMED History Report"  />
+
+	<!-- define the tabs for the page - note that if only one tab is present, then that tab's sections are promoted to the page level (ie., the tab
+	itself isn't shown -->
+	<Tabs>
+		<Tab ID="d5cd6b87-1bcb-43a4-a1f6-6ae17d830f44" Caption="MIMED History Report">
+
+			<!-- define the sections for this tab -->
+			<Sections>
+				<Section ID="6a467cc9-1389-427d-a9b5-b4e5405f44ce" >
+          <Report ID="9702af99-888a-43d0-940c-e65a98ea4a46" DisplayPromptArea="true" AutoLoad="true" >
+            <ParameterValues>
+              <ParameterValue ID="UMHSID" xmlns="bb_appfx_commontypes">
+                <Value>
+                  <PageContextID />
+                </Value>
+              </ParameterValue>
+            </ParameterValues>
+          </Report>
+				</Section>
+			</Sections>
+		</Tab>
+	</Tabs>
+
+	
+</PageDefinitionSpec>

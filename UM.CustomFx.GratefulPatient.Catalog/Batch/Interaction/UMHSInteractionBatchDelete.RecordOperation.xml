@@ -1,0 +1,36 @@
+<RecordOperationSpec 
+    xmlns:c="bb_appfx_commontypes"
+    ID="4D242803-028E-4128-812F-76D387893E87"
+    Name="MIMED Interaction Batch Delete"
+    Description="Used to delete the given MIMED Interaction Batch"
+    Author="UM Dev"
+    RecordType="MIMED Interaction Batch"
+    OperationType="Delete"
+    c:SecurityUIFolder="MIMED Data"
+    xmlns="bb_appfx_recordoperation"
+    >
+    <SPRecord>
+        <SPOperationImplementation SPName="USR_USP_UMHS_INTERACTIONBATCH_DELETE">
+            <c:CreateProcedureSQL>
+            <![CDATA[
+            create procedure dbo.USR_USP_UMHS_INTERACTIONBATCH_DELETE
+            (
+	            @ID uniqueidentifier,
+	            @CHANGEAGENTID uniqueidentifier
+            )
+            as begin
+	            --check deletion rules, if any
+
+	            -- use the system generated delete routine to allow proper recording of the deleting agent
+	            exec USP_USR_UMHS_INTERACTIONBATCH_DELETEBYID_WITHCHANGEAGENTID @ID, @CHANGEAGENTID
+	            return 0;
+	
+            end
+            ]]>
+            </c:CreateProcedureSQL>
+        </SPOperationImplementation>
+    </SPRecord>
+    <Prompt>
+        <StandardPrompt Text="Are you sure you want to delete this MIMED Interaction Batch record?" />
+    </Prompt>
+</RecordOperationSpec>

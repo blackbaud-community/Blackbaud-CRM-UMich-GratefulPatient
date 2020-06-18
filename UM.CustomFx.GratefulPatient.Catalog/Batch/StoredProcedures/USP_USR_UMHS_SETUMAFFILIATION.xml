@@ -1,0 +1,77 @@
+﻿<SQLStoredProcedureSpec 
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="e90f1757-8e6d-41da-a7be-a2f0b68ae28a"
+	Name="USP_USR_UMHS_SETUMAFFILIATION"
+	Description="Sets the Contact's MRN and associated Constituent on the USR_UMHS_BATCH_UMAFFILIATION table."
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_SETUMAFFILIATION" 
+  GrantServiceRolePermission="true"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_SETUMAFFILIATION
+(
+   @CONSTITUENTID uniqueidentifier
+  ,@MRN nvarchar(50)
+  ,@CHANGEAGENTID uniqueidentifier=null
+)
+as
+set nocount on;
+begin
+	declare @HASUMAFFILIATION bit;
+  declare @CONTACT_MRN nvarchar(50);
+  declare @CONTACT_CONSTITUENTID uniqueidentifier;
+  declare @CURRDATE datetime;
+
+  set @CURRDATE = getdate();
+
+  if @CHANGEAGENTID is null  
+    exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @ID=@CHANGEAGENTID output;
+		
+  set @MRN=ltrim(rtrim(isnull(@MRN, N'')));
+  
+  -- Exit if there isn't an MRN value
+  if 0 = LEN(@MRN) return;
+  
+  -- Exit is not an existing individual constituent
+  if not exists(select 1 from CONSTITUENT where ID=@CONSTITUENTID and ISORGANIZATION=0 AND ISGROUP=0 AND ISCONSTITUENT=1) return; 
+
+  -- Get the U-M affiliation for the Constituent
+  exec dbo.USP_USR_UMHS_HASUMAFFILIATION @CONSTITUENTID=@CONSTITUENTID, @HASUMAFFILIATION=@HASUMAFFILIATION OUTPUT;
+  
+  if exists(select 1 from USR_UMHS_BATCH_UMAFFILIATION where MRN=@MRN)
+  begin
+    -- Update U-M Affiliation for the existing Contact's MRN
+    update USR_UMHS_BATCH_UMAFFILIATION 
+    set 
+       CONSTITUENTID=@CONSTITUENTID
+      ,HASUMAFFILIATION=@HASUMAFFILIATION
+      ,ADDEDBYID=@CHANGEAGENTID
+      ,CHANGEDBYID=@CHANGEAGENTID
+      ,DATEADDED=@CURRDATE
+      ,DATECHANGED=@CURRDATE
+    where 
+      MRN=@MRN;
+  end
+  else
+  begin
+    -- Add Contact to the U-M Affiliation table
+    insert into USR_UMHS_BATCH_UMAFFILIATION (ID, MRN, CONSTITUENTID, HASUMAFFILIATION, ADDEDBYID, CHANGEDBYID, DATEADDED, DATECHANGED)
+    VALUES(
+       NEWID()
+      ,@MRN
+      ,@CONSTITUENTID
+      ,@HASUMAFFILIATION
+      ,@CHANGEAGENTID
+      ,@CHANGEAGENTID
+      ,@CURRDATE
+      ,@CURRDATE);
+  end
+
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

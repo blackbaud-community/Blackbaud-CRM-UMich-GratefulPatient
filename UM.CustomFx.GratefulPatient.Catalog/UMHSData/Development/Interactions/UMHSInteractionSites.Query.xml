@@ -1,0 +1,122 @@
+﻿<QueryViewSpec
+	xmlns="bb_appfx_queryview"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="d9ed24f6-adfe-4aba-8b76-57aa5d85a25e"
+	Name="MIMED Interaction Sites Query"
+	Description="A view defined for querying on MIMED interaction sites records"
+	Author="UM Dev"
+	IsRoot="true"
+	PrimaryKeyField="ID"
+	RecordType="MIMED Data"
+	c:SecurityUIFolder="MIMED Data"
+	>
+  <ResourceFile AssemblyName="Blackbaud.AppFx.Constituent.Catalog.dll" ClassName="Blackbaud.AppFx.Constituent.Catalog.InteractionSite.Query" />
+
+  <!-- define the view used to return data for the query -->
+	<ViewImplementation ViewName="USR_V_QUERY_UMHSINTERACTIONSITES">
+		<ViewSQL>
+			<![CDATA[
+          SELECT 
+             INTERACTIONSITE.ID,
+             INTERACTIONSITE.INTERACTIONID,
+             --I.SITEID,
+             SITE.NAME               AS SITE,              
+             ADDEDBY.APPLICATIONNAME as ADDEDBY_APPLICATION,
+             ADDEDBY.USERNAME as ADDEDBY_USERNAME,
+             CHANGEDBY.APPLICATIONNAME as CHANGEDBY_APPLICATION,
+             CHANGEDBY.USERNAME as CHANGEDBY_USERNAME,
+             INTERACTIONSITE.DATEADDED,
+             INTERACTIONSITE.DATECHANGED,
+             INTERACTIONSITE.TSLONG,
+              SITE.ID as SITEID,
+              SITE.DESCRIPTION as SITEDESCRIPTION,
+              SITE.SHORTNAME as SITESHORTNAME,
+              SITE.SITEID as SITESITEID,
+              SITE.ACRONYM as SITEACRONYM,
+              SITETYPECODE.DESCRIPTION as SITETYPECODE,
+              SITE.SITEPATH,
+              [SITE].[SITETYPECODEID]
+            from dbo.USR_UMHS_INTERACTIONSITE INTERACTIONSITE
+              inner join
+                (
+                  select
+                    SITE.ID,
+                    SITE.DESCRIPTION,
+                    SITE.SHORTNAME,
+                    SITE.SITEID,
+                    SITE.ACRONYM,
+                    SITE.NAME,
+                    SITE.SITETYPECODEID,
+                    UFN_SITE_GETPATH_BULK.SITEPATH
+                  from dbo.SITE
+                  cross apply dbo.UFN_SITE_GETPATH_BULK(SITE.ID)
+                  where UFN_SITE_GETPATH_BULK.ID = SITE.ID
+                ) as SITE on SITE.ID = INTERACTIONSITE.SITEID
+              left join dbo.SITETYPECODE on SITE.SITETYPECODEID = SITETYPECODE.ID
+              left join dbo.CHANGEAGENT as ADDEDBY ON ADDEDBY.ID = INTERACTIONSITE.ADDEDBYID
+              left join dbo.CHANGEAGENT as CHANGEDBY ON CHANGEDBY.ID = INTERACTIONSITE.CHANGEDBYID
+             
+			]]>
+		</ViewSQL>
+	</ViewImplementation>
+
+  <!-- describe each field in the view output -->
+  <Output>
+    <OutputFields>
+      <OutputField Caption="System record ID" Name="ID" Category="System Fields" CaptionResourceKey="$$system_record_id" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="Interaction ID" Name="INTERACTIONID" Category="System Fields" IsHidden="true" CaptionResourceKey="$$interaction_id" CategoryResourceKey="$$system_fields" />
+      <OutputField Caption="Name" Name="SITE" Category="Site Record" CaptionResourceKey="$$name" CategoryResourceKey="$$site_record">
+        <LookupInfo IDField="SITEID">
+          <SimpleDataList SimpleDataListID="C8E8D3BA-2725-421f-A796-E2FCC1202780" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADDEDBY_APPLICATION" Caption="Added by application" Category="System Fields" CaptionResourceKey="$$added_by_application" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="37E3E458-AF0D-4dbc-8A18-A93885521A42" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="ADDEDBY_USERNAME" Caption="Added by user name" Category="System Fields" CaptionResourceKey="$$added_by_user_name" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="CEA15E1C-E455-41be-9ECF-6B5453FA96A4" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="CHANGEDBY_APPLICATION" Caption="Changed by application" Category="System Fields" CaptionResourceKey="$$changed_by_application" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="37E3E458-AF0D-4dbc-8A18-A93885521A42" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="CHANGEDBY_USERNAME" Caption="Changed by user name" Category="System Fields" CaptionResourceKey="$$changed_by_user_name" CategoryResourceKey="$$system_fields">
+        <LookupInfo>
+          <SimpleDataList SimpleDataListID="CEA15E1C-E455-41be-9ECF-6B5453FA96A4" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="DATEADDED" Caption="Date added" Category="System Fields" CaptionResourceKey="$$date_added" CategoryResourceKey="$$system_fields" />
+      <OutputField Name="DATECHANGED" Caption="Date changed" Category="System Fields" CaptionResourceKey="$$date_changed" CategoryResourceKey="$$system_fields" />
+      <OutputField Name="TSLONG" Caption="Timestamp value" Category="System Fields" IsHidden="true" CaptionResourceKey="$$timestamp_value" CategoryResourceKey="$$system_fields" />
+      <OutputField Name="SITEID" Caption="Site record" Category="Site Record" DataType="Guid" CaptionResourceKey="$$site_record0" CategoryResourceKey="$$site_record">
+        <LookupInfo>
+          <SearchList ID="27a63ede-a0d4-4074-a85a-196df4adc0dd" />
+        </LookupInfo>
+        <Hierarchy TableName="SITE" IdentifyingColumnName="ID" MatchingColumnName="ID" />
+      </OutputField>
+      <OutputField Name="SITEDESCRIPTION" Caption="Description" Category="Site Record" CaptionResourceKey="$$description" CategoryResourceKey="$$site_record" />
+      <OutputField Name="SITESHORTNAME" Caption="Short name" Category="Site Record" CaptionResourceKey="$$short_name" CategoryResourceKey="$$site_record" />
+      <OutputField Name="SITESITEID" Caption="Site ID" Category="Site Record" CaptionResourceKey="$$site_id" CategoryResourceKey="$$site_record" />
+      <OutputField Name="SITEACRONYM" Caption="Acronym" Category="Site Record" CaptionResourceKey="$$acronym" CategoryResourceKey="$$site_record" />
+      <OutputField Name="SITETYPECODE" Caption="Site type" Category="Site Record" CaptionResourceKey="$$site_type" CategoryResourceKey="$$site_record">
+        <LookupInfo IDField="SITETYPECODEID">
+          <CodeTable CodeTableName="SITETYPECODE" IncludeInactive="true" />
+        </LookupInfo>
+      </OutputField>
+      <OutputField Name="SITEPATH" Caption="Site path" Category="Site Record" CaptionResourceKey="$$site_path" CategoryResourceKey="$$site_record" />
+      <OutputField Name="SITETYPECODEID" Caption="Site type code ID" DataType="Guid" IsHidden="true" CaptionResourceKey="$$site_type_code_id" />
+    </OutputFields>
+    <IdentifyingFields>
+      <IdentifyingField Name="SITE" />
+    </IdentifyingFields>
+  </Output>
+  <RelationshipOperations>
+    <AddToParentView Cardinality="OneToMany" PathAlias="Sites" Field="INTERACTIONID" ParentView="USR_V_QUERY_UMHSINTERACTION" ParentViewRelatedField="ID" />
+  </RelationshipOperations>
+</QueryViewSpec>
+

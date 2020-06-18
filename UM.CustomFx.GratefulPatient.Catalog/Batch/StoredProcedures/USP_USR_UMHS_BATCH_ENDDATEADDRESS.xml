@@ -1,0 +1,47 @@
+﻿<SQLStoredProcedureSpec
+	xmlns="bb_appfx_sqlstoredprocedure"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="0c446732-2d07-49f4-911e-15f81e5d8410"
+	Name="End date MIMED Data address"
+	Description="End date MIMED Data address"
+	Author="UM Dev"
+	SPName="USP_USR_UMHS_BATCH_ENDDATEADDRESS"
+	>
+
+	<CreateProcedureSQL>
+		<![CDATA[
+create procedure dbo.USP_USR_UMHS_BATCH_ENDDATEADDRESS
+(
+   @ID uniqueidentifier
+  ,@ENDDATE datetime
+  ,@REASONCODEID uniqueidentifier = null
+  ,@CHANGEAGENTID uniqueidentifier = null
+)
+as
+begin
+
+  set nocount on;
+  
+  declare @CURRENTDATE datetime
+  
+	if @CHANGEAGENTID is null  
+		exec dbo.USP_CHANGEAGENT_GETORCREATECHANGEAGENT @CHANGEAGENTID output
+				
+	set @CURRENTDATE = getdate()
+  
+  update dbo.USR_UMHS_ADDRESS 
+  set
+     ISPRIMARY=0
+    ,DONOTMAILREASONCODEID=@REASONCODEID
+    ,DONOTMAIL = 1
+    ,HISTORICALENDDATE=@ENDDATE
+    ,CHANGEDBYID=@CHANGEAGENTID
+    ,DATECHANGED=@CURRENTDATE
+  where
+    ID=@ID
+    
+end
+		]]>
+	</CreateProcedureSQL>
+
+</SQLStoredProcedureSpec>

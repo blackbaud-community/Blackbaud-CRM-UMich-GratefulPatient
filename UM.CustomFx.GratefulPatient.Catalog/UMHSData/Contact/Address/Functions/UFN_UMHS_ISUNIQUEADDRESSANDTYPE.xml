@@ -1,0 +1,50 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="5f25a126-3182-4475-af1c-94c6ecb26f9d"
+	Name="USR_UFN_UMHS_ISUNIQUEADDRESSANDTYPE"
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_ISUNIQUEADDRESSANDTYPE"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_ISUNIQUEADDRESSANDTYPE
+(
+  @UMHSID uniqueidentifier = null,
+	@ADDRESSBLOCK nvarchar(500) = '',
+  @CITY nvarchar(50) = '',
+  @STATEID uniqueidentifier = null,
+  @POSTCODE nvarchar(12) = '',
+  @COUNTRYID uniqueidentifier = null,
+	@ADDRESSTYPECODEID uniqueidentifier = null
+)
+returns bit with execute as caller
+as 
+begin
+  DECLARE @ADDRESSCOUNT INT = 0;
+  DECLARE @ISUNIQUE BIT = 1;
+  
+  SELECT 
+    @ADDRESSCOUNT=COUNT(1)
+  FROM USR_UMHS_ADDRESS
+  WHERE
+      UMHSID=@UMHSID
+  AND ADDRESSBLOCK=@ADDRESSBLOCK
+  AND CITY=@CITY
+  AND STATEID=@STATEID
+  AND COUNTRYID=@COUNTRYID
+  AND POSTCODE=@POSTCODE
+  AND ADDRESSTYPECODEID=@ADDRESSTYPECODEID
+  AND NULLIF(isnull(HISTORICALENDDATE, ''), '') is NULL  
+  
+  IF @ADDRESSCOUNT > 1
+    SET @ISUNIQUE=0;
+    
+  return @ISUNIQUE;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

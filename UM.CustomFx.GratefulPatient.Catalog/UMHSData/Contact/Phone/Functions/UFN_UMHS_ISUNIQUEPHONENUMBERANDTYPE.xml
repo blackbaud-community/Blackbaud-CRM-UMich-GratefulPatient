@@ -1,0 +1,42 @@
+﻿<SQLFunctionSpec
+	xmlns="bb_appfx_sqlfunction"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="b340d877-4d53-4b12-becf-9e46d13f3a06"
+	Name="USR_UFN_UMHS_ISUNIQUEPHONENUMBERANDTYPE"
+	Description="REPLACE_WITH_DESCRIPTION"
+	Author="UM Dev"
+	DBFunctionName="USR_UFN_UMHS_ISUNIQUEPHONENUMBERANDTYPE"
+	>
+
+	<CreateFunctionSQL>
+		<![CDATA[
+create function dbo.USR_UFN_UMHS_ISUNIQUEPHONENUMBERANDTYPE
+(
+  @UMHSID uniqueidentifier = null,
+	@NUMBER nvarchar(100) = '',
+	@PHONETYPECODEID uniqueidentifier = null
+)
+returns bit with execute as caller
+as 
+begin
+  DECLARE @NUMBERCOUNT INT = 0;
+  DECLARE @ISUNIQUE BIT = 1;
+  
+  SELECT 
+    @NUMBERCOUNT=COUNT(1)
+  FROM USR_UMHS_PHONE
+  WHERE
+      UMHSID=@UMHSID
+  AND NUMBER=@NUMBER
+  AND PHONETYPECODEID=@PHONETYPECODEID
+  AND NULLIF(isnull(ENDDATE, ''), '') is NULL  
+  
+  IF @NUMBERCOUNT > 1
+    SET @ISUNIQUE=0;
+    
+  return @ISUNIQUE;
+end
+		]]>
+	</CreateFunctionSQL>
+
+</SQLFunctionSpec>

@@ -1,0 +1,44 @@
+﻿<TableSpec 
+	xmlns="bb_appfx_table"
+	xmlns:c="bb_appfx_commontypes" 
+	ID="5ab5a4cd-2a9f-4b71-84e1-eeb567d96d57"
+	Name="MIMED Sub Department"
+	Description="Stores information about MIMED subdepartment records"
+	Author="UM Dev"
+	Tablename="USR_UMHS_SUBDEPARTMENT"		   
+	IsBuiltIn="false"
+	>
+
+	<!-- define fields on the table -->
+  <Fields>
+    <ForeignKeyField Name="DEPARTMENTID" Required="true" ForeignFieldName="ID"  ForeignTable="USR_UMHS_DEPARTMENT" OnDelete="CascadeDelete" />
+    <TextField Name="NAME" Length="100" Required="true" />
+    <SequenceField Description="Stores the user-defined sequence for subcategory." Name="SEQUENCE" />
+    <BooleanField Description="Indicates whether or not the record is active." Name="ISINACTIVE" />
+  </Fields>
+  <Indexes>
+    <Index IsUnique="true">
+      <IndexFields>
+        <IndexField Name="DEPARTMENTID" />
+        <IndexField Name="NAME" />
+      </IndexFields>
+    </Index>
+  </Indexes>
+  <!--<Triggers>
+    <Trigger Name="TR_SUBDEPARTMENT_T2BDELETE" Enabled="false">
+      <CreateTriggerSQL>
+        <![CDATA[
+                create trigger TR_SUBDEPARTMENT_T2BDELETE on dbo.USR_UMHS_DEPARTMENT after delete not for replication
+                as begin
+                /* TAIntegration data sync*/
+                if dbo.UFN_B2T_CONTEXTISSYNC() = 1
+                update dbo.B2TROWS
+                set SYNCSTATUSCODE = 11
+                where BBECID in(select ID from DELETED)
+                and BBECTABLE = 'USR_UMHS_SUBDEPARTMENT'
+                end
+        ]]>
+      </CreateTriggerSQL>
+    </Trigger>
+  </Triggers>-->
+</TableSpec>
